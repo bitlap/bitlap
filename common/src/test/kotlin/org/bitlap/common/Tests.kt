@@ -16,5 +16,5 @@ fun main() {
     rbm.add(2)
     rbm.add(3)
 
-    println(rbm.cardinality)
+    println(rbm.getCardinality())
 }

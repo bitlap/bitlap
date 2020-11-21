@@ -37,7 +37,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
 
   int size = 0;
 
-  protected RoaringArray() {
+  public RoaringArray() {
     this(INITIAL_CAPACITY);
   }
 
@@ -960,7 +960,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
     this.values[i] = c;
   }
 
-  protected int size() {
+ public int size() {
     return this.size;
   }
 

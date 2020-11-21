@@ -1050,7 +1050,7 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
     return answer;
   }
 
-  RoaringArray highLowContainer = null;
+  protected RoaringArray highLowContainer = null;
 
   /**
    * Create an empty bitmap

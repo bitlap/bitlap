@@ -51,6 +51,7 @@ public abstract class Container implements Iterable<Character>, Cloneable, Exter
    * @param x short to be added
    * @return the new container
    */
+  @Override
   public abstract Container add(char x);
 
   /**
@@ -828,6 +829,7 @@ public abstract class Container implements Iterable<Character>, Cloneable, Exter
    *
    * @return the new container
    */
+  @Override
   public abstract Container runOptimize();
 
   /**

@@ -31,9 +31,9 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
   static final int INITIAL_CAPACITY = 4;
 
 
-  char[] keys = null;
+  public char[] keys = null;
 
-  Container[] values = null;
+  public Container[] values = null;
 
   int size = 0;
 
@@ -119,7 +119,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
     size++;
   }
 
-  void append(RoaringArray roaringArray) {
+  public void append(RoaringArray roaringArray) {
     assert size == 0 || roaringArray.size == 0
             || keys[size - 1] < roaringArray.keys[0];
     if (roaringArray.size != 0 && size != 0) {
@@ -141,7 +141,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
    * @param sa other array
    * @param beforeStart given key is the largest key that we won't copy
    */
-  void appendCopiesAfter(RoaringArray sa, char beforeStart) {
+  public void appendCopiesAfter(RoaringArray sa, char beforeStart) {
     int startLocation = sa.getIndex(beforeStart);
     if (startLocation >= 0) {
       startLocation++;
@@ -181,7 +181,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
    * @param sa other array
    * @param index index in the other array
    */
-  void appendCopy(RoaringArray sa, int index) {
+  public void appendCopy(RoaringArray sa, int index) {
     extendArray(1);
     this.keys[this.size] = sa.keys[index];
     this.values[this.size] = sa.values[index].clone();
@@ -195,7 +195,7 @@ public final class RoaringArray implements Cloneable, Externalizable, Appendable
    * @param startingIndex starting index in the other array
    * @param end endingIndex (exclusive) in the other array
    */
-  void appendCopy(RoaringArray sa, int startingIndex, int end) {
+  public void appendCopy(RoaringArray sa, int startingIndex, int end) {
     extendArray(end - startingIndex);
     for (int i = startingIndex; i < end; ++i) {
       this.keys[this.size] = sa.keys[i];

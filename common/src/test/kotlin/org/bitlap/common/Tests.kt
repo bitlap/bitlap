@@ -11,10 +11,14 @@ import org.bitlap.common.bitmap.RBM
  */
 fun main() {
 
-    val rbm = RBM()
-    rbm.add(1)
-    rbm.add(2)
-    rbm.add(3)
+    val rbm = RBM(1, 10000000)
+    println(rbm.getCount())
+    println(RBM(rbm.getBytes()).getCount())
 
-    println(rbm.getCardinality())
+    val splits = rbm.split(10)
+    println(splits.size)
+    val rbmR = splits.values.fold(RBM()) { a, b ->
+        a.or(b)
+    }
+    println(rbmR.getCount())
 }

@@ -4,7 +4,7 @@ import java.io.ObjectInput
 import java.io.ObjectOutput
 
 /**
- * Desc:
+ * Desc: Abstract of [BM]
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa

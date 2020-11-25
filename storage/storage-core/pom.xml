@@ -6,14 +6,15 @@
         <groupId>org.bitlap</groupId>
         <artifactId>bitlap</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitlap-common</artifactId>
-
+    <artifactId>storage-core</artifactId>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     </build>
+
 </project>

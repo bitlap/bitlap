@@ -1,8 +1,11 @@
 package org.bitlap.common.bitmap
 
+import org.bitlap.common.Versions
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
+import java.io.ByteArrayInputStream
+import java.io.DataInputStream
 import java.nio.ByteBuffer
 
 /**
@@ -13,10 +16,10 @@ import java.nio.ByteBuffer
  * Created by IceMimosa
  * Date: 2020/11/16
  */
-open class RBM : AbsBM<RBM> {
+open class RBM : AbsBM {
 
     /**
-     * native data structure: RoaringBitmaps
+     * native data structure: RoaringBitmap
      */
     private var _rbm: RoaringBitmap = RoaringBitmap()
 
@@ -24,8 +27,7 @@ open class RBM : AbsBM<RBM> {
     constructor(rbm: RoaringBitmap?, copy: Boolean = false) {
         if (rbm != null) {
             _rbm = doIf(copy, rbm) {
-                _rbm.or(it)
-                _rbm
+                it.clone()
             }
         }
     }
@@ -35,7 +37,7 @@ open class RBM : AbsBM<RBM> {
     constructor(dat: IntArray) {
         _rbm.add(*dat)
     }
-    constructor(rangeStart: Int, rangeEnd: Int) {
+    constructor(rangeStart: Long, rangeEnd: Long) {
         _rbm.add(rangeStart, rangeEnd)
     }
 
@@ -63,27 +65,8 @@ open class RBM : AbsBM<RBM> {
         this.also { _rbm.add(rangeStart, rangeEnd) }
     }
 
-    /**
-     * Base operate functions
-     */
-    override fun and(bm: BM<RBM>): RBM = resetModify {
-        this.also { _rbm.and(bm.getNativeRBM()) }
-    }
-
-    override fun andNot(bm: BM<RBM>): RBM = resetModify {
-        this.also { _rbm.andNot(bm.getNativeRBM()) }
-    }
-
-    override fun or(bm: BM<RBM>): RBM = resetModify {
-        this.also { _rbm.or(bm.getNativeRBM()) }
-    }
-
-    override fun xor(bm: BM<RBM>): RBM = resetModify {
-        this.also { _rbm.xor(bm.getNativeRBM()) }
-    }
-
-    override fun orNot(bm: BM<RBM>, rangeEnd: Long): RBM = resetModify {
-        this.also { _rbm.orNot(bm.getNativeRBM(), rangeEnd) }
+    fun remove(dat: Int): RBM = resetModify {
+        this.also { _rbm.remove(dat) }
     }
 
     override fun repair(): RBM = doIf(modified, this) {
@@ -92,10 +75,11 @@ open class RBM : AbsBM<RBM> {
             modified = false
         }
     }
-    override fun getNativeRBM(): RoaringBitmap = _rbm
+    override fun getRBM(): RBM = this.also { it.repair() }
+    fun getNativeRBM(): RoaringBitmap = _rbm
     override fun getCountUnique(): Long = _rbm.longCardinality
     override fun getCount(): Long = _rbm.longCardinality
-    override fun getSizeInBytes(): Long = _rbm.longSizeInBytes
+    override fun getSizeInBytes(): Long = _rbm.longSizeInBytes + 1 // boolean
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, RBM> {
         if (splitSize <= 1 || _rbm.isEmpty) {
@@ -118,7 +102,8 @@ open class RBM : AbsBM<RBM> {
 
     override fun getBytes(buffer: ByteBuffer?): ByteArray {
         this.repair()
-        val buf = buffer ?: ByteBuffer.allocate(_rbm.serializedSizeInBytes())
+        val buf = buffer ?: ByteBuffer.allocate(Int.SIZE_BYTES + _rbm.serializedSizeInBytes())
+        buf.putInt(Versions.RBM_VERSION_V1)
         _rbm.serialize(buf)
         return buf.array()
     }
@@ -128,12 +113,15 @@ open class RBM : AbsBM<RBM> {
             if (bytes == null || bytes.isEmpty()) {
                 _rbm.clear()
             } else {
-                _rbm.deserialize(ByteBuffer.wrap(bytes))
+                DataInputStream(ByteArrayInputStream(bytes)).use { dis ->
+                    assert(dis.readInt() == Versions.RBM_VERSION_V1)
+                    _rbm.deserialize(dis)
+                }
             }
         }
     }
 
-    override fun contains(i: Int): Boolean = _rbm.contains(i)
+    override fun contains(dat: Int): Boolean = _rbm.contains(dat)
     override fun clone(): RBM = RBM(_rbm.clone())
 
     override fun equals(other: Any?): Boolean {
@@ -146,4 +134,31 @@ open class RBM : AbsBM<RBM> {
 
     override fun hashCode(): Int = _rbm.hashCode()
     override fun toString(): String = _rbm.toString()
+
+    /**
+     * Base operate functions
+     */
+    internal fun _and(bm: RBM): RBM = resetModify {
+        this.also { _rbm.and(bm._rbm) }
+    }
+    internal fun _andNot(bm: RBM): RBM = resetModify {
+        this.also { _rbm.andNot(bm._rbm) }
+    }
+    internal fun _or(bm: RBM): RBM = resetModify {
+        this.also { _rbm.or(bm._rbm) }
+    }
+    internal fun _xor(bm: RBM): RBM = resetModify {
+        this.also { _rbm.xor(bm._rbm) }
+    }
+    internal fun _orNot(bm: RBM, rangeEnd: Long): RBM = resetModify {
+        this.also { _rbm.orNot(bm._rbm, rangeEnd) }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun or(vararg rbms: RBM): RBM {
+            return RBM(RoaringBitmap.or(rbms.map { it._rbm }.iterator()))
+        }
+    }
 }

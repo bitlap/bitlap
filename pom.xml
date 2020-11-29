@@ -15,6 +15,7 @@
         <module>common</module>
         <module>storage/storage-core</module>
         <module>core</module>
+        <module>sql</module>
     </modules>
 
     <properties>
@@ -47,7 +48,28 @@
     </dependencies>
 
     <dependencyManagement>
-
+        <dependencies>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>storage-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>sql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <build>

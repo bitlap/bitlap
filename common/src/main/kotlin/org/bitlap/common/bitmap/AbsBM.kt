@@ -10,9 +10,11 @@ import java.io.ObjectOutput
  * Created by IceMimosa
  * Date: 2020/11/21
  */
-abstract class AbsBM<T> : BM<T> {
+abstract class AbsBM : BM {
 
-    @Volatile protected var modified: Boolean = true
+    @Volatile
+    @Transient
+    protected var modified: Boolean = true
     protected fun <T> resetModify(func: () -> T): T {
         modified = true
         return func.invoke()

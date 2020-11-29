@@ -1,7 +1,7 @@
 package org.bitlap.common.bitmap
 
 /**
- * Desc:
+ * Desc: Count Bitmap, support negative and positive count valus.
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa

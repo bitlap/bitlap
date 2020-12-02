@@ -10,7 +10,7 @@ package org.bitlap.common.bitmap
  * Date: 2020/11/26
  */
 
-fun <T> T.and(bm: T): T where T : BM {
+fun <T1, T2> T1.and(bm: T2): T1 where T1 : BM, T2: BM {
     return when (this) {
         is RBM -> this._and(bm.getRBM())
         is BBM -> {
@@ -23,7 +23,7 @@ fun <T> T.and(bm: T): T where T : BM {
         else -> {
             throw IllegalArgumentException()
         }
-    } as T
+    } as T1
 }
 
 fun <T> T.andNot(bm: T): T where T : BM {

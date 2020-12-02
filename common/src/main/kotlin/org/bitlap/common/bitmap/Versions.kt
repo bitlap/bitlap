@@ -1,4 +1,4 @@
-package org.bitlap.common
+package org.bitlap.common.bitmap
 
 /**
  * Desc: Bitmap's serializer versions

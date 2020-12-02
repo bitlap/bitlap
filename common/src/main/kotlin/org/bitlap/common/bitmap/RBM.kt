@@ -1,6 +1,6 @@
 package org.bitlap.common.bitmap
 
-import org.bitlap.common.Versions
+import org.bitlap.common.bitmap.rbm.FastAggregation
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
@@ -155,10 +155,30 @@ open class RBM : AbsBM {
     }
 
     companion object {
+        @JvmStatic
+        fun and(bm1: RBM, bm2: RBM): RBM = RBM(RoaringBitmap.and(bm1._rbm, bm2._rbm))
+        @JvmStatic
+        fun and(vararg bms: RBM): RBM = RBM(FastAggregation.and(bms.map { it._rbm }.iterator()))
+        @JvmStatic
+        fun andCount(bm1: RBM, bm2: RBM): Long = RoaringBitmap.andCardinality(bm1._rbm, bm2._rbm).toLong()
 
         @JvmStatic
-        fun or(vararg rbms: RBM): RBM {
-            return RBM(RoaringBitmap.or(rbms.map { it._rbm }.iterator()))
-        }
+        fun andNot(bm1: RBM, bm2: RBM): RBM = RBM(RoaringBitmap.andNot(bm1._rbm, bm2._rbm))
+        @JvmStatic
+        fun andNotCount(bm1: RBM, bm2: RBM): Long = RoaringBitmap.andNotCardinality(bm1._rbm, bm2._rbm).toLong()
+
+        @JvmStatic
+        fun or(bm1: RBM, bm2: RBM): RBM = RBM(RoaringBitmap.or(bm1._rbm, bm2._rbm))
+        @JvmStatic
+        fun or(vararg bms: RBM): RBM = RBM(RoaringBitmap.or(bms.map { it._rbm }.iterator()))
+        @JvmStatic
+        fun orCount(bm1: RBM, bm2: RBM): Long = RoaringBitmap.orCardinality(bm1._rbm, bm2._rbm).toLong()
+
+        @JvmStatic
+        fun xor(bm1: RBM, bm2: RBM): RBM = RBM(RoaringBitmap.xor(bm1._rbm, bm2._rbm))
+        @JvmStatic
+        fun xor(vararg bms: RBM): RBM = RBM(FastAggregation.xor(bms.map { it._rbm }.iterator()))
+        @JvmStatic
+        fun xorCount(bm1: RBM, bm2: RBM): Long = RoaringBitmap.xorCardinality(bm1._rbm, bm2._rbm).toLong()
     }
 }

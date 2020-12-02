@@ -1,6 +1,5 @@
 package org.bitlap.common.bitmap
 
-import org.bitlap.common.Versions
 import org.bitlap.common.doIf
 import org.bitlap.common.utils.BMUtils
 import java.io.ByteArrayInputStream
@@ -46,7 +45,12 @@ class BBM : AbsBM {
     }
     override fun isEmpty(): Boolean = container.values.all { it.isEmpty() }
 
-    fun add(bucket: Int, dat: Int) = add(bucket to dat)
+    fun add(bucket: Int, vararg dats: Int) = resetModify {
+        this.also {
+            container.computeIfAbsent(bucket) { RBM() }
+                .add(*dats)
+        }
+    }
     fun add(vararg dats: Pair<Int, Int>): BBM = resetModify {
         this.also {
             dats.forEach { (bucket, dat) ->
@@ -70,7 +74,6 @@ class BBM : AbsBM {
     fun remove(dat: Int): BBM = resetModify {
         this.also { container.values.forEach { it.remove(dat) } }
     }
-
 
     override fun repair(): BBM = doIf(modified, this) {
         it.also {
@@ -238,5 +241,47 @@ class BBM : AbsBM {
         }
         container.entries.removeIf { it.value.isEmpty() }
         this
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun and(bm1: BBM, bm2: RBM): BBM = bm1.clone()._and(bm2)
+        @JvmStatic
+        fun and(bm1: BBM, bm2: BBM): BBM = bm1.clone()._and(bm2)
+        @JvmStatic
+        fun and(vararg bms: BBM): BBM {
+            if (bms.isEmpty()) return BBM()
+            val answer = bms.first().clone()
+            bms.drop(1).forEach(answer::_and)
+            return answer
+        }
+
+        @JvmStatic
+        fun andNot(bm1: BBM, bm2: RBM): BBM = bm1.clone()._andNot(bm2)
+        @JvmStatic
+        fun andNot(bm1: BBM, bm2: BBM): BBM = bm1.clone()._andNot(bm2)
+
+        @JvmStatic
+        fun or(bm1: BBM, bm2: RBM): BBM = bm1.clone()._or(bm2)
+        @JvmStatic
+        fun or(bm1: BBM, bm2: BBM): BBM =
+            when {
+                bm1.isEmpty() -> bm2.clone()
+                bm2.isEmpty() -> bm1.clone()
+                else -> bm1.clone()._or(bm2)
+            }
+        @JvmStatic
+        fun or(vararg bms: BBM): BBM {
+            if (bms.isEmpty()) return BBM()
+            val answer = bms.first()
+            bms.drop(1).forEach(answer::_or)
+            return answer
+        }
+
+        @JvmStatic
+        fun xor(bm1: BBM, bm2: RBM): BBM = bm1.clone()._xor(bm2)
+        @JvmStatic
+        fun xor(bm1: BBM, bm2: BBM): BBM = bm1.clone()._xor(bm2)
     }
 }

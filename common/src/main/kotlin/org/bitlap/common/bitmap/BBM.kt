@@ -148,6 +148,7 @@ class BBM : AbsBM {
     }
 
     override fun contains(dat: Int): Boolean = container.values.any { it.contains(dat) }
+    fun contains(bucket: Int, dat: Int): Boolean = container.containsKey(bucket) && container[bucket]!!.contains(dat)
     override fun clone(): BBM = BBM(container, copy = true)
 
     override fun equals(other: Any?): Boolean {

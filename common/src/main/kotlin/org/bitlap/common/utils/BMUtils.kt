@@ -1,8 +1,6 @@
 package org.bitlap.common.utils
 
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.BM
-import org.bitlap.common.bitmap.RBM
+import org.bitlap.common.bitmap.*
 
 /**
  * Desc: [BM] Utils
@@ -60,12 +58,8 @@ object BMUtils {
      */
     inline fun <reified T1, reified T2> or(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
         return when (T1::class.java) {
-            RBM::class.java -> RBM.or(bm1 as RBM, bm2.getRBM())
-            BBM::class.java -> when (T2::class.java) {
-                RBM::class.java -> BBM.or(bm1 as BBM, bm2 as RBM)
-                BBM::class.java -> BBM.or(bm1 as BBM, bm2 as BBM)
-                else -> throw IllegalArgumentException()
-            }
+            RBM::class.java -> (bm1 as RBM).clone().or(bm2)
+            BBM::class.java -> (bm2 as BBM).clone().or(bm2)
             else -> throw IllegalArgumentException()
         } as T1
     }
@@ -75,12 +69,8 @@ object BMUtils {
      */
     inline fun <reified T1, reified T2> and(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
         return when (T1::class.java) {
-            RBM::class.java -> RBM.and(bm1 as RBM, bm2.getRBM())
-            BBM::class.java -> when (T2::class.java) {
-                RBM::class.java -> BBM.and(bm1 as BBM, bm2 as RBM)
-                BBM::class.java -> BBM.and(bm1 as BBM, bm2 as BBM)
-                else -> throw IllegalArgumentException()
-            }
+            RBM::class.java -> (bm1 as RBM).clone().and(bm2)
+            BBM::class.java -> (bm2 as BBM).clone().and(bm2)
             else -> throw IllegalArgumentException()
         } as T1
     }
@@ -91,12 +81,8 @@ object BMUtils {
      */
     inline fun <reified T1, reified T2> andNot(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
         return when (T1::class.java) {
-            RBM::class.java -> RBM.andNot(bm1 as RBM, bm2.getRBM())
-            BBM::class.java -> when (T2::class.java) {
-                RBM::class.java -> BBM.andNot(bm1 as BBM, bm2 as RBM)
-                BBM::class.java -> BBM.andNot(bm1 as BBM, bm2 as BBM)
-                else -> throw IllegalArgumentException()
-            }
+            RBM::class.java -> (bm1 as RBM).clone().andNot(bm2)
+            BBM::class.java -> (bm2 as BBM).clone().andNot(bm2)
             else -> throw IllegalArgumentException()
         } as T1
     }
@@ -106,12 +92,8 @@ object BMUtils {
      */
     inline fun <reified T1, reified T2> xor(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
         return when (T1::class.java) {
-            RBM::class.java -> RBM.xor(bm1 as RBM, bm2.getRBM())
-            BBM::class.java -> when (T2::class.java) {
-                RBM::class.java -> BBM.xor(bm1 as BBM, bm2 as RBM)
-                BBM::class.java -> BBM.xor(bm1 as BBM, bm2 as BBM)
-                else -> throw IllegalArgumentException()
-            }
+            RBM::class.java -> (bm1 as RBM).clone().xor(bm2)
+            BBM::class.java -> (bm2 as BBM).clone().xor(bm2)
             else -> throw IllegalArgumentException()
         } as T1
     }

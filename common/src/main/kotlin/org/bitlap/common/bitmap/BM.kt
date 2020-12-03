@@ -24,6 +24,9 @@ interface BM : Serializable, Externalizable {
     fun getSizeInBytes(): Long
     fun split(splitSize: Int, copy: Boolean = false): Map<Int, BM>
 
+    /**
+     * serialize
+     */
     fun getBytes(buffer: ByteBuffer? = null): ByteArray
     fun setBytes(bytes: ByteArray? = null): BM
 

@@ -1,12 +1,14 @@
 package org.bitlap.common.bitmap
 
 import org.bitlap.common.bitmap.rbm.FastAggregation
+import org.bitlap.common.bitmap.rbm.IntConsumer
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
+import kotlin.math.max
 
 /**
  * Desc:
@@ -152,6 +154,39 @@ open class RBM : AbsBM {
     }
     internal fun _orNot(bm: RBM, rangeEnd: Long): RBM = resetModify {
         this.also { _rbm.orNot(bm._rbm, rangeEnd) }
+    }
+
+    /**
+     * Consume functions
+     */
+    fun forEach(accept: (Int) -> Unit) = _rbm.forEach(IntConsumer { accept(it) })
+    fun iterator() = Iterable { _rbm.iterator() }
+
+    /** You can also use [iterator].chunk([bacthSize]) */
+    fun <T> iteratorBatch(batchSize: Int, transform: (List<Int>) -> T): List<T> {
+        val result = mutableListOf<T>()
+        val iterator = _rbm.batchIterator
+        val buffer = IntArray(max(batchSize, 1))
+        // batch iterator
+        val batch = ArrayList<Int>(batchSize)
+        while (iterator.hasNext()) {
+            val size = iterator.nextBatch(buffer)
+            if (size > 0) {
+                (0 until size).forEach { batch.add(buffer[it]) }
+                result.add(transform.invoke(batch))
+                batch.clear()
+            }
+        }
+        return result
+    }
+    fun iteratorReverse(): Iterable<Int> {
+        val i = _rbm.reverseIntIterator
+        return Iterable {
+            object : Iterator<Int> {
+                override fun hasNext() = i.hasNext()
+                override fun next(): Int = i.next()
+            }
+        }
     }
 
     companion object {

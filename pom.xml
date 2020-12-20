@@ -13,7 +13,7 @@
     <name>bitlap</name>
     <modules>
         <module>common</module>
-        <module>storage/storage-core</module>
+        <module>storage</module>
         <module>core</module>
         <module>sql</module>
     </modules>
@@ -22,8 +22,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-        <kotlin.version>1.4.20</kotlin.version>
+        <kotlin.version>1.4.21</kotlin.version>
         <kotest.version>4.3.1</kotest.version>
+
+        <!-- tools -->
+        <slf4j.version>1.7.30</slf4j.version>
+        <hutool.version>5.5.4</hutool.version>
+
     </properties>
 
     <dependencies>
@@ -37,7 +42,21 @@
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-setting</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
 
         <!-- test  -->
         <dependency>
@@ -58,12 +77,12 @@
             <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.kotest</groupId>
-            <artifactId>kotest-property-jvm</artifactId>
-            <version>${kotest.version}</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.kotest</groupId>-->
+<!--            <artifactId>kotest-property-jvm</artifactId>-->
+<!--            <version>${kotest.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -85,7 +104,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bitlap</groupId>
-                <artifactId>sql</artifactId>
+                <artifactId>bitlap-sql</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

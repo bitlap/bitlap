@@ -137,21 +137,22 @@ open class RBM : AbsBM {
     override fun hashCode(): Int = _rbm.hashCode()
     override fun toString(): String = _rbm.toString()
 
-    /**
-     * Base operate functions
-     */
-    internal fun _and(bm: RBM): RBM = resetModify {
-        this.also { _rbm.and(bm._rbm) }
+    override fun and(bm: BM): RBM = resetModify {
+        this.also { _rbm.and(bm.getRBM()._rbm) }
     }
-    internal fun _andNot(bm: RBM): RBM = resetModify {
-        this.also { _rbm.andNot(bm._rbm) }
+
+    override fun andNot(bm: BM): RBM = resetModify {
+        this.also { _rbm.andNot(bm.getRBM()._rbm) }
     }
-    internal fun _or(bm: RBM): RBM = resetModify {
-        this.also { _rbm.or(bm._rbm) }
+
+    override fun or(bm: BM): RBM = resetModify {
+        this.also { _rbm.or(bm.getRBM()._rbm) }
     }
-    internal fun _xor(bm: RBM): RBM = resetModify {
-        this.also { _rbm.xor(bm._rbm) }
+
+    override fun xor(bm: BM): RBM = resetModify {
+        this.also { _rbm.xor(bm.getRBM()._rbm) }
     }
+
     internal fun _orNot(bm: RBM, rangeEnd: Long): RBM = resetModify {
         this.also { _rbm.orNot(bm._rbm, rangeEnd) }
     }

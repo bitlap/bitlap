@@ -169,76 +169,93 @@ class BBM : AbsBM {
     override fun toString(): String = container.toString()
 
     /**
-     * Base operate functions
+     * operators
      */
-    internal fun _and(bbm: BBM): BBM = resetModify {
-        if (bbm.isEmpty()) {
-            container.clear()
-        } else {
-            container.forEach { (bit, rbm) ->
-                if (bbm.container.containsKey(bit)) {
-                    rbm.and(bbm.container[bit]!!)
+    override fun and(bm: BM): BBM = resetModify {
+        when (bm) {
+            is RBM -> {
+                if (bm.isEmpty()) {
+                    container.clear()
                 } else {
-                    rbm.empty()
+                    container.values.forEach { it.and(bm) }
+                    container.entries.removeIf { it.value.isEmpty() }
                 }
             }
+            is BBM -> {
+                if (bm.isEmpty()) {
+                    container.clear()
+                } else {
+                    container.forEach { (bit, rbm) ->
+                        if (bm.container.containsKey(bit)) {
+                            rbm.and(bm.container[bit]!!)
+                        } else {
+                            rbm.empty()
+                        }
+                    }
+                }
+                container.entries.removeIf { it.value.isEmpty() }
+            }
+            else -> throw IllegalArgumentException()
         }
-        container.entries.removeIf { it.value.isEmpty() }
         this
     }
-    internal fun _and(rbm: RBM): BBM = resetModify {
-        if (rbm.isEmpty()) {
-            container.clear()
-        } else {
-            container.values.forEach { it.and(rbm) }
-            container.entries.removeIf { it.value.isEmpty() }
-        }
-        this
-    }
-    internal fun _andNot(bbm: BBM): BBM = resetModify {
-        if (!bbm.isEmpty()) {
-            container.forEach { (bit, rbm) ->
-                if (bbm.container.containsKey(bit)) {
-                    rbm._andNot(bbm.container[bit]!!)
+
+    override fun andNot(bm: BM): BBM = resetModify {
+        when (bm) {
+            is RBM -> {
+                if (!bm.isEmpty()) {
+                    container.values.forEach { it.andNot(bm) }
                 }
             }
-        }
-        container.entries.removeIf { it.value.isEmpty() }
-        this
-    }
-    internal fun _andNot(rbm: RBM): BBM = resetModify {
-        if (!rbm.isEmpty()) {
-            container.values.forEach { it._andNot(rbm) }
-        }
-        container.entries.removeIf { it.value.isEmpty() }
-        this
-    }
-    internal fun _or(bbm: BBM): BBM = resetModify {
-        if (!bbm.isEmpty()) {
-            bbm.container.forEach { (bit, rbm) ->
-                container.computeIfAbsent(bit) { RBM() }.or(rbm)
+            is BBM -> {
+                if (!bm.isEmpty()) {
+                    container.forEach { (bit, rbm) ->
+                        if (bm.container.containsKey(bit)) {
+                            rbm.andNot(bm.container[bit]!!)
+                        }
+                    }
+                }
             }
-        }
-        this
-    }
-    internal fun _or(rbm: RBM): BBM = resetModify {
-        if (!rbm.isEmpty()) {
-            container.values.forEach { it.or(rbm) }
-        }
-        this
-    }
-    internal fun _xor(bbm: BBM): BBM = resetModify {
-        if (!bbm.isEmpty()) {
-            bbm.container.forEach { (bit, rbm) ->
-                container.computeIfAbsent(bit) { RBM() }._xor(rbm)
-            }
+            else -> throw IllegalArgumentException()
         }
         container.entries.removeIf { it.value.isEmpty() }
         this
     }
-    internal fun _xor(rbm: RBM): BBM = resetModify {
-        if (!rbm.isEmpty()) {
-            container.values.forEach { it._xor(rbm) }
+
+    override fun or(bm: BM): BBM = resetModify {
+        when (bm) {
+            is RBM -> {
+                if (!bm.isEmpty()) {
+                    container.values.forEach { it.or(bm) }
+                }
+            }
+            is BBM -> {
+                if (!bm.isEmpty()) {
+                    bm.container.forEach { (bit, rbm) ->
+                        container.computeIfAbsent(bit) { RBM() }.or(rbm)
+                    }
+                }
+            }
+            else -> throw IllegalArgumentException()
+        }
+        this
+    }
+
+    override fun xor(bm: BM): BBM = resetModify {
+        when (bm) {
+            is RBM -> {
+                if (!bm.isEmpty()) {
+                    container.values.forEach { it.xor(bm) }
+                }
+            }
+            is BBM -> {
+                if (!bm.isEmpty()) {
+                    bm.container.forEach { (bit, rbm) ->
+                        container.computeIfAbsent(bit) { RBM() }.xor(rbm)
+                    }
+                }
+            }
+            else -> throw IllegalArgumentException()
         }
         container.entries.removeIf { it.value.isEmpty() }
         this
@@ -247,42 +264,42 @@ class BBM : AbsBM {
     companion object {
 
         @JvmStatic
-        fun and(bm1: BBM, bm2: RBM): BBM = bm1.clone()._and(bm2)
+        fun and(bm1: BBM, bm2: RBM): BBM = bm1.clone().and(bm2)
         @JvmStatic
-        fun and(bm1: BBM, bm2: BBM): BBM = bm1.clone()._and(bm2)
+        fun and(bm1: BBM, bm2: BBM): BBM = bm1.clone().and(bm2)
         @JvmStatic
         fun and(vararg bms: BBM): BBM {
             if (bms.isEmpty()) return BBM()
             val answer = bms.first().clone()
-            bms.drop(1).forEach(answer::_and)
+            bms.drop(1).forEach(answer::and)
             return answer
         }
 
         @JvmStatic
-        fun andNot(bm1: BBM, bm2: RBM): BBM = bm1.clone()._andNot(bm2)
+        fun andNot(bm1: BBM, bm2: RBM): BBM = bm1.clone().andNot(bm2)
         @JvmStatic
-        fun andNot(bm1: BBM, bm2: BBM): BBM = bm1.clone()._andNot(bm2)
+        fun andNot(bm1: BBM, bm2: BBM): BBM = bm1.clone().andNot(bm2)
 
         @JvmStatic
-        fun or(bm1: BBM, bm2: RBM): BBM = bm1.clone()._or(bm2)
+        fun or(bm1: BBM, bm2: RBM): BBM = bm1.clone().or(bm2)
         @JvmStatic
         fun or(bm1: BBM, bm2: BBM): BBM =
             when {
                 bm1.isEmpty() -> bm2.clone()
                 bm2.isEmpty() -> bm1.clone()
-                else -> bm1.clone()._or(bm2)
+                else -> bm1.clone().or(bm2)
             }
         @JvmStatic
         fun or(vararg bms: BBM): BBM {
             if (bms.isEmpty()) return BBM()
             val answer = bms.first()
-            bms.drop(1).forEach(answer::_or)
+            bms.drop(1).forEach(answer::or)
             return answer
         }
 
         @JvmStatic
-        fun xor(bm1: BBM, bm2: RBM): BBM = bm1.clone()._xor(bm2)
+        fun xor(bm1: BBM, bm2: RBM): BBM = bm1.clone().xor(bm2)
         @JvmStatic
-        fun xor(bm1: BBM, bm2: BBM): BBM = bm1.clone()._xor(bm2)
+        fun xor(bm1: BBM, bm2: BBM): BBM = bm1.clone().xor(bm2)
     }
 }

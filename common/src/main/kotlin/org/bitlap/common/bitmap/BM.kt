@@ -30,6 +30,14 @@ interface BM : Serializable, Externalizable {
     fun getBytes(buffer: ByteBuffer? = null): ByteArray
     fun setBytes(bytes: ByteArray? = null): BM
 
+    /**
+     * operators
+     */
+    fun and(bm: BM): BM
+    fun andNot(bm: BM): BM
+    fun or(bm: BM): BM
+    fun xor(bm: BM): BM
+
     fun contains(dat: Int): Boolean
     fun clone(): BM
 }

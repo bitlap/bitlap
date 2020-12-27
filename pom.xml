@@ -27,6 +27,7 @@
 
         <!-- tools -->
         <slf4j.version>1.7.30</slf4j.version>
+        <logback.version>1.2.3</logback.version>
         <hutool.version>5.5.4</hutool.version>
 
     </properties>
@@ -46,6 +47,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -100,6 +106,11 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>storage-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-storage</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.RBM
-import org.bitlap.common.bitmap.or
 import org.bitlap.common.test.utils.BMTestUtils
 
 /**

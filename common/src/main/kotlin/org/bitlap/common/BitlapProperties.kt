@@ -16,7 +16,7 @@ object BitlapProperties : Serializable {
     /**
      * core properties
      */
-    private var props = Setting("bitlap.setting")
+    private var props = try { Setting("bitlap.setting") } catch (e: Exception) { Setting() }
 
     /**
      * core properties keys name

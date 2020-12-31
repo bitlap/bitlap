@@ -24,10 +24,12 @@ object BitlapProperties : Serializable {
     // Bitlap root dir
     const val DEFAULT_ROOT_DIR = "root.dir"
 
-    init {
+    @Synchronized
+    fun init() = this.also {
         PreConditions.checkNotBlank(this.setDefault(DEFAULT_ROOT_DIR), DEFAULT_ROOT_DIR)
     }
 
+    @Synchronized
     fun setDefault(key: String, value: String = "", overwrite: Boolean = false): String {
         var v = this.getDefault(key)
         if (v == null || overwrite) {

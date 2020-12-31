@@ -21,6 +21,8 @@ abstract class AbsBitlapStore<T> : BitlapStore<T> {
 
     constructor(conf: Configuration) {
         fs = rootPath.getFileSystem(conf)
+        fs.setWriteChecksum(false)
+        fs.setVerifyChecksum(false)
     }
 
 }

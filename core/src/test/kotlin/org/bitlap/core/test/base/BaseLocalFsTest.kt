@@ -30,6 +30,7 @@ abstract class BaseLocalFsTest : StringSpec() {
             localFS.mkdirs(workPath)
             // set bitlap properties
             BitlapProperties.setDefault(DEFAULT_ROOT_DIR, workPath.toString())
+            BitlapProperties.init()
         }
 
         afterSpec {

@@ -1,6 +1,9 @@
 package org.bitlap.core.test
 
-import org.bitlap.common.BitlapProperties
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import org.bitlap.common.error.BitlapException
 import org.bitlap.core.DataSourceManager
 import org.bitlap.core.test.base.BaseLocalFsTest
 
@@ -12,8 +15,14 @@ import org.bitlap.core.test.base.BaseLocalFsTest
 class DataSourceManagerTest : BaseLocalFsTest() {
     init {
         "test DataSource create" {
-            // val ds = DataSourceManager()
-            println(BitlapProperties.getRootDir())
+            val testName = "test_datasource"
+            val ds = DataSourceManager()
+            ds.createDataSource(testName)
+            ds.createDataSource(testName, true)
+            ds.exists(testName) shouldBe true
+            // get datasource
+            shouldThrow<BitlapException> { ds.getDataSource("xxx") }
+            ds.getDataSource(testName).createTime shouldNotBe null
         }
     }
 }

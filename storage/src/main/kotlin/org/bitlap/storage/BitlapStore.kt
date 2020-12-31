@@ -18,4 +18,9 @@ interface BitlapStore<T> {
      * Check [T] if exists
      */
     fun exists(t: T): Boolean
+
+    /**
+     * Get [t]
+     */
+    fun get(t: T): T
 }

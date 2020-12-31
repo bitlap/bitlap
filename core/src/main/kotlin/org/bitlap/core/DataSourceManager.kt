@@ -35,4 +35,21 @@ class DataSourceManager {
         store.store(ds)
     }
 
+    /**
+     * check [DataSource] with [name] exists.
+     */
+    fun exists(name: String): Boolean {
+        return store.exists(DataSource(name))
+    }
+
+    /**
+     * get [DataSource] with [name]
+     */
+    fun getDataSource(name: String): DataSource {
+        if (!exists(name)) {
+            throw BitlapException("DataSource [$name] is not exists.")
+        }
+        return store.get(DataSource(name))
+    }
+
 }

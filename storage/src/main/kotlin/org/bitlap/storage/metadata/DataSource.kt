@@ -5,4 +5,6 @@ package org.bitlap.core.metadata
  * Created by IceMimosa
  * Date: 2020/12/20
  */
-data class DataSource(val name: String)
+data class DataSource(val name: String) {
+    var createTime: Long? = null
+}

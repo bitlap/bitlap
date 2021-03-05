@@ -5,6 +5,12 @@ package org.bitlap.core.metadata
  * Created by IceMimosa
  * Date: 2020/12/20
  */
-data class DataSource(val name: String) {
-    var createTime: Long? = null
+data class DataSource(
+        val name: String,
+        val createTime: Long = System.currentTimeMillis(),
+        var updateTime: Long = System.currentTimeMillis(),
+) {
+
+
+
 }

@@ -12,51 +12,54 @@ import org.bitlap.core.metadata.DataSource
  * Created by IceMimosa
  * Date: 2020/12/23
  */
-class DataSourceStore : AbsBitlapStore<DataSource> {
+class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStore<DataSource>(conf) {
 
-    private var dataRootDir: Path
+    override val dataDir: Path = Path(BitlapProperties.getRootDir(), "data/$name")
+    private lateinit var metricStore: MetricStore
 
-    constructor(conf: Configuration) : super(conf) {
-        // init datasource data directory
-        dataRootDir = Path(BitlapProperties.getRootDir(), "data")
-        if (!fs.exists(dataRootDir)) {
-            fs.mkdirs(dataRootDir)
+    override fun open() {
+        super.open()
+        if (!fs.exists(dataDir)) {
+            fs.mkdirs(dataDir)
         }
+        this.metricStore = MetricStore(this, conf)
+        this.metricStore.open()
     }
 
     override fun store(t: DataSource): DataSource {
         val name = PreConditions.checkNotBlank(t.name).trim()
         // TODO: check name valid
-        val dsDir = Path(dataRootDir, name)
-        if (!fs.exists(dsDir)) {
-            fs.mkdirs(dsDir)
-            val schema = JSONUtil.toJsonStr(mapOf("name" to name, "createTime" to "${System.currentTimeMillis()}")).toByteArray()
-            fs.create(Path(dsDir, ".schema"), true).use {
-                it.writeInt(schema.size)
-                it.write(schema)
-            }
+        val schema = JSONUtil.toJsonStr(mapOf("name" to name, "createTime" to t.createTime, "updateTime" to t.updateTime)).toByteArray()
+        fs.create(Path(dataDir, ".schema"), true).use {
+            it.writeInt(schema.size)
+            it.write(schema)
         }
         return t
     }
 
-    override fun exists(t: DataSource): Boolean {
-        val name = PreConditions.checkNotBlank(t.name).trim()
-        val dsDir = Path(dataRootDir, name)
-        return fs.exists(dsDir)
+    fun exists(): Boolean {
+        return fs.exists(dataDir)
     }
 
-    override fun get(t: DataSource): DataSource {
-        val name = PreConditions.checkNotBlank(t.name).trim()
-        val dsDir = Path(dataRootDir, name)
-        val schema = fs.open(Path(dsDir, ".schema")).use {
+    fun get(): DataSource {
+        val schema = fs.open(Path(dataDir, ".schema")).use {
             val len = it.readInt()
             val buf = ByteArray(len)
             it.readFully(buf, 0, len)
             String(buf)
         }
         val json = JSONUtil.parse(schema)
-        return DataSource(json.getByPath("name", String::class.java)).also {
-            it.createTime = json.getByPath("createTime", String::class.java).toLong()
+        return DataSource(
+                json.getByPath("name", String::class.java),
+                json.getByPath("createTime", Long::class.java)
+        ).also {
+            it.updateTime = json.getByPath("updateTime", Long::class.java)
         }
+    }
+
+    fun getMetricStore(): MetricStore = this.metricStore
+
+    override fun close() {
+
     }
 }

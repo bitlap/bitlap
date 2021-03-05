@@ -1,5 +1,7 @@
 package org.bitlap.storage.store
 
+import java.io.Closeable
+
 /**
  * Desc: Base store for bitlap metadata.
  *
@@ -7,20 +9,13 @@ package org.bitlap.storage.store
  * Created by IceMimosa
  * Date: 2020/12/16
  */
-interface BitlapStore<T> {
+interface BitlapStore<T> : Closeable {
+
+    fun open()
 
     /**
      * Store [t] to persistent filesystem or other stores
      */
     fun store(t: T): T
 
-    /**
-     * Check [T] if exists
-     */
-    fun exists(t: T): Boolean
-
-    /**
-     * Get [t]
-     */
-    fun get(t: T): T
 }

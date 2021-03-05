@@ -13,9 +13,9 @@ import org.bitlap.storage.store.DataSourceStore
  * Created by IceMimosa
  * Date: 2020/12/20
  */
-class DataSourceManager {
+object DataSourceManager {
 
-    private val store = DataSourceStore(Configuration())
+    private val configuration = Configuration()
 
     /**
      * create [DataSource] with [name].
@@ -25,31 +25,36 @@ class DataSourceManager {
      */
     fun createDataSource(name: String, ifNotExists: Boolean = false) {
         PreConditions.checkNotBlank(name, "DataSource name cannot be null or blank.")
+        val store = DataSourceStore(name, configuration)
         val ds = DataSource(name)
-        val exists = store.exists(ds)
+        val exists = store.exists()
         if (exists && ifNotExists) {
             return
         } else if (exists) {
             throw BitlapException("DataSource [$name] already exists.")
         }
+        store.open()
         store.store(ds)
-    }
-
-    /**
-     * check [DataSource] with [name] exists.
-     */
-    fun exists(name: String): Boolean {
-        return store.exists(DataSource(name))
     }
 
     /**
      * get [DataSource] with [name]
      */
     fun getDataSource(name: String): DataSource {
-        if (!exists(name)) {
+        val store = DataSourceStore(name, configuration)
+        if (!store.exists()) {
             throw BitlapException("DataSource [$name] is not exists.")
         }
-        return store.get(DataSource(name))
+        return store.get()
+    }
+
+    fun getDataSourceStore(name: String): DataSourceStore {
+        val store = DataSourceStore(name, configuration)
+        if (!store.exists()) {
+            throw BitlapException("DataSource [$name] is not exists.")
+        }
+        store.open()
+        return store
     }
 
 }

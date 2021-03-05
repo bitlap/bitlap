@@ -45,7 +45,7 @@ class BBM : AbsBM {
     }
     override fun isEmpty(): Boolean = container.values.all { it.isEmpty() }
 
-    fun add(bucket: Int, vararg dats: Int) = resetModify {
+    fun add(bucket: Int, vararg dats: Int): BBM = resetModify {
         this.also {
             container.computeIfAbsent(bucket) { RBM() }
                 .add(*dats)

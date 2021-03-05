@@ -36,7 +36,7 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
   }
 
   public void addInt(int x) {
-    addLong(x);
+    addLong(Util.toUnsignedLong(x));
   }
 
   /**
@@ -607,6 +607,10 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
    * @param rangeEnd exclusive ending of range
    */
   public void add(final long rangeStart, final long rangeEnd) {
+    if (rangeEnd == 0 || Long.compareUnsigned(rangeStart, rangeEnd) >= 0) {
+      throw new IllegalArgumentException("Invalid range [" + rangeStart + "," + rangeEnd + ")");
+    }
+
     byte[] startHigh = LongUtils.highPart(rangeStart);
     int startLow = LongUtils.lowPart(rangeStart);
     byte[] endHigh = LongUtils.highPart(rangeEnd - 1);
@@ -649,7 +653,12 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
       char low = LongUtils.lowPart(x);
       Container container = containerWithIdx.getContainer();
       Container freshContainer = container.remove(low);
-      highLowContainer.replaceContainer(containerWithIdx.getContainerIdx(), freshContainer);
+      if (freshContainer.isEmpty()) {
+        // Attempt to remove empty container to save memory
+        highLowContainer.remove(high);
+      } else {
+        highLowContainer.replaceContainer(containerWithIdx.getContainerIdx(), freshContainer);
+      }
     }
   }
 

@@ -14,6 +14,8 @@ object BMUtils {
     /**
      * Bitmaps aggregate with [or] function, [T] should be the same implement.
      */
+    @JvmStatic
+    fun javaOr(vararg bms: BM): BM = or(*bms)
     inline fun <reified T> or(vararg bms: T): T where T : BM = or(bms.toList())
     inline fun <reified T> or(bms: Collection<T>): T where T : BM {
         if (bms.isEmpty()) {
@@ -35,6 +37,8 @@ object BMUtils {
     /**
      * Bitmaps aggregate with [and] function, [T] should be the same implement.
      */
+    @JvmStatic
+    fun javaAnd(vararg bms: BM) = and(*bms)
     inline fun <reified T> and(vararg bms: T): T where T : BM = and(bms.toList())
     inline fun <reified T> and(bms: Collection<T>): T where T : BM {
         if (bms.isEmpty()) {

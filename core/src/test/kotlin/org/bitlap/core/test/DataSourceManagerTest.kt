@@ -16,10 +16,9 @@ class DataSourceManagerTest : BaseLocalFsTest() {
     init {
         "test DataSource create" {
             val testName = "test_datasource"
-            val ds = DataSourceManager()
+            val ds = DataSourceManager
             ds.createDataSource(testName)
             ds.createDataSource(testName, true)
-            ds.exists(testName) shouldBe true
             // get datasource
             shouldThrow<BitlapException> { ds.getDataSource("xxx") }
             ds.getDataSource(testName).createTime shouldNotBe null

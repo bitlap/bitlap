@@ -14,15 +14,19 @@ import org.bitlap.common.BitlapProperties
  * Created by IceMimosa
  * Date: 2020/12/23
  */
-abstract class AbsBitlapStore<T> : BitlapStore<T> {
+abstract class AbsBitlapStore<T>(conf: Configuration) : BitlapStore<T> {
 
     protected val rootPath = Path(BitlapProperties.getRootDir())
-    protected var fs: FileSystem
+    protected var fs: FileSystem = rootPath.getFileSystem(conf).also {
+        it.setWriteChecksum(false)
+        it.setVerifyChecksum(false)
+    }
+    protected abstract val dataDir: Path
 
-    constructor(conf: Configuration) {
-        fs = rootPath.getFileSystem(conf)
-        fs.setWriteChecksum(false)
-        fs.setVerifyChecksum(false)
+    override fun open() {
+        if (!fs.exists(dataDir)) {
+            fs.mkdirs(dataDir)
+        }
     }
 
 }

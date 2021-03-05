@@ -29,6 +29,13 @@ public class Node4 extends Node {
   }
 
   @Override
+  public byte getChildKey(int pos) {
+    int shiftLeftLen = (3 - pos) * 8;
+    byte v = (byte) (key >> shiftLeftLen);
+    return v;
+  }
+
+  @Override
   public Node getChild(int pos) {
     return children[pos];
   }
@@ -100,7 +107,7 @@ public class Node4 extends Node {
     assert pos < count;
     children[pos] = null;
     count--;
-    key = IntegerUtil.shiftLeftFromSpecifiedPosition(key, pos, count);
+    key = IntegerUtil.shiftLeftFromSpecifiedPosition(key, pos, (4 - pos - 1));
     for (; pos < count; pos++) {
       children[pos] = children[pos + 1];
     }

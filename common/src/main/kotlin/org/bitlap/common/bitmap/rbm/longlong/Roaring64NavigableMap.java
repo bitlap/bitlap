@@ -56,7 +56,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
   // We guess consecutive .addLong will be on proximate longs: we remember the bitmap attached to
   // this bucket in order
   // to skip the indirection
-  private transient Entry<Integer, BitmapDataProvider> latestAddedHigh = null;
+  private transient Map.Entry<Integer, BitmapDataProvider> latestAddedHigh = null;
 
   private static final boolean DEFAULT_ORDER_IS_SIGNED = false;
   private static final boolean DEFAULT_CARDINALITIES_ARE_CACHED = true;
@@ -181,7 +181,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
     int low = low(x);
 
     // Copy the reference to prevent race-condition
-    Entry<Integer, BitmapDataProvider> local = latestAddedHigh;
+    Map.Entry<Integer, BitmapDataProvider> local = latestAddedHigh;
 
     BitmapDataProvider bitmap;
     if (local != null && local.getKey().intValue() == high) {
@@ -394,7 +394,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
   }
 
   private long throwSelectInvalidIndex(long j) {
-    // see buffer.ImmutableRoaringBitmap.select(int)
+    // see org.roaringbitmap.buffer.ImmutableRoaringBitmap.select(int)
     throw new IllegalArgumentException(
         "select " + j + " when the cardinality is " + this.getLongCardinality());
   }
@@ -597,7 +597,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
     }
   }
 
-  // From Arrays.binarySearch (Comparator). Check with Util.unsignedBinarySearch
+  // From Arrays.binarySearch (Comparator). Check with org.roaringbitmap.Util.unsignedBinarySearch
   private static int unsignedBinarySearch(int[] a, int fromIndex, int toIndex, int key,
       Comparator<? super Integer> c) {
     int low = fromIndex;
@@ -618,7 +618,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
     return -(low + 1); // key not found.
   }
 
-  private void ensureOne(Entry<Integer, BitmapDataProvider> e, int currentHigh, int indexOk) {
+  private void ensureOne(Map.Entry<Integer, BitmapDataProvider> e, int currentHigh, int indexOk) {
     // sortedHighs are valid only up to some index
     assert indexOk <= sortedHighs.length : indexOk + " is bigger than " + sortedHighs.length;
 
@@ -950,12 +950,12 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
    */
   @Override
   public LongIterator getLongIterator() {
-    final Iterator<Entry<Integer, BitmapDataProvider>> it = highToBitmap.entrySet().iterator();
+    final Iterator<Map.Entry<Integer, BitmapDataProvider>> it = highToBitmap.entrySet().iterator();
 
     return toIterator(it, false);
   }
 
-  protected LongIterator toIterator(final Iterator<Entry<Integer, BitmapDataProvider>> it,
+  protected LongIterator toIterator(final Iterator<Map.Entry<Integer, BitmapDataProvider>> it,
       final boolean reversed) {
     return new LongIterator() {
 
@@ -987,9 +987,9 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
        * @param it the underlying iterator which has to be moved to next long
        * @return true if we MAY have more entries. false if there is definitely nothing more
        */
-      private boolean moveToNextEntry(Iterator<Entry<Integer, BitmapDataProvider>> it) {
+      private boolean moveToNextEntry(Iterator<Map.Entry<Integer, BitmapDataProvider>> it) {
         if (it.hasNext()) {
-          Entry<Integer, BitmapDataProvider> next = it.next();
+          Map.Entry<Integer, BitmapDataProvider> next = it.next();
           currentKey = next.getKey();
           if (reversed) {
             currentIt = next.getValue().getReverseIntIterator();
@@ -1042,10 +1042,10 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
   @Override
   public long getLongSizeInBytes() {
     long size = 8;
-      
+
     // Size of containers
     size += highToBitmap.values().stream().mapToLong(p -> p.getLongSizeInBytes()).sum();
-    
+
     // Size of Map data-structure: we consider each TreeMap entry costs 40 bytes
     // http://java-performance.info/memory-consumption-of-java-data-types-2/
     size += 8L + 40L * highToBitmap.size();
@@ -1056,7 +1056,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
     // The cache impacts the size in heap
     size += 8L * sortedCumulatedCardinality.length;
     size += 4L * sortedHighs.length;
-    
+
     return size;
   }
 
@@ -1072,7 +1072,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
 
   /**
    * Use a run-length encoding where it is estimated as more space efficient
-   * 
+   *
    * @return whether a change was applied
    */
   public boolean runOptimize() {
@@ -1117,7 +1117,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
 
   /**
    * Deserialize (retrieve) this bitmap.
-   * 
+   *
    * Unlike RoaringBitmap, there is no specification for now: it may change from one java version to
    * another, and from one RoaringBitmap version to another.
    *
@@ -1274,13 +1274,7 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
           pushBitmapForHigh(high, bitmap);
         }
 
-        if (bitmap instanceof RoaringBitmap) {
-          ((RoaringBitmap) bitmap).add(startLowAsLong, endLowAsLong);
-        } else if (bitmap instanceof MutableRoaringBitmap) {
-          ((MutableRoaringBitmap) bitmap).add(startLowAsLong, endLowAsLong);
-        } else {
-          throw new UnsupportedOperationException("TODO. Not for " + bitmap.getClass());
-        }
+        bitmap.add(startLowAsLong, endLowAsLong);
       }
     }
 
@@ -1301,6 +1295,12 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
     if (bitmap != null) {
       int low = low(x);
       bitmap.remove(low);
+
+      if (bitmap.isEmpty()) {
+        // Remove the prefix from highToBitmap map
+        highToBitmap.remove(high);
+        latestAddedHigh = null;
+      }
 
       // Invalidate only if actually modified
       invalidateAboveHigh(high);

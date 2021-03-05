@@ -1918,7 +1918,6 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
     return new RoaringReverseIntIterator();
   }
 
-
   @Override
   public RoaringBatchIterator getBatchIterator() {
     return new RoaringBatchIterator(highLowContainer);

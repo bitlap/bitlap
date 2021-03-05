@@ -12,7 +12,7 @@ import kotlin.math.max
 
 /**
  * Desc:
- *   Build from RoaringBitmap[commit: 30897952]
+ *   Build from RoaringBitmap[commit: fc3754f2]
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa

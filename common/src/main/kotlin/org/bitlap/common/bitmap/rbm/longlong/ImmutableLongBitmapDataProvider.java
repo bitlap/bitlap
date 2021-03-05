@@ -6,6 +6,11 @@ package org.bitlap.common.bitmap.rbm.longlong;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.LongStream;
+import java.util.stream.StreamSupport;
 
 /**
  * Interface representing an immutable bitmap.
@@ -31,9 +36,9 @@ public interface ImmutableLongBitmapDataProvider {
 
   /**
    * Visit all values in the bitmap and pass them to the consumer.
-   * 
+   *
    * * Usage:
-   * 
+   *
    * <pre>
    * {@code
    *  bitmap.forEach(new LongConsumer() {
@@ -41,19 +46,19 @@ public interface ImmutableLongBitmapDataProvider {
    *    {@literal @}Override
    *    public void accept(long value) {
    *      // do something here
-   *      
+   *
    *    }});
    *   }
    * }
    * </pre>
-   * 
+   *
    * @param lc the consumer
    */
   public void forEach(LongConsumer lc);
 
   /**
    * For better performance, consider the Use the {@link #forEach forEach} method.
-   * 
+   *
    * @return a custom iterator over set bits, the bits are traversed in ascending sorted order
    */
   // RoaringBitmap proposes a PeekableLongIterator
@@ -66,8 +71,28 @@ public interface ImmutableLongBitmapDataProvider {
   public LongIterator getReverseLongIterator();
 
   /**
+   * @return an Ordered, Distinct, Sorted and Sized IntStream in ascending order
+   */
+  public default LongStream stream() {
+    int characteristics = Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SORTED
+        | Spliterator.SIZED;
+    Spliterator.OfLong x = Spliterators.spliterator(new RoaringOfLong(getLongIterator()),
+        getLongCardinality(), characteristics);
+    return StreamSupport.longStream(x, false);
+  }
+
+  /**
+   * @return an Ordered, Distinct and Sized IntStream providing bits in descending sorted order
+   */
+  public default LongStream reverseStream() {
+    int characteristics = Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SIZED;
+    Spliterator.OfLong x = Spliterators.spliterator(new RoaringOfLong(getLongIterator()),
+        getLongCardinality(), characteristics);
+    return StreamSupport.longStream(x, false);
+  }
+  /**
    * Estimate of the memory usage of this data structure.
-   * 
+   *
    * Internally, this is computed as a 64-bit counter.
    *
    * @return estimated memory usage.
@@ -99,9 +124,9 @@ public interface ImmutableLongBitmapDataProvider {
   /**
    * Rank returns the number of integers that are smaller or equal to x (Rank(infinity) would be
    * GetCardinality()).
-   * 
+   *
    * The value is a full 64-bit value.
-   * 
+   *
    * @param x upper limit
    *
    * @return the rank
@@ -143,4 +168,28 @@ public interface ImmutableLongBitmapDataProvider {
    */
   public long[] toArray();
 
+    /**
+   * An internal class to help provide streams.
+   * Sad but true the interface of IntIterator and PrimitiveIterator.OfInt
+   * Does not match. Otherwise it would be easier to just make IntIterator
+   * implement PrimitiveIterator.OfInt.
+   */
+  static final class RoaringOfLong implements PrimitiveIterator.OfLong {
+    private final LongIterator iterator;
+
+    public RoaringOfLong(LongIterator iterator) {
+      this.iterator = iterator;
+    }
+
+    @Override
+    public long nextLong() {
+      return iterator.next();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return iterator.hasNext();
+    }
+  }
 }
+

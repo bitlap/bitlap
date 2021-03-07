@@ -5,9 +5,11 @@ import org.bitlap.common.bitmap.rbm.IntConsumer
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
+
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
+
 import kotlin.math.max
 
 /**
@@ -80,7 +82,8 @@ open class RBM : AbsBM {
     override fun getRBM(): RBM = this.also { it.repair() }
     fun getNativeRBM(): RoaringBitmap = _rbm
     override fun getCountUnique(): Long = _rbm.longCardinality
-    override fun getCount(): Long = _rbm.longCardinality
+    override fun getCount(): Double = _rbm.longCardinality.toDouble()
+    override fun getLongCount(): Long = _rbm.longCardinality
     override fun getSizeInBytes(): Long = _rbm.longSizeInBytes + 1 // boolean
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, RBM> {
@@ -102,6 +105,7 @@ open class RBM : AbsBM {
         return results
     }
 
+    override fun getBytes(): ByteArray = getBytes(null)
     override fun getBytes(buffer: ByteBuffer?): ByteArray {
         this.repair()
         val buf = buffer ?: ByteBuffer.allocate(Int.SIZE_BYTES + _rbm.serializedSizeInBytes())
@@ -153,7 +157,7 @@ open class RBM : AbsBM {
         this.also { _rbm.xor(bm.getRBM()._rbm) }
     }
 
-    internal fun _orNot(bm: RBM, rangeEnd: Long): RBM = resetModify {
+    fun orNot(bm: RBM, rangeEnd: Long): RBM = resetModify {
         this.also { _rbm.orNot(bm._rbm, rangeEnd) }
     }
 
@@ -161,7 +165,7 @@ open class RBM : AbsBM {
      * Consume functions
      */
     fun forEach(accept: (Int) -> Unit) = _rbm.forEach(IntConsumer { accept(it) })
-    fun iterator() = Iterable { _rbm.iterator() }
+    fun iterator() = Iterable { _rbm.iterator() }.iterator()
 
     /** You can also use [iterator].chunk([bacthSize]) */
     fun <T> iteratorBatch(batchSize: Int, transform: (List<Int>) -> T): List<T> {
@@ -180,14 +184,14 @@ open class RBM : AbsBM {
         }
         return result
     }
-    fun iteratorReverse(): Iterable<Int> {
+    fun iteratorReverse(): Iterator<Int> {
         val i = _rbm.reverseIntIterator
         return Iterable {
             object : Iterator<Int> {
                 override fun hasNext() = i.hasNext()
                 override fun next(): Int = i.next()
             }
-        }
+        }.iterator()
     }
 
     companion object {

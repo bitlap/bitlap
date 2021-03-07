@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
 
 class BBM : AbsBM {
 
-    private val container = mutableMapOf<Int, RBM>()
+    val container = mutableMapOf<Int, RBM>()
 
     /**
      * get unique bitmap from [container]
@@ -38,10 +38,16 @@ class BBM : AbsBM {
     }
 
     override fun empty(): BBM = resetModify {
-        this.also { container.clear() }
+        this.also {
+            container.clear()
+            _rbm.empty()
+        }
     }
     override fun trim(): BBM = resetModify {
-        this.also { container.values.forEach { it.trim() } }
+        this.also {
+            container.values.forEach { it.trim() }
+            _rbm.empty()
+        }
     }
     override fun isEmpty(): Boolean = container.values.all { it.isEmpty() }
 
@@ -77,19 +83,20 @@ class BBM : AbsBM {
 
     override fun repair(): BBM = doIf(modified, this) {
         it.also {
-            container.entries.removeIf { it.value.isEmpty() }
+            container.entries.removeIf { e -> e.value.isEmpty() }
             container.values.forEach { o -> o.repair() }
+            _rbm = BMUtils.or(container.values)
             modified = false
         }
     }
     override fun getRBM(): RBM = doIf(modified, _rbm) {
-        repair()
-        _rbm = BMUtils.or(container.values)
+        this.repair()
         _rbm
     }
 
     override fun getCountUnique(): Long = getRBM().getCountUnique()
-    override fun getCount(): Long = container.values.fold(0) { cnt, r -> cnt + r.getCount() }
+    override fun getCount(): Double = getLongCount().toDouble()
+    override fun getLongCount(): Long = container.values.fold(0) { cnt, r -> cnt + r.getLongCount() }
     override fun getSizeInBytes(): Long {
         /** see [getBytes] */
         return container.values.fold(Int.SIZE_BYTES.toLong()) { size, r ->
@@ -104,16 +111,17 @@ class BBM : AbsBM {
             return mutableMapOf(0 to doIf(copy, this) { this.clone() })
         }
         val results = mutableMapOf<Int, BBM>()
-        container.forEach { (bit, rbm) ->
+        container.forEach { (bucket, rbm) ->
             val rs = rbm.split(splitSize, copy)
             rs.forEach { (index, r) ->
                 val bbm = results.computeIfAbsent(index) { BBM() }
-                bbm.container.computeIfAbsent(bit) { RBM() }.or(r)
+                bbm.container.computeIfAbsent(bucket) { RBM() }.or(r)
             }
         }
         return results
     }
 
+    override fun getBytes(): ByteArray = getBytes(null)
     override fun getBytes(buffer: ByteBuffer?): ByteArray {
         this.repair()
         val bos = ByteArrayOutputStream()
@@ -185,9 +193,9 @@ class BBM : AbsBM {
                 if (bm.isEmpty()) {
                     container.clear()
                 } else {
-                    container.forEach { (bit, rbm) ->
-                        if (bm.container.containsKey(bit)) {
-                            rbm.and(bm.container[bit]!!)
+                    container.forEach { (bucket, rbm) ->
+                        if (bm.container.containsKey(bucket)) {
+                            rbm.and(bm.container[bucket]!!)
                         } else {
                             rbm.empty()
                         }
@@ -209,9 +217,9 @@ class BBM : AbsBM {
             }
             is BBM -> {
                 if (!bm.isEmpty()) {
-                    container.forEach { (bit, rbm) ->
-                        if (bm.container.containsKey(bit)) {
-                            rbm.andNot(bm.container[bit]!!)
+                    container.forEach { (bucket, rbm) ->
+                        if (bm.container.containsKey(bucket)) {
+                            rbm.andNot(bm.container[bucket]!!)
                         }
                     }
                 }
@@ -231,8 +239,8 @@ class BBM : AbsBM {
             }
             is BBM -> {
                 if (!bm.isEmpty()) {
-                    bm.container.forEach { (bit, rbm) ->
-                        container.computeIfAbsent(bit) { RBM() }.or(rbm)
+                    bm.container.forEach { (bucket, rbm) ->
+                        container.computeIfAbsent(bucket) { RBM() }.or(rbm)
                     }
                 }
             }
@@ -250,8 +258,8 @@ class BBM : AbsBM {
             }
             is BBM -> {
                 if (!bm.isEmpty()) {
-                    bm.container.forEach { (bit, rbm) ->
-                        container.computeIfAbsent(bit) { RBM() }.xor(rbm)
+                    bm.container.forEach { (bucket, rbm) ->
+                        container.computeIfAbsent(bucket) { RBM() }.xor(rbm)
                     }
                 }
             }

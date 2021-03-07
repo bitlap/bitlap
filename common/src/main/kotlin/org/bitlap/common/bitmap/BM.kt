@@ -18,7 +18,8 @@ interface BM : Serializable, Externalizable {
     fun isEmpty(): Boolean
 
     fun repair(): BM
-    fun getCount(): Long
+    fun getCount(): Double
+    fun getLongCount(): Long
     fun getCountUnique(): Long
     fun getRBM(): RBM
     fun getSizeInBytes(): Long
@@ -27,7 +28,8 @@ interface BM : Serializable, Externalizable {
     /**
      * serialize
      */
-    fun getBytes(buffer: ByteBuffer? = null): ByteArray
+    fun getBytes(buffer: ByteBuffer?): ByteArray
+    fun getBytes(): ByteArray
     fun setBytes(bytes: ByteArray? = null): BM
 
     /**

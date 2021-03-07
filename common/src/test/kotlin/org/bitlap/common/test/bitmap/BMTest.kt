@@ -8,13 +8,13 @@ import org.bitlap.common.bitmap.RBM
 import org.bitlap.common.test.utils.BMTestUtils
 
 /**
- * Desc: [BBM] Test
+ * Desc: [BM] Test
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2020/12/4
  */
-class BBMTest : StringSpec({
+class BMTest : StringSpec({
 
     "RBM with 1000 ids" {
         val num = 1000
@@ -48,5 +48,9 @@ class BBMTest : StringSpec({
             r1.or(r2)
         }
         sBBM.getCountUnique() shouldBe num
+    }
+
+    "CBM with 1000 ids" {
+
     }
 })

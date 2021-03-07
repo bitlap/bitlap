@@ -12,10 +12,21 @@ object PreConditions {
     /**
      * check [str] cannot be null or blank
      */
+    @JvmStatic
     fun checkNotBlank(str: String?, key: String = "string", msg: String = "$key cannot be null or blank."): String {
         if (str.isNullOrBlank()) {
             throw BitlapException(msg)
         }
         return str
+    }
+
+    /**
+     * check [expr] cannot be false
+     */
+    @JvmStatic
+    fun checkExpression(expr: Boolean, key: String = "expr", msg: String = "$key cannot be false") {
+        if (!expr) {
+            throw BitlapException(msg)
+        }
     }
 }

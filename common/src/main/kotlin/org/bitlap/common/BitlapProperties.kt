@@ -33,7 +33,7 @@ object BitlapProperties : Serializable {
     fun setDefault(key: String, value: String = "", overwrite: Boolean = false): String {
         var v = this.getDefault(key)
         if (v == null || overwrite) {
-            this.props.set("default", key, value)
+            this.props.setByGroup( key, "default", value)
             v = value
         }
         return v

@@ -69,11 +69,11 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
             val metricRows = cleanRows.groupingBy { "${it.entityKey}${it.metricKey}" }
                     .fold({ _, r -> MetricRow(r.metricKey, r.entityKey, time, CBM(), BBM(), MetricRowMeta()) }) { _, a, b ->
                         a.entity.add(b.bucket, b.entity)
-                        // TODO: add count
+                        a.metric.add(b.bucket, b.entity, b.metric.toLong()) // TODO double support
                         a
                     }
                     .map { (_, r) ->
-                        r.metadata = MetricRowMeta(r.entity.getCountUnique(), r.entity.getCount(), 0.0)
+                        r.metadata = MetricRowMeta(r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
                         r
                     }
             metricStore.store(MetricRows(time, metricRows))

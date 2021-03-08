@@ -45,6 +45,7 @@ open class RBM : AbsBM {
         _rbm.add(rangeStart, rangeEnd)
     }
 
+    override fun clear(): RBM = this.empty()
     override fun empty(): RBM = resetModify {
         this.also { _rbm.clear() }
     }

@@ -13,6 +13,7 @@ import java.nio.ByteBuffer
  */
 interface BM : Serializable, Externalizable {
 
+    fun clear(): BM
     fun empty(): BM
     fun trim(): BM
     fun isEmpty(): Boolean

@@ -37,6 +37,7 @@ class BBM : AbsBM {
         this.setBytes(bytes)
     }
 
+    override fun clear(): BBM = this.empty()
     override fun empty(): BBM = resetModify {
         this.also {
             container.clear()
@@ -300,7 +301,7 @@ class BBM : AbsBM {
         @JvmStatic
         fun or(vararg bms: BBM): BBM {
             if (bms.isEmpty()) return BBM()
-            val answer = bms.first()
+            val answer = bms.first().clone()
             bms.drop(1).forEach(answer::or)
             return answer
         }

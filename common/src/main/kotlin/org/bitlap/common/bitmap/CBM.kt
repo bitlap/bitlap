@@ -47,6 +47,7 @@ class CBM : AbsBM {
         this.setBytes(bytes)
     }
 
+    override fun clear(): CBM = this.empty()
     override fun empty(): CBM = resetModify {
         this.also {
             container.clear()

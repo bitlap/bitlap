@@ -26,7 +26,7 @@ object BMUtils {
             return T::class.java.newInstance()
         }
         if (bms.size == 1) {
-            return bms.first()
+            return bms.first().clone() as T
         }
         if (bms.size == 2) {
             return or(bms.first(), bms.last())
@@ -50,7 +50,7 @@ object BMUtils {
             return T::class.java.newInstance()
         }
         if (bms.size == 1) {
-            return bms.first()
+            return bms.first().clone() as T
         }
         if (bms.size == 2) {
             return and(bms.first(), bms.last())

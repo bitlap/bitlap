@@ -164,6 +164,11 @@ open class RBM : AbsBM {
      * Consume functions
      */
     fun forEach(accept: (Int) -> Unit) = _rbm.forEach(IntConsumer { accept(it) })
+    fun toList(): MutableList<Int> {
+        return mutableListOf<Int>().also { ref ->
+            _rbm.forEach(IntConsumer { ref.add(it) })
+        }
+    }
     fun iterator() = Iterable { _rbm.iterator() }.iterator()
 
     /** You can also use [iterator].chunk([bacthSize]) */

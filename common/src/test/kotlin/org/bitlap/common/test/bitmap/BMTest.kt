@@ -3,6 +3,7 @@ package org.bitlap.common.test.bitmap
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.bitmap.BBM
+import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.bitmap.RBM
 import org.bitlap.common.test.utils.BMTestUtils
 
@@ -49,6 +50,50 @@ class BMTest : StringSpec({
         sBBM.getCountUnique() shouldBe num
     }
 
-    "CBM with 1000 ids" {
+    "Simple CBM with 1000 ids" {
+        val cbm = CBM()
+        cbm.add(0, 1, 10)
+        cbm.add(0, 2, 20)
+        cbm.add(0, 3, 30)
+        cbm.add(0, 4, 20)
+        cbm.add(1, 1, 40)
+
+        cbm.getCount() shouldBe 120
+        cbm.getCountUnique() shouldBe 4
+        cbm.getDistribution()[20.0]!!.getCountUnique() shouldBe 2
+        cbm.getTopCount(2).keys shouldBe setOf(1, 3)
+        CBM.equals(cbm, 20.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.gte(cbm, 30.0).getRBM().toList() shouldBe listOf(1, 3)
+        CBM.gt(cbm, 30.0).getRBM().toList() shouldBe listOf(1)
+        CBM.lte(cbm, 30.0).getRBM().toList() shouldBe listOf(2, 3, 4)
+        CBM.lt(cbm, 30.0).getRBM().toList() shouldBe listOf(2, 4)
+
+        // test weight
+        val cbmW = cbm.clone()
+        cbmW.weight = 0.1
+        cbmW.getCount() shouldBe 12
+        cbmW.getCountUnique() shouldBe 4
+        cbmW.getDistribution()[2.0]!!.getCountUnique() shouldBe 2
+        cbmW.getTopCount(2).keys shouldBe setOf(1, 3)
+        CBM.equals(cbmW, 2.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.gte(cbmW, 3.0).getRBM().toList() shouldBe listOf(1, 3)
+        CBM.gt(cbmW, 3.0).getRBM().toList() shouldBe listOf(1)
+        CBM.lte(cbmW, 3.0).getRBM().toList() shouldBe listOf(2, 3, 4)
+        CBM.lt(cbmW, 3.0).getRBM().toList() shouldBe listOf(2, 4)
+    }
+
+    "CBM with 2000000 ids" {
+        val num = 2000000
+        val cbm = BMTestUtils.randomCBM(100000, 10, num, num)
+        // serialize
+        val cbmSerD = CBM(cbm.getBytes())
+        cbm.getCount() shouldBe cbmSerD.getCount()
+        cbm.getCountUnique() shouldBe cbmSerD.getCountUnique()
+        // split
+        val cbmSplit = cbm.split(10, true).values.fold(CBM()) { r1, r2 ->
+            r1.or(r2)
+        }
+        cbm.getCount() shouldBe cbmSplit.getCount()
+        cbm.getCountUnique() shouldBe cbmSplit.getCountUnique()
     }
 })

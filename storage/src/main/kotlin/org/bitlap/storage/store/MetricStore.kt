@@ -19,18 +19,21 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
 
     override val dataDir: Path = Path(BitlapProperties.getRootDir(), "data/${dsStore.name}/metric")
     private val writerB = CarbonWriter.builder()
-            .withCsvInput("""[
+        .withCsvInput(
+            """[
                 {mk: string}, 
                 {ek: string}, 
                 {t: long},
                 {m: binary},
                 {e: binary},
                 {meta: string}
-            ]""".trimIndent())
-            .sortBy(arrayOf("mk", "ek", "t"))
-            .withBlockletSize(8)
-            .withPageSizeInMb(1)
-            .writtenBy("bitlap")
+            ]
+            """.trimIndent()
+        )
+        .sortBy(arrayOf("mk", "ek", "t"))
+        .withBlockletSize(8)
+        .withPageSizeInMb(1)
+        .writtenBy("bitlap")
 
     /**
      * Store [t] to persistent filesystem or other stores
@@ -50,6 +53,5 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
     }
 
     override fun close() {
-
     }
 }

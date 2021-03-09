@@ -34,7 +34,6 @@ abstract class BaseLocalFsTest : StringSpec() {
         }
 
         afterSpec {
-
         }
     }
 }

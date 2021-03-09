@@ -28,5 +28,4 @@ abstract class AbsBitlapStore<T>(conf: Configuration) : BitlapStore<T> {
             fs.mkdirs(dataDir)
         }
     }
-
 }

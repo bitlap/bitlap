@@ -33,7 +33,7 @@ object BitlapProperties : Serializable {
     fun setDefault(key: String, value: String = "", overwrite: Boolean = false): String {
         var v = this.getDefault(key)
         if (v == null || overwrite) {
-            this.props.setByGroup( key, "default", value)
+            this.props.setByGroup(key, "default", value)
             v = value
         }
         return v
@@ -46,4 +46,3 @@ object BitlapProperties : Serializable {
      */
     fun getRootDir(): String = getDefault(DEFAULT_ROOT_DIR)!!
 }
-

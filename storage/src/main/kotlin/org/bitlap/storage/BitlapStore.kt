@@ -17,5 +17,4 @@ interface BitlapStore<T> : Closeable {
      * Store [t] to persistent filesystem or other stores
      */
     fun store(t: T): T
-
 }

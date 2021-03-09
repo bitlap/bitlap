@@ -56,5 +56,4 @@ object DataSourceManager {
         store.open()
         return store
     }
-
 }

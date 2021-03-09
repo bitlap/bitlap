@@ -7,6 +7,4 @@ package org.bitlap.common.bitmap
  * Created by IceMimosa
  * Date: 2020/11/16
  */
-class CnpBM {
-
-}
+class CnpBM

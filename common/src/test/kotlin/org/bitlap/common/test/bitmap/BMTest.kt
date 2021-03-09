@@ -2,7 +2,6 @@ package org.bitlap.common.test.bitmap
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.RBM
 import org.bitlap.common.test.utils.BMTestUtils
@@ -51,6 +50,5 @@ class BMTest : StringSpec({
     }
 
     "CBM with 1000 ids" {
-
     }
 })

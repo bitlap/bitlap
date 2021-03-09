@@ -10,10 +10,10 @@ import java.util.*
  * Date: 2020/12/15
  */
 data class SimpleRow(
-        val time: Long,
-        val entity: Map<String, Int>,
-        val dimension: Map<String, String>,
-        val metric: Map<String, Double>,
+    val time: Long,
+    val entity: Map<String, Int>,
+    val dimension: Map<String, String>,
+    val metric: Map<String, Double>,
 ) {
 
     /**
@@ -32,9 +32,11 @@ data class SimpleRow(
 }
 
 data class SimpleRowSingle(
-        val time: Long,
-        val entityKey: String, val entity: Int,
-        val dimension: SortedMap<String, String>,
-        val metricKey: String, val metric: Double,
-        var bucket: Int = 0
+    val time: Long,
+    val entityKey: String,
+    val entity: Int,
+    val dimension: SortedMap<String, String>,
+    val metricKey: String,
+    val metric: Double,
+    var bucket: Int = 0
 )

@@ -21,11 +21,13 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
 
             val testTime = DateTime.parse("2021-01-01").millis
             writer.use {
-                it.write(listOf(
+                it.write(
+                    listOf(
                         SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 2.0)),
                         SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 3.0)),
                         SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 5.0))
-                ))
+                    )
+                )
             }
         }
     }

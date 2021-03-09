@@ -3,13 +3,11 @@ package org.bitlap.common.bitmap
 import org.bitlap.common.doIf
 import org.bitlap.common.utils.BMUtils
 import org.bitlap.common.utils.PreConditions
-
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.nio.ByteBuffer
-
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -86,8 +84,8 @@ class CBM : AbsBM {
         /** see [getBytes] */
         return container.values.fold(Int.SIZE_BYTES.toLong() + Double.SIZE_BYTES) { size, r ->
             size + r.getSizeInBytes() + 2 + // ref
-                    Int.SIZE_BYTES +        // mapKey
-                    Int.SIZE_BYTES          // bytes length
+                Int.SIZE_BYTES + // mapKey
+                Int.SIZE_BYTES // bytes length
         }
     }
 
@@ -183,8 +181,7 @@ class CBM : AbsBM {
     fun add(bucket: Int, dat: Int, count: Long): CBM = resetModify {
         if (dat < 0 || count <= 0) {
             this
-        }
-        else {
+        } else {
             val bits = BMUtils.oneBitPositions(count)
             var carrier = false
             var currentIndex = 0
@@ -324,11 +321,11 @@ class CBM : AbsBM {
              * equivalent to: (a & b) | ( b & c) | (a & c)
              */
             val newCarry = BBM.or(
-                    BBM.and(
-                            b,
-                            BBM.or(a, carry)
-                    ),
-                    BBM.and(a, carry)
+                BBM.and(
+                    b,
+                    BBM.or(a, carry)
+                ),
+                BBM.and(a, carry)
             )
             a.xor(b)
             a.xor(carry)
@@ -340,7 +337,6 @@ class CBM : AbsBM {
             return this
         }
     }
-
 
     override fun xor(bm: BM): CBM = resetModify {
         when (bm) {
@@ -438,8 +434,8 @@ class CBM : AbsBM {
             distributions.values.removeIf { it.isEmpty() }
         }
         return distributions
-                .filter { it.value.getLongCount() > 0L }
-                .mapKeys { weight * it.key }
+            .filter { it.value.getLongCount() > 0L }
+            .mapKeys { weight * it.key }
     }
 
     companion object {
@@ -485,9 +481,10 @@ class CBM : AbsBM {
             val distribution = cbm.getDistribution(maxCount)
             val rbm = RBM()
             distribution.forEach { (currentCnt, r) ->
-                if ((greater && currentCnt > threshold)
-                        || (!greater && currentCnt < threshold)
-                        || (equals && abs(currentCnt - threshold) < 1e-6)) {
+                if ((greater && currentCnt > threshold) ||
+                    (!greater && currentCnt < threshold) ||
+                    (equals && abs(currentCnt - threshold) < 1e-6)
+                ) {
                     rbm.or(r)
                 }
             }

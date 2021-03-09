@@ -2,7 +2,6 @@ package org.bitlap.common.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-
 import org.bitlap.common.utils.BMUtils
 
 /**
@@ -21,5 +20,4 @@ class BMUtilsTest : StringSpec({
         BMUtils.minMultiToInt(0.01) shouldBe 100
         BMUtils.minMultiToInt(0.0000001) shouldBe 1 // overflow
     }
-
 })

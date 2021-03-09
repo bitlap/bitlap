@@ -181,4 +181,34 @@ object BMUtils {
             else -> defaultValue
         }
     }
+
+    /**
+     * Compute [CBM] with op
+     */
+    @JvmStatic
+    fun compute(cbm: CBM, op: String, threshold: Array<Double>): CBM {
+        if (threshold.isEmpty()) {
+            throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
+        }
+        return when (op) {
+            ">=" -> CBM.gte(cbm, threshold.first())
+            ">" -> CBM.gt(cbm, threshold.first())
+            "<=" -> CBM.lte(cbm, threshold.first())
+            "<" -> CBM.lt(cbm, threshold.first())
+            "=" -> CBM.equals(cbm, threshold.first())
+            "!=" -> CBM.andNot(cbm, CBM.equals(cbm, threshold.first()).getRBM())
+            "between" -> {
+                if (threshold.size <= 1) {
+                    throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
+                }
+                val (first, second) = threshold
+                when {
+                    first > second -> CBM()
+                    first == second -> CBM.equals(cbm, first)
+                    else -> CBM.lte(CBM.gte(cbm, first), second)
+                }
+            }
+            else -> throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
+        }
+    }
 }

@@ -50,8 +50,8 @@ class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStor
         }
         val json = JSONUtil.parse(schema)
         return DataSource(
-                json.getByPath("name", String::class.java),
-                json.getByPath("createTime", Long::class.java)
+            json.getByPath("name", String::class.java),
+            json.getByPath("createTime", Long::class.java)
         ).also {
             it.updateTime = json.getByPath("updateTime", Long::class.java)
         }
@@ -60,6 +60,5 @@ class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStor
     fun getMetricStore(): MetricStore = this.metricStore
 
     override fun close() {
-
     }
 }

@@ -6,11 +6,7 @@ package org.bitlap.core.metadata
  * Date: 2020/12/20
  */
 data class DataSource(
-        val name: String,
-        val createTime: Long = System.currentTimeMillis(),
-        var updateTime: Long = System.currentTimeMillis(),
-) {
-
-
-
-}
+    val name: String,
+    val createTime: Long = System.currentTimeMillis(),
+    var updateTime: Long = System.currentTimeMillis(),
+)

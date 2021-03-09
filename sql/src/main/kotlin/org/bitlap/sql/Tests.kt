@@ -4,7 +4,6 @@ import org.apache.calcite.config.Lex
 import org.apache.calcite.sql.dialect.OracleSqlDialect
 import org.apache.calcite.sql.parser.SqlParser
 
-
 /**
  * Desc:
  *

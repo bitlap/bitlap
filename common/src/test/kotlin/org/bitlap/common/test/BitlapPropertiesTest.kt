@@ -14,5 +14,4 @@ class BitlapPropertiesTest : StringSpec({
     "test simple bitlap properties" {
         BitlapProperties.getRootDir() shouldBe "/tmp/data/bitlap"
     }
-
 })

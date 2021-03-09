@@ -102,8 +102,8 @@ class BBM : AbsBM {
         /** see [getBytes] */
         return container.values.fold(Int.SIZE_BYTES.toLong()) { size, r ->
             size + r.getSizeInBytes() + 2 + // ref
-                    Int.SIZE_BYTES +        // mapKey
-                    Int.SIZE_BYTES          // bytes length
+                Int.SIZE_BYTES + // mapKey
+                Int.SIZE_BYTES // bytes length
         }
     }
 

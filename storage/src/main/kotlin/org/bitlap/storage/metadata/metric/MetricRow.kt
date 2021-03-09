@@ -12,10 +12,10 @@ import org.bitlap.storage.metadata.metric.MetricRowMeta
  * Date: 2021/1/26
  */
 data class MetricRow(
-        val metricKey: String,
-        val entityKey: String,
-        val tm: Long,
-        val metric: CBM,
-        val entity: BBM,
-        var metadata: MetricRowMeta,
+    val metricKey: String,
+    val entityKey: String,
+    val tm: Long,
+    val metric: CBM,
+    val entity: BBM,
+    var metadata: MetricRowMeta,
 )

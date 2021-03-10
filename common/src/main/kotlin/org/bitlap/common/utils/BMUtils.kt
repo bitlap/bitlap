@@ -1,6 +1,10 @@
 package org.bitlap.common.utils
 
-import org.bitlap.common.bitmap.*
+import org.bitlap.common.bitmap.BBM
+import org.bitlap.common.bitmap.BM
+import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.bitmap.RBM
+import org.bitlap.common.bitmap.Versions
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import kotlin.math.max

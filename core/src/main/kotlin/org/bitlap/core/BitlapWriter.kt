@@ -13,6 +13,4 @@ interface BitlapWriter<T> : Closeable {
 
     fun write(t: T)
     fun write(ts: List<T>)
-
-    override fun close()
 }

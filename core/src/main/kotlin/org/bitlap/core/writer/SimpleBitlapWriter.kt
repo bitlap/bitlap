@@ -10,7 +10,7 @@ import org.bitlap.core.model.SimpleRowSingle
 import org.bitlap.storage.metadata.MetricRow
 import org.bitlap.storage.metadata.metric.MetricRowMeta
 import org.bitlap.storage.metadata.metric.MetricRows
-import java.util.*
+import java.util.Collections
 
 /**
  * Desc: Simple data row write to bitlap

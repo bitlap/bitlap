@@ -1,6 +1,6 @@
 package org.bitlap.core.model
 
-import java.util.*
+import java.util.SortedMap
 
 /**
  * Desc: Simple row for [org.bitlap.core.sdk.writer.SimpleBitlapWriter]

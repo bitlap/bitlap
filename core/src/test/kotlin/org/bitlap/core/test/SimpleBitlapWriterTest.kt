@@ -2,6 +2,9 @@ package org.bitlap.core.test
 
 import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.SimpleRow
+import org.bitlap.core.model.query.Query
+import org.bitlap.core.model.query.Time
+import org.bitlap.core.reader.DefaultBitlapReader
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.writer.SimpleBitlapWriter
 import org.joda.time.DateTime
@@ -25,9 +28,15 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
                     listOf(
                         SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 2.0)),
                         SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 3.0)),
-                        SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 5.0))
+                        SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 5.0)),
+                        SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("vv" to 10.0))
                     )
                 )
+            }
+
+            val reader = DefaultBitlapReader()
+            reader.use {
+                it.read(Query(dsName, Time(testTime), "user", "pv"))
             }
         }
     }

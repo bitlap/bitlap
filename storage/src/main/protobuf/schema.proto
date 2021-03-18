@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "org.bitlap.storage.metadata.schema";
+option java_multiple_files = true;
+option java_outer_classname = "Schema";
+
+message DataSourcePB {
+    string name = 1;
+    int64 createTime = 2;
+    int64 updateTime = 3;
+}

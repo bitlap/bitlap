@@ -1,11 +1,11 @@
 package org.bitlap.storage.store
 
-import cn.hutool.json.JSONUtil
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapProperties
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.metadata.DataSource
+import org.bitlap.storage.metadata.schema.DataSourcePB
 
 /**
  * Mail: chk19940609@gmail.com
@@ -29,7 +29,7 @@ class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStor
     override fun store(t: DataSource): DataSource {
         val name = PreConditions.checkNotBlank(t.name).trim()
         // TODO: check name valid
-        val schema = JSONUtil.toJsonStr(mapOf("name" to name, "createTime" to t.createTime, "updateTime" to t.updateTime)).toByteArray()
+        val schema = DataSourcePB.newBuilder().setName(name).setCreateTime(t.createTime).setUpdateTime(t.updateTime).build().toByteArray()
         fs.create(Path(dataDir, ".schema"), true).use {
             it.writeInt(schema.size)
             it.write(schema)
@@ -46,15 +46,13 @@ class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStor
             val len = it.readInt()
             val buf = ByteArray(len)
             it.readFully(buf, 0, len)
-            String(buf)
+            DataSourcePB.parseFrom(buf)
         }
-        val json = JSONUtil.parse(schema)
         return DataSource(
-            json.getByPath("name", String::class.java),
-            json.getByPath("createTime", Long::class.java)
-        ).also {
-            it.updateTime = json.getByPath("updateTime", Long::class.java)
-        }
+            schema.name,
+            schema.createTime,
+            schema.updateTime
+        )
     }
 
     fun getMetricStore(): MetricStore = this.metricStore

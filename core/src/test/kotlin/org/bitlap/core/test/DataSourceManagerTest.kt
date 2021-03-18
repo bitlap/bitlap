@@ -1,6 +1,7 @@
 package org.bitlap.core.test
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.bitlap.common.error.BitlapException
 import org.bitlap.core.DataSourceManager
@@ -20,7 +21,9 @@ class DataSourceManagerTest : BaseLocalFsTest() {
             ds.createDataSource(testName, true)
             // get datasource
             shouldThrow<BitlapException> { ds.getDataSource("xxx") }
-            ds.getDataSource(testName).createTime shouldNotBe null
+            val getDS = ds.getDataSource(testName)
+            getDS.name shouldBe testName
+            getDS.createTime shouldNotBe null
         }
     }
 }

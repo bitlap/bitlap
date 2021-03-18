@@ -161,6 +161,7 @@
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
                                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <sourceDir>target/generated-sources</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -174,6 +175,7 @@
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
                                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <sourceDir>${project.build.directory}/generated-sources</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>

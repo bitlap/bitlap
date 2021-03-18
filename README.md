@@ -1,5 +1,5 @@
 
-[![](https://jitci.com/gh/bitlap/bitlap/svg)](https://jitci.com/gh/bitlap/bitlap)
+[![](https://jitpack.io/v/bitlap/bitlap.svg)](https://jitpack.io/#bitlap/bitlap)
 
 # bitlap
 OLAP

@@ -20,7 +20,7 @@ import kotlin.math.min
  * Date: 2020/11/16
  */
 
-class CBM : AbsBM {
+class CBM : AbsBM, ComparableBM {
 
     val container = mutableMapOf<Int, BBM>()
     private var _bbm = BBM()
@@ -438,6 +438,103 @@ class CBM : AbsBM {
             .mapKeys { weight * it.key }
     }
 
+    /**
+     * [ComparableBM]
+     */
+    override fun gt(threshold: Double): CBM = this.gt(threshold, false)
+    override fun gt(threshold: Double, copy: Boolean): CBM {
+        return filterWithThreshold(this, threshold, true, false, copy)
+    }
+    override fun gte(threshold: Double): CBM = this.gte(threshold, false)
+    override fun gte(threshold: Double, copy: Boolean): CBM {
+        return filterWithThreshold(this, threshold, true, true, copy)
+    }
+    override fun lt(threshold: Double): CBM = this.lt(threshold, false)
+    override fun lt(threshold: Double, copy: Boolean): CBM {
+        return filterWithThreshold(this, threshold, false, false, copy)
+    }
+    override fun lte(threshold: Double): CBM = this.lte(threshold, false)
+    override fun lte(threshold: Double, copy: Boolean): CBM {
+        return filterWithThreshold(this, threshold, false, true, copy)
+    }
+    override fun eq(threshold: Double): CBM = this.eq(threshold, false)
+    override fun eq(threshold: Double, copy: Boolean): CBM {
+        return equalsOrNot(this, threshold, copy, true)
+    }
+    override fun neq(threshold: Double): CBM = this.neq(threshold, false)
+    override fun neq(threshold: Double, copy: Boolean): CBM {
+        return equalsOrNot(this, threshold, copy, false)
+    }
+    override fun between(first: Double, second: Double): CBM = this.between(first, second, false)
+    override fun between(first: Double, second: Double, copy: Boolean): CBM {
+        return when {
+            first > second -> CBM()
+            first == second -> this.eq(first)
+            else -> this.gte(first, copy).lte(second)
+        }
+    }
+
+    private fun filterWithThreshold(cbm: CBM, threshold: Double, greater: Boolean, equals: Boolean, copy: Boolean): CBM {
+        var maxCount = Long.MAX_VALUE
+        if (!greater) {
+            maxCount = min(threshold.toLong() + 1, maxCount)
+        }
+        val distribution = cbm.getDistribution(maxCount)
+        val rbm = RBM()
+        distribution.forEach { (currentCnt, r) ->
+            if ((greater && currentCnt > threshold) ||
+                (!greater && currentCnt < threshold) ||
+                (equals && abs(currentCnt - threshold) < 1e-6)
+            ) {
+                rbm.or(r)
+            }
+        }
+        return CBM(cbm.container, copy, cbm.weight).and(rbm)
+    }
+
+    private fun equalsOrNot(cbm: CBM, threshold: Double, copy: Boolean, equals: Boolean): CBM {
+        val cnt = (threshold / cbm.weight).toLong()
+        if (cnt <= 0 || abs(cnt * cbm.weight - threshold) >= 1e-6) {
+            return CBM()
+        }
+        val roaringCBM = mergeAsRBM(cbm)
+        val bits: IntArray = BMUtils.oneBitPositions(cnt)
+        val i1Max = bits.size
+        val i2Max = roaringCBM.maxBit + 1
+        if (bits[i1Max - 1] >= i2Max) {
+            return CBM()
+        }
+        val rbm = roaringCBM.container.getOrDefault(bits[0], BBM()).getRBM()
+        var i1 = 0
+        var i2 = 0
+
+        while (i1 < i1Max && i2 < i2Max) {
+            val b1 = bits[i1]
+            val rbm2 = roaringCBM.container.getOrDefault(i2, BBM()).getRBM()
+            if (b1 == i2) {
+                rbm.and(rbm2)
+                i1 += 1
+                i2 += 1
+            } else {
+                while (b1 > i2 && i2 < i2Max) {
+                    rbm.andNot(rbm2)
+                    i2 += 1
+                }
+            }
+        }
+
+        while (i2 < i2Max) {
+            rbm.andNot(roaringCBM.container.getOrDefault(i2, BBM()).getRBM())
+            i2 += 1
+        }
+
+        if (rbm.isEmpty()) {
+            return CBM()
+        }
+        val result = CBM(cbm.container, copy, cbm.weight)
+        return if (equals) result.and(rbm) else result.andNot(rbm)
+    }
+
     companion object {
 
         @JvmStatic
@@ -465,74 +562,19 @@ class CBM : AbsBM {
         }
 
         @JvmStatic
-        fun gt(cbm: CBM, threshold: Double): CBM = filterWithThreshold(cbm, threshold, true, false)
+        fun gt(cbm: CBM, threshold: Double): CBM = cbm.gt(threshold, true)
         @JvmStatic
-        fun gte(cbm: CBM, threshold: Double): CBM = filterWithThreshold(cbm, threshold, true, true)
+        fun gte(cbm: CBM, threshold: Double): CBM = cbm.gte(threshold, true)
         @JvmStatic
-        fun lt(cbm: CBM, threshold: Double): CBM = filterWithThreshold(cbm, threshold, false, false)
+        fun lt(cbm: CBM, threshold: Double): CBM = cbm.lt(threshold, true)
         @JvmStatic
-        fun lte(cbm: CBM, threshold: Double): CBM = filterWithThreshold(cbm, threshold, false, true)
-
-        private fun filterWithThreshold(cbm: CBM, threshold: Double, greater: Boolean, equals: Boolean): CBM {
-            var maxCount = Long.MAX_VALUE
-            if (!greater) {
-                maxCount = min(threshold.toLong() + 1, maxCount)
-            }
-            val distribution = cbm.getDistribution(maxCount)
-            val rbm = RBM()
-            distribution.forEach { (currentCnt, r) ->
-                if ((greater && currentCnt > threshold) ||
-                    (!greater && currentCnt < threshold) ||
-                    (equals && abs(currentCnt - threshold) < 1e-6)
-                ) {
-                    rbm.or(r)
-                }
-            }
-            return and(cbm, rbm)
-        }
-
+        fun lte(cbm: CBM, threshold: Double): CBM = cbm.lte(threshold, true)
         @JvmStatic
-        fun equals(cbm: CBM, threshold: Double): CBM {
-            val cnt = (threshold / cbm.weight).toLong()
-            if (cnt <= 0 || abs(cnt * cbm.weight - threshold) >= 1e-6) {
-                return CBM()
-            }
-            val roaringCBM = mergeAsRBM(cbm)
-            val bits: IntArray = BMUtils.oneBitPositions(cnt)
-            val i1Max = bits.size
-            val i2Max = roaringCBM.maxBit + 1
-            if (bits[i1Max - 1] >= i2Max) {
-                return CBM()
-            }
-            val rbm = roaringCBM.container.getOrDefault(bits[0], BBM()).getRBM()
-            var i1 = 0
-            var i2 = 0
-
-            while (i1 < i1Max && i2 < i2Max) {
-                val b1 = bits[i1]
-                val rbm2 = roaringCBM.container.getOrDefault(i2, BBM()).getRBM()
-                if (b1 == i2) {
-                    rbm.and(rbm2)
-                    i1 += 1
-                    i2 += 1
-                } else {
-                    while (b1 > i2 && i2 < i2Max) {
-                        rbm.andNot(rbm2)
-                        i2 += 1
-                    }
-                }
-            }
-
-            while (i2 < i2Max) {
-                rbm.andNot(roaringCBM.container.getOrDefault(i2, BBM()).getRBM())
-                i2 += 1
-            }
-
-            if (rbm.isEmpty()) {
-                return CBM()
-            }
-            return cbm.clone().and(rbm)
-        }
+        fun eq(cbm: CBM, threshold: Double): CBM = cbm.eq(threshold, true)
+        @JvmStatic
+        fun neq(cbm: CBM, threshold: Double): CBM = cbm.neq(threshold, true)
+        @JvmStatic
+        fun between(cbm: CBM, first: Double, second: Double): CBM = cbm.between(first, second, true)
 
         @JvmStatic
         fun mergeAsRBM(cbm: CBM): CBM {

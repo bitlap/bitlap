@@ -62,11 +62,13 @@ class BMTest : StringSpec({
         cbm.getCountUnique() shouldBe 4
         cbm.getDistribution()[20.0]!!.getCountUnique() shouldBe 2
         cbm.getTopCount(2).keys shouldBe setOf(1, 3)
-        CBM.equals(cbm, 20.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.eq(cbm, 20.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.neq(cbm, 20.0).getRBM().toList() shouldBe listOf(1, 3)
         CBM.gte(cbm, 30.0).getRBM().toList() shouldBe listOf(1, 3)
         CBM.gt(cbm, 30.0).getRBM().toList() shouldBe listOf(1)
         CBM.lte(cbm, 30.0).getRBM().toList() shouldBe listOf(2, 3, 4)
         CBM.lt(cbm, 30.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.between(cbm, 20.0, 30.0).getRBM().toList() shouldBe listOf(2, 3, 4)
 
         // test weight
         val cbmW = cbm.clone()
@@ -75,11 +77,13 @@ class BMTest : StringSpec({
         cbmW.getCountUnique() shouldBe 4
         cbmW.getDistribution()[2.0]!!.getCountUnique() shouldBe 2
         cbmW.getTopCount(2).keys shouldBe setOf(1, 3)
-        CBM.equals(cbmW, 2.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.eq(cbmW, 2.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.neq(cbmW, 2.0).getRBM().toList() shouldBe listOf(1, 3)
         CBM.gte(cbmW, 3.0).getRBM().toList() shouldBe listOf(1, 3)
         CBM.gt(cbmW, 3.0).getRBM().toList() shouldBe listOf(1)
         CBM.lte(cbmW, 3.0).getRBM().toList() shouldBe listOf(2, 3, 4)
         CBM.lt(cbmW, 3.0).getRBM().toList() shouldBe listOf(2, 4)
+        CBM.between(cbmW, 2.0, 3.0).getRBM().toList() shouldBe listOf(2, 3, 4)
     }
 
     "CBM with 2000000 ids" {

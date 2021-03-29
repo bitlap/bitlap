@@ -3,6 +3,7 @@ package org.bitlap.common.utils
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.BM
 import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.bitmap.ComparableBM
 import org.bitlap.common.bitmap.RBM
 import org.bitlap.common.bitmap.Versions
 import java.io.ByteArrayInputStream
@@ -190,27 +191,23 @@ object BMUtils {
      * Compute [CBM] with op
      */
     @JvmStatic
-    fun compute(cbm: CBM, op: String, threshold: Array<Double>): CBM {
+    fun compute(cbm: ComparableBM, op: String, threshold: Array<Double>, copy: Boolean = true): ComparableBM {
         if (threshold.isEmpty()) {
             throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
         }
         return when (op) {
-            ">=" -> CBM.gte(cbm, threshold.first())
-            ">" -> CBM.gt(cbm, threshold.first())
-            "<=" -> CBM.lte(cbm, threshold.first())
-            "<" -> CBM.lt(cbm, threshold.first())
-            "=" -> CBM.equals(cbm, threshold.first())
-            "!=" -> CBM.andNot(cbm, CBM.equals(cbm, threshold.first()).getRBM())
+            ">=" -> cbm.gte(threshold.first(), copy)
+            ">" -> cbm.gt(threshold.first(), copy)
+            "<=" -> cbm.lte(threshold.first(), copy)
+            "<" -> cbm.lt(threshold.first(), copy)
+            "=" -> cbm.eq(threshold.first(), copy)
+            "!=" -> cbm.neq(threshold.first(), copy)
             "between" -> {
                 if (threshold.size <= 1) {
                     throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
                 }
                 val (first, second) = threshold
-                when {
-                    first > second -> CBM()
-                    first == second -> CBM.equals(cbm, first)
-                    else -> CBM.lte(CBM.gte(cbm, first), second)
-                }
+                cbm.between(first, second, copy)
             }
             else -> throw IllegalArgumentException("Illegal threshold: $threshold, op: $op")
         }

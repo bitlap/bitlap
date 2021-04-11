@@ -16,7 +16,7 @@ data class Query(
     /**
      * @required time
      */
-    val time: Time,
+    val time: QueryTime,
 
     /**
      * @required entity name
@@ -24,7 +24,12 @@ data class Query(
     val entity: String,
 
     /**
-     * metric name
+     * @required query metrics
      */
-    val metric: String
+    val metric: List<QueryMetric>,
+
+    /**
+     * query dimensions
+     */
+    val dimensions: List<String> = emptyList(),
 )

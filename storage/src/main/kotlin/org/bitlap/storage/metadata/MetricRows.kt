@@ -1,6 +1,4 @@
-package org.bitlap.storage.metadata.metric
-
-import org.bitlap.storage.metadata.MetricRow
+package org.bitlap.storage.metadata
 
 /**
  * Desc:

@@ -8,10 +8,9 @@ import org.apache.carbondata.sdk.file.CarbonWriter
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapProperties
-import org.bitlap.storage.metadata.metric.MetricRowMeta
-import org.bitlap.storage.metadata.metric.MetricRows
+import org.bitlap.storage.metadata.MetricRowMeta
+import org.bitlap.storage.metadata.MetricRows
 import org.joda.time.DateTime
-import java.util.*
 
 /**
  * Desc:
@@ -27,15 +26,15 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         .withCsvInput( // TODO: add enum
             """[
                 {mk: string}, 
-                {ek: string}, 
                 {t: long},
+                {ek: string}, 
                 {m: binary},
                 {e: binary},
                 {meta: string}
             ]
             """.trimIndent()
         )
-        .sortBy(arrayOf("mk", "ek", "t"))
+        .sortBy(arrayOf("mk", "t", "ek"))
         .withBlockletSize(8)
         .withPageSizeInMb(1)
         .writtenBy("bitlap")
@@ -59,13 +58,13 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         val output = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
         val writer = writerB.outputPath(Path(dataDir, output).toString()).build()
         t.metrics.forEach {
-            writer.write(arrayOf(it.metricKey, it.entityKey, it.tm, ByteArray(0), it.entity.getBytes(), JSONUtil.toJsonStr(it.metadata)))
+            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, ByteArray(0), it.entity.getBytes(), JSONUtil.toJsonStr(it.metadata)))
         }
         writer.close()
         return t
     }
 
-    fun queryMeta(time: Long, metric: String, entity: String): List<MetricRowMeta> {
+    fun queryMeta(time: Long, metrics: List<String>, entity: String): List<MetricRowMeta> {
         val date = DateTime(time)
         val dir = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
         val reader = readerB.withFolder(Path(dataDir, dir).toString())
@@ -74,7 +73,7 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
                 AndExpression(
                     FilterUtil.prepareEqualToExpression("t", "long", time),
                     AndExpression(
-                        FilterUtil.prepareEqualToExpression("mk", "string", metric),
+                        FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics),
                         FilterUtil.prepareEqualToExpression("ek", "string", entity)
                     )
                 ),
@@ -84,15 +83,9 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         while (reader.hasNext()) {
             val rows = reader.readNextBatchRow()
             rows.forEach { row ->
-                row as Array<*>
-                val jsonObj = JSONUtil.parseObj(row.first().toString())
-                metas.add(
-                    MetricRowMeta(
-                        jsonObj.getLong("entityUniqueCount"),
-                        jsonObj.getLong("entityCount"),
-                        jsonObj.getDouble("metricCount"),
-                    )
-                )
+                val (meta) = row as Array<*>
+                val jsonObj = JSONUtil.parseObj(meta.toString())
+                metas.add(MetricRowMeta.fromJson(jsonObj))
             }
         }
         reader.close()

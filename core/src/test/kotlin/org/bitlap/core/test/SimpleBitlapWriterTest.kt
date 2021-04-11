@@ -3,7 +3,8 @@ package org.bitlap.core.test
 import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.query.Query
-import org.bitlap.core.model.query.Time
+import org.bitlap.core.model.query.QueryMetric
+import org.bitlap.core.model.query.QueryTime
 import org.bitlap.core.reader.DefaultBitlapReader
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.writer.SimpleBitlapWriter
@@ -35,9 +36,10 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
             }
 
             val reader = DefaultBitlapReader()
-            reader.use {
-                it.read(Query(dsName, Time(testTime), "user", "pv"))
+            val rows = reader.use {
+                it.read(Query(dsName, QueryTime(testTime), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
             }
+            println(rows)
         }
     }
 }

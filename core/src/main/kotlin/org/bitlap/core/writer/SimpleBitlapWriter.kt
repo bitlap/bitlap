@@ -8,8 +8,8 @@ import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.SimpleRowSingle
 import org.bitlap.storage.metadata.MetricRow
-import org.bitlap.storage.metadata.metric.MetricRowMeta
-import org.bitlap.storage.metadata.metric.MetricRows
+import org.bitlap.storage.metadata.MetricRowMeta
+import org.bitlap.storage.metadata.MetricRows
 import java.util.Collections
 
 /**
@@ -66,13 +66,15 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
             }
             // store metrics
             val metricRows = cleanRows.groupingBy { "${it.entityKey}${it.metricKey}" }
-                .fold({ _, r -> MetricRow(r.metricKey, r.entityKey, time, CBM(), BBM(), MetricRowMeta()) }) { _, a, b ->
+                .fold({ _, r ->
+                    MetricRow(time, r.metricKey, r.entityKey, CBM(), BBM(), MetricRowMeta(time, r.metricKey, r.entityKey))
+                }) { _, a, b ->
                     a.entity.add(b.bucket, b.entity)
                     a.metric.add(b.bucket, b.entity, b.metric.toLong()) // TODO double support
                     a
                 }
                 .map { (_, r) ->
-                    r.metadata = MetricRowMeta(r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
+                    r.metadata = MetricRowMeta(r.tm, r.metricKey, r.entityKey, r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
                     r
                 }
             metricStore.store(MetricRows(time, metricRows))

@@ -2,7 +2,6 @@ package org.bitlap.storage.metadata
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.storage.metadata.metric.MetricRowMeta
 
 /**
  * Desc: One row for metric data model.
@@ -12,9 +11,9 @@ import org.bitlap.storage.metadata.metric.MetricRowMeta
  * Date: 2021/1/26
  */
 data class MetricRow(
+    val tm: Long,
     val metricKey: String,
     val entityKey: String,
-    val tm: Long,
     val metric: CBM,
     val entity: BBM,
     var metadata: MetricRowMeta,

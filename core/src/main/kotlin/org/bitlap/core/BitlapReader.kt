@@ -1,6 +1,7 @@
 package org.bitlap.core
 
 import org.bitlap.core.model.query.Query
+import org.bitlap.core.model.query.RawRow
 import java.io.Closeable
 
 /**
@@ -12,5 +13,5 @@ import java.io.Closeable
  */
 interface BitlapReader : Closeable {
 
-    fun read(query: Query)
+    fun read(query: Query): List<RawRow>
 }

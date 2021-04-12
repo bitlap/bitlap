@@ -1,6 +1,5 @@
 package org.bitlap.storage.store
 
-import cn.hutool.json.JSONUtil
 import org.apache.carbondata.core.scan.expression.logical.AndExpression
 import org.apache.carbondata.core.scan.filter.FilterUtil
 import org.apache.carbondata.sdk.file.CarbonReader
@@ -8,6 +7,7 @@ import org.apache.carbondata.sdk.file.CarbonWriter
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapProperties
+import org.bitlap.common.utils.JSONUtils
 import org.bitlap.storage.metadata.MetricRowMeta
 import org.bitlap.storage.metadata.MetricRows
 import org.joda.time.DateTime
@@ -58,7 +58,7 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         val output = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
         val writer = writerB.outputPath(Path(dataDir, output).toString()).build()
         t.metrics.forEach {
-            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, ByteArray(0), it.entity.getBytes(), JSONUtil.toJsonStr(it.metadata)))
+            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, ByteArray(0), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
         }
         writer.close()
         return t
@@ -84,8 +84,8 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
             val rows = reader.readNextBatchRow()
             rows.forEach { row ->
                 val (meta) = row as Array<*>
-                val jsonObj = JSONUtil.parseObj(meta.toString())
-                metas.add(MetricRowMeta.fromJson(jsonObj))
+                val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+                metas.add(metaObj)
             }
         }
         reader.close()

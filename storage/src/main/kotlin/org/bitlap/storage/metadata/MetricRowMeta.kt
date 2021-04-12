@@ -1,7 +1,5 @@
 package org.bitlap.storage.metadata
 
-import cn.hutool.json.JSONObject
-
 /**
  * Desc: Metadata for [org.bitlap.storage.metadata.MetricRow]
  *
@@ -16,17 +14,4 @@ data class MetricRowMeta(
     val entityUniqueCount: Long = 0,
     val entityCount: Long = 0,
     val metricCount: Double = 0.0
-) {
-
-    companion object {
-        fun fromJson(jsonObj: JSONObject): MetricRowMeta =
-            MetricRowMeta(
-                jsonObj.getLong("tm"),
-                jsonObj.getStr("metricKey"),
-                jsonObj.getStr("entityKey"),
-                jsonObj.getLong("entityUniqueCount"),
-                jsonObj.getLong("entityCount"),
-                jsonObj.getDouble("metricCount"),
-            )
-    }
-}
+)

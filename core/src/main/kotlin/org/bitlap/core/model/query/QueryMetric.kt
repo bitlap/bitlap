@@ -13,5 +13,5 @@ data class QueryMetric(
 )
 
 enum class AggType {
-    None, Count, CountDistinc, Sum
+    None, Distinct, Count, CountDistinct, Sum, AVG
 }

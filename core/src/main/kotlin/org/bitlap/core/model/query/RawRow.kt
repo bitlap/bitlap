@@ -1,6 +1,7 @@
 package org.bitlap.core.model.query
 
 import org.bitlap.core.reader.DefaultBitlapReader
+import java.io.Serializable
 
 /**
  * Desc: raw data row for [DefaultBitlapReader]
@@ -9,7 +10,4 @@ import org.bitlap.core.reader.DefaultBitlapReader
  * Created by IceMimosa
  * Date: 2021/3/30
  */
-data class RawRow(
-    val metrics: Map<String, Any> = mutableMapOf(),
-    val dimensions: Map<String, String> = mutableMapOf()
-)
+class RawRow(val data: Array<*>) : Serializable

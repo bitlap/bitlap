@@ -7,7 +7,10 @@ import org.apache.carbondata.sdk.file.CarbonWriter
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapProperties
+import org.bitlap.common.bitmap.BBM
+import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
+import org.bitlap.storage.metadata.MetricRow
 import org.bitlap.storage.metadata.MetricRowMeta
 import org.bitlap.storage.metadata.MetricRows
 import org.joda.time.DateTime
@@ -58,10 +61,39 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         val output = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
         val writer = writerB.outputPath(Path(dataDir, output).toString()).build()
         t.metrics.forEach {
-            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, ByteArray(0), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
+            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, it.metric.getBytes(), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
         }
         writer.close()
         return t
+    }
+
+    fun query(time: Long, metrics: List<String>, entity: String): List<MetricRow> {
+        val date = DateTime(time)
+        val dir = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
+        val reader = readerB.withFolder(Path(dataDir, dir).toString())
+            .projection(arrayOf("mk", "t", "ek", "m", "meta"))
+            .filter(
+                AndExpression(
+                    FilterUtil.prepareEqualToExpression("t", "long", time),
+                    AndExpression(
+                        FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics),
+                        FilterUtil.prepareEqualToExpression("ek", "string", entity)
+                    )
+                ),
+            )
+            .build<Any>()
+        val result = mutableListOf<MetricRow>()
+        while (reader.hasNext()) {
+            val rows = reader.readNextBatchRow()
+            rows.forEach { row ->
+                val (mk, t, ek, m, meta) = row as Array<*>
+                val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+                // TODO: with BBM
+                result.add(MetricRow(t as Long, mk.toString(), ek.toString(), CBM(m as? ByteArray), BBM(), metaObj))
+            }
+        }
+        reader.close()
+        return result
     }
 
     fun queryMeta(time: Long, metrics: List<String>, entity: String): List<MetricRowMeta> {

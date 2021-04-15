@@ -41,7 +41,7 @@ class CBM : AbsBM, ComparableBM {
         this.weight = weight
         this.updateMaxBit()
     }
-    constructor(bytes: ByteArray) {
+    constructor(bytes: ByteArray?) {
         this.setBytes(bytes)
     }
 

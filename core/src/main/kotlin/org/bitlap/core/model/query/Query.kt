@@ -26,7 +26,7 @@ data class Query(
     /**
      * @required query metrics
      */
-    val metric: List<QueryMetric>,
+    val metrics: List<QueryMetric>,
 
     /**
      * query dimensions

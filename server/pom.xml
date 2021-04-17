@@ -9,19 +9,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitlap-sql</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.calcite</groupId>
-            <artifactId>calcite-core</artifactId>
-            <version>1.26.0</version>
-        </dependency>
-    </dependencies>
+    <artifactId>bitlap-server</artifactId>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-client</artifactId>
+        </dependency>
+    </dependencies>
 </project>

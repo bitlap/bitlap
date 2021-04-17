@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitlap-core</artifactId>
+    <artifactId>bitlap-client</artifactId>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -18,19 +18,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>jraft-core</artifactId>
+            <version>${sofa.jraft.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-storage</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.calcite</groupId>
-            <artifactId>calcite-core</artifactId>
-            <version>${calcite.version}</version>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>rpc-grpc-impl</artifactId>
+            <version>${sofa.jraft.version}</version>
         </dependency>
     </dependencies>
-
 </project>

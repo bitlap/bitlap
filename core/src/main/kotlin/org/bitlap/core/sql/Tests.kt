@@ -1,4 +1,4 @@
-package org.bitlap.sql
+package org.bitlap.core.sql
 
 import org.apache.calcite.config.Lex
 import org.apache.calcite.sql.dialect.OracleSqlDialect

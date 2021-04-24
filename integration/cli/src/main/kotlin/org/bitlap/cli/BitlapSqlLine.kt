@@ -4,7 +4,7 @@ import org.bitlap.cli.extension.BitlapCliApplication
 import sqlline.SqlLine
 import sqlline.SqlLineOpts
 import java.io.File
-import java.util.*
+import java.util.Locale
 import kotlin.system.exitProcess
 
 /**

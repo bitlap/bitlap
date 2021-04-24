@@ -17,16 +17,6 @@
             <artifactId>bitlap-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.os72</groupId>
-            <artifactId>protobuf-java-shaded-360</artifactId>
-            <version>0.9</version>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.os72</groupId>-->
-<!--            <artifactId>protobuf-java-util-shaded-360</artifactId>-->
-<!--            <version>0.9</version>-->
-<!--        </dependency>-->
-        <dependency>
             <groupId>org.apache.carbondata</groupId>
             <artifactId>carbondata-sdk</artifactId>
             <version>2.1.1</version>
@@ -54,28 +44,5 @@
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-
-        <plugins>
-            <plugin>
-                <groupId>com.github.os72</groupId>
-                <artifactId>protoc-jar-maven-plugin</artifactId>
-                <version>3.6.0.1</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <protocVersion>3.6.0</protocVersion>
-                            <type>java-shaded</type>
-                            <inputDirectories>
-                                <include>src/main/protobuf</include>
-                            </inputDirectories>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>

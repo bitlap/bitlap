@@ -3,9 +3,9 @@ package org.bitlap.storage.store
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapProperties
+import org.bitlap.common.proto.storage.DataSourcePB
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.metadata.DataSource
-import org.bitlap.storage.metadata.schema.DataSourcePB
 
 /**
  * Mail: chk19940609@gmail.com

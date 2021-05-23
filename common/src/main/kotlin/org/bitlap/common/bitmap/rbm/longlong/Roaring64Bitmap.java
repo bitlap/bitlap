@@ -29,7 +29,7 @@ import org.bitlap.common.bitmap.rbm.art.LeafNodeIterator;
  */
 public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
 
-  private HighLowContainer highLowContainer;
+  public HighLowContainer highLowContainer;
 
   public Roaring64Bitmap() {
     highLowContainer = new HighLowContainer();

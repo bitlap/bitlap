@@ -126,7 +126,7 @@ open class RBM : AbsBM {
         }
     }
 
-    override fun contains(dat: Int): Boolean = _rbm.contains(dat)
+    override operator fun contains(dat: Int): Boolean = _rbm.contains(dat)
     override fun clone(): RBM = RBM(_rbm.clone())
 
     override fun equals(other: Any?): Boolean {
@@ -197,6 +197,14 @@ open class RBM : AbsBM {
             }
         }.iterator()
     }
+
+    /**
+     * operator functions
+     */
+    operator fun plus(o: RBM) = this.clone().or(o)
+    operator fun plus(dat: Int) = this.clone().add(dat)
+    operator fun minus(o: RBM) = this.clone().andNot(o)
+    operator fun minus(dat: Int) = this.clone().remove(dat)
 
     companion object {
         @JvmStatic

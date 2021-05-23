@@ -1,4 +1,4 @@
-package org.bitlap
+package org.bitlap.jdbc
 
 import java.sql.Connection
 import java.sql.Driver

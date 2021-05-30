@@ -2,7 +2,7 @@ package org.bitlap.storage.store
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.bitlap.common.BitlapProperties
+import org.bitlap.common.BitlapConf
 import org.bitlap.common.proto.storage.DataSourcePB
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.metadata.DataSource
@@ -12,9 +12,9 @@ import org.bitlap.core.metadata.DataSource
  * Created by IceMimosa
  * Date: 2020/12/23
  */
-class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStore<DataSource>(conf) {
+class DataSourceStore(val name: String, val hadoopConf: Configuration, val conf: BitlapConf) : AbsBitlapStore<DataSource>(hadoopConf, conf) {
 
-    override val dataDir: Path = Path(BitlapProperties.getRootDir(), "data/$name")
+    override val dataDir: Path = Path(rootPath, "data/$name")
     private lateinit var metricStore: MetricStore
 
     override fun open() {
@@ -22,7 +22,7 @@ class DataSourceStore(val name: String, val conf: Configuration) : AbsBitlapStor
         if (!fs.exists(dataDir)) {
             fs.mkdirs(dataDir)
         }
-        this.metricStore = MetricStore(this, conf)
+        this.metricStore = MetricStore(this, hadoopConf, conf)
         this.metricStore.open()
     }
 

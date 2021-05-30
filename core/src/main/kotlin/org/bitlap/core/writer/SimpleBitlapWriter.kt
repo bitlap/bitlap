@@ -2,9 +2,9 @@ package org.bitlap.core.writer
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.common.error.BitlapException
+import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.BitlapWriter
-import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.SimpleRowSingle
 import org.bitlap.storage.metadata.MetricRow
@@ -23,7 +23,7 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
 
     private var closed = false
     private val rows = Collections.synchronizedList(mutableListOf<SimpleRow>())
-    private val dataSourceStore = DataSourceManager.getDataSourceStore(datasource)
+    private val dataSourceStore = BitlapContext.dataSourceManager.getDataSourceStore(datasource)
 
     override fun write(t: SimpleRow) {
         rows.add(t)

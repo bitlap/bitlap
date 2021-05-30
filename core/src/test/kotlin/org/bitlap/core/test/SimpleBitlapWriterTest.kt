@@ -1,6 +1,6 @@
 package org.bitlap.core.test
 
-import org.bitlap.core.DataSourceManager
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.query.Query
 import org.bitlap.core.model.query.QueryMetric
@@ -20,7 +20,7 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
 
         "test SimpleBitlapWriter" {
             val dsName = "test_datasource"
-            DataSourceManager.createDataSource(dsName, true)
+            BitlapContext.dataSourceManager.createDataSource(dsName, true)
             val writer = SimpleBitlapWriter(dsName)
 
             val testTime = DateTime.parse("2021-01-01").millis

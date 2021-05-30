@@ -9,8 +9,10 @@ import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
+import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycle
 import org.bitlap.common.proto.rpc.HelloRpcPB
+import org.bitlap.common.utils.withPaths
 import org.bitlap.server.raft.rpc.HelloRpcProcessor
 import java.io.File
 
@@ -21,7 +23,7 @@ import java.io.File
  * Created by IceMimosa
  * Date: 2021/4/22
  */
-open class BitlapServerEndpoint : LifeCycle {
+open class BitlapServerEndpoint(val conf: BitlapConf) : LifeCycle {
 
     @Volatile
     private var started = false
@@ -35,27 +37,28 @@ open class BitlapServerEndpoint : LifeCycle {
         if (this.started) {
             return
         }
-        val dataPath = "/usr/local/var/bitlap"
         val groupId = "bitlap-cluster"
-        val serverIdStr = "localhost:8001"
-        val initConfStr = "localhost:8001"
+        val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)!!
+        val serverIdStr = conf.get(BitlapConf.NODE_BIND_HOST)
+        val initConfStr = conf.get(BitlapConf.NODE_BIND_PEERS)
 
         FileUtils.forceMkdir(File(dataPath))
+        val nodeOptions = NodeOptions().apply {
+            logUri = dataPath.withPaths("raft", "log")
+            raftMetaUri = dataPath.withPaths("raft", "meta")
+            snapshotUri = dataPath.withPaths("raft", "snapshot")
+            electionTimeoutMs = 1000
+            isDisableCli = false
+            snapshotIntervalSecs = 30
+            fsm = MetaStateMachine()
+            initialConf = Configuration().apply {
+                require(parse(initConfStr)) { "Fail to parse initConf: $initConfStr" }
+            }
+        }
 
-        val nodeOptions = NodeOptions()
-        nodeOptions.electionTimeoutMs = 1000
-        nodeOptions.isDisableCli = false
-        nodeOptions.snapshotIntervalSecs = 30
-
-        val serverId = PeerId()
-        require(serverId.parse(serverIdStr)) { "Fail to parse serverId:$serverIdStr" }
-        val initConf = Configuration()
-        require(initConf.parse(initConfStr)) { "Fail to parse initConf:$initConfStr" }
-        nodeOptions.initialConf = initConf
-        nodeOptions.fsm = MetaStateMachine()
-        nodeOptions.logUri = dataPath + File.separator + "log"
-        nodeOptions.raftMetaUri = dataPath + File.separator + "raft_meta"
-        nodeOptions.snapshotUri = dataPath + File.separator + "snapshot"
+        val serverId = PeerId().apply {
+            require(parse(serverIdStr)) { "Fail to parse serverId:$serverIdStr" }
+        }
 
         RpcFactoryHelper.rpcFactory().registerProtobufSerializer(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance())
         MarshallerHelper.registerRespInstance(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance())

@@ -171,7 +171,7 @@ class CBM : AbsBM, ComparableBM {
     }
 
     override fun toString(): String {
-        return "CBM(weight=$weight, maxBit=$maxBit, container=$container)"
+        return "CBM(weight=$weight, maxBit=$maxBit, count=${this.getCount()}, uniqueCount=${this.getCountUnique()})"
     }
 
     /**

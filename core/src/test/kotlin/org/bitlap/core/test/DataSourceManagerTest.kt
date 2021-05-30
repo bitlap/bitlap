@@ -3,8 +3,8 @@ package org.bitlap.core.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.bitlap.common.error.BitlapException
-import org.bitlap.core.DataSourceManager
+import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.test.base.BaseLocalFsTest
 
 /**
@@ -16,7 +16,7 @@ class DataSourceManagerTest : BaseLocalFsTest() {
     init {
         "test DataSource create" {
             val testName = "test_datasource"
-            val ds = DataSourceManager
+            val ds = BitlapContext.dataSourceManager
             ds.createDataSource(testName)
             ds.createDataSource(testName, true)
             // get datasource

@@ -10,10 +10,10 @@ import sqlline.SqlLine
  * Created by IceMimosa
  * Date: 2021/4/18
  */
-class BitlapPromptHandler(sqlline: SqlLine) : PromptHandler(sqlline) {
+class BitlapPromptHandler(sqlline: SqlLine, prompt: String) : PromptHandler(sqlline) {
 
     override fun getDefaultPrompt(connectionIndex: Int, url: String?, defaultPrompt: String?): String {
-        return StringBuilder("bitlap").apply {
+        return StringBuilder(prompt).apply {
             sqlLine.connectionMetadata.currentSchema?.also {
                 append(" ($it)")
             }

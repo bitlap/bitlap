@@ -3,7 +3,7 @@ package org.bitlap.storage.store
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
-import org.bitlap.common.BitlapProperties
+import org.bitlap.common.BitlapConf
 
 /**
  * Desc:
@@ -14,10 +14,11 @@ import org.bitlap.common.BitlapProperties
  * Created by IceMimosa
  * Date: 2020/12/23
  */
-abstract class AbsBitlapStore<T>(conf: Configuration) : BitlapStore<T> {
+abstract class AbsBitlapStore<T>(hadoopConf: Configuration, conf: BitlapConf) : BitlapStore<T> {
 
-    protected val rootPath = Path(BitlapProperties.getRootDir())
-    protected var fs: FileSystem = rootPath.getFileSystem(conf).also {
+    protected val projectName = conf.get(BitlapConf.PROJECT_NAME)
+    protected val rootPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_DATA)
+    protected var fs: FileSystem = Path(rootPath).getFileSystem(hadoopConf).also {
         it.setWriteChecksum(false)
         it.setVerifyChecksum(false)
     }

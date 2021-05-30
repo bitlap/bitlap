@@ -1,8 +1,8 @@
 package org.bitlap.core.reader
 
 import org.bitlap.common.utils.PreConditions
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.BitlapReader
-import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.query.AggType
 import org.bitlap.core.model.query.Query
 import org.bitlap.core.model.query.RawRow
@@ -17,7 +17,7 @@ import org.bitlap.core.model.query.RawRow
 class DefaultBitlapReader : BitlapReader {
 
     override fun read(query: Query): List<RawRow> {
-        val dsStore = DataSourceManager.getDataSourceStore(PreConditions.checkNotBlank(query.datasource))
+        val dsStore = BitlapContext.dataSourceManager.getDataSourceStore(PreConditions.checkNotBlank(query.datasource))
         val metricStore = dsStore.getMetricStore()
 
         val shouldMaterialize = query.metrics.any { it.aggType == AggType.None || it.aggType == AggType.Distinct }

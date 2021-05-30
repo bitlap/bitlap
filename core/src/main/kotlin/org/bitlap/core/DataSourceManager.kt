@@ -14,10 +14,9 @@ import org.bitlap.storage.store.DataSourceStore
  * Created by IceMimosa
  * Date: 2020/12/20
  */
-object DataSourceManager {
+open class DataSourceManager(val conf: BitlapConf) {
 
     private val configuration = Configuration()
-    lateinit var conf: BitlapConf // TODO: remove
 
     /**
      * create [DataSource] with [name].

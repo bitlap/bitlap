@@ -138,7 +138,9 @@ open class RBM : AbsBM {
     }
 
     override fun hashCode(): Int = _rbm.hashCode()
-    override fun toString(): String = _rbm.toString()
+    override fun toString(): String {
+        return "RBM(count=${this.getCount()}, uniqueCount=${this.getCountUnique()})"
+    }
 
     override fun and(bm: BM): RBM = resetModify {
         this.also { _rbm.and(bm.getRBM()._rbm) }

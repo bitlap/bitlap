@@ -6,6 +6,7 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
+import org.bitlap.core.BitlapContext
 
 /**
  * Mail: chk19940609@gmail.com
@@ -29,7 +30,7 @@ abstract class BaseLocalFsTest : StringSpec() {
             }
             localFS.mkdirs(workPath)
             // set bitlap properties
-            conf = BitlapConf()
+            conf = BitlapContext.bitlapConf
             conf.set(BitlapConf.DEFAULT_ROOT_DIR_DATA, workPath.toString())
         }
 

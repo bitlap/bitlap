@@ -4,6 +4,7 @@ import com.alipay.sofa.jraft.RouteTable
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import org.bitlap.common.BitlapConf
 import org.bitlap.common.proto.rpc.HelloRpcPB
 import org.bitlap.server.raft.BitlapServerEndpoint
 
@@ -16,7 +17,8 @@ import org.bitlap.server.raft.BitlapServerEndpoint
  */
 class BitlapServer {
 
-    private val server = BitlapServerEndpoint()
+    private val conf = BitlapConf()
+    private val server = BitlapServerEndpoint(conf)
 
     fun start() {
         this.server.start()

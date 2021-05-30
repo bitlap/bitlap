@@ -20,6 +20,7 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
 
         "test SimpleBitlapWriter" {
             val dsName = "test_datasource"
+            DataSourceManager.conf = conf
             DataSourceManager.createDataSource(dsName, true)
             val writer = SimpleBitlapWriter(dsName)
 

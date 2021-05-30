@@ -2,7 +2,7 @@ package org.bitlap.core.writer
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.common.error.BitlapException
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapWriter
 import org.bitlap.core.DataSourceManager
 import org.bitlap.core.model.SimpleRow

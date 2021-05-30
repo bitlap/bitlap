@@ -1,4 +1,4 @@
-package org.bitlap.common.error
+package org.bitlap.common.exception
 
 import java.lang.RuntimeException
 

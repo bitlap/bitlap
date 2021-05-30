@@ -23,6 +23,11 @@
             <version>1.4.200</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-cli-jvm</artifactId>
+            <version>${kotlin.cli.version}</version>
+        </dependency>
+        <dependency>
             <groupId>sqlline</groupId>
             <artifactId>sqlline</artifactId>
             <version>${sqlline.version}</version>

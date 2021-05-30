@@ -1,2 +1,3 @@
 [default]
-root.dir = /tmp/data/bitlap
+root.dir.data = /tmp/data/bitlap_data
+root.dir.local = /tmp/data/bitlap

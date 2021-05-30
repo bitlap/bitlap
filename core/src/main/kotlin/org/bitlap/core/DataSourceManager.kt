@@ -1,7 +1,8 @@
 package org.bitlap.core
 
 import org.apache.hadoop.conf.Configuration
-import org.bitlap.common.error.BitlapException
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.metadata.DataSource
 import org.bitlap.storage.store.DataSourceStore
@@ -16,6 +17,7 @@ import org.bitlap.storage.store.DataSourceStore
 object DataSourceManager {
 
     private val configuration = Configuration()
+    lateinit var conf: BitlapConf // TODO: remove
 
     /**
      * create [DataSource] with [name].
@@ -25,7 +27,7 @@ object DataSourceManager {
      */
     fun createDataSource(name: String, ifNotExists: Boolean = false) {
         PreConditions.checkNotBlank(name, "DataSource name cannot be null or blank.")
-        val store = DataSourceStore(name, configuration)
+        val store = DataSourceStore(name, configuration, conf)
         val ds = DataSource(name)
         val exists = store.exists()
         if (exists && ifNotExists) {
@@ -41,7 +43,7 @@ object DataSourceManager {
      * get [DataSource] with [name]
      */
     fun getDataSource(name: String): DataSource {
-        val store = DataSourceStore(name, configuration)
+        val store = DataSourceStore(name, configuration, conf)
         if (!store.exists()) {
             throw BitlapException("DataSource [$name] is not exists.")
         }
@@ -49,7 +51,7 @@ object DataSourceManager {
     }
 
     fun getDataSourceStore(name: String): DataSourceStore {
-        val store = DataSourceStore(name, configuration)
+        val store = DataSourceStore(name, configuration, conf)
         if (!store.exists()) {
             throw BitlapException("DataSource [$name] is not exists.")
         }

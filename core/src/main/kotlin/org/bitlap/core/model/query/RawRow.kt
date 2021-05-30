@@ -2,7 +2,6 @@ package org.bitlap.core.model.query
 
 import org.bitlap.core.reader.DefaultBitlapReader
 import java.io.Serializable
-import java.util.*
 
 /**
  * Desc: raw data row for [DefaultBitlapReader]
@@ -14,6 +13,6 @@ import java.util.*
 class RawRow(val data: Array<*>) : Serializable {
 
     override fun toString(): String {
-        return Arrays.toString(data)
+        return data.contentToString()
     }
 }

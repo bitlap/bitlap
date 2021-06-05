@@ -175,7 +175,9 @@ class BBM : AbsBM {
         return result
     }
 
-    override fun toString(): String = container.toString()
+    override fun toString(): String {
+        return "BBM(count=${this.getCount()}, uniqueCount=${this.getCountUnique()})"
+    }
 
     /**
      * operators

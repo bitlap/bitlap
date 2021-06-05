@@ -10,4 +10,9 @@ import java.io.Serializable
  * Created by IceMimosa
  * Date: 2021/3/30
  */
-class RawRow(val data: Array<*>) : Serializable
+class RawRow(val data: Array<*>) : Serializable {
+
+    override fun toString(): String {
+        return data.contentToString()
+    }
+}

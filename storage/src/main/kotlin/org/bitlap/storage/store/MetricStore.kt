@@ -6,7 +6,7 @@ import org.apache.carbondata.sdk.file.CarbonReader
 import org.apache.carbondata.sdk.file.CarbonWriter
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.bitlap.common.BitlapProperties
+import org.bitlap.common.BitlapConf
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
@@ -22,9 +22,9 @@ import org.joda.time.DateTime
  * Created by IceMimosa
  * Date: 2021/1/26
  */
-class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStore<MetricRows>(conf) {
+class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<MetricRows>(hadoopConf, conf) {
 
-    override val dataDir: Path = Path(BitlapProperties.getRootDir(), "data/${dsStore.name}/metric")
+    override val dataDir: Path = Path(rootPath, "data/${dsStore.name}/metric")
     private val writerB = CarbonWriter.builder()
         .withCsvInput( // TODO: add enum
             """[
@@ -40,7 +40,7 @@ class MetricStore(dsStore: DataSourceStore, conf: Configuration) : AbsBitlapStor
         .sortBy(arrayOf("mk", "t", "ek"))
         .withBlockletSize(8)
         .withPageSizeInMb(1)
-        .writtenBy("bitlap")
+        .writtenBy(projectName)
 
     private val readerB = CarbonReader.builder()
         .withRowRecordReader() // disable vector read

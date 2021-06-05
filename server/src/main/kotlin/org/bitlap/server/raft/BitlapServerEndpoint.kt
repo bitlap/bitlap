@@ -12,12 +12,11 @@ import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycle
 import org.bitlap.common.proto.rpc.HelloRpcPB
-import org.bitlap.server.raft.rpc.*
 import org.bitlap.common.utils.withPaths
+import org.bitlap.server.raft.rpc.*
 import org.bitlap.server.raft.rpc.HelloRpcProcessor
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
-
 
 /**
  * Desc: Endpoint of bitlap server

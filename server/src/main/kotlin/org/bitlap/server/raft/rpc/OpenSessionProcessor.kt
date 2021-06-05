@@ -12,7 +12,7 @@ import org.bitlap.common.proto.driver.BOpenSession
  * @version 1.0
  */
 class OpenSessionProcessor : RpcProcessor<BOpenSession.BOpenSessionReq> {
-    override fun handleRequest(rpcCtx: RpcContext?, request: BOpenSession.BOpenSessionReq?) {
+    override fun handleRequest(rpcCtx: RpcContext, request: BOpenSession.BOpenSessionReq) {
         TODO("Not yet implemented")
     }
 

@@ -12,11 +12,9 @@ import org.bitlap.common.proto.driver.BExecuteStatement
  * @version 1.0
  */
 class ExecuteStatementProcessor : RpcProcessor<BExecuteStatement.BExecuteStatementReq> {
-    override fun handleRequest(rpcCtx: RpcContext?, request: BExecuteStatement.BExecuteStatementReq?) {
+    override fun handleRequest(rpcCtx: RpcContext, request: BExecuteStatement.BExecuteStatementReq) {
         TODO("Not yet implemented")
     }
 
     override fun interest(): String = BExecuteStatement.BExecuteStatementReq::class.java.name
-
-
 }

@@ -11,8 +11,10 @@ import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.LifeCycle
 import org.bitlap.common.proto.rpc.HelloRpcPB
-import org.bitlap.server.raft.rpc.HelloRpcProcessor
+import org.bitlap.server.raft.rpc.*
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+
 
 /**
  * Desc: Endpoint of bitlap server
@@ -23,18 +25,23 @@ import java.io.File
  */
 open class BitlapServerEndpoint : LifeCycle {
 
-    @Volatile
-    private var started = false
+    private val allProcessors = listOf(
+        CloseSessionProcessor(),
+        OpenSessionProcessor(),
+        ExecuteStatementProcessor(),
+        FetchResultsProcessor(),
+        HelloRpcProcessor()
+    )
 
-    @Volatile
-    private var shutdown = true
-
+    private val started = AtomicBoolean(false)
+    private val shutdown = AtomicBoolean(true)
     private lateinit var node: Node
 
     override fun start() {
-        if (this.started) {
+        if (!this.started.compareAndSet(false, true)) {
             return
         }
+        this.shutdown.set(false)
         val dataPath = "/usr/local/var/bitlap"
         val groupId = "bitlap-cluster"
         val serverIdStr = "localhost:8001"
@@ -57,24 +64,22 @@ open class BitlapServerEndpoint : LifeCycle {
         nodeOptions.raftMetaUri = dataPath + File.separator + "raft_meta"
         nodeOptions.snapshotUri = dataPath + File.separator + "snapshot"
 
-        RpcFactoryHelper.rpcFactory().registerProtobufSerializer(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance())
+        RpcFactoryHelper.rpcFactory()
+            .registerProtobufSerializer(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance())
         MarshallerHelper.registerRespInstance(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance())
         val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.endpoint)
-        rpcServer.registerProcessor(HelloRpcProcessor())
-
+        allProcessors.forEach { rpcServer.registerProcessor(it) }
         val raftGroupService = RaftGroupService(groupId, serverId, nodeOptions, rpcServer)
         this.node = raftGroupService.start()
-
-        this.started = true
-        this.shutdown = false
-
         println("Started counter server at port:" + node.nodeId.peerId.port)
     }
 
-    override fun isStarted(): Boolean = this.started
-    override fun isShutdown(): Boolean = this.shutdown
+    override fun isStarted(): Boolean = this.started.get()
+    override fun isShutdown(): Boolean = this.shutdown.get()
 
     override fun close() {
-        this.node.shutdown()
+        if (this.shutdown.compareAndSet(false, true)) {
+            this.node.shutdown()
+        }
     }
 }

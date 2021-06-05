@@ -12,7 +12,7 @@ import org.bitlap.common.proto.driver.BFetchResults
  * @version 1.0
  */
 class FetchResultsProcessor : RpcProcessor<BFetchResults.BFetchResultsReq> {
-    override fun handleRequest(rpcCtx: RpcContext?, request: BFetchResults.BFetchResultsReq?) {
+    override fun handleRequest(rpcCtx: RpcContext, request: BFetchResults.BFetchResultsReq) {
         TODO("Not yet implemented")
     }
 

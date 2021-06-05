@@ -13,7 +13,7 @@ import org.bitlap.common.proto.driver.BCloseSession
  */
 class CloseSessionProcessor : RpcProcessor<BCloseSession.BCloseSessionReq> {
 
-    override fun handleRequest(rpcCtx: RpcContext?, request: BCloseSession.BCloseSessionReq?) {
+    override fun handleRequest(rpcCtx: RpcContext, request: BCloseSession.BCloseSessionReq) {
         TODO("Not yet implemented")
     }
 

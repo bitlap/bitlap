@@ -17,12 +17,15 @@ import java.io.Serializable
 open class BitlapConf() : Serializable {
 
     private val log = LoggerFactory.getLogger(BitlapConf::class.java)
-    @Volatile private lateinit var sessionConf: Map<String, String>
+    @Volatile
+    private lateinit var sessionConf: Map<String, String>
 
     // for session
     constructor(sessionConf: Map<String, String>) : this() {
         this.sessionConf = sessionConf
     }
+
+    fun getSessionConfig(): Map<String, String> = this.sessionConf
 
     /**
      * core properties

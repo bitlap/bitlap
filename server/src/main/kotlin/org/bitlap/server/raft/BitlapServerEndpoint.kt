@@ -15,6 +15,7 @@ import org.bitlap.common.proto.rpc.HelloRpcPB
 import org.bitlap.common.utils.withPaths
 import org.bitlap.server.raft.cli.BCLIService
 import org.bitlap.server.raft.cli.HelloRpcProcessor
+import org.bitlap.server.raft.cli.SessionManager
 import org.bitlap.server.raft.cli.rpc.CloseSessionProcessor
 import org.bitlap.server.raft.cli.rpc.ExecuteStatementProcessor
 import org.bitlap.server.raft.cli.rpc.FetchResultsProcessor
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle {
 
-    private val cliService = BCLIService()
+    private val cliService = BCLIService(SessionManager())
     private val allProcessors = listOf(
         CloseSessionProcessor(cliService),
         OpenSessionProcessor(cliService),

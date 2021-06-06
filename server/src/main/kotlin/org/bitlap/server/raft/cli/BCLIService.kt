@@ -6,7 +6,7 @@ package org.bitlap.server.raft.cli
  * @since 2021/6/6
  * @version 1.0
  */
-open class BCLIService : CLIService {
+open class BCLIService(private val sessionManager: SessionManager) : CLIService {
 
     // get session manager by conf
     // create session
@@ -15,15 +15,17 @@ open class BCLIService : CLIService {
     // fetch results by OperationHandle
 
     override fun openSession(
-        username: String?,
-        password: String?,
+        username: String,
+        password: String,
         configuration: Map<String, String>?
     ): SessionHandle? {
-        TODO("Not yet implemented")
+        return sessionManager.openSession(
+            null, username, password,  configuration ?: mapOf()
+        ).sessionHandle
     }
 
     override fun closeSession(sessionHandle: SessionHandle) {
-        TODO("Not yet implemented")
+        sessionManager.closeSession(sessionHandle)
     }
 
     override fun executeStatement(

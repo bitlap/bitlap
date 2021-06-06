@@ -9,7 +9,7 @@ package org.bitlap.server.raft.cli
 interface CLIService {
 
     @Throws(BSQLException::class)
-    fun openSession(username: String?, password: String?, configuration: Map<String, String>?): SessionHandle?
+    fun openSession(username: String, password: String, configuration: Map<String, String>?): SessionHandle?
 
     @Throws(BSQLException::class)
     fun closeSession(sessionHandle: SessionHandle)

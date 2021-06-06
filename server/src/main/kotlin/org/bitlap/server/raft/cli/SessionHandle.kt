@@ -11,6 +11,7 @@ import java.util.UUID
  */
 open class SessionHandle : Handle {
 
+    constructor()
     constructor(bSessionHandle: BSessionHandle) : super(bSessionHandle.sessionId)
     constructor(handleId: HandleIdentifier) : super(handleId)
 

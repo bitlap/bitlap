@@ -1,5 +1,8 @@
 package org.bitlap.server.raft.cli
 
+import org.bitlap.common.BitlapConf
+import java.util.concurrent.atomic.AtomicBoolean
+
 /**
  *
  * @author 梦境迷离
@@ -8,38 +11,43 @@ package org.bitlap.server.raft.cli
  */
 interface AbstractBitlapSession {
 
-    /**
-     * Set the session manager for the session
-     * @param sessionManager
-     */
-    fun setSessionManager(sessionManager: SessionManager)
-    /**
-     * Get the session manager for the session
-     */
-    fun getSessionManager(): SessionManager
-
-    @Throws(Exception::class)
-    fun open(sessionConfMap: Map<String, String>?)
+    val sessionState: AtomicBoolean
+    var lastAccessTime: Long
+    val sessionHandle: SessionHandle
+    val password: String
+    val username: String
+    val creationTime: Long
+    val sessionConf: BitlapConf
+    val sessionManager: SessionManager
 
     /**
-     * execute operation handler
+     * open Session
+     * @param sessionConfMap
+     * @return SessionHandle The Session handle
+     * @throws BSQLException
+     */
+    @Throws(BSQLException::class)
+    fun open(sessionConfMap: Map<String, String>?): SessionHandle
+
+    /**
+     * execute statement
      * @param statement
      * @param confOverlay
-     * @return
+     * @return OperationHandle The Operate handle
      * @throws BSQLException
      */
     @Throws(BSQLException::class)
     fun executeStatement(
         statement: String,
         confOverlay: Map<String, String>?
-    ): OperationHandle?
+    ): OperationHandle
 
     /**
-     * execute operation handler
+     * execute statement
      * @param statement
      * @param confOverlay
      * @param queryTimeout
-     * @return
+     * @return OperationHandle The Operate handle
      * @throws BSQLException
      */
     @Throws(BSQLException::class)
@@ -47,8 +55,12 @@ interface AbstractBitlapSession {
         statement: String,
         confOverlay: Map<String, String>?,
         queryTimeout: Long
-    ): OperationHandle?
+    ): OperationHandle
 
+    /**
+     * close Session
+     * @throws BSQLException
+     */
     @Throws(BSQLException::class)
     fun close()
 }

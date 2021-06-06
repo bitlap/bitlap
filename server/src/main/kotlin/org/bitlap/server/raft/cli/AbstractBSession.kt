@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @since 2021/6/6
  * @version 1.0
  */
-interface AbstractBitlapSession {
+interface AbstractBSession {
 
     val sessionState: AtomicBoolean
     var lastAccessTime: Long

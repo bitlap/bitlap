@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapSession : AbstractBitlapSession {
+class BSession : AbstractBSession {
 
     @Volatile
     override var lastAccessTime: Long = 0

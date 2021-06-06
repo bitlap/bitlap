@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
  */
 open class SessionManager {
 
-    private val handleToSession = ConcurrentHashMap<SessionHandle, AbstractBitlapSession>()
+    private val handleToSession = ConcurrentHashMap<SessionHandle, AbstractBSession>()
     private val sessionAddLock = Any()
     private val sessionThread = Thread {// register center
         while (true) {
@@ -54,15 +54,28 @@ open class SessionManager {
         username: String,
         password: String,
         sessionConf: Map<String, String>
-    ): BitlapSession {
+    ): BSession {
         synchronized(sessionAddLock) {
-            val session = BitlapSession(
+            val session = BSession(
                 sessionHandle,
                 username,
                 password,
                 sessionConf,
                 this
             )
+
+            try {
+                executeSessionHooks(session)
+            } catch (e: Exception) {
+                println("Failed to execute session hooks: $e")
+                try {
+                    session.close()
+                } catch (t: Throwable) {
+                    println("Error closing session: $t")
+                }
+                throw BSQLException("Failed to execute session hooks: " + e.message, e)
+            }
+
             handleToSession[session.sessionHandle] = session
             println(
                 "Session opened, " + session.sessionHandle.toString() + ", current sessions:" + getOpenSessionCount()
@@ -75,7 +88,6 @@ open class SessionManager {
     @Throws(BSQLException::class)
     fun closeSession(sessionHandle: SessionHandle) {
         synchronized(sessionAddLock) {
-            handleToSession[sessionHandle]
             handleToSession.remove(sessionHandle) ?: throw BSQLException("Session does not exist: $sessionHandle")
             println("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
             if (getOpenSessionCount() == 0) {
@@ -91,5 +103,13 @@ open class SessionManager {
 
     open fun getOpenSessionCount(): Int {
         return handleToSession.size
+    }
+
+    private fun executeSessionHooks(abstractBSession: AbstractBSession) {
+        //TODO need HookContext, and get read hooks from conf
+        val sessionHooks: List<BSessionHook> = listOf()
+        for (sessionHook in sessionHooks) {
+            sessionHook.run(BSessionHookContextImpl(abstractBSession))
+        }
     }
 }

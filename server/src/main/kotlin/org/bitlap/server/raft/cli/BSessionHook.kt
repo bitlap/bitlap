@@ -12,7 +12,7 @@ interface BSessionHook : Hook {
 
     /**
      * @param sessionHookContext context
-     * @throws HiveSQLException
+     * @throws BSQLException
      */
     @Throws(BSQLException::class)
     fun run(sessionHookContext: BSessionHookContext)

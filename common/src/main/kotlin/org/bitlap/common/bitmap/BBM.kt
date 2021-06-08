@@ -250,8 +250,7 @@ class BBM : AbsBM {
             is RBM -> {
                 if (container.isEmpty()) {
                     container[MAGIC_BUCKET] = bm.clone()
-                }
-                else if (!bm.isEmpty()) {
+                } else if (!bm.isEmpty()) {
                     container.values.forEach { it.or(bm) }
                 }
             }
@@ -278,8 +277,7 @@ class BBM : AbsBM {
             is RBM -> {
                 if (container.isEmpty()) {
                     container[MAGIC_BUCKET] = bm.clone()
-                }
-                else if (!bm.isEmpty()) {
+                } else if (!bm.isEmpty()) {
                     container.values.forEach { it.xor(bm) }
                 }
             }

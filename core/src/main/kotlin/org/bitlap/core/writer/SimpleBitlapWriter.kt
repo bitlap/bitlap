@@ -50,7 +50,7 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
                 .values
             // 2. identify bucket id for dimensions for each entity + metric
             val cleanRows = singleRows.groupBy { "${it.entityKey}${it.entity}${it.metricKey}" }.flatMap { (_, sRows) ->
-                val temps = mutableMapOf<String, Int>()
+                val temps = hashMapOf<String, Int>()
                 var counter = 0
                 sRows.sortedByDescending { it.metric }.map { sRow ->
                     val dim = sRow.dimension.toString()

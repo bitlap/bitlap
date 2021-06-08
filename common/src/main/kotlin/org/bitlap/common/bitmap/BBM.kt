@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
 
 class BBM : AbsBM {
 
-    val container = mutableMapOf<Int, RBM>()
+    val container = hashMapOf<Int, RBM>()
 
     /**
      * get unique bitmap from [container]
@@ -109,9 +109,9 @@ class BBM : AbsBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, BBM> {
         if (splitSize <= 1) {
-            return mutableMapOf(0 to doIf(copy, this) { this.clone() })
+            return hashMapOf(0 to doIf(copy, this) { this.clone() })
         }
-        val results = mutableMapOf<Int, BBM>()
+        val results = hashMapOf<Int, BBM>()
         container.forEach { (bucket, rbm) ->
             val rs = rbm.split(splitSize, copy)
             rs.forEach { (index, r) ->
@@ -193,14 +193,20 @@ class BBM : AbsBM {
                 }
             }
             is BBM -> {
-                if (bm.isEmpty()) {
-                    container.clear()
+                if (bm.isMagic()) {
+                    this.and(bm.container[MAGIC_BUCKET]!!)
                 } else {
-                    container.forEach { (bucket, rbm) ->
-                        if (bm.container.containsKey(bucket)) {
-                            rbm.and(bm.container[bucket]!!)
-                        } else {
-                            rbm.empty()
+                    if (bm.isEmpty()) {
+                        container.clear()
+                    } else {
+                        val magic = bm.container[MAGIC_BUCKET]
+                        container.forEach { (bucket, rbm) ->
+                            if (bm.container.containsKey(bucket)) {
+                                rbm.and(bm.container[bucket]!!)
+                                magic?.also { rbm.and(it) }
+                            } else {
+                                rbm.empty()
+                            }
                         }
                     }
                 }
@@ -219,10 +225,16 @@ class BBM : AbsBM {
                 }
             }
             is BBM -> {
-                if (!bm.isEmpty()) {
-                    container.forEach { (bucket, rbm) ->
-                        if (bm.container.containsKey(bucket)) {
-                            rbm.andNot(bm.container[bucket]!!)
+                if (bm.isMagic()) {
+                    this.andNot(bm.container[MAGIC_BUCKET]!!)
+                } else {
+                    if (!bm.isEmpty()) {
+                        val magic = bm.container[MAGIC_BUCKET]
+                        container.forEach { (bucket, rbm) ->
+                            if (bm.container.containsKey(bucket)) {
+                                rbm.andNot(bm.container[bucket]!!)
+                                magic?.also { rbm.andNot(it) }
+                            }
                         }
                     }
                 }
@@ -236,14 +248,23 @@ class BBM : AbsBM {
     override fun or(bm: BM): BBM = resetModify {
         when (bm) {
             is RBM -> {
-                if (!bm.isEmpty()) {
+                if (container.isEmpty()) {
+                    container[MAGIC_BUCKET] = bm.clone()
+                }
+                else if (!bm.isEmpty()) {
                     container.values.forEach { it.or(bm) }
                 }
             }
             is BBM -> {
-                if (!bm.isEmpty()) {
-                    bm.container.forEach { (bucket, rbm) ->
-                        container.computeIfAbsent(bucket) { RBM() }.or(rbm)
+                if (bm.isMagic()) {
+                    this.or(bm.container[MAGIC_BUCKET]!!)
+                } else {
+                    if (!bm.isEmpty()) {
+                        val magic = bm.container[MAGIC_BUCKET]
+                        bm.container.forEach { (bucket, rbm) ->
+                            val tmp = container.computeIfAbsent(bucket) { RBM() }.or(rbm)
+                            magic?.also { tmp.or(it) }
+                        }
                     }
                 }
             }
@@ -255,14 +276,23 @@ class BBM : AbsBM {
     override fun xor(bm: BM): BBM = resetModify {
         when (bm) {
             is RBM -> {
-                if (!bm.isEmpty()) {
+                if (container.isEmpty()) {
+                    container[MAGIC_BUCKET] = bm.clone()
+                }
+                else if (!bm.isEmpty()) {
                     container.values.forEach { it.xor(bm) }
                 }
             }
             is BBM -> {
-                if (!bm.isEmpty()) {
-                    bm.container.forEach { (bucket, rbm) ->
-                        container.computeIfAbsent(bucket) { RBM() }.xor(rbm)
+                if (bm.isMagic()) {
+                    this.xor(bm.container[MAGIC_BUCKET]!!)
+                } else {
+                    if (!bm.isEmpty()) {
+                        val magic = bm.container[MAGIC_BUCKET]
+                        bm.container.forEach { (bucket, rbm) ->
+                            val tmp = container.computeIfAbsent(bucket) { RBM() }.xor(rbm)
+                            magic?.also { tmp.xor(it) }
+                        }
                     }
                 }
             }
@@ -272,7 +302,35 @@ class BBM : AbsBM {
         this
     }
 
+    /**
+     * Check BBM if only contains [MAGIC_BUCKET]
+     */
+    private fun isMagic(): Boolean {
+        if (!container.containsKey(MAGIC_BUCKET)) {
+            return false
+        }
+        container.entries.removeIf { it.value.isEmpty() }
+        return container.size == 1 && container[MAGIC_BUCKET] != null
+    }
+
+    /**
+     * operator functions
+     */
+    operator fun plusAssign(o: BM) {
+        this.or(o)
+    }
+    operator fun plus(o: BM) = this.clone().or(o)
+    operator fun minusAssign(o: BM) {
+        this.andNot(o)
+    }
+    operator fun minus(o: BM) = this.clone().andNot(o)
+
     companion object {
+
+        /**
+         * magic bucket, -1 will be considered as [RBM]
+         */
+        const val MAGIC_BUCKET = -1
 
         @JvmStatic
         fun and(bm1: BBM, bm2: RBM): BBM = bm1.clone().and(bm2)

@@ -22,7 +22,7 @@ import kotlin.math.min
 
 class CBM : AbsBM, ComparableBM {
 
-    val container = mutableMapOf<Int, BBM>()
+    val container = hashMapOf<Int, BBM>()
     private var _bbm = BBM()
     var maxBit = 0
         private set
@@ -91,9 +91,9 @@ class CBM : AbsBM, ComparableBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, CBM> {
         if (splitSize <= 1) {
-            return mutableMapOf(0 to doIf(copy, this) { this.clone() })
+            return hashMapOf(0 to doIf(copy, this) { this.clone() })
         }
-        val results = mutableMapOf<Int, CBM>()
+        val results = hashMapOf<Int, CBM>()
         container.forEach { (bit, bbm) ->
             val bs = bbm.split(splitSize, copy)
             bs.forEach { (index, b) ->
@@ -535,6 +535,18 @@ class CBM : AbsBM, ComparableBM {
         return if (equals) result.and(rbm) else result.andNot(rbm)
     }
 
+    /**
+     * operator functions
+     */
+    operator fun plusAssign(o: BM) {
+        this.or(o)
+    }
+    operator fun plus(o: BM) = this.clone().or(o)
+    operator fun minusAssign(o: BM) {
+        this.andNot(o)
+    }
+    operator fun minus(o: BM) = this.clone().andNot(o)
+
     companion object {
 
         @JvmStatic
@@ -581,10 +593,10 @@ class CBM : AbsBM, ComparableBM {
             val bucketIds = cbm.container.values.flatMap { it.container.keys }.distinct().sorted()
             val cbms = mutableListOf<CBM>()
             bucketIds.forEach { bid ->
-                val tempCBMContainer = mutableMapOf<Int, BBM>()
+                val tempCBMContainer = hashMapOf<Int, BBM>()
                 cbm.container.forEach { (k, v) ->
-                    val tempBBMContainer = mutableMapOf<Int, RBM>()
-                    tempBBMContainer[-1] = v.container[bid] ?: RBM() // TODO: support -1
+                    val tempBBMContainer = hashMapOf<Int, RBM>()
+                    tempBBMContainer[BBM.MAGIC_BUCKET] = v.container[bid] ?: RBM()
                     tempCBMContainer[k] = BBM(tempBBMContainer, true)
                 }
                 cbms.add(CBM(tempCBMContainer, true))
@@ -607,7 +619,7 @@ class CBM : AbsBM, ComparableBM {
 
         @JvmStatic
         fun shift(cbm: CBM, bit: Int): CBM {
-            val results = mutableMapOf<Int, BBM>()
+            val results = hashMapOf<Int, BBM>()
             cbm.container.forEach { (k, v) ->
                 val shiftedBit = k + bit
                 if (shiftedBit >= 0) {

@@ -4,7 +4,7 @@ import org.bitlap.common.BitlapConf
 
 /**
  * BSessionHookContext.
- * Interface passed to the HiveServer2 session hook execution. This enables
+ * Interface passed to the BitlapServer session hook execution. This enables
  * the hook implementation to accesss session config, user and session handle
  * @author 梦境迷离
  * @since 2021/6/6

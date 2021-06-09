@@ -34,7 +34,7 @@ open class BitlapConf() : Serializable {
         try {
             Setting("bitlap.setting")
         } catch (e: Exception) {
-            log.error("Loading bitlap.setting config error, cause: ", e)
+            log.warn("Loading bitlap.setting config error, cause: ", e)
             Setting()
         }
     }

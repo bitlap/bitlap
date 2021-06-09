@@ -87,9 +87,9 @@ open class RBM : AbsBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, RBM> {
         if (splitSize <= 1 || _rbm.isEmpty) {
-            return mutableMapOf(0 to doIf(copy, this) { it.clone() })
+            return hashMapOf(0 to doIf(copy, this) { it.clone() })
         }
-        val results = mutableMapOf<Int, RBM>()
+        val results = hashMapOf<Int, RBM>()
         val array = _rbm.highLowContainer
         (0 until array.size()).forEach { i ->
             val key = array.keys[i]
@@ -203,9 +203,22 @@ open class RBM : AbsBM {
     /**
      * operator functions
      */
-    operator fun plus(o: RBM) = this.clone().or(o)
+    operator fun plusAssign(o: BM) {
+        this.or(o)
+    }
+    operator fun plusAssign(dat: Int) {
+        this.add(dat)
+    }
+    operator fun plus(o: BM) = this.clone().or(o)
     operator fun plus(dat: Int) = this.clone().add(dat)
-    operator fun minus(o: RBM) = this.clone().andNot(o)
+
+    operator fun minusAssign(o: BM) {
+        this.andNot(o)
+    }
+    operator fun minusAssign(dat: Int) {
+        this.remove(dat)
+    }
+    operator fun minus(o: BM) = this.clone().andNot(o)
     operator fun minus(dat: Int) = this.clone().remove(dat)
 
     companion object {

@@ -10,7 +10,7 @@ import java.sql.*
  * @version 1.0
  */
 class BitlapStatement : Statement {
-   
+
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         throw SQLFeatureNotSupportedException("Method not supported")
     }

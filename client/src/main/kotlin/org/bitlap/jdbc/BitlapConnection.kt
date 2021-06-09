@@ -12,7 +12,7 @@ import java.util.concurrent.Executor
  * @version 1.0
  */
 class BitlapConnection : Connection {
- 
+
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         throw SQLFeatureNotSupportedException("Method not supported")
     }
@@ -20,7 +20,7 @@ class BitlapConnection : Connection {
     override fun isWrapperFor(iface: Class<*>?): Boolean {
         throw SQLFeatureNotSupportedException("Method not supported")
     }
-    
+
     override fun close() {
         TODO("Not yet implemented")
     }
@@ -174,7 +174,7 @@ class BitlapConnection : Connection {
     override fun releaseSavepoint(savepoint: Savepoint?) {
         throw SQLFeatureNotSupportedException("Method not supported")
     }
-    
+
     override fun createClob(): Clob {
         throw SQLFeatureNotSupportedException("Method not supported")
     }

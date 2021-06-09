@@ -16,5 +16,4 @@ interface BSessionHook : Hook {
      */
     @Throws(BSQLException::class)
     fun run(sessionHookContext: BSessionHookContext)
-
 }

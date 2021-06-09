@@ -20,7 +20,7 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         configuration: Map<String, String>?
     ): SessionHandle? {
         return sessionManager.openSession(
-            null, username, password,  configuration ?: mapOf()
+            null, username, password, configuration ?: mapOf()
         ).sessionHandle
     }
 

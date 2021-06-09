@@ -3,7 +3,6 @@ package org.bitlap.server.raft.cli
 import org.bitlap.common.BitlapConf
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 /**
  * Bitlap Session
  *

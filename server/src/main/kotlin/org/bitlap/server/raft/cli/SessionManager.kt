@@ -13,7 +13,7 @@ open class SessionManager {
 
     private val handleToSession = ConcurrentHashMap<SessionHandle, AbstractBSession>()
     private val sessionAddLock = Any()
-    private val sessionThread = Thread {// register center
+    private val sessionThread = Thread { // register center
         while (true) {
             val iterator = handleToSession.iterator()
             println("There are [${handleToSession.size}] surviving sessions")
@@ -34,7 +34,6 @@ open class SessionManager {
                 }
 
                 TimeUnit.SECONDS.sleep(1)
-
             } catch (e: Exception) {
                 println("Failed to listen for session error: $e.localizedMessage")
             }
@@ -92,9 +91,9 @@ open class SessionManager {
             println("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
             if (getOpenSessionCount() == 0) {
                 println(
-                    "This instance of Bitlap has been removed from the list of server "
-                        + "instances available for dynamic service discovery. "
-                        + "The last client session has ended - will shutdown now."
+                    "This instance of Bitlap has been removed from the list of server " +
+                        "instances available for dynamic service discovery. " +
+                        "The last client session has ended - will shutdown now."
                 )
                 // TODO STOP server
             }
@@ -106,7 +105,7 @@ open class SessionManager {
     }
 
     private fun executeSessionHooks(abstractBSession: AbstractBSession) {
-        //TODO need HookContext, and get read hooks from conf
+        // TODO need HookContext, and get read hooks from conf
         val sessionHooks: List<BSessionHook> = listOf()
         for (sessionHook in sessionHooks) {
             sessionHook.run(BSessionHookContextImpl(abstractBSession))

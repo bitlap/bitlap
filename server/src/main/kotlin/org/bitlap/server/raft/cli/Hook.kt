@@ -6,5 +6,4 @@ package org.bitlap.server.raft.cli
  * @since 2021/6/6
  * @version 1.0
  */
-interface Hook {
-}
+interface Hook

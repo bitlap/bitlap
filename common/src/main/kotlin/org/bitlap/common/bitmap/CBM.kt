@@ -179,55 +179,53 @@ class CBM : AbsBM, ComparableBM {
      */
     fun add(dat: Int, count: Long): CBM = this.add(0, dat, count)
     fun add(bucket: Int, dat: Int, count: Long): CBM = resetModify {
-        if (dat < 0 || count <= 0) {
-            this
-        } else {
-            val bits = BMUtils.oneBitPositions(count)
-            var carrier = false
-            var currentIndex = 0
-            var currentBit1 = bits[currentIndex]
-            var currentBit2 = 0
+        PreConditions.checkExpression(count > 0, "CBM count should be greater than 0")
 
-            while (currentBit2 <= maxBit || currentIndex < bits.size || carrier) {
-                val bbm = container.computeIfAbsent(currentBit2) { BBM() }
-                if (currentBit1 == currentBit2) {
-                    if (!carrier) {
-                        if (bbm.contains(bucket, dat)) {
-                            bbm.remove(bucket, dat)
-                            carrier = true
-                        } else {
-                            bbm.add(bucket, dat)
-                        }
-                    }
-                    currentIndex += 1
-                    if (currentIndex < bits.size) {
-                        currentBit1 = bits[currentIndex]
-                    }
-                } else if (currentBit2 > currentBit1) {
-                    if (carrier) {
-                        if (bbm.contains(bucket, dat)) {
-                            bbm.remove(bucket, dat)
-                        } else {
-                            bbm.add(bucket, dat)
-                            carrier = false
-                        }
+        val bits = BMUtils.oneBitPositions(count)
+        var carrier = false
+        var currentIndex = 0
+        var currentBit1 = bits[currentIndex]
+        var currentBit2 = 0
+
+        while (currentBit2 <= maxBit || currentIndex < bits.size || carrier) {
+            val bbm = container.computeIfAbsent(currentBit2) { BBM() }
+            if (currentBit1 == currentBit2) {
+                if (!carrier) {
+                    if (bbm.contains(bucket, dat)) {
+                        bbm.remove(bucket, dat)
+                        carrier = true
                     } else {
-                        break
+                        bbm.add(bucket, dat)
                     }
-                } else if (carrier) {
+                }
+                currentIndex += 1
+                if (currentIndex < bits.size) {
+                    currentBit1 = bits[currentIndex]
+                }
+            } else if (currentBit2 > currentBit1) {
+                if (carrier) {
                     if (bbm.contains(bucket, dat)) {
                         bbm.remove(bucket, dat)
                     } else {
                         bbm.add(bucket, dat)
                         carrier = false
                     }
+                } else {
+                    break
                 }
-                currentBit2 += 1
+            } else if (carrier) {
+                if (bbm.contains(bucket, dat)) {
+                    bbm.remove(bucket, dat)
+                } else {
+                    bbm.add(bucket, dat)
+                    carrier = false
+                }
             }
-            // maxBit = currentBit2 - 1
-            maxBit = container.keys.maxOrNull() ?: 0
-            this
+            currentBit2 += 1
         }
+        // maxBit = currentBit2 - 1
+        maxBit = container.keys.maxOrNull() ?: 0
+        this
     }
 
     override fun and(bm: BM): CBM = resetModify {

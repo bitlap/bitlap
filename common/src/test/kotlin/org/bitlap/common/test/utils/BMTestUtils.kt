@@ -74,7 +74,7 @@ object BMTestUtils {
         while (current < total) {
             val bucket = Random.nextInt(maxBucket)
             val id = Random.nextInt(maxId)
-            val cnt = Random.nextLong(maxCount)
+            val cnt = Random.nextLong(maxCount) + 1
             cbm.add(bucket, id, cnt)
             current ++
         }

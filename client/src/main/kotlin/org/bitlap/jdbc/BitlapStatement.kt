@@ -1,5 +1,6 @@
 package org.bitlap.jdbc
 
+import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import java.sql.*
 
 /**
@@ -9,7 +10,15 @@ import java.sql.*
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapStatement : Statement {
+class BitlapStatement() : Statement {
+
+    private lateinit var session: JdbcSessionState
+    private lateinit var cli: CliClientServiceImpl
+
+    constructor(session: JdbcSessionState, cli: CliClientServiceImpl) : this() {
+        this.session = session
+        this.cli = cli
+    }
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         throw SQLFeatureNotSupportedException("Method not supported")

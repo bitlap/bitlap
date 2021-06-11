@@ -40,8 +40,10 @@ open class SessionManager {
         }
     }
 
+
     init {
         sessionThread.start()
+        sessionThread.isDaemon = true
     }
 
     // service, provider, conf, discover
@@ -54,6 +56,8 @@ open class SessionManager {
         password: String,
         sessionConf: Map<String, String>
     ): BSession {
+
+        println("Server get properties [username:$username, password:$password, sessionHandle:$sessionHandle, sessionConf:$sessionConf]")
         synchronized(sessionAddLock) {
             val session = BSession(
                 sessionHandle,
@@ -62,19 +66,6 @@ open class SessionManager {
                 sessionConf,
                 this
             )
-
-            try {
-                executeSessionHooks(session)
-            } catch (e: Exception) {
-                println("Failed to execute session hooks: $e")
-                try {
-                    session.close()
-                } catch (t: Throwable) {
-                    println("Error closing session: $t")
-                }
-                throw BSQLException("Failed to execute session hooks: " + e.message, e)
-            }
-
             handleToSession[session.sessionHandle] = session
             println(
                 "Session opened, " + session.sessionHandle.toString() + ", current sessions:" + getOpenSessionCount()
@@ -102,13 +93,5 @@ open class SessionManager {
 
     open fun getOpenSessionCount(): Int {
         return handleToSession.size
-    }
-
-    private fun executeSessionHooks(abstractBSession: AbstractBSession) {
-        // TODO need HookContext, and get read hooks from conf
-        val sessionHooks: List<BSessionHook> = listOf()
-        for (sessionHook in sessionHooks) {
-            sessionHook.run(BSessionHookContextImpl(abstractBSession))
-        }
     }
 }

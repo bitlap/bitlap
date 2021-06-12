@@ -38,7 +38,7 @@ class BitlapDriver : Driver {
         /**
          * The required prefix for the connection url
          */
-        private const val URL_PREFIX = "jdbc:hive://"
+        private const val URL_PREFIX = "jdbc:bitlap://"
 
         /**
          * If host is provided, without a port
@@ -51,12 +51,12 @@ class BitlapDriver : Driver {
         private const val DBNAME_PROPERTY_KEY = "DBNAME"
 
         /**
-         * Property key for the Hive Server host
+         * Property key for the bitlap Server host
          */
         private const val HOST_PROPERTY_KEY = "HOST"
 
         /**
-         * Property key for the Hive Server port
+         * Property key for the bitlap Server port
          */
         private const val PORT_PROPERTY_KEY = "PORT"
 

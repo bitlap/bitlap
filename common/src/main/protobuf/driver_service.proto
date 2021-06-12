@@ -151,10 +151,10 @@ message BOperationHandle {
     // 2) 0 for operations that don't modify or add rows.
     //
     // 3) < 0 if the operation is capable of modifiying rows,
-    //    but Hive is unable to determine how many rows were
-    //    modified. For example, Hive's LOAD DATA command
+    //    but bitlap is unable to determine how many rows were
+    //    modified. For example, bitlap's LOAD DATA command
     //    doesn't generate row count information because
-    //    Hive doesn't inspect the data as it is loaded.
+    //    bitlap doesn't inspect the data as it is loaded.
     //
     // modifiedRowCount is unset if the operation generates
     // a result set.

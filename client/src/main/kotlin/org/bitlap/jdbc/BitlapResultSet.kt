@@ -20,6 +20,26 @@ class BitlapResultSet() : ResultSet {
 
     private lateinit var client: CliClientServiceImpl
     private var row: ArrayList<*>? = null
+    private var maxRows: Int = 0
+    private var columnNames: List<String>? = null
+    private var columnTypes: List<String>? = null
+    private var rowsFetched = 0
+
+    /**
+     * jvm field
+     */
+    @JvmField
+    var warningChain: SQLWarning? = null
+
+    @JvmField
+    var wasNull = false
+
+    constructor(client: CliClientServiceImpl, maxRows: Int) : this() {
+        this.client = client
+        this.row = ArrayList<Any?>()
+        this.maxRows = maxRows
+        initDynamicSerde()
+    }
 
     constructor(client: CliClientServiceImpl) : this() {
         this.client = client
@@ -33,6 +53,8 @@ class BitlapResultSet() : ResultSet {
     private fun initDynamicSerde() {
         try {
             val dsp = Properties()
+            columnNames = ArrayList()
+            columnTypes = ArrayList()
             // todo
         } catch (ex: Exception) {
             // TODO: Decide what to do here.
@@ -52,24 +74,26 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun next(): Boolean {
-        val row_str: String = ""
+//        if (maxRows > 0 && rowsFetched >= maxRows) return false
+        var row_str = ""
 //        try {
-//            row_str = client.fetchOne()
+//            row_str = client.fetchOne() as String
+//            rowsFetched++
 //            if (row_str != "") {
-//                // TODO deserialize
-//                val o: Any = JSONUtils.fromJson(row_str, ArrayList::class.java)
+//                val o: Any = ds.deserialize(BytesWritable(row_str.toByteArray()))
 //                row = o as ArrayList<*>
 //            }
 //        } catch (ex: java.lang.Exception) {
+//            ex.printStackTrace()
 //            throw SQLException("Error retrieving next row")
 //        }
         // NOTE: fetchOne dosn't throw new SQLException("Method not supported").
         // NOTE: fetchOne dosn't throw new SQLException("Method not supported").
-        return row_str !== ""
+        return row_str != ""
     }
 
     override fun wasNull(): Boolean {
-        TODO("Not yet implemented")
+        return wasNull
     }
 
     override fun getString(columnIndex: Int): String {
@@ -285,12 +309,12 @@ class BitlapResultSet() : ResultSet {
         TODO("Not yet implemented")
     }
 
-    override fun getWarnings(): SQLWarning {
-        TODO("Not yet implemented")
+    override fun getWarnings(): SQLWarning? {
+        return warningChain
     }
 
     override fun clearWarnings() {
-        TODO("Not yet implemented")
+        warningChain = null
     }
 
     override fun getCursorName(): String {
@@ -302,7 +326,17 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun getObject(columnIndex: Int): Any {
+        if (row == null) {
+            throw SQLException("No row found.")
+        }
+
+        if (columnIndex > row!!.size) {
+            throw SQLException("Invalid columnIndex: $columnIndex")
+        }
+
         return try {
+            wasNull = false
+            if (row!![columnIndex - 1] == null) wasNull = true
             row!![columnIndex - 1]
         } catch (e: java.lang.Exception) {
             throw SQLException(e.toString())

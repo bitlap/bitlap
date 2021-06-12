@@ -42,8 +42,8 @@ open class SessionManager {
 
 
     init {
-        sessionThread.start()
         sessionThread.isDaemon = true
+        sessionThread.start()
     }
 
     // service, provider, conf, discover

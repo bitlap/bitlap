@@ -72,13 +72,13 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     }
 
     override fun close() {
-        try {
-            val groupId = "bitlap-cluster"
-            val leader = RouteTable.getInstance().selectLeader(groupId)
-            if (cli.isConnected(leader.endpoint)) cli.shutdown()
-        } finally {
-            isClosed = true
-        }
+//        try {
+//            val groupId = "bitlap-cluster"
+//            val leader = RouteTable.getInstance().selectLeader(groupId)
+//            if (cli.isConnected(leader.endpoint)) cli.shutdown()
+//        } finally {
+//            isClosed = true
+//        }
     }
 
     override fun createStatement(): Statement {

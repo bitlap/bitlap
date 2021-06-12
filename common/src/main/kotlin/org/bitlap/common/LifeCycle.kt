@@ -10,5 +10,4 @@ import java.io.Closeable
 interface LifeCycle : Closeable {
     fun start()
     fun isStarted(): Boolean
-    fun isShutdown(): Boolean
 }

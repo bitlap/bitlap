@@ -28,6 +28,7 @@ object Test {
         check(RouteTable.getInstance().refreshLeader(cli, groupId, 3000).isOk) { "Refresh leader failed" }
         val leader = RouteTable.getInstance().selectLeader(groupId)
         println("Leader is $leader")
+        Thread.currentThread().join()
     }
 
 }

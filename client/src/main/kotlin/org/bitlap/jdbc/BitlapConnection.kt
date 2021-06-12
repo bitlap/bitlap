@@ -3,12 +3,22 @@ package org.bitlap.jdbc
 import com.alipay.sofa.jraft.RouteTable
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.option.CliOptions
+import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import com.alipay.sofa.jraft.util.RpcFactoryHelper
+import com.google.protobuf.ByteString
 import org.bitlap.common.BitlapConf
+import org.bitlap.common.proto.driver.BCloseSession
+import org.bitlap.common.proto.driver.BExecuteStatement
+import org.bitlap.common.proto.driver.BFetchResults
 import org.bitlap.common.proto.driver.BOpenSession
+import org.bitlap.common.proto.rpc.HelloRpcPB
+import java.nio.ByteBuffer
 import java.sql.*
 import java.util.Properties
+import java.util.UUID
 import java.util.concurrent.Executor
+
 
 /**
  * Bitlap Connection
@@ -25,11 +35,38 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     }
 
     private var session: JdbcSessionState
-    private var cli: CliClientServiceImpl = CliClientServiceImpl()
+    private var client: CliClientServiceImpl = CliClientServiceImpl()
     private var isClosed = true
     private var warningChain: SQLWarning? = null
 
     init {
+        listOf(
+            Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance()),
+            Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionReq.getDefaultInstance()),
+            Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionReq.getDefaultInstance()),
+            Pair(
+                BExecuteStatement.BExecuteStatementReq::class.java.name,
+                BExecuteStatement.BExecuteStatementReq.getDefaultInstance()
+            ),
+            Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsReq.getDefaultInstance()),
+        ).forEach {
+            RpcFactoryHelper.rpcFactory()
+                .registerProtobufSerializer(it.first, it.second)
+        }
+
+        listOf(
+            Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance()),
+            Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionResp.getDefaultInstance()),
+            Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionResp.getDefaultInstance()),
+            Pair(
+                BExecuteStatement.BExecuteStatementReq::class.java.name,
+                BExecuteStatement.BExecuteStatementResp.getDefaultInstance()
+            ),
+            Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsResp.getDefaultInstance()),
+        ).forEach {
+            MarshallerHelper.registerRespInstance(it.first, it.second)
+        }
+
         session = JdbcSessionState(BitlapConf())
         JdbcSessionState.start(session)
         if (!uri.startsWith(URI_PREFIX)) {
@@ -40,26 +77,27 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
         // parse uri
         val parts = uri.split("/").toTypedArray()
         try {
+            // TODO Secondary wrap for registration and release
             val groupId = "bitlap-cluster"
             val conf = Configuration()
             conf.parse(parts[0])
             RouteTable.getInstance().updateConfiguration(groupId, conf)
-            cli.init(CliOptions())
-            val c = cli
-            check(RouteTable.getInstance().refreshLeader(c, groupId, 1000).isOk) { "Refresh leader failed" }
+            client.init(CliOptions())
+            check(RouteTable.getInstance().refreshLeader(client, groupId, 1000).isOk) { "Refresh leader failed" }
             val leader = RouteTable.getInstance().selectLeader(groupId)
-            println("Leader is $leader")
-            cli.rpcClient.invokeAsync(
-                leader.endpoint,
-                BOpenSession.BOpenSessionReq.newBuilder().setUsername("root").setPassword("root").build(),
-                { result, err ->
+            println("Leader: $leader")
+            client.rpcClient.invokeAsync(
+                leader.endpoint, BOpenSession.BOpenSessionReq.newBuilder().setUsername(info?.get("user").toString())
+                    .setPassword(info?.get("password").toString()).build(), { result, err ->
                     result as BOpenSession.BOpenSessionResp
-                    println("==========================> ${result.sessionHandle}")
-                },
-                5000
-            )
-        } catch (e: Exception) {
+                    val id = ByteBuffer.wrap(ByteString.copyFromUtf8(result.sessionHandle.sessionId.guid).toByteArray())
+                    println("Open session: ${UUID(id.long, id.long)}")
 
+                }, 5000
+            )
+            Thread.currentThread().join()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -82,7 +120,7 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     }
 
     override fun createStatement(): Statement {
-        return BitlapStatement(session, cli)
+        return BitlapStatement(session, client)
     }
 
     override fun createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement {

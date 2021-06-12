@@ -13,7 +13,7 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
 
     fun test() {
         Class.forName(driverName)
-        val con = DriverManager.getConnection("jdbc:bitlap://127.0.0.1:23333/default", "", "")
+        val con = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", "root", "root")
         assertNotNull("Connection is null", con)
         val stmt: Statement = con.createStatement()
         assertNotNull("Statement is null", stmt)

@@ -33,7 +33,7 @@ open class SessionManager {
                     }
                 }
 
-                TimeUnit.SECONDS.sleep(1)
+                TimeUnit.SECONDS.sleep(3)
             } catch (e: Exception) {
                 println("Failed to listen for session error: $e.localizedMessage")
             }
@@ -68,7 +68,7 @@ open class SessionManager {
             )
             handleToSession[session.sessionHandle] = session
             println(
-                "Session opened, " + session.sessionHandle.toString() + ", current sessions:" + getOpenSessionCount()
+                "Session opened, " + session.sessionHandle.toString() + ", session total:" + getOpenSessionCount()
             )
 
             return session

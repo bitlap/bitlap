@@ -68,23 +68,22 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle {
     }
 }
 
-private fun BitlapServerEndpoint.registerReq() {
+private fun BitlapServerEndpoint.registerResp() {
     listOf(
         Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance()),
         Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionResp.getDefaultInstance()),
         Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionResp.getDefaultInstance()),
         Pair(
             BExecuteStatement.BExecuteStatementReq::class.java.name,
-            BExecuteStatement.BExecuteStatementReq.getDefaultInstance()
+            BExecuteStatement.BExecuteStatementResp.getDefaultInstance()
         ),
         Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsResp.getDefaultInstance()),
     ).forEach {
-        RpcFactoryHelper.rpcFactory()
-            .registerProtobufSerializer(it.first, it.second)
+        MarshallerHelper.registerRespInstance(it.first, it.second)
     }
 }
 
-private fun BitlapServerEndpoint.registerResp() {
+private fun BitlapServerEndpoint.registerReq() {
     listOf(
         Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance()),
         Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionReq.getDefaultInstance()),
@@ -95,7 +94,8 @@ private fun BitlapServerEndpoint.registerResp() {
         ),
         Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsReq.getDefaultInstance()),
     ).forEach {
-        MarshallerHelper.registerRespInstance(it.first, it.second)
+        RpcFactoryHelper.rpcFactory()
+            .registerProtobufSerializer(it.first, it.second)
     }
 }
 

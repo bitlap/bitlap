@@ -1,4 +1,4 @@
-package org.bitlap.server.raft.rpc
+package org.bitlap.server.raft.cli
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor

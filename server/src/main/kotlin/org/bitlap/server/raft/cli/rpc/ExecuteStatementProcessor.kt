@@ -1,0 +1,35 @@
+package org.bitlap.server.raft.cli.rpc
+
+import com.alipay.sofa.jraft.rpc.RpcContext
+import com.alipay.sofa.jraft.rpc.RpcProcessor
+import org.bitlap.common.proto.driver.BExecuteStatement
+import org.bitlap.server.raft.cli.BSQLException
+import org.bitlap.server.raft.cli.CLIService
+import org.bitlap.server.raft.cli.SessionHandle
+
+/**
+ * ExecuteStatement
+ *
+ * @author 梦境迷离
+ * @since 2021/6/5
+ * @version 1.0
+ */
+class ExecuteStatementProcessor(private val cliService: CLIService) :
+    RpcProcessor<BExecuteStatement.BExecuteStatementReq>, BaseProcessor {
+    override fun handleRequest(rpcCtx: RpcContext, request: BExecuteStatement.BExecuteStatementReq) {
+        val sessionHandle = request.sessionHandle
+        val statement = request.statement
+        val confOverlayMap = request.confOverlayMap
+        val resp: BExecuteStatement.BExecuteStatementResp? = try {
+            val operationHandle = cliService.executeStatement(SessionHandle(sessionHandle), statement, confOverlayMap)
+            BExecuteStatement.BExecuteStatementResp.newBuilder()
+                .setOperationHandle(operationHandle?.toBOperationHandle())
+                .setStatus(success()).build()
+        } catch (e: BSQLException) {
+            BExecuteStatement.BExecuteStatementResp.newBuilder().setStatus(error()).build()
+        }
+        rpcCtx.sendResponse(resp)
+    }
+
+    override fun interest(): String = BExecuteStatement.BExecuteStatementReq::class.java.name
+}

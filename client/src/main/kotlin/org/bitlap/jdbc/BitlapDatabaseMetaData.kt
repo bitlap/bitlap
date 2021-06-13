@@ -11,7 +11,7 @@ import java.sql.RowIdLifetime
  * @since 2021/6/12
  * @version 1.0
  */
-class BitlapDatabaseMetaData: DatabaseMetaData {
+class BitlapDatabaseMetaData : DatabaseMetaData {
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
     }

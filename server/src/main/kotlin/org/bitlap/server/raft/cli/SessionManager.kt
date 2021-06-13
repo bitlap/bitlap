@@ -40,7 +40,6 @@ open class SessionManager {
         }
     }
 
-
     init {
         sessionThread.isDaemon = true
         sessionThread.start()

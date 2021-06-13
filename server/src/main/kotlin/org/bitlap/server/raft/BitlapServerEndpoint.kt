@@ -95,5 +95,4 @@ private fun BitlapServerEndpoint.extractOptions(conf: BitlapConf): NodeOptions {
             require(parse(initConfStr)) { "Fail to parse initConf: $initConfStr" }
         }
     }
-
 }

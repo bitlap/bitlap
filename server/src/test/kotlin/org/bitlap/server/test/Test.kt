@@ -14,7 +14,6 @@ import org.bitlap.server.BitlapServer
  */
 object Test {
 
-
     @JvmStatic
     fun main(args: Array<String>) {
         BitlapServer().start()
@@ -30,5 +29,4 @@ object Test {
         println("Leader is $leader")
         Thread.currentThread().join()
     }
-
 }

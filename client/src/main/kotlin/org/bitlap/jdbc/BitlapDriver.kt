@@ -59,7 +59,6 @@ class BitlapDriver : Driver {
          * Property key for the bitlap Server port
          */
         private const val PORT_PROPERTY_KEY = "PORT"
-
     }
 
     override fun connect(url: String, info: Properties?): Connection {

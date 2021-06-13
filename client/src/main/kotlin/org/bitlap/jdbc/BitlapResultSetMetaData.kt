@@ -80,11 +80,11 @@ class BitlapResultSetMetaData() : ResultSetMetaData {
     }
 
     override fun getPrecision(column: Int): Int {
-        return if (Types.DOUBLE == getColumnType(column)) -1 else 0 //Do we have a precision limit?
+        return if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a precision limit?
     }
 
     override fun getScale(column: Int): Int {
-        return if (Types.DOUBLE == getColumnType(column)) -1 else 0 //Do we have a scale limit?
+        return if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a scale limit?
     }
 
     override fun getTableName(column: Int): String {

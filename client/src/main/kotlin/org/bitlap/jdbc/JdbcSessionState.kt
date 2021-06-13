@@ -8,7 +8,7 @@ import org.bitlap.common.BitlapConf
  * @since 2021/6/12
  * @version 1.0
  */
-class JdbcSessionState(private val conf: BitlapConf?) {// current configuration
+class JdbcSessionState(private val conf: BitlapConf?) { // current configuration
 
     companion object {
 
@@ -34,7 +34,5 @@ class JdbcSessionState(private val conf: BitlapConf?) {// current configuration
         fun get(): JdbcSessionState {
             return tss.get()
         }
-
     }
-
 }

@@ -16,7 +16,6 @@ import java.util.Properties
 import java.util.UUID
 import java.util.concurrent.Executor
 
-
 /**
  * Bitlap Connection
  *
@@ -28,7 +27,6 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"
-
     }
 
     private var session: JdbcSessionState
@@ -64,13 +62,15 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
             val leader = RouteTable.getInstance().selectLeader(groupId)
             println("Leader: $leader")
             client.rpcClient.invokeAsync(
-                leader.endpoint, BOpenSession.BOpenSessionReq.newBuilder().setUsername(info?.get("user").toString())
-                    .setPassword(info?.get("password").toString()).build(), { result, err ->
+                leader.endpoint,
+                BOpenSession.BOpenSessionReq.newBuilder().setUsername(info?.get("user").toString())
+                    .setPassword(info?.get("password").toString()).build(),
+                { result, err ->
                     result as BOpenSession.BOpenSessionResp
                     val id = ByteBuffer.wrap(ByteString.copyFromUtf8(result.sessionHandle.sessionId.guid).toByteArray())
                     println("Open session: ${UUID(id.long, id.long)}")
-
-                }, 5000
+                },
+                5000
             )
             Thread.currentThread().join()
         } catch (e: Exception) {

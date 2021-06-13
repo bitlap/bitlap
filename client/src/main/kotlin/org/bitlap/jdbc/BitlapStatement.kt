@@ -20,7 +20,7 @@ class BitlapStatement() : Statement {
      * `
      * statement.execute(String sql);
      * statement.getResultSet();
-    ` *
+     ` *
      */
     private var resultSet: ResultSet? = null
 
@@ -53,7 +53,7 @@ class BitlapStatement() : Statement {
     }
 
     override fun close() {
-        //TODO: how to properly shut down the client?
+        // TODO: how to properly shut down the client?
         resultSet = null
         isClosed = true
     }
@@ -131,8 +131,8 @@ class BitlapStatement() : Statement {
     }
 
     override fun execute(sql: String?): Boolean {
-        //TODO: this should really check if there are results, but there's no easy
-        //way to do that without calling rs.next();
+        // TODO: this should really check if there are results, but there's no easy
+        // way to do that without calling rs.next();
         val rs = executeQuery(sql)
         return rs != null
     }

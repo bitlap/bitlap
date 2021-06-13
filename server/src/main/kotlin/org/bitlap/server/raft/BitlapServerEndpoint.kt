@@ -12,11 +12,7 @@ import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycle
-import org.bitlap.common.proto.driver.BCloseSession
-import org.bitlap.common.proto.driver.BExecuteStatement
-import org.bitlap.common.proto.driver.BFetchResults
-import org.bitlap.common.proto.driver.BOpenSession
-import org.bitlap.common.proto.rpc.HelloRpcPB
+import org.bitlap.common.RpcServiceSupport
 import org.bitlap.common.utils.withPaths
 import org.bitlap.server.raft.cli.BCLIService
 import org.bitlap.server.raft.cli.HelloRpcProcessor
@@ -35,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Created by IceMimosa
  * Date: 2021/4/22
  */
-open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle {
+open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle, RpcServiceSupport {
 
     private val started = AtomicBoolean(false)
     private lateinit var node: Node
@@ -50,8 +46,12 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle {
         val serverId = PeerId().apply {
             require(parse(serverIdStr)) { "Fail to parse serverId:$serverIdStr" }
         }
-        registerReq()
-        registerResp()
+        registerMessageInstances(RpcServiceSupport.registerReq()) {
+            RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
+        }
+        registerMessageInstances(RpcServiceSupport.registerResp()) {
+            MarshallerHelper.registerRespInstance(it.first, it.second)
+        }
         val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.endpoint)
         registerProcessor(rpcServer)
         val raftGroupService = RaftGroupService(groupId, serverId, nodeOptions, rpcServer)
@@ -65,37 +65,6 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle {
         if (this.started.compareAndSet(true, false)) {
             this.node.shutdown()
         }
-    }
-}
-
-private fun BitlapServerEndpoint.registerResp() {
-    listOf(
-        Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance()),
-        Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionResp.getDefaultInstance()),
-        Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionResp.getDefaultInstance()),
-        Pair(
-            BExecuteStatement.BExecuteStatementReq::class.java.name,
-            BExecuteStatement.BExecuteStatementResp.getDefaultInstance()
-        ),
-        Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsResp.getDefaultInstance()),
-    ).forEach {
-        MarshallerHelper.registerRespInstance(it.first, it.second)
-    }
-}
-
-private fun BitlapServerEndpoint.registerReq() {
-    listOf(
-        Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance()),
-        Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionReq.getDefaultInstance()),
-        Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionReq.getDefaultInstance()),
-        Pair(
-            BExecuteStatement.BExecuteStatementReq::class.java.name,
-            BExecuteStatement.BExecuteStatementReq.getDefaultInstance()
-        ),
-        Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsReq.getDefaultInstance()),
-    ).forEach {
-        RpcFactoryHelper.rpcFactory()
-            .registerProtobufSerializer(it.first, it.second)
     }
 }
 

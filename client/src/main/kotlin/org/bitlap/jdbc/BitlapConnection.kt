@@ -8,11 +8,8 @@ import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import com.google.protobuf.ByteString
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.proto.driver.BCloseSession
-import org.bitlap.common.proto.driver.BExecuteStatement
-import org.bitlap.common.proto.driver.BFetchResults
+import org.bitlap.common.RpcServiceSupport
 import org.bitlap.common.proto.driver.BOpenSession
-import org.bitlap.common.proto.rpc.HelloRpcPB
 import java.nio.ByteBuffer
 import java.sql.*
 import java.util.Properties
@@ -27,7 +24,7 @@ import java.util.concurrent.Executor
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapConnection(private var uri: String, val info: Properties?) : Connection {
+class BitlapConnection(private var uri: String, val info: Properties?) : Connection, RpcServiceSupport {
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"
@@ -40,30 +37,10 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     private var warningChain: SQLWarning? = null
 
     init {
-        listOf(
-            Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Res.getDefaultInstance()),
-            Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionReq.getDefaultInstance()),
-            Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionReq.getDefaultInstance()),
-            Pair(
-                BExecuteStatement.BExecuteStatementReq::class.java.name,
-                BExecuteStatement.BExecuteStatementReq.getDefaultInstance()
-            ),
-            Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsReq.getDefaultInstance()),
-        ).forEach {
-            RpcFactoryHelper.rpcFactory()
-                .registerProtobufSerializer(it.first, it.second)
+        registerMessageInstances(RpcServiceSupport.registerReq()) {
+            RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
         }
-
-        listOf(
-            Pair(HelloRpcPB.Req::class.java.name, HelloRpcPB.Req.getDefaultInstance()),
-            Pair(BOpenSession.BOpenSessionReq::class.java.name, BOpenSession.BOpenSessionResp.getDefaultInstance()),
-            Pair(BCloseSession.BCloseSessionReq::class.java.name, BCloseSession.BCloseSessionResp.getDefaultInstance()),
-            Pair(
-                BExecuteStatement.BExecuteStatementReq::class.java.name,
-                BExecuteStatement.BExecuteStatementResp.getDefaultInstance()
-            ),
-            Pair(BFetchResults.BFetchResultsReq::class.java.name, BFetchResults.BFetchResultsResp.getDefaultInstance()),
-        ).forEach {
+        registerMessageInstances(RpcServiceSupport.registerResp()) {
             MarshallerHelper.registerRespInstance(it.first, it.second)
         }
 

@@ -46,10 +46,10 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle, RpcSe
         val serverId = PeerId().apply {
             require(parse(serverIdStr)) { "Fail to parse serverId:$serverIdStr" }
         }
-        registerMessageInstances(RpcServiceSupport.registerReq()) {
+        registerMessageInstances(RpcServiceSupport.requestInstances()) {
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
         }
-        registerMessageInstances(RpcServiceSupport.registerResp()) {
+        registerMessageInstances(RpcServiceSupport.responseInstances()) {
             MarshallerHelper.registerRespInstance(it.first, it.second)
         }
         val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.endpoint)

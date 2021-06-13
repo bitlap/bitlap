@@ -3,7 +3,7 @@ package org.bitlap.common
 import com.google.protobuf.GeneratedMessageV3
 
 /**
- *
+ * rpc common context and action
  * @author 梦境迷离
  * @since 2021/6/13
  * @version 1.0
@@ -18,7 +18,7 @@ interface RpcServiceSupport {
     }
 
     companion object {
-        fun registerResp(): List<Pair<String, GeneratedMessageV3>> {
+        fun responseInstances(): List<Pair<String, GeneratedMessageV3>> {
             return listOf(
                 Pair(
                     org.bitlap.common.proto.rpc.HelloRpcPB.Req::class.java.name,
@@ -43,7 +43,7 @@ interface RpcServiceSupport {
             )
         }
 
-        fun registerReq(): List<Pair<String, GeneratedMessageV3>> {
+        fun requestInstances(): List<Pair<String, GeneratedMessageV3>> {
             return listOf(
                 Pair(
                     org.bitlap.common.proto.rpc.HelloRpcPB.Req::class.java.name,

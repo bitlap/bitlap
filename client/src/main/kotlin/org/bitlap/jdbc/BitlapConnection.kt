@@ -37,10 +37,10 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     private var warningChain: SQLWarning? = null
 
     init {
-        registerMessageInstances(RpcServiceSupport.registerReq()) {
+        registerMessageInstances(RpcServiceSupport.requestInstances()) {
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
         }
-        registerMessageInstances(RpcServiceSupport.registerResp()) {
+        registerMessageInstances(RpcServiceSupport.responseInstances()) {
             MarshallerHelper.registerRespInstance(it.first, it.second)
         }
 

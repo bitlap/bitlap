@@ -9,7 +9,7 @@ import java.util.SortedMap
  * Created by IceMimosa
  * Date: 2020/12/15
  */
-data class SimpleRow(
+data class SimpleRow( // TODO: 抽象层事件流
     val time: Long,
     val entity: Map<String, Int>,
     val dimension: Map<String, String>,

@@ -1,4 +1,4 @@
-package org.bitlap.core
+package org.bitlap.core.io
 
 import org.bitlap.core.model.query.Query
 import org.bitlap.core.model.query.RawRow

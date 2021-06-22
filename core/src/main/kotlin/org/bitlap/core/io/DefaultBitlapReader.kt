@@ -1,8 +1,7 @@
-package org.bitlap.core.reader
+package org.bitlap.core.io
 
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.BitlapReader
 import org.bitlap.core.model.query.AggType
 import org.bitlap.core.model.query.Query
 import org.bitlap.core.model.query.RawRow
@@ -20,21 +19,26 @@ class DefaultBitlapReader : BitlapReader {
         val dsStore = BitlapContext.dataSourceManager.getDataSourceStore(PreConditions.checkNotBlank(query.datasource))
         val metricStore = dsStore.getMetricStore()
 
+        if (query.hasDimensions()) {
+            // TODO: with dimensions
+            return emptyList()
+        }
         val shouldMaterialize = query.metrics.any { it.aggType == AggType.None || it.aggType == AggType.Distinct }
         val rows = mutableListOf<RawRow>()
-        if (!shouldMaterialize) {
-            val metas = metricStore.queryMeta(query.time.start, query.metrics.map { it.metricKey }, query.entity)
+        val time = query.time.timeRange
+        if (shouldMaterialize) {
+            val mRows = metricStore.query(time, query.metrics.map { it.name }, query.entity)
                 .map { it.metricKey to it }
                 .toMap()
             // handle metric meta data
-            val metrics = query.metrics.map { metas[it.metricKey]?.metricCount ?: 0.0 }.toTypedArray()
+            val metrics = query.metrics.map { mRows[it.name]?.metric ?: 0.0 }.toTypedArray()
             rows.add(RawRow(metrics))
         } else {
-            val mRows = metricStore.query(query.time.start, query.metrics.map { it.metricKey }, query.entity)
+            val metas = metricStore.queryMeta(time, query.metrics.map { it.name }, query.entity)
                 .map { it.metricKey to it }
                 .toMap()
             // handle metric meta data
-            val metrics = query.metrics.map { mRows[it.metricKey]?.metric ?: 0.0 }.toTypedArray()
+            val metrics = query.metrics.map { metas[it.name]?.metricCount ?: 0.0 }.toTypedArray()
             rows.add(RawRow(metrics))
         }
         return rows

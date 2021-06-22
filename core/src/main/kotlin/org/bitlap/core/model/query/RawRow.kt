@@ -1,6 +1,6 @@
 package org.bitlap.core.model.query
 
-import org.bitlap.core.reader.DefaultBitlapReader
+import org.bitlap.core.io.DefaultBitlapReader
 import java.io.Serializable
 
 /**

@@ -1,4 +1,4 @@
-package org.bitlap.core
+package org.bitlap.core.meta
 
 import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf

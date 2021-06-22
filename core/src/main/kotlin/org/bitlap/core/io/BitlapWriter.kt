@@ -1,4 +1,4 @@
-package org.bitlap.core
+package org.bitlap.core.io
 
 import java.io.Closeable
 

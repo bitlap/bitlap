@@ -1,10 +1,9 @@
-package org.bitlap.core.writer
+package org.bitlap.core.io
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.BitlapWriter
 import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.SimpleRowSingle
 import org.bitlap.storage.metadata.MetricRow

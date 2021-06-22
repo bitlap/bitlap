@@ -32,4 +32,19 @@ data class Query(
      * query dimensions
      */
     val dimensions: List<String> = emptyList(),
-)
+
+    /**
+     * query filters
+     */
+    val filters: List<QueryFilter> = emptyList(),
+
+    /**
+     * query limit
+     */
+    val limit: Int = 10000,
+) {
+
+    fun hasDimensions(): Boolean {
+        return dimensions.isNotEmpty() || filters.isNotEmpty()
+    }
+}

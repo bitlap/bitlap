@@ -35,7 +35,8 @@ import org.joda.time.DateTime
 class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<MetricRows>(hadoopConf, conf) {
 
     override val dataDir: Path = Path(rootPath, "data/${dsStore.name}/metric")
-    private val writerB = CarbonWriter.builder()
+    // TODO: wait for https://github.com/apache/carbondata/pull/4159
+    private fun writerB() = CarbonWriter.builder()
         .withCsvInput( // TODO: add enum
             """[
                 {mk: string}, 
@@ -69,7 +70,7 @@ class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: Bit
         }
         val date = DateTime(t.tm)
         val output = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
-        val writer = writerB.outputPath(Path(dataDir, output).toString()).build()
+        val writer = writerB().outputPath(Path(dataDir, output).toString()).build()
         t.metrics.forEach {
             writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, it.metric.getBytes(), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
         }

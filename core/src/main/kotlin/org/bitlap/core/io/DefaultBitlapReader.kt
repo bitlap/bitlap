@@ -23,6 +23,10 @@ class DefaultBitlapReader : BitlapReader {
             // TODO: with dimensions
             return emptyList()
         }
+        val metaColumns = mutableListOf<String>().apply {
+            addAll(query.dimensions)
+            addAll(query.metrics.map { it.name })
+        }
         val shouldMaterialize = query.metrics.any { it.aggType == AggType.None || it.aggType == AggType.Distinct }
         val rows = mutableListOf<RawRow>()
         val time = query.time.timeRange
@@ -32,14 +36,14 @@ class DefaultBitlapReader : BitlapReader {
                 .toMap()
             // handle metric meta data
             val metrics = query.metrics.map { mRows[it.name]?.metric ?: 0.0 }.toTypedArray()
-            rows.add(RawRow(metrics))
+            rows.add(RawRow(metrics, metaColumns))
         } else {
             val metas = metricStore.queryMeta(time, query.metrics.map { it.name }, query.entity)
                 .map { it.metricKey to it }
                 .toMap()
             // handle metric meta data
             val metrics = query.metrics.map { metas[it.name]?.metricCount ?: 0.0 }.toTypedArray()
-            rows.add(RawRow(metrics))
+            rows.add(RawRow(metrics, metaColumns))
         }
         return rows
     }

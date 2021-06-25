@@ -1,5 +1,7 @@
 package org.bitlap.core.test
 
+import io.kotest.matchers.shouldBe
+import org.bitlap.common.bitmap.CBM
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.io.DefaultBitlapReader
 import org.bitlap.core.io.SimpleBitlapWriter
@@ -36,19 +38,22 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
                 )
                 it.write(
                     listOf(
-                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 2.0)),
-                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 3.0)),
-                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 5.0)),
-                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("vv" to 10.0))
+                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 20.0)),
+                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 30.0)),
+                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 50.0)),
+                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("vv" to 100.0))
                     )
                 )
             }
 
             val reader = DefaultBitlapReader()
             val rows = reader.use {
-                it.read(Query(dsName, QueryTime(testTime), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
+                it.read(Query(dsName, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
             }
-            println(rows)
+            rows.size shouldBe 1
+            val pv = rows.first().getBM("pv")
+            pv.getCount() shouldBe 100
+            pv.getCountUnique() shouldBe 2
         }
     }
 }

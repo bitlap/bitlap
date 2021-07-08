@@ -17,21 +17,6 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.11.1</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.google.protobuf</groupId>-->
-<!--            <artifactId>protobuf-java-util</artifactId>-->
-<!--            <version>3.11.1</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.os72</groupId>-->
-<!--            <artifactId>protobuf-java-shaded-3-11-1</artifactId>-->
-<!--            <version>0.9</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.os72</groupId>-->
-<!--            <artifactId>protobuf-java-shaded-3-11-1</artifactId>-->
-<!--            <version>0.9</version>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -51,7 +36,6 @@
                         </goals>
                         <configuration>
                             <protocVersion>3.11.1</protocVersion>
-<!--                            <type>java-shaded</type>-->
                             <inputDirectories>
                                 <include>src/main/protobuf</include>
                             </inputDirectories>

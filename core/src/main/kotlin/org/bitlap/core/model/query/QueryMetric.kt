@@ -8,7 +8,7 @@ package org.bitlap.core.model.query
  * Date: 2021/4/11
  */
 data class QueryMetric(
-    val metricKey: String,
+    val name: String,
     val aggType: AggType = AggType.None
 )
 

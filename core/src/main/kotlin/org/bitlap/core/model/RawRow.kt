@@ -1,4 +1,4 @@
-package org.bitlap.core.model.query
+package org.bitlap.core.model
 
 import org.bitlap.common.bitmap.BM
 import org.bitlap.common.exception.BitlapException

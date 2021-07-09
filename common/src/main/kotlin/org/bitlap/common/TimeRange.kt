@@ -1,6 +1,5 @@
 package org.bitlap.common
 
-import org.bitlap.common.utils.PreConditions
 import org.bitlap.common.utils.Range
 import org.joda.time.DateTime
 
@@ -21,7 +20,7 @@ class TimeRange private constructor(lower: LeftCut<DateTime>, upper: RightCut<Da
 
     companion object {
         fun of(start: DateTime, end: DateTime, inclusive: Pair<Boolean, Boolean> = true to true): TimeRange {
-            return when(inclusive) {
+            return when (inclusive) {
                 true to true -> TimeRange(LeftCut(start, BoundType.CLOSE), RightCut(end, BoundType.CLOSE))
                 true to false -> TimeRange(LeftCut(start, BoundType.CLOSE), RightCut(end, BoundType.OPEN))
                 false to true -> TimeRange(LeftCut(start, BoundType.CLOSE), RightCut(end, BoundType.OPEN))

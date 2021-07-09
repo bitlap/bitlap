@@ -2,10 +2,10 @@ package org.bitlap.core.io
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.data.Event
+import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.model.SimpleRow
-import org.bitlap.core.model.SimpleRowSingle
 import org.bitlap.storage.metadata.MetricRow
 import org.bitlap.storage.metadata.MetricRowMeta
 import org.bitlap.storage.metadata.MetricRows
@@ -18,17 +18,17 @@ import java.util.Collections
  * Created by IceMimosa
  * Date: 2020/12/15
  */
-class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
+class SimpleBitlapWriter(datasource: String) : BitlapWriter<Event> {
 
     private var closed = false
-    private val rows = Collections.synchronizedList(mutableListOf<SimpleRow>())
+    private val rows = Collections.synchronizedList(mutableListOf<Event>())
     private val dataSourceStore = BitlapContext.dataSourceManager.getDataSourceStore(datasource)
 
-    override fun write(t: SimpleRow) {
+    override fun write(t: Event) {
         rows.add(t)
     }
 
-    override fun write(ts: List<SimpleRow>) {
+    override fun write(ts: List<Event>) {
         rows.addAll(ts)
     }
 
@@ -41,22 +41,22 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
         val metricStore = this.dataSourceStore.getMetricStore()
         rows.groupBy { it.time }.forEach { (time, rs) ->
             // 1. agg metric
-            val singleRows = rs.flatMap { it.toSingleRows() }
-                .groupingBy { "${it.entityKey}${it.entity}${it.dimension}${it.metricKey}" }
-                .reduce { _, a, b ->
-                    SimpleRowSingle(a.time, a.entityKey, a.entity, a.dimension, a.metricKey, a.metric + b.metric)
+            val singleRows = rs
+                .groupingBy { "${it.entity}${it.dimension}${it.metric.key}" }
+                .fold({ _, e -> EventWithDimId.from(e, false) }) { _, a, b ->
+                    a.also { it.metric += b.metric.value }
                 }
                 .values
-            // 2. identify bucket id for dimensions for each entity + metric
-            val cleanRows = singleRows.groupBy { "${it.entityKey}${it.entity}${it.metricKey}" }.flatMap { (_, sRows) ->
+            // 2. identify sort id for dimensions for each entity + metric
+            val cleanRows = singleRows.groupBy { "${it.entity}${it.metric.key}" }.flatMap { (_, sRows) ->
                 val temps = hashMapOf<String, Int>()
                 var counter = 0
-                sRows.sortedByDescending { it.metric }.map { sRow ->
+                sRows.sortedByDescending { it.metric.value }.map { sRow ->
                     val dim = sRow.dimension.toString()
                     if (temps.containsKey(dim)) {
-                        sRow.bucket = temps[dim]!!
+                        sRow.dimId = temps[dim]!!
                     } else {
-                        sRow.bucket = counter
+                        sRow.dimId = counter
                         temps[dim] = counter
                         counter ++
                     }
@@ -64,12 +64,12 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<SimpleRow> {
                 }
             }
             // store metrics
-            val metricRows = cleanRows.groupingBy { "${it.entityKey}${it.metricKey}" }
+            val metricRows = cleanRows.groupingBy { "${it.entity.key}${it.metric.key}" }
                 .fold({ _, r ->
-                    MetricRow(time, r.metricKey, r.entityKey, CBM(), BBM(), MetricRowMeta(time, r.metricKey, r.entityKey))
+                    MetricRow(time, r.metric.key, r.entity.key, CBM(), BBM(), MetricRowMeta(time, r.metric.key, r.entity.key))
                 }) { _, a, b ->
-                    a.entity.add(b.bucket, b.entity)
-                    a.metric.add(b.bucket, b.entity, b.metric.toLong()) // TODO double support
+                    a.entity.add(b.dimId, b.entity.id)
+                    a.metric.add(b.dimId, b.entity.id, b.metric.value.toLong()) // TODO double support
                     a
                 }
                 .map { (_, r) ->

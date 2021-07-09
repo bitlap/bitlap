@@ -75,5 +75,4 @@ class RangeTest : StringSpec({
         empty = Range.closedOpen(2, 2)
         empty.isEmpty() shouldBe true
     }
-
 })

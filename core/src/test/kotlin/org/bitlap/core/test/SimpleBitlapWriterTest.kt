@@ -1,11 +1,13 @@
 package org.bitlap.core.test
 
 import io.kotest.matchers.shouldBe
-import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.data.Dimension
+import org.bitlap.common.data.Entity
+import org.bitlap.common.data.Event
+import org.bitlap.common.data.Metric
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.io.DefaultBitlapReader
 import org.bitlap.core.io.SimpleBitlapWriter
-import org.bitlap.core.model.SimpleRow
 import org.bitlap.core.model.query.Query
 import org.bitlap.core.model.query.QueryMetric
 import org.bitlap.core.model.query.QueryTime
@@ -30,18 +32,18 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
             writer.use {
                 it.write(
                     listOf(
-                        SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 2.0)),
-                        SimpleRow(testTime, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 3.0)),
-                        SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 5.0)),
-                        SimpleRow(testTime, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("vv" to 10.0))
+                        Event.of(testTime, Entity("user", 1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 2.0)),
+                        Event.of(testTime, Entity("user", 1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 3.0)),
+                        Event.of(testTime, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 5.0)),
+                        Event.of(testTime, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 10.0))
                     )
                 )
                 it.write(
                     listOf(
-                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 20.0)),
-                        SimpleRow(testTime2, mapOf("user" to 1), mapOf("city" to "北京", "os" to "Windows"), mapOf("pv" to 30.0)),
-                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("pv" to 50.0)),
-                        SimpleRow(testTime2, mapOf("user" to 2), mapOf("city" to "北京", "os" to "Mac"), mapOf("vv" to 100.0))
+                        Event.of(testTime2, Entity("user", 1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 20.0)),
+                        Event.of(testTime2, Entity("user", 1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 30.0)),
+                        Event.of(testTime2, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 50.0)),
+                        Event.of(testTime2, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 100.0))
                     )
                 )
             }

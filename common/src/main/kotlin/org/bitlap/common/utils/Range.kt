@@ -133,7 +133,7 @@ open class Range<C : Comparable<C>>(val lower: LeftCut<C>, val upper: RightCut<C
             return endpoint == null || boundType == BoundType.INFINITY
         }
 
-        abstract fun <R: Comparable<R>> map(func: (C?) -> R?): Cut<R>
+        abstract fun <R : Comparable<R>> map(func: (C?) -> R?): Cut<R>
         abstract fun describe(): String
     }
 
@@ -150,7 +150,7 @@ open class Range<C : Comparable<C>>(val lower: LeftCut<C>, val upper: RightCut<C
             }
         }
 
-        override fun <R: Comparable<R>> map(func: (C?) -> R?): LeftCut<R> {
+        override fun <R : Comparable<R>> map(func: (C?) -> R?): LeftCut<R> {
             return LeftCut(func(endpoint), boundType)
         }
 
@@ -179,7 +179,7 @@ open class Range<C : Comparable<C>>(val lower: LeftCut<C>, val upper: RightCut<C
             }
         }
 
-        override fun <R: Comparable<R>> map(func: (C?) -> R?): RightCut<R> {
+        override fun <R : Comparable<R>> map(func: (C?) -> R?): RightCut<R> {
             return RightCut(func(endpoint), boundType)
         }
 

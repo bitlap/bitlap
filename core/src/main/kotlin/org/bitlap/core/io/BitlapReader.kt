@@ -1,7 +1,7 @@
 package org.bitlap.core.io
 
+import org.bitlap.core.model.RawRow
 import org.bitlap.core.model.query.Query
-import org.bitlap.core.model.query.RawRow
 import java.io.Closeable
 
 /**

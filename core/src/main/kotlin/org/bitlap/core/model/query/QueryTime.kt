@@ -13,5 +13,4 @@ import org.joda.time.DateTime
 data class QueryTime(val timeRange: TimeRange) {
 
     constructor(start: Long) : this(TimeRange(DateTime(start)))
-
 }

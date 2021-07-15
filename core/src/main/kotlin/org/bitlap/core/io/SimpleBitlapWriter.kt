@@ -6,9 +6,8 @@ import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.storage.metadata.MetricRow
-import org.bitlap.storage.metadata.MetricRowMeta
-import org.bitlap.storage.metadata.MetricRows
+import org.bitlap.storage.load.MetricRow
+import org.bitlap.storage.load.MetricRowMeta
 import java.util.Collections
 
 /**
@@ -76,7 +75,7 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<Event> {
                     r.metadata = MetricRowMeta(r.tm, r.metricKey, r.entityKey, r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
                     r
                 }
-            metricStore.store(MetricRows(time, metricRows))
+            metricStore.store(time to metricRows)
 
             // store metric with one dimension
             // TODO

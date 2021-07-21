@@ -9,3 +9,4 @@ import org.bitlap.common.BitlapEvent
  */
 
 data class DataSourceCreateEvent(val name: String) : BitlapEvent
+data class DataSourceUpdateEvent(val name: String) : BitlapEvent

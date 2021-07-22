@@ -182,6 +182,7 @@
     </dependencyManagement>
 
     <!-- If not working: https://stackoverflow.com/questions/8223689/maven-project-defined-repository-not-works -->
+    <!--
     <repositories>
         <repository>
             <id>kotlinx</id>
@@ -189,6 +190,7 @@
             <url>https://kotlin.bintray.com/kotlinx/</url>
         </repository>
     </repositories>
+    -->
     <distributionManagement>
         <snapshotRepository>
             <id>central</id>

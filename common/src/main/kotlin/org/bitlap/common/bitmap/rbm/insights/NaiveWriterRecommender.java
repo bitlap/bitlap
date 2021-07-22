@@ -2,12 +2,12 @@ package org.bitlap.common.bitmap.rbm.insights;
 
 /**
  * The purpose of this class it to help user decide
- * which {@link org.roaringbitmap.RoaringBitmapWriter} heuristic to use.
+ * which {@link org.bitlap.common.bitmap.rbm.RoaringBitmapWriter} heuristic to use.
  */
 public class NaiveWriterRecommender {
   /**
    * Based on the statistics it applies expert rules
-   * to help tuning the {@link org.roaringbitmap.RoaringBitmapWriter}
+   * to help tuning the {@link org.bitlap.common.bitmap.rbm.RoaringBitmapWriter }
    * @param s statistics
    * @return some message
    */

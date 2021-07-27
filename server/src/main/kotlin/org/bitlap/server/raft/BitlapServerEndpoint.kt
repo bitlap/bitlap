@@ -10,7 +10,7 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.LifeCycle
+import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.proto.rpc.HelloRpcPB
 import org.bitlap.common.utils.withPaths
 import org.bitlap.server.raft.rpc.HelloRpcProcessor
@@ -23,20 +23,16 @@ import java.io.File
  * Created by IceMimosa
  * Date: 2021/4/22
  */
-open class BitlapServerEndpoint(val conf: BitlapConf) : LifeCycle {
-
-    @Volatile
-    private var started = false
-
-    @Volatile
-    private var shutdown = true
+open class BitlapServerEndpoint(val conf: BitlapConf) : LifeCycleWrapper() {
 
     private lateinit var node: Node
 
+    @Synchronized
     override fun start() {
         if (this.started) {
             return
         }
+        super.start()
         val groupId = "bitlap-cluster"
         val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)!!
         val serverIdStr = conf.get(BitlapConf.NODE_BIND_HOST)
@@ -68,16 +64,12 @@ open class BitlapServerEndpoint(val conf: BitlapConf) : LifeCycle {
         val raftGroupService = RaftGroupService(groupId, serverId, nodeOptions, rpcServer)
         this.node = raftGroupService.start()
 
-        this.started = true
-        this.shutdown = false
-
         println("Started counter server at port:" + node.nodeId.peerId.port)
     }
 
-    override fun isStarted(): Boolean = this.started
-    override fun isShutdown(): Boolean = this.shutdown
-
+    @Synchronized
     override fun close() {
+        super.close()
         this.node.shutdown()
     }
 }

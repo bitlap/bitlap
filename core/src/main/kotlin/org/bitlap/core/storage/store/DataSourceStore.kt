@@ -1,11 +1,11 @@
-package org.bitlap.storage.store
+package org.bitlap.core.storage.store
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.proto.storage.DataSourcePB
 import org.bitlap.common.utils.PreConditions
-import org.bitlap.core.metadata.DataSource
+import org.bitlap.core.storage.metadata.DataSource
 
 /**
  * Mail: chk19940609@gmail.com

@@ -1,4 +1,4 @@
-package org.bitlap.storage.load
+package org.bitlap.core.storage.load
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM

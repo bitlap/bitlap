@@ -21,7 +21,7 @@ class EventBusTest : StringSpec({
 
     "Test simple eventbus" {
         val count = AtomicInteger(0)
-        val eventBus = EventBus()
+        val eventBus = EventBus().apply { start() }
         eventBus.subscribe<TestEvent1> {
             count.incrementAndGet()
         }.subscribe<TestEvent1> {
@@ -39,6 +39,12 @@ class EventBusTest : StringSpec({
                 }
             }
         }
+
         count.get() shouldBe (1000 + 1000 * 2 + 500500)
+        eventBus.isStarted() shouldBe true
+        eventBus.isShutdown() shouldBe false
+        eventBus.close()
+        eventBus.isStarted() shouldBe false
+        eventBus.isShutdown() shouldBe true
     }
 })

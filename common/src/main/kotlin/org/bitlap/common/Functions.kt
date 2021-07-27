@@ -1,5 +1,8 @@
 package org.bitlap.common
 
+import mu.KLogger
+import mu.KotlinLogging
+
 /**
  * Desc: Enhance functions
  *
@@ -17,4 +20,11 @@ fun <T> doIf(flag: Boolean, t: T, func: (T) -> T): T {
         return func.invoke(t)
     }
     return t
+}
+
+/**
+ * Create kotlin logger wrapper
+ */
+fun logger(func: () -> Unit): KLogger {
+    return KotlinLogging.logger(func)
 }

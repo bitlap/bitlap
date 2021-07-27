@@ -1,4 +1,4 @@
-package org.bitlap.storage.store
+package org.bitlap.core.storage
 
 import java.io.Closeable
 

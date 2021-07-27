@@ -1,4 +1,4 @@
-package org.bitlap.storage.store
+package org.bitlap.core.storage.store
 
 import org.apache.carbondata.core.metadata.datatype.DataTypes
 import org.apache.carbondata.core.scan.expression.ColumnExpression
@@ -21,9 +21,9 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.Range.BoundType
-import org.bitlap.storage.load.MetricRow
-import org.bitlap.storage.load.MetricRowIterator
-import org.bitlap.storage.load.MetricRowMeta
+import org.bitlap.core.storage.load.MetricRow
+import org.bitlap.core.storage.load.MetricRowIterator
+import org.bitlap.core.storage.load.MetricRowMeta
 import org.joda.time.DateTime
 
 /**
@@ -38,7 +38,7 @@ class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: Bit
     override val dataDir: Path = Path(rootPath, "data/${dsStore.name}/metric")
     // TODO: wait for https://github.com/apache/carbondata/pull/4159
     private fun writerB() = CarbonWriter.builder()
-        .withCsvInput( // TODO: add enum
+        .withCsvInput( // TODO: add enum & add shard_id if cbm is too big
             """[
                 {mk: string}, 
                 {t: long},

@@ -6,8 +6,8 @@ import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.storage.load.MetricRow
-import org.bitlap.storage.load.MetricRowMeta
+import org.bitlap.core.storage.load.MetricRow
+import org.bitlap.core.storage.load.MetricRowMeta
 import java.util.Collections
 
 /**

@@ -4,8 +4,8 @@ import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
-import org.bitlap.core.metadata.DataSource
-import org.bitlap.storage.store.DataSourceStore
+import org.bitlap.core.storage.metadata.DataSource
+import org.bitlap.core.storage.store.DataSourceStore
 
 /**
  * Desc: datasource manager

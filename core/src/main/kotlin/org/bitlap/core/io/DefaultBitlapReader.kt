@@ -31,16 +31,14 @@ class DefaultBitlapReader : BitlapReader {
         val rows = mutableListOf<RawRow>()
         val time = query.time.timeRange
         if (shouldMaterialize) {
-            val mRows = metricStore.query(time, query.metrics.map { it.name }, query.entity).use { rs ->
-                rs.asSequence().map { it.metricKey to it }.toMap()
-            }
+            val mRows = metricStore.query(time, query.metrics.map { it.name }, query.entity)
+                .asSequence().map { it.metricKey to it }.toMap()
             // handle metric meta data
             val metrics = query.metrics.map { mRows[it.name]?.metric ?: 0.0 }.toTypedArray()
             rows.add(RawRow(metrics, metaColumns))
         } else {
-            val metas = metricStore.queryMeta(time, query.metrics.map { it.name }, query.entity).use { rs ->
-                rs.asSequence().map { it.metricKey to it }.toMap()
-            }
+            val metas = metricStore.queryMeta(time, query.metrics.map { it.name }, query.entity)
+                .asSequence().map { it.metricKey to it }.toMap()
             // handle metric meta data
             val metrics = query.metrics.map { metas[it.name]?.metricCount ?: 0.0 }.toTypedArray()
             rows.add(RawRow(metrics, metaColumns))

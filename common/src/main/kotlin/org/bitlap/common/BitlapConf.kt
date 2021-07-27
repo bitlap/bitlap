@@ -4,7 +4,6 @@ import cn.hutool.setting.Setting
 import org.bitlap.common.conf.BitlapConfKey
 import org.bitlap.common.conf.Validators
 import org.bitlap.common.utils.withPaths
-import org.slf4j.LoggerFactory
 import java.io.Serializable
 
 /**
@@ -25,7 +24,7 @@ import java.io.Serializable
  */
 open class BitlapConf : Serializable {
 
-    private val log = LoggerFactory.getLogger(BitlapConf::class.java)
+    private val log = logger { }
 
     /**
      * core properties

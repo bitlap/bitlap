@@ -1,6 +1,5 @@
 package org.bitlap.common
 
-import java.io.Closeable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -15,8 +14,9 @@ typealias BitlapSubscriber<E> = (e: E) -> Unit
 
 open class EventBus(
     val executor: ExecutorService = Executors.newWorkStealingPool()
-) : Closeable {
+) : LifeCycleWrapper() {
 
+    private val log = logger { }
     val subscribers = ConcurrentHashMap<Class<out BitlapEvent>, MutableList<BitlapSubscriber<*>>>()
 
     inline fun <reified E : BitlapEvent> subscribe(noinline subscriber: BitlapSubscriber<E>): EventBus {
@@ -36,7 +36,14 @@ open class EventBus(
     }
 
     @Synchronized
+    override fun start() {
+        super.start()
+        log.info("EventBus system has been started.")
+    }
+
+    @Synchronized
     override fun close() {
+        super.close()
         if (this.executor.isShutdown) {
             return
         }
@@ -45,6 +52,9 @@ open class EventBus(
             if (!this.executor.awaitTermination(2, TimeUnit.SECONDS)) {
                 this.executor.shutdownNow()
             }
+        }.onFailure {
+            log.error("Error when closing EventBus, cause: ", it)
         }
+        log.info("EventBus system has been closed.")
     }
 }

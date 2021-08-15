@@ -50,7 +50,7 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null) {
         return when (group) {
             "default" -> "bitlap_$cleanKey"
             else -> "bitlap_${group}_$cleanKey"
-        }.toUpperCase()
+        }.uppercase()
     }
 
     var desc = ""

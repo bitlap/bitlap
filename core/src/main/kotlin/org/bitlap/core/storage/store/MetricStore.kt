@@ -1,6 +1,7 @@
 package org.bitlap.core.storage.store
 
 import org.apache.carbondata.core.metadata.datatype.DataTypes
+import org.apache.carbondata.core.metadata.datatype.Field
 import org.apache.carbondata.core.scan.expression.ColumnExpression
 import org.apache.carbondata.core.scan.expression.Expression
 import org.apache.carbondata.core.scan.expression.LiteralExpression
@@ -12,6 +13,7 @@ import org.apache.carbondata.core.scan.expression.logical.AndExpression
 import org.apache.carbondata.core.scan.filter.FilterUtil
 import org.apache.carbondata.sdk.file.CarbonReader
 import org.apache.carbondata.sdk.file.CarbonWriter
+import org.apache.carbondata.sdk.file.Schema
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
@@ -36,25 +38,27 @@ import org.joda.time.DateTime
 class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
 
     override val dataDir: Path = Path(rootPath, "data/${dsStore.name}/metric")
-    // TODO: wait for https://github.com/apache/carbondata/pull/4159
     private fun writerB() = CarbonWriter.builder()
-        .withCsvInput( // TODO: add enum & add shard_id if cbm is too big
-            """[
-                {mk: string}, 
-                {t: long},
-                {ek: string}, 
-                {m: binary},
-                {e: binary},
-                {meta: string}
-            ]
-            """.trimIndent()
+        .withCsvInput(
+            Schema(
+                arrayOf( // TODO: add enum & add shard_id if cbm is too big
+                    Field("mk", DataTypes.STRING),
+                    Field("t", DataTypes.LONG),
+                    Field("ek", DataTypes.STRING),
+                    // Field("m", DataTypes.createArrayType(DataTypes.BINARY)),
+                    // Field("e", DataTypes.createArrayType(DataTypes.BINARY)),
+                    Field("m", DataTypes.BINARY),
+                    Field("e", DataTypes.BINARY),
+                    Field("meta", DataTypes.STRING),
+                )
+            )
         )
         .sortBy(arrayOf("mk", "t", "ek"))
         .withBlockletSize(8)
         .withPageSizeInMb(1)
         .writtenBy(projectName)
 
-    private val readerB = CarbonReader.builder()
+    private fun readerB() = CarbonReader.builder()
         .withRowRecordReader() // disable vector read
         .withBatch(1000) // default is 100
 
@@ -130,7 +134,7 @@ class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: Bit
         }
         // 2. build reader
         val timeExpr = buildTimeExpression(time)
-        val reader = readerB.withFileLists(files)
+        val reader = readerB().withFileLists(files)
             .projection(projections)
             .filter(
                 AndExpression(

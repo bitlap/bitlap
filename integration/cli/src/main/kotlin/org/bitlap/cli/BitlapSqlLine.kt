@@ -29,7 +29,7 @@ object BitlapSqlLine {
         val baseDir = File(
             System.getProperty("user.home"),
             (
-                if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) ""
+                if (System.getProperty("os.name").lowercase().contains("windows")) ""
                 else "."
                 ) + projectName
         ).absolutePath

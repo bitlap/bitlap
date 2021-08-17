@@ -10,7 +10,4 @@ import org.bitlap.core.sql.Rule
  * Created by IceMimosa
  * Date: 2021/8/12
  */
-abstract class RelNodeRule : Rule<RelNode> {
-
-
-}
+abstract class RelNodeRule : Rule<RelNode>

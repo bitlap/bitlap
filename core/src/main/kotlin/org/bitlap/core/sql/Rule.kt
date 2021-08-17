@@ -12,5 +12,4 @@ interface Rule<R> {
     val name: String get() = this::class.java.name
 
     fun execute(plan: R): R
-
 }

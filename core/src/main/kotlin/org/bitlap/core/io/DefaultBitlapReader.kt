@@ -16,7 +16,7 @@ import org.bitlap.core.model.query.Query
 class DefaultBitlapReader : BitlapReader {
 
     override fun read(query: Query): List<RawRow> {
-        val dsStore = BitlapContext.dataSourceManager.getDataSourceStore(PreConditions.checkNotBlank(query.datasource))
+        val dsStore = BitlapContext.catalog.getDataSourceStore(PreConditions.checkNotBlank(query.datasource))
         val metricStore = dsStore.getMetricStore()
 
         if (query.hasDimensions()) {

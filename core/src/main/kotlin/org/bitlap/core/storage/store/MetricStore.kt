@@ -37,7 +37,7 @@ import org.joda.time.DateTime
  */
 class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
 
-    override val dataDir: Path = Path(rootPath, "data/${dsStore.name}/metric")
+    override val dataDir: Path = Path(rootPath, "data/${dsStore.schema}/${dsStore.name}/metric")
     private fun writerB() = CarbonWriter.builder()
         .withCsvInput(
             Schema(

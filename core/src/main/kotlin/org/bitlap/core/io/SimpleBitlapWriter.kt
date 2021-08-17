@@ -21,7 +21,7 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<Event> {
 
     private var closed = false
     private val rows = Collections.synchronizedList(mutableListOf<Event>())
-    private val dataSourceStore = BitlapContext.dataSourceManager.getDataSourceStore(datasource)
+    private val dataSourceStore = BitlapContext.catalog.getDataSourceStore(datasource)
 
     override fun write(t: Event) {
         rows.add(t)

@@ -6,7 +6,6 @@ import org.bitlap.common.BitlapConf
 import sqlline.SqlLine
 import sqlline.SqlLineOpts
 import java.io.File
-import java.util.Locale
 import kotlin.system.exitProcess
 
 /**

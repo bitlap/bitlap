@@ -1,7 +1,8 @@
 package org.bitlap.core
 
+import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf
-import org.bitlap.core.meta.DataSourceManager
+import org.bitlap.core.data.BitlapCatalog
 
 /**
  * Desc: Context with core components.
@@ -14,5 +15,11 @@ object BitlapContext {
 
     val bitlapConf = BitlapConf()
 
-    val dataSourceManager = DataSourceManager(bitlapConf)
+    val catalog by lazy {
+        BitlapCatalog.apply {
+            conf = bitlapConf
+            hadoopConf = Configuration()
+            start()
+        }
+    }
 }

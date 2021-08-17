@@ -12,9 +12,9 @@ import org.bitlap.core.storage.metadata.DataSource
  * Created by IceMimosa
  * Date: 2020/12/23
  */
-class DataSourceStore(val name: String, val hadoopConf: Configuration, val conf: BitlapConf) : AbsBitlapStore<DataSource>(hadoopConf, conf) {
+class DataSourceStore(val name: String, val schema: String, val hadoopConf: Configuration, val conf: BitlapConf) : AbsBitlapStore<DataSource>(hadoopConf, conf) {
 
-    override val dataDir: Path = Path(rootPath, "data/$name")
+    override val dataDir: Path = Path(rootPath, "data/$schema/$name")
     private lateinit var metricStore: MetricStore
 
     override fun open() {
@@ -29,7 +29,7 @@ class DataSourceStore(val name: String, val hadoopConf: Configuration, val conf:
     override fun store(t: DataSource): DataSource {
         val name = PreConditions.checkNotBlank(t.name).trim()
         // TODO: check name valid
-        val schema = DataSourcePB.newBuilder().setName(name).setCreateTime(t.createTime).setUpdateTime(t.updateTime).build().toByteArray()
+        val schema = DataSourcePB.newBuilder().setSchema(t.schema).setName(name).setCreateTime(t.createTime).setUpdateTime(t.updateTime).build().toByteArray()
         fs.create(Path(dataDir, ".schema"), true).use {
             it.writeInt(schema.size)
             it.write(schema)
@@ -49,6 +49,7 @@ class DataSourceStore(val name: String, val hadoopConf: Configuration, val conf:
             DataSourcePB.parseFrom(buf)
         }
         return DataSource(
+            schema.schema,
             schema.name,
             schema.createTime,
             schema.updateTime

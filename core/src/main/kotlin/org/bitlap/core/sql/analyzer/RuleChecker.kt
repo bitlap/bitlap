@@ -15,5 +15,4 @@ class RuleChecker : RelNodeRule() {
     override fun execute(plan: RelNode): RelNode {
         TODO("Not yet implemented")
     }
-
 }

@@ -11,7 +11,7 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.LifeCycle
+import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.RpcServiceSupport
 import org.bitlap.common.utils.withPaths
 import org.bitlap.server.raft.cli.BCLIService
@@ -22,7 +22,6 @@ import org.bitlap.server.raft.cli.rpc.ExecuteStatementProcessor
 import org.bitlap.server.raft.cli.rpc.FetchResultsProcessor
 import org.bitlap.server.raft.cli.rpc.OpenSessionProcessor
 import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Desc: Endpoint of bitlap server
@@ -31,15 +30,16 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Created by IceMimosa
  * Date: 2021/4/22
  */
-open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle, RpcServiceSupport {
+open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper(), RpcServiceSupport {
 
-    private val started = AtomicBoolean(false)
     private lateinit var node: Node
 
+    @Synchronized
     override fun start() {
-        if (!this.started.compareAndSet(false, true)) {
+        if (this.started) {
             return
         }
+        super.start()
         val groupId = "bitlap-cluster"
         val serverIdStr = conf.get(BitlapConf.NODE_BIND_HOST)
         val nodeOptions = extractOptions(conf)
@@ -59,12 +59,10 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycle, RpcSe
         println("Started counter server at port:" + node.nodeId.peerId.port)
     }
 
-    override fun isStarted(): Boolean = this.started.get()
-
+    @Synchronized
     override fun close() {
-        if (this.started.compareAndSet(true, false)) {
-            this.node.shutdown()
-        }
+        super.close()
+        this.node.shutdown()
     }
 }
 

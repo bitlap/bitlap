@@ -10,6 +10,15 @@ import java.io.Serializable
 /**
  * Desc: Bitlap core configuration.
  *
+ * [BitlapConfKey] is designed as follows, and the priority is the same as below:
+ *   1. with `name` and `group` to get value from `bitlap.setting` configuration
+ *   2. with `sys` to get value from system properties, default is `bitlap.${name}`
+ *   3. with `env` to get value from system environment, default is `BITLAP_${upper_trans_dot(name)}`
+ *   4. `default` value
+ *   5. value `data type`
+ *   6. value `validator`
+ *   7. conf key `version`
+ *   8. ......
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/5/28
@@ -17,6 +26,7 @@ import java.io.Serializable
 open class BitlapConf() : Serializable {
 
     private val log = LoggerFactory.getLogger(BitlapConf::class.java)
+
     @Volatile
     private lateinit var sessionConf: Map<String, String>
 
@@ -67,24 +77,30 @@ open class BitlapConf() : Serializable {
     }
 
     companion object {
+        /**
+         * Project name, default is bitlap
+         */
         val PROJECT_NAME = BitlapConfKey("project.name", "bitlap")
             .sys("bitlap.project.name")
             .env("BITLAP_PROJECT_NAME")
 
+        /**
+         * Data dir and local dir
+         */
         val DEFAULT_ROOT_DIR_DATA = BitlapConfKey<String>("root.dir.data")
             .validator(Validators.NOT_BLANK)
-
         val DEFAULT_ROOT_DIR_LOCAL = BitlapConfKey<String>("root.dir.local")
             .validator(Validators.NOT_BLANK)
-
         val DEFAULT_ROOT_DIR_LOCAL_META = BitlapConfKey<String>("root.dir.local.meta")
             .defaultBy {
                 it.get(DEFAULT_ROOT_DIR_LOCAL)?.withPaths("meta")
             }
 
+        /**
+         * Node address
+         */
         val NODE_BIND_HOST = BitlapConfKey<String>("node.bind.host")
             .validator(Validators.NOT_BLANK)
-
         val NODE_BIND_PEERS = BitlapConfKey<String>("node.bind.peers")
             .validator(Validators.NOT_BLANK)
     }

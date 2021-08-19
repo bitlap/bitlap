@@ -14,6 +14,8 @@ import kotlin.math.max
  * Desc:
  *   Build from RoaringBitmap[commit: fc3754f2]
  *
+ * RBM number: support: 0, 1, ..., 2147483647, -2147483648, -2147483647,..., -1
+ *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2020/11/16
@@ -94,7 +96,7 @@ open class RBM : AbsBM {
         (0 until array.size()).forEach { i ->
             val key = array.keys[i]
             val value = doIf(copy, array.values[i]) { it.clone() }
-            val idx = key.toShort() % splitSize
+            val idx = key.code % splitSize
             if (results.containsKey(idx)) {
                 results[idx]!!._rbm.append(key, value)
             } else {

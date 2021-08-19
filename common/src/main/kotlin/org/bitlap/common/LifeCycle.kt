@@ -11,3 +11,24 @@ interface LifeCycle : Closeable {
     fun start()
     fun isStarted(): Boolean
 }
+
+abstract class LifeCycleWrapper : LifeCycle {
+
+    @Volatile
+    protected var started = false
+    @Volatile
+    protected var shutdown = true
+
+    override fun start() {
+        shutdown = false
+        started = true
+    }
+
+    override fun close() {
+        started = false
+        shutdown = true
+    }
+
+    override fun isStarted(): Boolean = this.started
+    override fun isShutdown(): Boolean = this.shutdown
+}

@@ -6,7 +6,7 @@
 
 /**
  * The org.roaringbitmap.longlong package  provides
- * one class ({@link org.roaringbitmap.longlong.Roaring64NavigableMap}) that   users
+ * one class ({@link org.bitlap.common.bitmap.rbm.longlong.Roaring64NavigableMap}) that   users
  * can rely upon for fast set of 64-bit integers.
  * 
  * 

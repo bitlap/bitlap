@@ -1,6 +1,7 @@
 package org.bitlap.core
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.core.meta.DataSourceManager
 
 /**
  * Desc: Context with core components.

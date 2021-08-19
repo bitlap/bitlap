@@ -1,7 +1,12 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import java.sql.*
+import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.SQLFeatureNotSupportedException
+import java.sql.SQLWarning
+import java.sql.Statement
 
 /**
  * Bitlap Statement

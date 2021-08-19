@@ -1,6 +1,7 @@
-import junit.framework.TestCase
+
 import java.sql.DriverManager
 import java.sql.Statement
+import junit.framework.TestCase
 
 /**
  *

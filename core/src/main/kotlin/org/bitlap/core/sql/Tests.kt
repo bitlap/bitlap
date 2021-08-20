@@ -25,6 +25,7 @@ fun main1() {
 }
 
 fun main() {
-    val sql = "select 1+2*3, id, name from test where id < 5 and name = 'mimosa'"
+//    val sql = "select 1+2*3, id, name from test where id < 5 and name = 'mimosa'"
+    val sql = "create schema a"
     val parser = QueryExecution(sql)
 }

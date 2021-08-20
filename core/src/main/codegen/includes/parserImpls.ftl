@@ -15,22 +15,6 @@
 // limitations under the License.
 -->
 
-<#--
-  Add implementations of additional parser statements, literals or
-  data types.
-  Example of SqlShowTables() implementation:
-  SqlNode SqlShowTables()
-  {
-    ...local variables...
-  }
-  {
-    <SHOW> <TABLES>
-    ...
-    {
-      return SqlShowTables(...)
-    }
-  }
--->
 SqlNode SqlRunExampleNode() :
 {
   SqlNode stringNode;
@@ -41,4 +25,51 @@ SqlNode SqlRunExampleNode() :
   {
     return new SqlRunExampleNode(getPos(), token.image);
   }
+}
+
+SqlCreate SqlCreateExtended(Span s, boolean replace) :
+{
+    final SqlCreate create;
+}
+{
+    (
+        create = SqlCreateSchema(s, replace)
+    )
+    {
+        return create;
+    }
+}
+
+/**
+ * Parses a "IF NOT EXISTS" option, default is false.
+ */
+boolean IfNotExistsOpt() :
+{
+}
+{
+    (
+        LOOKAHEAD(3)
+        <IF> <NOT> <EXISTS> { return true; }
+    |
+        { return false; }
+    )
+}
+
+/**
+ * Parse tree for {@code CREATE SCHEMA} statement.
+ */
+SqlCreate SqlCreateSchema(Span s, boolean replace) :
+{
+    SqlIdentifier schemaName;
+    boolean ifNotExists = false;
+}
+{
+    <SCHEMA>
+
+    ifNotExists = IfNotExistsOpt()
+
+    schemaName = CompoundIdentifier()
+    {
+        return SqlDdlNodes.createSchema(s.pos(), replace, ifNotExists, schemaName);
+    }
 }

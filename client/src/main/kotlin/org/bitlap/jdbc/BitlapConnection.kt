@@ -1,16 +1,7 @@
 package org.bitlap.jdbc
 
-import com.alipay.sofa.jraft.RouteTable
 import com.alipay.sofa.jraft.conf.Configuration
-import com.alipay.sofa.jraft.option.CliOptions
-import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import com.google.protobuf.ByteString
-import org.bitlap.common.BitlapConf
-import org.bitlap.common.RpcServiceSupport
-import org.bitlap.common.proto.driver.BOpenSession
-import java.nio.ByteBuffer
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob
@@ -18,15 +9,18 @@ import java.sql.Connection
 import java.sql.DatabaseMetaData
 import java.sql.NClob
 import java.sql.PreparedStatement
-import java.sql.SQLFeatureNotSupportedException
 import java.sql.SQLWarning
 import java.sql.SQLXML
 import java.sql.Savepoint
 import java.sql.Statement
 import java.sql.Struct
 import java.util.Properties
-import java.util.UUID
 import java.util.concurrent.Executor
+import org.bitlap.common.client.BitlapClient
+import org.bitlap.common.client.BitlapClient.closeSession
+import org.bitlap.common.client.BitlapClient.openSession
+import org.bitlap.common.client.RpcServiceSupport
+import org.bitlap.common.proto.driver.BSessionHandle
 
 /**
  * Bitlap Connection
@@ -35,27 +29,20 @@ import java.util.concurrent.Executor
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapConnection(private var uri: String, val info: Properties?) : Connection, RpcServiceSupport {
+class BitlapConnection(private var uri: String, info: Properties?) : Connection, RpcServiceSupport {
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"
     }
 
-    private var session: JdbcSessionState
+    private var session: BSessionHandle? = null
     private var client: CliClientServiceImpl = CliClientServiceImpl()
     private var isClosed = true
     private var warningChain: SQLWarning? = null
 
     init {
-        registerMessageInstances(RpcServiceSupport.requestInstances()) {
-            RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
-        }
-        registerMessageInstances(RpcServiceSupport.responseInstances()) {
-            MarshallerHelper.registerRespInstance(it.first, it.second)
-        }
+        BitlapClient.beforeInit()
 
-        session = JdbcSessionState(BitlapConf())
-        JdbcSessionState.start(session)
         if (!uri.startsWith(URI_PREFIX)) {
             throw Exception("Invalid URL: $uri")
         }
@@ -65,67 +52,53 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
         val parts = uri.split("/").toTypedArray()
         try {
             // TODO Secondary wrap for registration and release
-            val groupId = "bitlap-cluster"
             val conf = Configuration()
             conf.parse(parts[0])
-            RouteTable.getInstance().updateConfiguration(groupId, conf)
-            client.init(CliOptions())
-            check(RouteTable.getInstance().refreshLeader(client, groupId, 1000).isOk) { "Refresh leader failed" }
-            val leader = RouteTable.getInstance().selectLeader(groupId)
-            println("Leader: $leader")
-            client.rpcClient.invokeAsync(
-                leader.endpoint,
-                BOpenSession.BOpenSessionReq.newBuilder().setUsername(info?.get("user").toString())
-                    .setPassword(info?.get("password").toString()).build(),
-                { result, err ->
-                    result as BOpenSession.BOpenSessionResp
-                    val id = ByteBuffer.wrap(ByteString.copyFromUtf8(result.sessionHandle.sessionId.guid).toByteArray())
-                    println("Open session: ${UUID(id.long, id.long)}")
-                },
-                5000
-            )
-            Thread.currentThread().join()
+            session = client.openSession(conf, info)
+            isClosed = false
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun isWrapperFor(iface: Class<*>?): Boolean {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun close() {
-//        try {
-//            val groupId = "bitlap-cluster"
-//            val leader = RouteTable.getInstance().selectLeader(groupId)
-//            if (cli.isConnected(leader.endpoint)) cli.shutdown()
-//        } finally {
-//            isClosed = true
-//        }
+        try {
+            if (session != null) {
+                client.closeSession(session!!)
+            }
+        } finally {
+            isClosed = true
+        }
+
     }
 
     override fun createStatement(): Statement {
-        return BitlapStatement(session, client)
+        assert(session != null)
+        return BitlapStatement(session!!, client)
     }
 
     override fun createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createStatement(resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): Statement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(sql: String): PreparedStatement {
-        return BitlapPreparedStatement(sql)
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(sql: String?, resultSetType: Int, resultSetConcurrency: Int): PreparedStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(
@@ -134,27 +107,27 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
         resultSetConcurrency: Int,
         resultSetHoldability: Int
     ): PreparedStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(sql: String?, autoGeneratedKeys: Int): PreparedStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(sql: String?, columnIndexes: IntArray?): PreparedStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareStatement(sql: String?, columnNames: Array<out String>?): PreparedStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareCall(sql: String?): CallableStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareCall(sql: String?, resultSetType: Int, resultSetConcurrency: Int): CallableStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun prepareCall(
@@ -163,67 +136,67 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
         resultSetConcurrency: Int,
         resultSetHoldability: Int
     ): CallableStatement {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun nativeSQL(sql: String?): String {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun setAutoCommit(autoCommit: Boolean) {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun getAutoCommit(): Boolean {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun commit() {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun rollback() {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun rollback(savepoint: Savepoint?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
-    }
-
-    override fun isClosed(): Boolean {
         TODO("Not yet implemented")
     }
 
+    override fun nativeSQL(sql: String?): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun setAutoCommit(autoCommit: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAutoCommit(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun commit() {
+        TODO("Not yet implemented")
+    }
+
+    override fun rollback() {
+        TODO("Not yet implemented")
+    }
+
+    override fun rollback(savepoint: Savepoint?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun isClosed(): Boolean {
+        return isClosed
+    }
+
     override fun getMetaData(): DatabaseMetaData {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setReadOnly(readOnly: Boolean) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun isReadOnly(): Boolean {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setCatalog(catalog: String?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getCatalog(): String {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setTransactionIsolation(level: Int) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getTransactionIsolation(): Int {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getWarnings(): SQLWarning {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun clearWarnings() {
@@ -231,94 +204,94 @@ class BitlapConnection(private var uri: String, val info: Properties?) : Connect
     }
 
     override fun getTypeMap(): MutableMap<String, Class<*>> {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setTypeMap(map: MutableMap<String, Class<*>>?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setHoldability(holdability: Int) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getHoldability(): Int {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setSavepoint(): Savepoint {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setSavepoint(name: String?): Savepoint {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun releaseSavepoint(savepoint: Savepoint?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createClob(): Clob {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createBlob(): Blob {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createNClob(): NClob {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createSQLXML(): SQLXML {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun isValid(timeout: Int): Boolean {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setClientInfo(name: String?, value: String?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setClientInfo(properties: Properties?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getClientInfo(name: String?): String {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getClientInfo(): Properties {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createArrayOf(typeName: String?, elements: Array<out Any>?): java.sql.Array {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun createStruct(typeName: String?, attributes: Array<out Any>?): Struct {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setSchema(schema: String?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getSchema(): String {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun abort(executor: Executor?) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun setNetworkTimeout(executor: Executor?, milliseconds: Int) {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 
     override fun getNetworkTimeout(): Int {
-        throw SQLFeatureNotSupportedException("Method not supported")
+        TODO("Not yet implemented")
     }
 }

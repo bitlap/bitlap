@@ -12,7 +12,7 @@ import javax.sql.DataSource
  * @since 2021/6/12
  * @version 1.0
  */
-class BitlapDataSource : DataSource {
+open class BitlapDataSource : DataSource {
     override fun getLogWriter(): PrintWriter {
         TODO("Not yet implemented")
     }
@@ -42,14 +42,14 @@ class BitlapDataSource : DataSource {
     }
 
     override fun getConnection(): Connection {
-        return try {
-            BitlapConnection("", null)
-        } catch (ex: Exception) {
-            throw SQLException()
-        }
+        return getConnection("", "")
     }
 
     override fun getConnection(username: String?, password: String?): Connection {
-        TODO("Not yet implemented")
+        return try {
+            BitlapConnection("", null)
+        } catch (ex: java.lang.Exception) {
+            throw SQLException("Error in getting HiveConnection", ex)
+        }
     }
 }

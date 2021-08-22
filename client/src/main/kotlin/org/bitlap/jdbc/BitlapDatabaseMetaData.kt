@@ -1,9 +1,11 @@
 package org.bitlap.jdbc
 
+import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import java.sql.Connection
 import java.sql.DatabaseMetaData
 import java.sql.ResultSet
 import java.sql.RowIdLifetime
+import org.bitlap.common.proto.driver.BSessionHandle
 
 /**
  *
@@ -11,7 +13,11 @@ import java.sql.RowIdLifetime
  * @since 2021/6/12
  * @version 1.0
  */
-class BitlapDatabaseMetaData : DatabaseMetaData {
+open class BitlapDatabaseMetaData(
+    private val session: BSessionHandle,
+    private val client: CliClientServiceImpl
+) : DatabaseMetaData {
+
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
     }

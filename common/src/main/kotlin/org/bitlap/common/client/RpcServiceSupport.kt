@@ -1,4 +1,4 @@
-package org.bitlap.common
+package org.bitlap.common.client
 
 import com.google.protobuf.GeneratedMessageV3
 

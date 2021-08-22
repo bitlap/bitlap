@@ -21,15 +21,5 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>jraft-core</artifactId>
-            <version>${sofa.jraft.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>rpc-grpc-impl</artifactId>
-            <version>${sofa.jraft.version}</version>
-        </dependency>
     </dependencies>
 </project>

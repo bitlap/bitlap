@@ -21,6 +21,9 @@ import java.sql.Time
 import java.sql.Timestamp
 import java.util.Calendar
 import java.util.Properties
+import org.bitlap.common.client.BitlapClient.fetchResults
+import org.bitlap.common.proto.driver.BOperationHandle
+import org.bitlap.common.proto.driver.BSessionHandle
 
 /**
  *
@@ -30,12 +33,13 @@ import java.util.Properties
  */
 class BitlapResultSet() : ResultSet {
 
-    private lateinit var client: CliClientServiceImpl
-    private var row: ArrayList<*>? = null
+    private var client: CliClientServiceImpl? = null
+    private var row: Array<*>? = null
     private var maxRows: Int = 0
-    private var columnNames: List<String>? = null
-    private var columnTypes: List<String>? = null
+    private var emptyResultSet = false
+    private var isClosed = false
     private var rowsFetched = 0
+    private var fetchSize = 0
 
     /**
      * jvm field
@@ -45,18 +49,40 @@ class BitlapResultSet() : ResultSet {
 
     @JvmField
     var wasNull = false
+    private lateinit var columnNames: MutableList<String>
+    private lateinit var columnTypes: MutableList<String>
+    private var fetchedRows: List<String>? = null
+    private var fetchedRowsItr: Iterator<String>? = null
+
+    private var sessHandle: BSessionHandle? = null
+    private var stmtHandle: BOperationHandle? = null
 
     constructor(client: CliClientServiceImpl, maxRows: Int) : this() {
         this.client = client
-        this.row = ArrayList<Any?>()
+        this.row = arrayOfNulls<Any>(7)
         this.maxRows = maxRows
         initDynamicSerde()
     }
 
-    constructor(client: CliClientServiceImpl) : this() {
-        this.client = client
-        row = ArrayList<Any?>()
-        initDynamicSerde()
+    constructor(builder: Builder) : this() {
+        this.client = builder.client
+        this.stmtHandle = builder.stmtHandle
+        this.sessHandle = builder.sessHandle
+        this.fetchSize = builder.fetchSize
+        columnNames = builder.colNames
+        columnTypes = builder.colTypes
+        if (builder.retrieveSchema) {
+            //retrieveSchema() TODO
+        } else {
+            columnNames.addAll(builder.colNames)
+            columnTypes.addAll(builder.colTypes)
+        }
+        this.emptyResultSet = builder.emptyResultSet
+        maxRows = if (builder.emptyResultSet) {
+            0
+        } else {
+            builder.maxRows
+        }
     }
 
     /**
@@ -82,26 +108,33 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun close() {
-        TODO("Not yet implemented")
+        client = null
+        stmtHandle = null
+        sessHandle = null
+        isClosed = true
     }
 
     override fun next(): Boolean {
-//        if (maxRows > 0 && rowsFetched >= maxRows) return false
-        var row_str = ""
-//        try {
-//            row_str = client.fetchOne() as String
-//            rowsFetched++
-//            if (row_str != "") {
-//                val o: Any = ds.deserialize(BytesWritable(row_str.toByteArray()))
-//                row = o as ArrayList<*>
-//            }
-//        } catch (ex: java.lang.Exception) {
-//            ex.printStackTrace()
-//            throw SQLException("Error retrieving next row")
-//        }
-        // NOTE: fetchOne dosn't throw new SQLException("Method not supported").
-        // NOTE: fetchOne dosn't throw new SQLException("Method not supported").
-        return row_str != ""
+        if (isClosed || client === null) {
+            throw SQLException("Resultset is closed")
+        }
+        if (emptyResultSet || maxRows in 1..rowsFetched) {
+            return false
+        }
+        if (fetchedRows == null || !fetchedRowsItr!!.hasNext()) {
+            fetchedRows = stmtHandle?.let { client?.fetchResults(it) }.orEmpty()
+            fetchedRowsItr = fetchedRows!!.iterator()
+        }
+
+        if (fetchedRowsItr!!.hasNext()) {
+            row = arrayOf(fetchedRowsItr!!.next())
+        } else {
+            return false
+        }
+
+        rowsFetched++
+
+        return true //TODO Moves the cursor down one row from its current position.
     }
 
     override fun wasNull(): Boolean {
@@ -246,11 +279,7 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun getDate(columnIndex: Int): Date {
-        return try {
-            Date.valueOf(row!![columnIndex - 1] as String)
-        } catch (e: java.lang.Exception) {
-            throw SQLException("Cannot convert column $columnIndex to date: $e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getDate(columnLabel: String?): Date {
@@ -338,21 +367,7 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun getObject(columnIndex: Int): Any {
-        if (row == null) {
-            throw SQLException("No row found.")
-        }
-
-        if (columnIndex > row!!.size) {
-            throw SQLException("Invalid columnIndex: $columnIndex")
-        }
-
-        return try {
-            wasNull = false
-            if (row!![columnIndex - 1] == null) wasNull = true
-            row!![columnIndex - 1]
-        } catch (e: java.lang.Exception) {
-            throw SQLException(e.toString())
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getObject(columnLabel: String?): Any {
@@ -444,7 +459,10 @@ class BitlapResultSet() : ResultSet {
     }
 
     override fun setFetchSize(rows: Int) {
-        TODO("Not yet implemented")
+        if (isClosed) {
+            throw SQLException("Resultset is closed")
+        }
+        fetchSize = rows
     }
 
     override fun getFetchSize(): Int {
@@ -917,5 +935,67 @@ class BitlapResultSet() : ResultSet {
 
     override fun updateNCharacterStream(columnLabel: String?, reader: Reader?) {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        fun builder(): Builder = Builder()
+        class Builder {
+            lateinit var client: CliClientServiceImpl
+            lateinit var stmtHandle: BOperationHandle
+            lateinit var sessHandle: BSessionHandle
+
+            /**
+             * Sets the limit for the maximum number of rows that any ResultSet object produced by this
+             * Statement can contain to the given number. If the limit is exceeded, the excess rows
+             * are silently dropped. The value must be >= 0, and 0 means there is not limit.
+             */
+            var maxRows = 0
+            var retrieveSchema = true
+            var colNames: MutableList<String> = mutableListOf()
+            var colTypes: MutableList<String> = mutableListOf()
+            var fetchSize = 50
+            var emptyResultSet = false
+            fun setClient(client: CliClientServiceImpl): Builder {
+                this.client = client
+                return this
+            }
+
+            fun setStmtHandle(stmtHandle: BOperationHandle): Builder {
+                this.stmtHandle = stmtHandle
+                return this
+            }
+
+            fun setSessionHandle(sessHandle: BSessionHandle): Builder {
+                this.sessHandle = sessHandle
+                return this
+            }
+
+            fun setMaxRows(maxRows: Int): Builder {
+                this.maxRows = maxRows
+                return this
+            }
+
+            fun setSchema(colNames: MutableList<String>?, colTypes: List<String>?): Builder {
+                this.colNames.addAll(colNames!!)
+                this.colTypes.addAll(colTypes!!)
+                retrieveSchema = false
+                return this
+            }
+
+            fun setFetchSize(fetchSize: Int): Builder {
+                this.fetchSize = fetchSize
+                return this
+            }
+
+            fun setEmptyResultSet(emptyResultSet: Boolean): Builder {
+                this.emptyResultSet = emptyResultSet
+                return this
+            }
+
+            @Throws(SQLException::class)
+            fun build(): BitlapResultSet {
+                return BitlapResultSet(this)
+            }
+        }
     }
 }

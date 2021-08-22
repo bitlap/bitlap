@@ -13,9 +13,9 @@ import java.sql.Types
 class BitlapResultSetMetaData() : ResultSetMetaData {
 
     private lateinit var columnNames: List<String>
-    private var columnTypes: List<String>? = null
+    private lateinit var columnTypes: List<String>
 
-    constructor(columnNames: List<String>, columnTypes: List<String>?) : this() {
+    constructor(columnNames: List<String>, columnTypes: List<String>) : this() {
         this.columnNames = columnNames
         this.columnTypes = columnTypes
     }

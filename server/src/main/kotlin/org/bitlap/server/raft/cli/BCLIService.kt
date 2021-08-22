@@ -1,5 +1,10 @@
 package org.bitlap.server.raft.cli
 
+import java.util.UUID
+import org.bitlap.common.proto.driver.BHandleIdentifier
+import org.bitlap.common.proto.driver.BOperationHandle
+import org.bitlap.common.proto.driver.BOperationType
+
 /**
  * Implementation of driver RPC core.
  * @author 梦境迷离
@@ -33,7 +38,13 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         statement: String,
         confOverlay: Map<String, String>?
     ): OperationHandle? {
-        TODO("Not yet implemented")
+        val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
+            .setOperationId(
+                BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
+                    .setSecret(UUID.randomUUID().toString()).build()
+            )
+            .setHasResultSet(true).build()
+        return OperationHandle(opHandle)
     }
 
     override fun executeStatement(
@@ -42,10 +53,16 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         confOverlay: Map<String, String>?,
         queryTimeout: Long
     ): OperationHandle? {
-        TODO("Not yet implemented")
+        val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
+            .setOperationId(
+                BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
+                    .setSecret(UUID.randomUUID().toString()).build()
+            )
+            .setHasResultSet(true).build()
+        return OperationHandle(opHandle)
     }
 
     override fun fetchResults(opHandle: OperationHandle): List<String?>? {
-        TODO("Not yet implemented")
+        return listOf("hello", "world", "nice", "to", "meet", "you") //mock data
     }
 }

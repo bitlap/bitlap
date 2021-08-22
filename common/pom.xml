@@ -17,6 +17,16 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.11.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>jraft-core</artifactId>
+            <version>${sofa.jraft.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>rpc-grpc-impl</artifactId>
+            <version>${sofa.jraft.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

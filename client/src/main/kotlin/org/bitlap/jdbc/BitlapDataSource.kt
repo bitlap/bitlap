@@ -49,7 +49,7 @@ open class BitlapDataSource : DataSource {
         return try {
             BitlapConnection("", null)
         } catch (ex: java.lang.Exception) {
-            throw SQLException("Error in getting HiveConnection", ex)
+            throw SQLException("Error in getting BitlapConnection", ex)
         }
     }
 }

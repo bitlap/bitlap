@@ -29,14 +29,14 @@ import org.bitlap.common.proto.driver.BSessionHandle
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapConnection(private var uri: String, info: Properties?) : Connection, RpcServiceSupport {
+open class BitlapConnection(private var uri: String, info: Properties?) : Connection, RpcServiceSupport {
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"
     }
 
     private var session: BSessionHandle? = null
-    private var client: CliClientServiceImpl = CliClientServiceImpl()
+    private val client: CliClientServiceImpl by lazy { CliClientServiceImpl() }
     private var isClosed = true
     private var warningChain: SQLWarning? = null
 

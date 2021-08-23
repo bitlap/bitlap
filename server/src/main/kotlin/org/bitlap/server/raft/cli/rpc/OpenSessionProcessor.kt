@@ -20,8 +20,8 @@ class OpenSessionProcessor(private val cliService: CLIService) :
         val username = request.username
         val password = request.password
         val configurationMap = request.configurationMap
-        val sessionHandle = cliService.openSession(username, password, configurationMap)
         val resp: BOpenSession.BOpenSessionResp? = try {
+            val sessionHandle = cliService.openSession(username, password, configurationMap)
             BOpenSession.BOpenSessionResp.newBuilder()
                 .setSessionHandle(sessionHandle?.toBSessionHandle())
                 .setStatus(success()).build()

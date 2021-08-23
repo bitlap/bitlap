@@ -17,11 +17,12 @@ import org.bitlap.common.proto.driver.BSessionHandle
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapStatement() : Statement {
+class BitlapStatement(
+    private val sessHandle: BSessionHandle,
+    private val client: CliClientServiceImpl
+) : Statement {
 
-    private lateinit var sessHandle: BSessionHandle
     private var stmtHandle: BOperationHandle? = null
-    private lateinit var client: CliClientServiceImpl
     private val fetchSize = 50
 
     /**
@@ -47,11 +48,6 @@ class BitlapStatement() : Statement {
      * Keep state so we can fail certain calls made after close();
      */
     private var isClosed = false
-
-    constructor(session: BSessionHandle, client: CliClientServiceImpl) : this() {
-        this.sessHandle = session
-        this.client = client
-    }
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
@@ -145,7 +141,7 @@ class BitlapStatement() : Statement {
         } catch (ex: Exception) {
             throw SQLException(ex.toString())
         }
-        resultSet = BitlapResultSet.builder().setClient(client).setSessionHandle(sessHandle)
+        resultSet = BitlapQueryResultSet.builder().setClient(client).setSessionHandle(sessHandle)
             .setStmtHandle(stmtHandle!!).setMaxRows(maxRows).setFetchSize(fetchSize)
             .build()
         return true
@@ -192,7 +188,7 @@ class BitlapStatement() : Statement {
     }
 
     override fun getFetchSize(): Int {
-       return fetchSize
+        return fetchSize
     }
 
     override fun getResultSetConcurrency(): Int {

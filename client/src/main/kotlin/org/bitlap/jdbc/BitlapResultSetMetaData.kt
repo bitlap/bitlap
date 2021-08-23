@@ -10,15 +10,10 @@ import java.sql.Types
  * @since 2021/6/12
  * @version 1.0
  */
-class BitlapResultSetMetaData() : ResultSetMetaData {
-
-    private lateinit var columnNames: List<String>
-    private lateinit var columnTypes: List<String>
-
-    constructor(columnNames: List<String>, columnTypes: List<String>) : this() {
-        this.columnNames = columnNames
-        this.columnTypes = columnTypes
-    }
+open class BitlapResultSetMetaData(
+    private var columnNames: MutableList<String>,
+    private var columnTypes: MutableList<String>
+) : ResultSetMetaData {
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
@@ -96,9 +91,9 @@ class BitlapResultSetMetaData() : ResultSetMetaData {
     }
 
     override fun getColumnType(column: Int): Int {
-        if (columnTypes == null) throw SQLException("Could not determine column type name for ResultSet")
-        if (column < 1 || column > columnTypes!!.size) throw SQLException("Invalid column value: $column")
-        return when (val type = columnTypes!![column - 1]) {
+        if (columnTypes.isEmpty()) throw SQLException("Could not determine column type name for ResultSet")
+        if (column < 1 || column > columnTypes.size) throw SQLException("Invalid column value: $column")
+        return when (val type = columnTypes[column - 1]) {
             "string" -> Types.VARCHAR
             "bool" -> Types.BOOLEAN
             "double" -> Types.DOUBLE

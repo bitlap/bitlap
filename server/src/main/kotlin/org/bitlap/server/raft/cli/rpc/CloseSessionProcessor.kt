@@ -19,8 +19,8 @@ class CloseSessionProcessor(private val cliService: CLIService) :
     BaseProcessor {
     override fun handleRequest(rpcCtx: RpcContext, request: BCloseSession.BCloseSessionReq) {
         val sessionHandle = request.sessionHandle
-        cliService.closeSession(SessionHandle(sessionHandle))
         val resp: BCloseSession.BCloseSessionResp? = try {
+            cliService.closeSession(SessionHandle(sessionHandle))
             BCloseSession.BCloseSessionResp.newBuilder()
                 .setStatus(success()).build()
         } catch (e: BSQLException) {

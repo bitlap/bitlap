@@ -19,8 +19,8 @@ class FetchResultsProcessor(private val cliService: CLIService) :
     BaseProcessor {
     override fun handleRequest(rpcCtx: RpcContext, request: BFetchResults.BFetchResultsReq) {
         val operationHandle = request.operationHandle
-        val result = cliService.fetchResults(OperationHandle((operationHandle)))
         val resp: BFetchResults.BFetchResultsResp? = try {
+            val result = cliService.fetchResults(OperationHandle((operationHandle)))
             BFetchResults.BFetchResultsResp.newBuilder()
                 .setHasMoreRows(false)
                 .setStatus(success()).addAllResults(result).build()

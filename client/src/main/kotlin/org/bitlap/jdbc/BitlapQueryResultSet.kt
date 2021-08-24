@@ -5,7 +5,6 @@ import org.bitlap.common.client.BitlapClient.fetchResults
 import org.bitlap.common.exception.BSQLException
 import org.bitlap.common.proto.driver.BOperationHandle
 import org.bitlap.common.proto.driver.BSessionHandle
-import java.sql.SQLException
 
 /**
  *
@@ -163,7 +162,6 @@ class BitlapQueryResultSet(
                 return this
             }
 
-            @Throws(SQLException::class)
             fun build(): BitlapQueryResultSet {
                 return BitlapQueryResultSet(this)
             }

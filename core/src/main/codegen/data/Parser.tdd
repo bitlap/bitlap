@@ -28,17 +28,41 @@
   # Example: "org.apache.calcite.sql.*", "java.util.List".
   imports: [
     "org.bitlap.core.sql.SqlRunExampleNode"
-    "org.apache.calcite.sql.SqlCreate"
     "org.apache.calcite.sql.ddl.SqlDdlNodes"
-    "org.apache.calcite.sql.ddl.SqlCreateSchema"
+    "org.apache.calcite.sql.SqlCreate"
+    "org.bitlap.core.sql.parser.SqlCreateSchema"
+    "org.bitlap.core.sql.parser.SqlCreateDataSource"
+    "org.apache.calcite.sql.SqlDrop"
+    "org.bitlap.core.sql.parser.SqlDropSchema"
+    "org.bitlap.core.sql.parser.SqlDropDataSource"
+    "org.bitlap.core.sql.parser.SqlShowSchemas"
+    "org.bitlap.core.sql.parser.SqlShowDataSources"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
   # not a reserved keyword, add it to the 'nonReservedKeywords' section.
   keywords: [
-    "RUN"
+    "COMMENT"
+    "DATABASES"
+    "DATASOURCE"
+    "DATASOURCES"
     "EXAMPLE"
+    "FUNCTIONS"
     "IF"
+    "JAR"
+    "JARS"
+    "LOAD"
+    "METADATA"
+    "OVERWRITE"
+    "OVERWRITING"
+    "REMOVE"
+    "RENAME"
+    "RUN"
+    "SCHEMAS"
+    "TABLES"
+    "UNLOAD"
+    "USE"
+    "VIEWS"
   ]
 
   # List of keywords from "keywords" section that are not reserved.
@@ -370,6 +394,7 @@
   # List of non-reserved keywords to add;
   # items in this list become non-reserved.
   nonReservedKeywordsToAdd: [
+    "IF"
   ]
 
   # List of non-reserved keywords to remove;
@@ -387,6 +412,8 @@
   # Example: "SqlShowDatabases()", "SqlShowTables()".
   statementParserMethods: [
     "SqlRunExampleNode()"
+    "SqlShowSchemas()"
+    "SqlShowDataSources()"
   ]
 
   # List of methods for parsing custom literals.
@@ -424,6 +451,7 @@
   # Each must accept arguments "(SqlParserPos pos)".
   # Example: "SqlDropSchema".
   dropStatementParserMethods: [
+    "SqlDropExtended"
   ]
 
   # Binary operators tokens.

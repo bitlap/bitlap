@@ -1,9 +1,9 @@
 package org.bitlap.server.raft.cli
 
 import com.google.protobuf.ByteString
-import org.bitlap.common.proto.driver.BHandleIdentifier
 import java.nio.ByteBuffer
 import java.util.UUID
+import org.bitlap.common.proto.driver.BHandleIdentifier
 
 /**
  * Abstract descriptor
@@ -12,30 +12,18 @@ import java.util.UUID
  * @since 2021/6/6
  * @version 1.0
  */
-open class HandleIdentifier {
-    private var publicId: UUID
-    private var secretId: UUID
-
-    constructor() {
-        publicId = UUID.randomUUID()
-        secretId = UUID.randomUUID()
-    }
-
-    constructor(publicId: UUID, secretId: UUID) : this() {
-        this.publicId = publicId
-        this.secretId = secretId
-    }
+open class HandleIdentifier(
+    var publicId: UUID = UUID.randomUUID(),
+    var secretId: UUID = UUID.randomUUID()
+) {
 
     constructor(bHandleId: BHandleIdentifier) : this() {
         var bb = ByteBuffer.wrap(ByteString.copyFromUtf8(bHandleId.guid).toByteArray())
-        publicId = UUID(bb.long, bb.long)
+        this.publicId = UUID(bb.long, bb.long)
         bb = ByteBuffer.wrap(ByteString.copyFromUtf8(bHandleId.secret).toByteArray())
-        secretId = UUID(bb.long, bb.long)
+        this.secretId = UUID(bb.long, bb.long)
     }
 
-    fun getPublicId(): UUID = publicId
-
-    fun getSecretId(): UUID = secretId
 
     open fun toBHandleIdentifier(): BHandleIdentifier {
         val guid = ByteArray(16)

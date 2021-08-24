@@ -2,7 +2,6 @@ package org.bitlap.server.raft.cli
 
 import java.util.concurrent.atomic.AtomicBoolean
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.exception.BitlapException
 
 /**
  *
@@ -26,7 +25,6 @@ interface AbstractBSession {
      * @param sessionConfMap
      * @return SessionHandle The Session handle
      */
-    @Throws(BitlapException::class)
     fun open(sessionConfMap: Map<String, String>?): SessionHandle
 
     /**
@@ -35,7 +33,6 @@ interface AbstractBSession {
      * @param confOverlay
      * @return OperationHandle The Operate handle
      */
-    @Throws(BitlapException::class)
     fun executeStatement(
         statement: String,
         confOverlay: Map<String, String>?

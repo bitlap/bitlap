@@ -9,19 +9,15 @@ import org.bitlap.common.proto.driver.BOperationHandle
  * @since 2021/6/6
  * @version 1.0
  */
-open class OperationHandle : Handle {
+open class OperationHandle(
+    private var opType: OperationType,
+    private var hasResultSet: Boolean = false
+) : Handle() {
 
-    private var opType: OperationType
-    private var hasResultSet = false
-
-    constructor(opType: OperationType) : super() {
-        this.opType = opType
-    }
-
-    constructor(bOperationHandle: BOperationHandle) : super(bOperationHandle.operationId) {
-        this.opType = OperationType.getOperationType(bOperationHandle.operationType)
-        this.hasResultSet = bOperationHandle.hasResultSet
-    }
+    constructor(bOperationHandle: BOperationHandle) : this(
+        OperationType.getOperationType(bOperationHandle.operationType),
+        bOperationHandle.hasResultSet
+    )
 
     fun toBOperationHandle(): BOperationHandle {
         return BOperationHandle.newBuilder().setHasResultSet(hasResultSet)

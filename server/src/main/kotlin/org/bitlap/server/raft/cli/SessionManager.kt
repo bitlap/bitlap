@@ -49,7 +49,6 @@ open class SessionManager {
     // service, provider, conf, discover
     // session life cycle manage
 
-    @Throws(BitlapException::class)
     fun openSession(
         sessionHandle: SessionHandle?,
         username: String,
@@ -75,7 +74,6 @@ open class SessionManager {
         }
     }
 
-    @Throws(BitlapException::class)
     fun closeSession(sessionHandle: SessionHandle) {
         synchronized(sessionAddLock) {
             handleToSession.remove(sessionHandle) ?: throw BitlapException("Session does not exist: $sessionHandle")

@@ -1,7 +1,7 @@
 package org.bitlap.server.raft.cli
 
-import org.bitlap.common.BitlapConf
 import java.util.concurrent.atomic.AtomicBoolean
+import org.bitlap.common.BitlapConf
 
 /**
  * Bitlap Session
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @since 2021/6/6
  * @version 1.0
  */
-class BSession : AbstractBSession {
+class BSession() : AbstractBSession {
 
     @Volatile
     override var lastAccessTime: Long = 0
@@ -22,7 +22,6 @@ class BSession : AbstractBSession {
     override lateinit var sessionManager: SessionManager
     override val sessionState: AtomicBoolean = AtomicBoolean(false)
 
-    constructor()
     constructor(
         sessionHandle: SessionHandle?,
         username: String,
@@ -31,7 +30,7 @@ class BSession : AbstractBSession {
         sessionManager: SessionManager
     ) : this() {
         this.username = username
-        this.sessionHandle = sessionHandle ?: SessionHandle()
+        this.sessionHandle = sessionHandle ?: SessionHandle(HandleIdentifier())
         this.password = password
         this.sessionConf = BitlapConf(sessionConf)
         this.creationTime = System.currentTimeMillis()

@@ -9,23 +9,11 @@ import org.bitlap.common.proto.driver.BHandleIdentifier
  * @since 2021/6/6
  * @version 1.0
  */
-abstract class Handle {
-
-    private var handleId: HandleIdentifier
+abstract class Handle(private var handleId: HandleIdentifier = HandleIdentifier()) {
 
     open fun getHandleIdentifier(): HandleIdentifier = handleId
 
-    constructor() {
-        this.handleId = HandleIdentifier()
-    }
-
-    constructor(handleId: HandleIdentifier) : this() {
-        this.handleId = handleId
-    }
-
-    constructor(bHandleIdentifier: BHandleIdentifier) : this() {
-        this.handleId = HandleIdentifier(bHandleIdentifier)
-    }
+    constructor(bHandleIdentifier: BHandleIdentifier) : this(HandleIdentifier(bHandleIdentifier))
 
     override fun hashCode(): Int {
         val prime = 31

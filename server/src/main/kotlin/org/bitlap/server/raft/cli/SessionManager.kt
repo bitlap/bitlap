@@ -2,6 +2,7 @@ package org.bitlap.server.raft.cli
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import org.bitlap.common.exception.BitlapException
 
 /**
  *
@@ -48,7 +49,7 @@ open class SessionManager {
     // service, provider, conf, discover
     // session life cycle manage
 
-    @Throws(BSQLException::class)
+    @Throws(BitlapException::class)
     fun openSession(
         sessionHandle: SessionHandle?,
         username: String,
@@ -74,10 +75,10 @@ open class SessionManager {
         }
     }
 
-    @Throws(BSQLException::class)
+    @Throws(BitlapException::class)
     fun closeSession(sessionHandle: SessionHandle) {
         synchronized(sessionAddLock) {
-            handleToSession.remove(sessionHandle) ?: throw BSQLException("Session does not exist: $sessionHandle")
+            handleToSession.remove(sessionHandle) ?: throw BitlapException("Session does not exist: $sessionHandle")
             println("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
             if (getOpenSessionCount() == 0) {
                 println(

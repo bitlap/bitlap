@@ -2,8 +2,8 @@ package org.bitlap.server.raft.cli.rpc
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.proto.driver.BFetchResults
-import org.bitlap.server.raft.cli.BSQLException
 import org.bitlap.server.raft.cli.CLIService
 import org.bitlap.server.raft.cli.OperationHandle
 
@@ -24,7 +24,7 @@ class FetchResultsProcessor(private val cliService: CLIService) :
             BFetchResults.BFetchResultsResp.newBuilder()
                 .setHasMoreRows(false)
                 .setStatus(success()).addAllResults(result).build()
-        } catch (e: BSQLException) {
+        } catch (e: BitlapException) {
             BFetchResults.BFetchResultsResp.newBuilder().setStatus(error()).build()
         }
         rpcCtx.sendResponse(resp)

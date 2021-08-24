@@ -2,8 +2,8 @@ package org.bitlap.server.raft.cli.rpc
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.proto.driver.BExecuteStatement
-import org.bitlap.server.raft.cli.BSQLException
 import org.bitlap.server.raft.cli.CLIService
 import org.bitlap.server.raft.cli.SessionHandle
 
@@ -23,9 +23,9 @@ class ExecuteStatementProcessor(private val cliService: CLIService) :
         val resp: BExecuteStatement.BExecuteStatementResp? = try {
             val operationHandle = cliService.executeStatement(SessionHandle(sessionHandle), statement, confOverlayMap)
             BExecuteStatement.BExecuteStatementResp.newBuilder()
-                .setOperationHandle(operationHandle?.toBOperationHandle())
+                .setOperationHandle(operationHandle.toBOperationHandle())
                 .setStatus(success()).build()
-        } catch (e: BSQLException) {
+        } catch (e: BitlapException) {
             BExecuteStatement.BExecuteStatementResp.newBuilder().setStatus(error()).build()
         }
         rpcCtx.sendResponse(resp)

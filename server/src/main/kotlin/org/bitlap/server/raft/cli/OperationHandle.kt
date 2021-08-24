@@ -23,7 +23,7 @@ open class OperationHandle : Handle {
         this.hasResultSet = bOperationHandle.hasResultSet
     }
 
-    fun toBOperationHandle(): BOperationHandle? {
+    fun toBOperationHandle(): BOperationHandle {
         return BOperationHandle.newBuilder().setHasResultSet(hasResultSet)
             .setOperationId(getHandleIdentifier().toBHandleIdentifier())
             .setOperationType(opType.toBOperationType()).build()

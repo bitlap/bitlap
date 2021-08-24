@@ -9,10 +9,9 @@ package org.bitlap.jdbc
 abstract class BitlapMetaDataResultSet<M>(
     override var columnNames: MutableList<String> = ArrayList(),
     override var columnTypes: MutableList<String> = ArrayList(),
-    protected var data: List<M>? = mutableListOf()
+    protected var data: List<M> = mutableListOf()
 ) : BitlapBaseResultSet() {
 
     override fun close() {
-
     }
 }

@@ -1,10 +1,11 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import java.sql.SQLException
 import org.bitlap.common.client.BitlapClient.fetchResults
+import org.bitlap.common.exception.BSQLException
 import org.bitlap.common.proto.driver.BOperationHandle
 import org.bitlap.common.proto.driver.BSessionHandle
+import java.sql.SQLException
 
 /**
  *
@@ -55,12 +56,11 @@ class BitlapQueryResultSet(
     }
 
     private fun retrieveSchema() {
-
     }
 
     override fun next(): Boolean {
         if (isClosed || client === null) {
-            throw SQLException("Resultset is closed")
+            throw BSQLException("Resultset is closed")
         }
         if (emptyResultSet || maxRows in 1..rowsFetched) {
             return false
@@ -78,7 +78,7 @@ class BitlapQueryResultSet(
 
         rowsFetched++
 
-        return true //TODO Moves the cursor down one row from its current position.
+        return true // TODO Moves the cursor down one row from its current position.
     }
 
     override fun isClosed(): Boolean {

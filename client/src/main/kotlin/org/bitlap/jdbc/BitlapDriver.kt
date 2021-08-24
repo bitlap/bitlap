@@ -1,5 +1,6 @@
 package org.bitlap.jdbc
 
+import org.bitlap.common.exception.BSQLException
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo
@@ -61,11 +62,11 @@ class BitlapDriver : Driver {
         private const val PORT_PROPERTY_KEY = "PORT"
     }
 
-    override fun connect(url: String, info: Properties?): Connection {
+    override fun connect(url: String, info: Properties): Connection {
         return try {
             BitlapConnection(url, info)
         } catch (ex: Exception) {
-            throw SQLException(ex.toString())
+            throw BSQLException(ex.toString())
         }
     }
 

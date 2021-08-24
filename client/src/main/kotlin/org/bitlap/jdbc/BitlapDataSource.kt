@@ -1,5 +1,6 @@
 package org.bitlap.jdbc
 
+import org.apache.commons.lang.StringUtils
 import java.io.PrintWriter
 import java.sql.Connection
 import java.sql.SQLException
@@ -13,6 +14,7 @@ import javax.sql.DataSource
  * @version 1.0
  */
 open class BitlapDataSource : DataSource {
+
     override fun getLogWriter(): PrintWriter {
         TODO("Not yet implemented")
     }
@@ -42,12 +44,12 @@ open class BitlapDataSource : DataSource {
     }
 
     override fun getConnection(): Connection {
-        return getConnection("", "")
+        return getConnection(StringUtils.EMPTY, StringUtils.EMPTY)
     }
 
     override fun getConnection(username: String?, password: String?): Connection {
         return try {
-            BitlapConnection("", null)
+            BitlapConnection(StringUtils.EMPTY)
         } catch (ex: java.lang.Exception) {
             throw SQLException("Error in getting BitlapConnection", ex)
         }

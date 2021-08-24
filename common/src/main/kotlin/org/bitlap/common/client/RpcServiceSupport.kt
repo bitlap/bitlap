@@ -40,6 +40,22 @@ interface RpcServiceSupport {
                     org.bitlap.common.proto.driver.BFetchResults.BFetchResultsReq::class.java.name,
                     org.bitlap.common.proto.driver.BFetchResults.BFetchResultsResp.getDefaultInstance()
                 ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetColumns.BGetColumnsReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetColumns.BGetColumnsResp.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetSchemas.BGetSchemasReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetSchemas.BGetSchemasResp.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetTables.BGetTablesReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetTables.BGetTablesResp.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataResp.getDefaultInstance()
+                ),
             )
         }
 
@@ -64,6 +80,22 @@ interface RpcServiceSupport {
                 Pair(
                     org.bitlap.common.proto.driver.BFetchResults.BFetchResultsReq::class.java.name,
                     org.bitlap.common.proto.driver.BFetchResults.BFetchResultsReq.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetColumns.BGetColumnsReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetColumns.BGetColumnsReq.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetSchemas.BGetSchemasReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetSchemas.BGetSchemasReq.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetTables.BGetTablesReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetTables.BGetTablesReq.getDefaultInstance()
+                ),
+                Pair(
+                    org.bitlap.common.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataReq::class.java.name,
+                    org.bitlap.common.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataReq.getDefaultInstance()
                 ),
             )
         }

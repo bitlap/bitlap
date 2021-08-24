@@ -2,8 +2,8 @@ package org.bitlap.server.raft.cli.rpc
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.proto.driver.BCloseSession
-import org.bitlap.server.raft.cli.BSQLException
 import org.bitlap.server.raft.cli.CLIService
 import org.bitlap.server.raft.cli.SessionHandle
 
@@ -23,7 +23,7 @@ class CloseSessionProcessor(private val cliService: CLIService) :
             cliService.closeSession(SessionHandle(sessionHandle))
             BCloseSession.BCloseSessionResp.newBuilder()
                 .setStatus(success()).build()
-        } catch (e: BSQLException) {
+        } catch (e: BitlapException) {
             BCloseSession.BCloseSessionResp.newBuilder()
                 .setStatus(error()).build()
         }

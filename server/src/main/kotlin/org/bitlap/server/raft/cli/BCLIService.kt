@@ -23,7 +23,7 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         username: String,
         password: String,
         configuration: Map<String, String>?
-    ): SessionHandle? {
+    ): SessionHandle {
         return sessionManager.openSession(
             null, username, password, configuration ?: mapOf()
         ).sessionHandle
@@ -37,7 +37,7 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         sessionHandle: SessionHandle,
         statement: String,
         confOverlay: Map<String, String>?
-    ): OperationHandle? {
+    ): OperationHandle {
         val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
             .setOperationId(
                 BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
@@ -52,7 +52,7 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         statement: String,
         confOverlay: Map<String, String>?,
         queryTimeout: Long
-    ): OperationHandle? {
+    ): OperationHandle {
         val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
             .setOperationId(
                 BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
@@ -63,6 +63,6 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
     }
 
     override fun fetchResults(opHandle: OperationHandle): List<String?>? {
-        return listOf("hello", "world", "nice", "to", "meet", "you") //mock data
+        return listOf("hello", "world", "nice", "to", "meet", "you") // mock data
     }
 }

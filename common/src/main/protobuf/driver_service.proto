@@ -166,3 +166,160 @@ enum BOperationType {
     B_OPERATION_TYPE_EXECUTE_STATEMENT = 0;
     // TODO others
 }
+
+// Metadata used to describe the schema (column names, types, comments)
+// of result sets.
+message BTableSchema {
+    repeated BColumnDesc columns = 1;
+}
+
+// A result set column descriptor.
+message BColumnDesc {
+    // The name of the column
+    string column_name = 1;
+    // The type descriptor for this column
+    string type_desc = 2; //TODO
+}
+
+// Represents a row in a rowset.
+message BRow {
+    string col_vals = 1; //only support string
+}
+
+// Represents a rowset
+message BRowSet {
+    // The starting row offset of this rowset.
+    int64 start_row_offset = 1;
+    repeated BRow rows = 2;
+    repeated BColumn columns = 3;
+}
+
+message BColumn {
+    // TODO pb does not support inheritance?
+    repeated string string_column = 1;
+}
+
+// GetSchemas()
+//
+// Retrieves the schema names available in this database.
+// The results are ordered by TABLE_CATALOG and TABLE_SCHEM.
+// col1
+// name: TABLE_SCHEM
+// type: STRING
+// desc: schema name
+// col2
+// name: TABLE_CATALOG
+// type: STRING
+// desc: catalog name
+message BGetSchemas {
+    message BGetSchemasReq {
+        // Session to run this request against
+        BSessionHandle session_handle = 1;
+        // Name of the catalog. Must not contain a search pattern.
+        string  catalog_name = 2;
+        // schema name or pattern
+        string  schema_name = 3;
+    }
+
+    message BGetSchemasResp {
+        BStatus status = 1;
+        BOperationHandle operation_handle = 2;
+    }
+}
+
+// GetTables()
+//
+// Returns a list of tables with catalog, schema, and table
+// type information. The information is returned as a result
+// set which can be fetched using the OperationHandle
+// provided in the response.
+// Results are ordered by TABLE_TYPE, TABLE_CAT, TABLE_SCHEM, and TABLE_NAME
+//
+// Result Set Columns:
+//
+// col1
+// name: TABLE_CAT
+// type: STRING
+// desc: Catalog name. NULL if not applicable.
+//
+// col2
+// name: TABLE_SCHEM
+// type: STRING
+// desc: Schema name.
+//
+// col3
+// name: TABLE_NAME
+// type: STRING
+// desc: Table name.
+//
+// col4
+// name: TABLE_TYPE
+// type: STRING
+// desc: The table type, e.g. "TABLE", "VIEW", etc.
+//
+// col5
+// name: REMARKS
+// type: STRING
+// desc: Comments about the table
+//
+message BGetTables {
+    message BGetTablesReq {
+        // Session to run this request against
+        BSessionHandle session_handle = 1;
+        // Name of the schema or a search pattern.
+        string  schema_name = 2;
+        // Name of the table or a search pattern.
+        string  table_name = 3;
+    }
+
+    message BGetTablesResp {
+        BStatus status = 1;
+        BOperationHandle operation_handle = 2;
+    }
+}
+
+// GetColumns()
+//
+// Returns a list of columns in the specified tables.
+// The information is returned as a result set which can be fetched
+// using the OperationHandle provided in the response.
+// Results are ordered by TABLE_CAT, TABLE_SCHEM, TABLE_NAME,
+// and ORDINAL_POSITION.
+//
+// Result Set Columns are the same as those for the ODBC CLIColumns
+// function.
+//
+message BGetColumns {
+    message BGetColumnsReq {
+        // Session to run this request against
+        BSessionHandle session_handle = 1;
+        // Schema name or search pattern
+        string  schema_name = 2;
+        // Table name or search pattern
+        string  table_name = 3;
+        // Column name or search pattern
+        string  column_name = 4;
+    }
+
+    message BGetColumnsResp {
+        BStatus status = 1;
+        BOperationHandle operation_handle = 2;
+    }
+
+}
+
+// GetResultSetMetadata()
+//
+// Retrieves schema information for the specified operation
+message BGetResultSetMetadata {
+    message BGetResultSetMetadataReq {
+        // Operation for which to fetch result set schema information
+        BOperationHandle operation_handle = 1;
+    }
+
+    message BGetResultSetMetadataResp {
+        BStatus status = 1;
+        BTableSchema schema = 2;
+    }
+
+}

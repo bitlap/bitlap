@@ -1,14 +1,14 @@
 package org.bitlap.common.bitmap
 
-import java.io.ByteArrayInputStream
-import java.io.DataInputStream
-import java.nio.ByteBuffer
-import kotlin.math.max
 import org.bitlap.common.bitmap.rbm.FastAggregation
 import org.bitlap.common.bitmap.rbm.IntConsumer
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
+import java.io.ByteArrayInputStream
+import java.io.DataInputStream
+import java.nio.ByteBuffer
+import kotlin.math.max
 
 /**
  * Desc:

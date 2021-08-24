@@ -1,7 +1,8 @@
 package org.bitlap.server.raft.cli
 
-import org.bitlap.common.BitlapConf
 import java.util.concurrent.atomic.AtomicBoolean
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.exception.BitlapException
 
 /**
  *
@@ -24,9 +25,8 @@ interface AbstractBSession {
      * open Session
      * @param sessionConfMap
      * @return SessionHandle The Session handle
-     * @throws BSQLException
      */
-    @Throws(BSQLException::class)
+    @Throws(BitlapException::class)
     fun open(sessionConfMap: Map<String, String>?): SessionHandle
 
     /**
@@ -34,9 +34,8 @@ interface AbstractBSession {
      * @param statement
      * @param confOverlay
      * @return OperationHandle The Operate handle
-     * @throws BSQLException
      */
-    @Throws(BSQLException::class)
+    @Throws(BitlapException::class)
     fun executeStatement(
         statement: String,
         confOverlay: Map<String, String>?
@@ -48,9 +47,7 @@ interface AbstractBSession {
      * @param confOverlay
      * @param queryTimeout
      * @return OperationHandle The Operate handle
-     * @throws BSQLException
      */
-    @Throws(BSQLException::class)
     fun executeStatement(
         statement: String,
         confOverlay: Map<String, String>?,
@@ -59,8 +56,6 @@ interface AbstractBSession {
 
     /**
      * close Session
-     * @throws BSQLException
      */
-    @Throws(BSQLException::class)
     fun close()
 }

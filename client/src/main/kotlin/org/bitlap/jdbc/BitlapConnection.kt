@@ -2,6 +2,12 @@ package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import org.bitlap.common.client.BitlapClient
+import org.bitlap.common.client.BitlapClient.closeSession
+import org.bitlap.common.client.BitlapClient.openSession
+import org.bitlap.common.client.RpcServiceSupport
+import org.bitlap.common.exception.BSQLException
+import org.bitlap.common.proto.driver.BSessionHandle
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob
@@ -16,11 +22,6 @@ import java.sql.Statement
 import java.sql.Struct
 import java.util.Properties
 import java.util.concurrent.Executor
-import org.bitlap.common.client.BitlapClient
-import org.bitlap.common.client.BitlapClient.closeSession
-import org.bitlap.common.client.BitlapClient.openSession
-import org.bitlap.common.client.RpcServiceSupport
-import org.bitlap.common.proto.driver.BSessionHandle
 
 /**
  * Bitlap Connection
@@ -29,7 +30,7 @@ import org.bitlap.common.proto.driver.BSessionHandle
  * @since 2021/6/6
  * @version 1.0
  */
-open class BitlapConnection(private var uri: String, info: Properties?) : Connection, RpcServiceSupport {
+open class BitlapConnection(uri: String, info: Properties = Properties()) : Connection, RpcServiceSupport {
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"
@@ -47,13 +48,13 @@ open class BitlapConnection(private var uri: String, info: Properties?) : Connec
             throw Exception("Invalid URL: $uri")
         }
         // remove prefix
-        uri = uri.substring(URI_PREFIX.length)
+        val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
+        val hosts = uriWithoutPrefix.split(",")
         // parse uri
-        val parts = uri.split("/").toTypedArray()
+        val parts = hosts.map { it.split("/").toTypedArray() }
         try {
-            // TODO Secondary wrap for registration and release
             val conf = Configuration()
-            conf.parse(parts[0])
+            parts.forEach { conf.parse(it[0]) }
             session = client.openSession(conf, info)
             isClosed = false
         } catch (e: Exception) {
@@ -71,18 +72,18 @@ open class BitlapConnection(private var uri: String, info: Properties?) : Connec
 
     override fun close() {
         try {
-            if (session != null) {
-                client.closeSession(session!!)
-            }
+            session?.let { client.closeSession(it) }
         } finally {
             isClosed = true
         }
-
     }
 
     override fun createStatement(): Statement {
-        assert(session != null)
-        return BitlapStatement(session!!, client)
+        if (session != null) {
+            return BitlapStatement(session!!, client)
+        } else {
+            throw BSQLException("Statement is closed")
+        }
     }
 
     override fun createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement {

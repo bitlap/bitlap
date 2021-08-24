@@ -2,8 +2,8 @@ package org.bitlap.server.raft.cli.rpc
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.proto.driver.BOpenSession
-import org.bitlap.server.raft.cli.BSQLException
 import org.bitlap.server.raft.cli.CLIService
 
 /**
@@ -23,9 +23,9 @@ class OpenSessionProcessor(private val cliService: CLIService) :
         val resp: BOpenSession.BOpenSessionResp? = try {
             val sessionHandle = cliService.openSession(username, password, configurationMap)
             BOpenSession.BOpenSessionResp.newBuilder()
-                .setSessionHandle(sessionHandle?.toBSessionHandle())
+                .setSessionHandle(sessionHandle.toBSessionHandle())
                 .setStatus(success()).build()
-        } catch (e: BSQLException) {
+        } catch (e: BitlapException) {
             BOpenSession.BOpenSessionResp.newBuilder().setStatus(error()).build()
         }
         rpcCtx.sendResponse(resp)

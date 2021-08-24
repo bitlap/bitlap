@@ -7,8 +7,6 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import com.google.protobuf.ProtocolStringList
-import java.sql.SQLException
-import java.util.Properties
 import org.bitlap.common.proto.driver.BCloseSession
 import org.bitlap.common.proto.driver.BExecuteStatement
 import org.bitlap.common.proto.driver.BFetchResults
@@ -22,6 +20,8 @@ import org.bitlap.common.proto.driver.BSessionHandle
 import org.bitlap.common.proto.driver.BStatus
 import org.bitlap.common.proto.driver.BStatusCode
 import org.bitlap.common.proto.driver.BTableSchema
+import java.sql.SQLException
+import java.util.Properties
 
 /**
  * Wrap the rpc invoked

@@ -10,8 +10,8 @@ import org.bitlap.common.proto.driver.BOperationHandle
  * @version 1.0
  */
 open class OperationHandle(
-    private var opType: OperationType,
-    private var hasResultSet: Boolean = false
+    private val opType: OperationType,
+    private val hasResultSet: Boolean = false
 ) : Handle() {
 
     constructor(bOperationHandle: BOperationHandle) : this(

@@ -9,7 +9,7 @@ import org.bitlap.common.proto.driver.BHandleIdentifier
  * @since 2021/6/6
  * @version 1.0
  */
-abstract class Handle(private var handleId: HandleIdentifier = HandleIdentifier()) {
+abstract class Handle(private val handleId: HandleIdentifier = HandleIdentifier()) {
 
     open fun getHandleIdentifier(): HandleIdentifier = handleId
 

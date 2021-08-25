@@ -21,6 +21,10 @@ import org.bitlap.server.raft.cli.SessionManager
 import org.bitlap.server.raft.cli.rpc.CloseSessionProcessor
 import org.bitlap.server.raft.cli.rpc.ExecuteStatementProcessor
 import org.bitlap.server.raft.cli.rpc.FetchResultsProcessor
+import org.bitlap.server.raft.cli.rpc.GetColumnsProcessor
+import org.bitlap.server.raft.cli.rpc.GetResultSetMetaDataProcessor
+import org.bitlap.server.raft.cli.rpc.GetSchemasProcessor
+import org.bitlap.server.raft.cli.rpc.GetTablesProcessor
 import org.bitlap.server.raft.cli.rpc.OpenSessionProcessor
 
 /**
@@ -73,7 +77,11 @@ private fun BitlapServerEndpoint.registerProcessor(rpcServer: RpcServer) {
         OpenSessionProcessor(cliService),
         ExecuteStatementProcessor(cliService),
         FetchResultsProcessor(cliService),
-        HelloRpcProcessor()
+        HelloRpcProcessor(),
+        GetResultSetMetaDataProcessor(cliService),
+        GetSchemasProcessor(cliService),
+        GetTablesProcessor(cliService),
+        GetColumnsProcessor(cliService),
     ).forEach { rpcServer.registerProcessor(it) }
 }
 

@@ -1,9 +1,15 @@
 package org.bitlap.server.raft.cli
 
 import java.util.UUID
+import org.bitlap.common.proto.driver.BColumn
+import org.bitlap.common.proto.driver.BColumnDesc
 import org.bitlap.common.proto.driver.BHandleIdentifier
 import org.bitlap.common.proto.driver.BOperationHandle
 import org.bitlap.common.proto.driver.BOperationType
+import org.bitlap.common.proto.driver.BRow
+import org.bitlap.common.proto.driver.BRowSet
+import org.bitlap.common.proto.driver.BTableSchema
+import org.bitlap.common.proto.driver.BTypeId
 
 /**
  * Implementation of driver RPC core.
@@ -62,7 +68,16 @@ open class BCLIService(private val sessionManager: SessionManager) : CLIService 
         return OperationHandle(opHandle)
     }
 
-    override fun fetchResults(opHandle: OperationHandle): List<String?>? {
-        return listOf("hello", "world", "nice", "to", "meet", "you") // mock data
+    override fun fetchResults(opHandle: OperationHandle): BRowSet {
+        // ID NAME
+        // 1 zhangsan
+        return BRowSet.newBuilder().addRows(BRow.newBuilder().addColVals("1").addColVals("zhangsan").build())
+            .addColumns(BColumn.newBuilder().addStringColumn("ID").addStringColumn("NAME").build()).build()
+    }
+
+    override fun getResultSetMetadata(opHandle: OperationHandle): BTableSchema {
+        val columnId = BColumnDesc.newBuilder().setColumnName("ID").setTypeDesc(BTypeId.B_TYPE_ID_STRING_TYPE).build()
+        val columnName = BColumnDesc.newBuilder().setColumnName("NAME").setTypeDesc(BTypeId.B_TYPE_ID_STRING_TYPE).build()
+        return BTableSchema.newBuilder().addColumns(columnId).addColumns(columnName).build()
     }
 }

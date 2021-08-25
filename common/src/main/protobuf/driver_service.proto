@@ -86,7 +86,7 @@ message BFetchResults {
         // option in the future of adding alternate formats for
         // representing result set data, e.g. delimited strings,
         // binary encoded, etc.
-        repeated string results = 3; // TODO should use BRowSet
+        BRowSet results = 3;
     }
 }
 
@@ -178,12 +178,12 @@ message BColumnDesc {
     // The name of the column
     string column_name = 1;
     // The type descriptor for this column
-    string type_desc = 2; //TODO
+    BTypeId type_desc = 2; //TODO
 }
 
 // Represents a row in a rowset.
 message BRow {
-    string col_vals = 1; //only support string
+    repeated string col_vals = 1; //only support string
 }
 
 // Represents a rowset
@@ -322,4 +322,9 @@ message BGetResultSetMetadata {
         BTableSchema schema = 2;
     }
 
+}
+
+enum BTypeId {
+    B_TYPE_ID_UNSPECIFIED = 0;
+    B_TYPE_ID_STRING_TYPE = 1;
 }

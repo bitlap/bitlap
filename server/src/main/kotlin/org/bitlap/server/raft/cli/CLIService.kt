@@ -1,5 +1,8 @@
 package org.bitlap.server.raft.cli
 
+import org.bitlap.common.proto.driver.BRowSet
+import org.bitlap.common.proto.driver.BTableSchema
+
 
 /**
  * Interface definition of driver RPC.
@@ -26,7 +29,11 @@ interface CLIService {
         queryTimeout: Long
     ): OperationHandle
 
-    fun fetchResults(opHandle: OperationHandle): List<String?>? // TODO use RowSet
+    fun fetchResults(opHandle: OperationHandle): BRowSet
+
+    fun getResultSetMetadata(
+        opHandle: OperationHandle,
+    ): BTableSchema //convert BTableSchema to kotlin class
 
     // other methods
 }

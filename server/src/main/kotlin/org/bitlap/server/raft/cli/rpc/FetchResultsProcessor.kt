@@ -23,7 +23,7 @@ class FetchResultsProcessor(private val cliService: CLIService) :
             val result = cliService.fetchResults(OperationHandle((operationHandle)))
             BFetchResults.BFetchResultsResp.newBuilder()
                 .setHasMoreRows(false)
-                .setStatus(success()).addAllResults(result).build()
+                .setStatus(success()).setResults(result).build()
         } catch (e: BitlapException) {
             BFetchResults.BFetchResultsResp.newBuilder().setStatus(error()).build()
         }

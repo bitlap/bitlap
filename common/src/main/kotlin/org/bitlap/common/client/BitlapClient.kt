@@ -6,7 +6,6 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import com.google.protobuf.ProtocolStringList
 import org.bitlap.common.proto.driver.BCloseSession
 import org.bitlap.common.proto.driver.BExecuteStatement
 import org.bitlap.common.proto.driver.BFetchResults
@@ -33,7 +32,7 @@ import java.util.Properties
 object BitlapClient : RpcServiceSupport {
 
     private const val groupId: String = "bitlap-cluster"
-    private const val timeout = 50000L
+    private const val timeout = 5000L
 
     // TODO we should verify status
 
@@ -86,7 +85,7 @@ object BitlapClient : RpcServiceSupport {
 
     fun CliClientServiceImpl.fetchResults(
         operationHandle: BOperationHandle
-    ): ProtocolStringList? {
+    ): BFetchResults.BFetchResultsResp {
         val leader = RouteTable.getInstance().selectLeader(groupId)
         val result = this.rpcClient.invokeSync(
             leader.endpoint,
@@ -95,7 +94,7 @@ object BitlapClient : RpcServiceSupport {
         )
         result as BFetchResults.BFetchResultsResp
         verifySuccess(result.status)
-        return result.resultsList
+        return result
     }
 
     fun CliClientServiceImpl.getSchemas(

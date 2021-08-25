@@ -12,13 +12,16 @@ import java.sql.Ref
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 import java.sql.RowId
-import java.sql.SQLException
 import java.sql.SQLWarning
 import java.sql.SQLXML
 import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
 import java.util.Calendar
+import org.bitlap.common.exception.BSQLException
+import org.bitlap.common.proto.driver.BRow
+import org.bitlap.common.proto.driver.BTableSchema
+import org.bitlap.common.proto.driver.BTypeId
 
 /**
  *
@@ -31,14 +34,13 @@ abstract class BitlapBaseResultSet : ResultSet {
     @JvmField
     protected var warningChain: SQLWarning? = null
 
-    @JvmField
-    protected var wasNull = false
-
-    protected open var row: Array<*>? = null
+    protected open var row: BRow? = null
 
     protected open lateinit var columnNames: MutableList<String>
 
     protected open lateinit var columnTypes: MutableList<String>
+
+    private lateinit var schema: BTableSchema
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
@@ -53,24 +55,20 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun wasNull(): Boolean {
-        return wasNull
+        return false // This is kotlin
     }
 
     override fun getString(columnIndex: Int): String {
-        // Column index starts from 1, not 0.
-        return row!![columnIndex - 1].toString()
+        val value = getColumnValue(columnIndex)
+        return value.toString()
     }
 
     override fun getString(columnLabel: String?): String {
-        TODO("Not yet implemented")
+        return getString(findColumn(columnLabel))
     }
 
     override fun getBoolean(columnIndex: Int): Boolean {
-        val obj = row!![columnIndex - 1]
-        if (Number::class.java.isInstance(obj)) {
-            return (obj as Number).toInt() != 0
-        }
-        throw SQLException("Cannot convert column $columnIndex to boolean")
+        TODO("Not yet implemented")
     }
 
     override fun getBoolean(columnLabel: String?): Boolean {
@@ -78,11 +76,8 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getByte(columnIndex: Int): Byte {
-        val obj = row!![columnIndex - 1]
-        if (Number::class.java.isInstance(obj)) {
-            return (obj as Number).toByte()
-        }
-        throw SQLException("Cannot convert column $columnIndex to byte")
+        TODO("Not yet implemented")
+
     }
 
     override fun getByte(columnLabel: String?): Byte {
@@ -90,15 +85,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getShort(columnIndex: Int): Short {
-        try {
-            val obj = row!![columnIndex - 1]
-            if (Number::class.java.isInstance(obj)) {
-                return (obj as Number).toShort()
-            }
-            throw java.lang.Exception("Illegal conversion")
-        } catch (e: java.lang.Exception) {
-            throw SQLException("Cannot convert column $columnIndex to short: $e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getShort(columnLabel: String?): Short {
@@ -106,15 +93,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getInt(columnIndex: Int): Int {
-        try {
-            val obj = row!![columnIndex - 1]
-            if (Number::class.java.isInstance(obj)) {
-                return (obj as Number).toInt()
-            }
-            throw java.lang.Exception("Illegal conversion")
-        } catch (e: java.lang.Exception) {
-            throw SQLException("Cannot convert column $columnIndex to integer$e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getInt(columnLabel: String?): Int {
@@ -122,15 +101,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getLong(columnIndex: Int): Long {
-        try {
-            val obj = row!![columnIndex - 1]
-            if (Number::class.java.isInstance(obj)) {
-                return (obj as Number).toLong()
-            }
-            throw java.lang.Exception("Illegal conversion")
-        } catch (e: java.lang.Exception) {
-            throw SQLException("Cannot convert column $columnIndex to long: $e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getLong(columnLabel: String?): Long {
@@ -138,15 +109,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getFloat(columnIndex: Int): Float {
-        try {
-            val obj = row!![columnIndex - 1]
-            if (Number::class.java.isInstance(obj)) {
-                return (obj as Number).toFloat()
-            }
-            throw java.lang.Exception("Illegal conversion")
-        } catch (e: java.lang.Exception) {
-            throw SQLException("Cannot convert column $columnIndex to float: $e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getFloat(columnLabel: String?): Float {
@@ -154,15 +117,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getDouble(columnIndex: Int): Double {
-        try {
-            val obj = row!![columnIndex - 1]
-            if (Number::class.java.isInstance(obj)) {
-                return (obj as Number).toDouble()
-            }
-            throw Exception("Illegal conversion")
-        } catch (e: Exception) {
-            throw SQLException("Cannot convert column $columnIndex to double: $e")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun getDouble(columnLabel: String?): Double {
@@ -306,7 +261,12 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun findColumn(columnLabel: String?): Int {
-        TODO("Not yet implemented")
+        var columnIndex = columnNames.indexOf(columnLabel)
+        return if (columnIndex == -1) {
+            throw BSQLException()
+        } else {
+            ++columnIndex
+        }
     }
 
     override fun getCharacterStream(columnIndex: Int): Reader {
@@ -848,4 +808,30 @@ abstract class BitlapBaseResultSet : ResultSet {
     override fun updateNCharacterStream(columnLabel: String?, reader: Reader?) {
         TODO("Not yet implemented")
     }
+
+    private fun getColumnValue(columnIndex: Int): Any {
+        if (row == null) {
+            throw BSQLException("No row found.")
+        }
+        val colVals = row!!.colValsList ?: throw BSQLException("RowSet does not contain any columns!")
+        if (columnIndex > colVals.size) {
+            throw BSQLException("Invalid columnIndex: $columnIndex")
+        }
+
+        val bColumnValue = colVals[columnIndex - 1]
+        val columnType = getSchema().getColumns(columnIndex - 1).typeDesc
+        when (columnType) {
+            BTypeId.B_TYPE_ID_STRING_TYPE -> return bColumnValue
+            else -> throw BSQLException("Unrecognized column type:$columnType")
+        }
+    }
+
+    protected open fun setSchema(schema: BTableSchema) {
+        this.schema = schema
+    }
+
+    protected open fun getSchema(): BTableSchema {
+        return this.schema
+    }
+
 }

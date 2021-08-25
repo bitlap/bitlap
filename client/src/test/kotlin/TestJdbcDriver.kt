@@ -1,6 +1,6 @@
-import junit.framework.TestCase
 import java.sql.DriverManager
 import java.sql.Statement
+import junit.framework.TestCase
 
 /**
  *
@@ -21,13 +21,12 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
 
         stmt.execute("select * from hello_table;")
         val resultSet = stmt.resultSet
-        val ret = mutableListOf<String>()
-        var i = 0
-        while (resultSet.next() && i < 6) {
-            i += 1
-            val row1 = resultSet.getString(1)
-            ret.add(row1)
-        }
-        assert(ret.toList() == listOf("hello", "world", "nice", "to", "meet", "you"))
+        resultSet.next()
+        val id = resultSet.getString(1)
+        println(id)
+
+        resultSet.next()
+        val name = resultSet.getString(2)
+        println(name)
     }
 }

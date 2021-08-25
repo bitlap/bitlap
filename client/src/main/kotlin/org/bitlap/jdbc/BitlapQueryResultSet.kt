@@ -1,10 +1,14 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import java.sql.SQLException
 import org.bitlap.common.client.BitlapClient.fetchResults
+import org.bitlap.common.client.BitlapClient.getResultSetMetadata
 import org.bitlap.common.exception.BSQLException
 import org.bitlap.common.proto.driver.BOperationHandle
+import org.bitlap.common.proto.driver.BRow
 import org.bitlap.common.proto.driver.BSessionHandle
+import org.bitlap.common.proto.driver.BTypeId
 
 /**
  *
@@ -15,8 +19,10 @@ import org.bitlap.common.proto.driver.BSessionHandle
 class BitlapQueryResultSet(
     private var client: CliClientServiceImpl?,
     private var maxRows: Int,
-    override var row: Array<*>? = arrayOfNulls<Any>(7)
+    override var row: BRow? = null
 ) : BitlapBaseResultSet() {
+
+    private val typeNames by lazy { mapOf(Pair(BTypeId.B_TYPE_ID_STRING_TYPE, "STRING")) } // todo
 
     private var emptyResultSet = false
     private var rowsFetched = 0
@@ -27,11 +33,10 @@ class BitlapQueryResultSet(
     @JvmField
     protected var fetchSize = 0
 
-    private var fetchedRows: List<String>? = null
-    private var fetchedRowsItr: Iterator<String>? = null
+    private var fetchedRows: List<BRow>? = null
+    private var fetchedRowsItr: Iterator<BRow>? = null
     private var sessHandle: BSessionHandle? = null
     private var stmtHandle: BOperationHandle? = null
-    // protected lateinit schema BTableSchema todo
 
     constructor(builder: Builder) : this(builder.client, builder.maxRows) {
         this.client = builder.client
@@ -55,6 +60,36 @@ class BitlapQueryResultSet(
     }
 
     private fun retrieveSchema() {
+        try {
+            if (client == null || stmtHandle == null) {
+                throw BSQLException("Resultset is closed")
+            }
+            val namesSb = StringBuilder()
+            val typesSb = StringBuilder()
+
+            val schema = client!!.getResultSetMetadata(stmtHandle!!)
+            if (schema.columnsList.isEmpty()) {
+                return
+            }
+
+            this.setSchema(schema)
+            val columns = schema.columnsList
+            for (pos in 0 until schema.columnsCount) {
+                if (pos != 0) {
+                    namesSb.append(",")
+                    typesSb.append(",")
+                }
+                val columnName: String = columns[pos].columnName
+                columnNames.add(columnName)
+                val columnTypeName: String = typeNames[columns[pos].typeDesc]!! //TODO types
+                columnTypes.add(columnTypeName)
+            }
+        } catch (e: SQLException) {
+            throw e
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw SQLException("Could not create ResultSet: " + e.message, e)
+        }
     }
 
     override fun next(): Boolean {
@@ -64,18 +99,26 @@ class BitlapQueryResultSet(
         if (emptyResultSet || maxRows in 1..rowsFetched) {
             return false
         }
-        if (fetchedRows == null || !fetchedRowsItr!!.hasNext()) {
-            fetchedRows = stmtHandle?.let { client?.fetchResults(it) }.orEmpty()
-            fetchedRowsItr = fetchedRows!!.iterator()
-        }
+        try {
 
-        if (fetchedRowsItr!!.hasNext()) {
-            row = arrayOf(fetchedRowsItr!!.next())
-        } else {
-            return false
-        }
+            if (fetchedRows == null || !fetchedRowsItr!!.hasNext()) {
+                fetchedRows = stmtHandle?.let { client?.fetchResults(it)?.results!!.rowsList }
+                fetchedRowsItr = fetchedRows!!.iterator()
+            }
 
-        rowsFetched++
+            if (fetchedRowsItr!!.hasNext()) {
+                row = fetchedRowsItr!!.next()
+            } else {
+                return false
+            }
+
+            rowsFetched++
+        } catch (e: SQLException) {
+            throw e
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw SQLException("Error retrieving next row", e)
+        }
 
         return true // TODO Moves the cursor down one row from its current position.
     }
@@ -91,14 +134,6 @@ class BitlapQueryResultSet(
     override fun setFetchSize(rows: Int) {
         this.fetchSize = rows
     }
-
-//    protected open fun setSchema(schema: BTableSchema) {
-//        this.schema = schema
-//    }
-//
-//    protected open fun getSchema(): BTableSchema? {
-//        return schema
-//    }
 
     override fun close() {
         this.client = null

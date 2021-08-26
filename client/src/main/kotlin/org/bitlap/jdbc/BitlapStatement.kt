@@ -1,9 +1,9 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.common.client.BitlapClient.executeStatement
-import org.bitlap.common.proto.driver.BOperationHandle
-import org.bitlap.common.proto.driver.BSessionHandle
+import org.bitlap.network.client.BitlapClient.executeStatement
+import org.bitlap.network.proto.driver.BOperationHandle
+import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException

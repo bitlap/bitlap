@@ -9,23 +9,22 @@ import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.rpc.RpcServer
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import java.io.File
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
-import org.bitlap.common.client.RpcServiceSupport
 import org.bitlap.common.utils.withPaths
-import org.bitlap.server.raft.cli.BCLIService
-import org.bitlap.server.raft.cli.HelloRpcProcessor
-import org.bitlap.server.raft.cli.SessionManager
-import org.bitlap.server.raft.cli.rpc.CloseSessionProcessor
-import org.bitlap.server.raft.cli.rpc.ExecuteStatementProcessor
-import org.bitlap.server.raft.cli.rpc.FetchResultsProcessor
-import org.bitlap.server.raft.cli.rpc.GetColumnsProcessor
-import org.bitlap.server.raft.cli.rpc.GetResultSetMetaDataProcessor
-import org.bitlap.server.raft.cli.rpc.GetSchemasProcessor
-import org.bitlap.server.raft.cli.rpc.GetTablesProcessor
-import org.bitlap.server.raft.cli.rpc.OpenSessionProcessor
+import org.bitlap.network.client.RpcServiceSupport
+import org.bitlap.network.core.BCLIService
+import org.bitlap.network.core.SessionManager
+import org.bitlap.network.rpc.CloseSessionProcessor
+import org.bitlap.network.rpc.ExecuteStatementProcessor
+import org.bitlap.network.rpc.FetchResultsProcessor
+import org.bitlap.network.rpc.GetColumnsProcessor
+import org.bitlap.network.rpc.GetResultSetMetaDataProcessor
+import org.bitlap.network.rpc.GetSchemasProcessor
+import org.bitlap.network.rpc.GetTablesProcessor
+import org.bitlap.network.rpc.OpenSessionProcessor
+import java.io.File
 
 /**
  * Desc: Endpoint of bitlap server
@@ -77,7 +76,6 @@ private fun BitlapServerEndpoint.registerProcessor(rpcServer: RpcServer) {
         OpenSessionProcessor(cliService),
         ExecuteStatementProcessor(cliService),
         FetchResultsProcessor(cliService),
-        HelloRpcProcessor(),
         GetResultSetMetaDataProcessor(cliService),
         GetSchemasProcessor(cliService),
         GetTablesProcessor(cliService),

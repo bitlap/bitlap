@@ -1,14 +1,14 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import org.bitlap.network.BSQLException
+import org.bitlap.network.client.BitlapClient.fetchResults
+import org.bitlap.network.client.BitlapClient.getResultSetMetadata
+import org.bitlap.network.proto.driver.BOperationHandle
+import org.bitlap.network.proto.driver.BRow
+import org.bitlap.network.proto.driver.BSessionHandle
+import org.bitlap.network.proto.driver.BTypeId
 import java.sql.SQLException
-import org.bitlap.common.client.BitlapClient.fetchResults
-import org.bitlap.common.client.BitlapClient.getResultSetMetadata
-import org.bitlap.common.exception.BSQLException
-import org.bitlap.common.proto.driver.BOperationHandle
-import org.bitlap.common.proto.driver.BRow
-import org.bitlap.common.proto.driver.BSessionHandle
-import org.bitlap.common.proto.driver.BTypeId
 
 /**
  *
@@ -81,7 +81,7 @@ class BitlapQueryResultSet(
                 }
                 val columnName: String = columns[pos].columnName
                 columnNames.add(columnName)
-                val columnTypeName: String = typeNames[columns[pos].typeDesc]!! //TODO types
+                val columnTypeName: String = typeNames[columns[pos].typeDesc]!! // TODO types
                 columnTypes.add(columnTypeName)
             }
         } catch (e: SQLException) {

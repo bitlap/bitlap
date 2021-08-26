@@ -1,5 +1,9 @@
 package org.bitlap.jdbc
 
+import org.bitlap.network.BSQLException
+import org.bitlap.network.proto.driver.BRow
+import org.bitlap.network.proto.driver.BTableSchema
+import org.bitlap.network.proto.driver.BTypeId
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -18,10 +22,6 @@ import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
 import java.util.Calendar
-import org.bitlap.common.exception.BSQLException
-import org.bitlap.common.proto.driver.BRow
-import org.bitlap.common.proto.driver.BTableSchema
-import org.bitlap.common.proto.driver.BTypeId
 
 /**
  *
@@ -77,7 +77,6 @@ abstract class BitlapBaseResultSet : ResultSet {
 
     override fun getByte(columnIndex: Int): Byte {
         TODO("Not yet implemented")
-
     }
 
     override fun getByte(columnLabel: String?): Byte {
@@ -833,5 +832,4 @@ abstract class BitlapBaseResultSet : ResultSet {
     protected open fun getSchema(): BTableSchema {
         return this.schema
     }
-
 }

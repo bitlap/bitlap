@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
+            <artifactId>bitlap-network</artifactId>
         </dependency>
     </dependencies>
 </project>

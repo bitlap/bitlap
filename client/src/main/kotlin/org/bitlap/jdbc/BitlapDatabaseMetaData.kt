@@ -1,7 +1,7 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.common.proto.driver.BSessionHandle
+import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.Connection
 import java.sql.DatabaseMetaData
 import java.sql.ResultSet

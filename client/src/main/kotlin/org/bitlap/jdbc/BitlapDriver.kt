@@ -1,5 +1,6 @@
 package org.bitlap.jdbc
 
+import org.bitlap.network.BSQLException
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo
@@ -7,7 +8,6 @@ import java.sql.SQLException
 import java.util.Properties
 import java.util.logging.Logger
 import java.util.regex.Pattern
-import org.bitlap.common.exception.BSQLException
 
 /**
  * Desc: JDBC driver for bitlap

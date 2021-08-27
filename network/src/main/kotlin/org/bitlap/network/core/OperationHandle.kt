@@ -21,7 +21,7 @@ open class OperationHandle(
 
     fun toBOperationHandle(): BOperationHandle {
         return BOperationHandle.newBuilder().setHasResultSet(hasResultSet)
-//            .setOperationId(super.handleId.toBHandleIdentifier())
+            .setOperationId(super.handleId.toBHandleIdentifier())
             .setOperationType(opType.toBOperationType()).build()
     }
 

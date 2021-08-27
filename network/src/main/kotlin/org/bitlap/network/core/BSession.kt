@@ -1,6 +1,10 @@
 package org.bitlap.network.core
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.network.proto.driver.BHandleIdentifier
+import org.bitlap.network.proto.driver.BOperationHandle
+import org.bitlap.network.proto.driver.BOperationType
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -19,7 +23,7 @@ class BSession() : AbstractBSession {
     override lateinit var sessionHandle: SessionHandle
     override lateinit var sessionConf: BitlapConf
     override var creationTime: Long = 0
-    override lateinit var sessionManager: SessionManager
+    override lateinit var sessionManager: SessionManager // TODO add operationManager
     override val sessionState: AtomicBoolean = AtomicBoolean(false)
 
     constructor(
@@ -44,7 +48,13 @@ class BSession() : AbstractBSession {
     }
 
     override fun executeStatement(statement: String, confOverlay: Map<String, String>?): OperationHandle {
-        TODO("Not yet implemented")
+        val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
+            .setOperationId(
+                BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
+                    .setSecret(UUID.randomUUID().toString()).build()
+            )
+            .setHasResultSet(true).build()
+        return OperationHandle(opHandle)
     }
 
     override fun executeStatement(
@@ -52,7 +62,7 @@ class BSession() : AbstractBSession {
         confOverlay: Map<String, String>?,
         queryTimeout: Long
     ): OperationHandle {
-        TODO("Not yet implemented")
+        return executeStatement(statement, confOverlay)
     }
 
     override fun close() {

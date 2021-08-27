@@ -7,7 +7,6 @@ import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
-import org.bitlap.network.proto.driver.BTypeId
 import java.sql.SQLException
 
 /**
@@ -22,8 +21,6 @@ class BitlapQueryResultSet(
     override var row: BRow? = null
 ) : BitlapBaseResultSet() {
 
-    private val typeNames by lazy { mapOf(Pair(BTypeId.B_TYPE_ID_STRING_TYPE, "STRING")) } // todo
-
     private var emptyResultSet = false
     private var rowsFetched = 0
 
@@ -33,8 +30,8 @@ class BitlapQueryResultSet(
     @JvmField
     protected var fetchSize = 0
 
-    private var fetchedRows: List<BRow>? = null
-    private var fetchedRowsItr: Iterator<BRow>? = null
+    private var fetchedRows: List<BRow> = listOf()
+    private var fetchedRowsItr: Iterator<BRow> = fetchedRows.iterator()
     private var sessHandle: BSessionHandle? = null
     private var stmtHandle: BOperationHandle? = null
 
@@ -67,8 +64,8 @@ class BitlapQueryResultSet(
             val namesSb = StringBuilder()
             val typesSb = StringBuilder()
 
-            val schema = client!!.getResultSetMetadata(stmtHandle!!)
-            if (schema.columnsList.isEmpty()) {
+            val schema = client?.getResultSetMetadata(stmtHandle!!)
+            if (schema == null || schema.columnsList.isEmpty()) {
                 return
             }
 
@@ -79,11 +76,12 @@ class BitlapQueryResultSet(
                     namesSb.append(",")
                     typesSb.append(",")
                 }
-                val columnName: String = columns[pos].columnName
+                val columnName = columns[pos].columnName
                 columnNames.add(columnName)
-                val columnTypeName: String = typeNames[columns[pos].typeDesc]!! // TODO types
+                val columnTypeName = TypeNameMapping.typeNames[columns[pos].typeDesc]!! // TODO types
                 columnTypes.add(columnTypeName)
             }
+            println("retrieveSchema => names: $namesSb, types: $typesSb")
         } catch (e: SQLException) {
             throw e
         } catch (e: Exception) {
@@ -93,7 +91,7 @@ class BitlapQueryResultSet(
     }
 
     override fun next(): Boolean {
-        if (isClosed || client === null) {
+        if (isClosed || client === null || stmtHandle == null) {
             throw BSQLException("Resultset is closed")
         }
         if (emptyResultSet || maxRows in 1..rowsFetched) {
@@ -101,13 +99,15 @@ class BitlapQueryResultSet(
         }
         try {
 
-            if (fetchedRows == null || !fetchedRowsItr!!.hasNext()) {
-                fetchedRows = stmtHandle?.let { client?.fetchResults(it)?.results!!.rowsList }
-                fetchedRowsItr = fetchedRows!!.iterator()
+            if (fetchedRows.isEmpty() || !fetchedRowsItr.hasNext()) {
+                val result = client?.fetchResults(stmtHandle!!)
+                if (result != null) {
+                    fetchedRows = result.results?.rowsList.orEmpty()
+                    fetchedRowsItr = fetchedRows.iterator()
+                }
             }
-
-            if (fetchedRowsItr!!.hasNext()) {
-                row = fetchedRowsItr!!.next()
+            if (fetchedRowsItr.hasNext()) {
+                row = fetchedRowsItr.next()
             } else {
                 return false
             }
@@ -120,7 +120,7 @@ class BitlapQueryResultSet(
             throw SQLException("Error retrieving next row", e)
         }
 
-        return true // TODO Moves the cursor down one row from its current position.
+        return true
     }
 
     override fun isClosed(): Boolean {
@@ -180,9 +180,9 @@ class BitlapQueryResultSet(
                 return this
             }
 
-            fun setSchema(colNames: MutableList<String>?, colTypes: List<String>?): Builder {
-                this.colNames.addAll(colNames!!)
-                this.colTypes.addAll(colTypes!!)
+            fun setSchema(colNames: List<String>, colTypes: List<String>): Builder {
+                this.colNames.addAll(colNames)
+                this.colTypes.addAll(colTypes)
                 retrieveSchema = false
                 return this
             }

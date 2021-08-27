@@ -89,7 +89,29 @@ open class SessionManager {
         }
     }
 
-    open fun getOpenSessionCount(): Int {
+    private fun getOpenSessionCount(): Int {
         return handleToSession.size
+    }
+
+    fun getSession(sessionHandle: SessionHandle): AbstractBSession {
+        var session: AbstractBSession?
+        synchronized(sessionAddLock) {
+            session = handleToSession[sessionHandle]
+        }
+        if (session == null) {
+            throw BitlapException("Invalid SessionHandle: $sessionHandle")
+        }
+        return session!!
+    }
+
+    fun refreshSession(sessionHandle: SessionHandle, session: AbstractBSession) {
+        synchronized(sessionAddLock) {
+            session.lastAccessTime = System.currentTimeMillis()
+            if (handleToSession.contains(sessionHandle)) {
+                handleToSession[sessionHandle] = session
+            } else {
+                throw BitlapException("Invalid SessionHandle: $sessionHandle")
+            }
+        }
     }
 }

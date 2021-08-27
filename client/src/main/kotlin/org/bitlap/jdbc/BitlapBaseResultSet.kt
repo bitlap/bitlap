@@ -820,7 +820,17 @@ abstract class BitlapBaseResultSet : ResultSet {
         val bColumnValue = colVals[columnIndex - 1]
         val columnType = getSchema().getColumns(columnIndex - 1).typeDesc
         when (columnType) {
-            BTypeId.B_TYPE_ID_STRING_TYPE -> return bColumnValue
+            BTypeId.B_TYPE_ID_STRING_TYPE ->
+                return bColumnValue.toStringUtf8()
+            BTypeId.B_TYPE_ID_INT_TYPE ->
+                if (bColumnValue.toStringUtf8().isNotEmpty())
+                    return Integer.parseInt(bColumnValue.toStringUtf8())
+                else throw BSQLException("Column value can not be null for column type: $columnType")
+            BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
+                if (bColumnValue.toStringUtf8().isNotEmpty())
+                    return java.lang.Double.parseDouble(bColumnValue.toStringUtf8())
+                else throw BSQLException("Column value can not be null for column type: $columnType")
+
             else -> throw BSQLException("Unrecognized column type:$columnType")
         }
     }

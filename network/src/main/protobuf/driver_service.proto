@@ -183,7 +183,7 @@ message BColumnDesc {
 
 // Represents a row in a rowset.
 message BRow {
-    repeated string col_vals = 1; //only support string
+    repeated bytes col_vals = 1;
 }
 
 // Represents a rowset
@@ -327,4 +327,6 @@ message BGetResultSetMetadata {
 enum BTypeId {
     B_TYPE_ID_UNSPECIFIED = 0;
     B_TYPE_ID_STRING_TYPE = 1;
+    B_TYPE_ID_INT_TYPE = 2;
+    B_TYPE_ID_DOUBLE_TYPE = 3;
 }

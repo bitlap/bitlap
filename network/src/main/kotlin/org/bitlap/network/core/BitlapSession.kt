@@ -1,11 +1,7 @@
 package org.bitlap.network.core
 
-import org.bitlap.common.BitlapConf
-import org.bitlap.network.proto.driver.BHandleIdentifier
-import org.bitlap.network.proto.driver.BOperationHandle
-import org.bitlap.network.proto.driver.BOperationType
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
+import org.bitlap.common.BitlapConf
 
 /**
  * Bitlap Session
@@ -14,31 +10,29 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @since 2021/6/6
  * @version 1.0
  */
-class BSession() : AbstractBSession {
+class BitlapSession() : Session {
 
     @Volatile
-    override var lastAccessTime: Long = 0
+    override var lastAccessTime: Long = System.currentTimeMillis()
     override lateinit var username: String
     override lateinit var password: String
     override lateinit var sessionHandle: SessionHandle
     override lateinit var sessionConf: BitlapConf
-    override var creationTime: Long = 0
+    override val creationTime: Long = System.currentTimeMillis()
     override lateinit var sessionManager: SessionManager // TODO add operationManager
     override val sessionState: AtomicBoolean = AtomicBoolean(false)
 
     constructor(
-        sessionHandle: SessionHandle?,
         username: String,
         password: String,
         sessionConf: Map<String, String>,
-        sessionManager: SessionManager
+        sessionManager: SessionManager,
+        sessionHandle: SessionHandle = SessionHandle(HandleIdentifier())
     ) : this() {
         this.username = username
-        this.sessionHandle = sessionHandle ?: SessionHandle(HandleIdentifier())
+        this.sessionHandle = sessionHandle
         this.password = password
         this.sessionConf = BitlapConf(sessionConf)
-        this.creationTime = System.currentTimeMillis()
-        this.lastAccessTime = System.currentTimeMillis()
         this.sessionState.compareAndSet(false, true)
         this.sessionManager = sessionManager
     }
@@ -48,13 +42,7 @@ class BSession() : AbstractBSession {
     }
 
     override fun executeStatement(statement: String, confOverlay: Map<String, String>?): OperationHandle {
-        val opHandle = BOperationHandle.newBuilder().setOperationType(BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT)
-            .setOperationId(
-                BHandleIdentifier.newBuilder().setGuid(UUID.randomUUID().toString())
-                    .setSecret(UUID.randomUUID().toString()).build()
-            )
-            .setHasResultSet(true).build()
-        return OperationHandle(opHandle)
+        return OperationHandle(OperationType.EXECUTE_STATEMENT, true)
     }
 
     override fun executeStatement(

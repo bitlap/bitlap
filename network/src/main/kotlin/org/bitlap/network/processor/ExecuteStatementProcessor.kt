@@ -1,4 +1,4 @@
-package org.bitlap.network.rpc
+package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
@@ -15,7 +15,7 @@ import org.bitlap.network.proto.driver.BExecuteStatement
  * @version 1.0
  */
 class ExecuteStatementProcessor(private val cliService: CLIService) :
-    RpcProcessor<BExecuteStatement.BExecuteStatementReq>, BaseProcessor {
+    RpcProcessor<BExecuteStatement.BExecuteStatementReq>, ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BExecuteStatement.BExecuteStatementReq) {
         val sessionHandle = request.sessionHandle
         val statement = request.statement
@@ -26,6 +26,7 @@ class ExecuteStatementProcessor(private val cliService: CLIService) :
                 .setOperationHandle(operationHandle.toBOperationHandle())
                 .setStatus(success()).build()
         } catch (e: BitlapException) {
+            e.printStackTrace()
             BExecuteStatement.BExecuteStatementResp.newBuilder().setStatus(error()).build()
         }
         rpcCtx.sendResponse(resp)

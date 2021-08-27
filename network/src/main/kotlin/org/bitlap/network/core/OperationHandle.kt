@@ -21,7 +21,7 @@ open class OperationHandle(
 
     fun toBOperationHandle(): BOperationHandle {
         return BOperationHandle.newBuilder().setHasResultSet(hasResultSet)
-            .setOperationId(getHandleIdentifier().toBHandleIdentifier())
+//            .setOperationId(super.handleId.toBHandleIdentifier())
             .setOperationType(opType.toBOperationType()).build()
     }
 
@@ -46,6 +46,6 @@ open class OperationHandle(
     }
 
     override fun toString(): String {
-        return "OperationHandle [opType=" + opType + ", getHandleIdentifier()=" + getHandleIdentifier() + "]"
+        return "OperationHandle [opType=" + opType + ", getHandleIdentifier()=" + super.handleId + "]"
     }
 }

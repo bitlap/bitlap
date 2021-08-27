@@ -1,8 +1,8 @@
 package org.bitlap.network.core
 
-import org.bitlap.common.exception.BitlapException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import org.bitlap.common.exception.BitlapException
 
 /**
  *
@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit
  * @since 2021/6/6
  * @version 1.0
  */
-open class SessionManager {
+class SessionManager {
 
-    private val handleToSession = ConcurrentHashMap<SessionHandle, AbstractBSession>()
+    private val handleToSession = ConcurrentHashMap<SessionHandle, Session>()
     private val sessionAddLock = Any()
     private val sessionThread = Thread { // register center
         while (true) {
@@ -31,6 +31,8 @@ open class SessionManager {
                     if (element.value.lastAccessTime + 20 * 60 * 1000 < now) {
                         iterator.remove()
                         println("Session has not been visited for 20 minutes, remove session: $sessionHandle")
+                    } else {
+                        println("SessionId: ${sessionHandle.handleId}")
                     }
                 }
 
@@ -50,26 +52,21 @@ open class SessionManager {
     // session life cycle manage
 
     fun openSession(
-        sessionHandle: SessionHandle?,
         username: String,
         password: String,
         sessionConf: Map<String, String>
-    ): BSession {
+    ): BitlapSession {
 
-        println("Server get properties [username:$username, password:$password, sessionHandle:$sessionHandle, sessionConf:$sessionConf]")
+        println("Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
         synchronized(sessionAddLock) {
-            val session = BSession(
-                sessionHandle,
+            val session = BitlapSession(
                 username,
                 password,
                 sessionConf,
                 this
             )
             handleToSession[session.sessionHandle] = session
-            println(
-                "Session opened, " + session.sessionHandle.toString() + ", session total:" + getOpenSessionCount()
-            )
-
+            println("Create session: ${session.sessionHandle}")
             return session
         }
     }
@@ -93,8 +90,8 @@ open class SessionManager {
         return handleToSession.size
     }
 
-    fun getSession(sessionHandle: SessionHandle): AbstractBSession {
-        var session: AbstractBSession?
+    fun getSession(sessionHandle: SessionHandle): Session {
+        var session: Session?
         synchronized(sessionAddLock) {
             session = handleToSession[sessionHandle]
         }
@@ -104,10 +101,10 @@ open class SessionManager {
         return session!!
     }
 
-    fun refreshSession(sessionHandle: SessionHandle, session: AbstractBSession) {
+    fun refreshSession(sessionHandle: SessionHandle, session: Session) {
         synchronized(sessionAddLock) {
             session.lastAccessTime = System.currentTimeMillis()
-            if (handleToSession.contains(sessionHandle)) {
+            if (handleToSession.containsKey(sessionHandle)) {
                 handleToSession[sessionHandle] = session
             } else {
                 throw BitlapException("Invalid SessionHandle: $sessionHandle")

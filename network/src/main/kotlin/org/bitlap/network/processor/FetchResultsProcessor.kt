@@ -1,4 +1,4 @@
-package org.bitlap.network.rpc
+package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
@@ -16,15 +16,16 @@ import org.bitlap.network.proto.driver.BFetchResults
  */
 class FetchResultsProcessor(private val cliService: CLIService) :
     RpcProcessor<BFetchResults.BFetchResultsReq>,
-    BaseProcessor {
+    ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BFetchResults.BFetchResultsReq) {
         val operationHandle = request.operationHandle
         val resp: BFetchResults.BFetchResultsResp = try {
             val result = cliService.fetchResults(OperationHandle((operationHandle)))
             BFetchResults.BFetchResultsResp.newBuilder()
                 .setHasMoreRows(false)
-                .setStatus(success()).setResults(result).build()
+                .setStatus(success()).setResults(result.toBRowSet()).build()
         } catch (e: BitlapException) {
+            e.printStackTrace()
             BFetchResults.BFetchResultsResp.newBuilder().setStatus(error()).build()
         }
         rpcCtx.sendResponse(resp)

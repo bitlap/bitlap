@@ -1,7 +1,7 @@
 package org.bitlap.network.core
 
-import org.bitlap.common.BitlapConf
 import java.util.concurrent.atomic.AtomicBoolean
+import org.bitlap.common.BitlapConf
 
 /**
  *
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @since 2021/6/6
  * @version 1.0
  */
-interface AbstractBSession {
+interface Session {
 
     val sessionState: AtomicBoolean
     var lastAccessTime: Long

@@ -1,4 +1,4 @@
-package org.bitlap.network.rpc
+package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
@@ -16,7 +16,7 @@ import org.bitlap.network.proto.driver.BCloseSession
  */
 class CloseSessionProcessor(private val cliService: CLIService) :
     RpcProcessor<BCloseSession.BCloseSessionReq>,
-    BaseProcessor {
+    ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BCloseSession.BCloseSessionReq) {
         val sessionHandle = request.sessionHandle
         val resp: BCloseSession.BCloseSessionResp = try {
@@ -24,6 +24,7 @@ class CloseSessionProcessor(private val cliService: CLIService) :
             BCloseSession.BCloseSessionResp.newBuilder()
                 .setStatus(success()).build()
         } catch (e: BitlapException) {
+            e.printStackTrace()
             BCloseSession.BCloseSessionResp.newBuilder()
                 .setStatus(error()).build()
         }

@@ -2,12 +2,6 @@ package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.network.BSQLException
-import org.bitlap.network.client.BitlapClient
-import org.bitlap.network.client.BitlapClient.closeSession
-import org.bitlap.network.client.BitlapClient.openSession
-import org.bitlap.network.client.RpcServiceSupport
-import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob
@@ -22,6 +16,12 @@ import java.sql.Statement
 import java.sql.Struct
 import java.util.Properties
 import java.util.concurrent.Executor
+import org.bitlap.network.BSQLException
+import org.bitlap.network.NetworkHelper
+import org.bitlap.network.client.BitlapClient
+import org.bitlap.network.client.BitlapClient.closeSession
+import org.bitlap.network.client.BitlapClient.openSession
+import org.bitlap.network.proto.driver.BSessionHandle
 
 /**
  * Bitlap Connection
@@ -30,7 +30,7 @@ import java.util.concurrent.Executor
  * @since 2021/6/6
  * @version 1.0
  */
-open class BitlapConnection(uri: String, info: Properties = Properties()) : Connection, RpcServiceSupport {
+open class BitlapConnection(uri: String, info: Properties = Properties()) : Connection, NetworkHelper {
 
     companion object {
         private const val URI_PREFIX = "jdbc:bitlap://"

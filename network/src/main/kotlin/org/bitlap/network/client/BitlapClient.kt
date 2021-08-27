@@ -6,6 +6,10 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
+import java.sql.SQLException
+import java.util.Properties
+import org.bitlap.network.NetworkHelper
+import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BCloseSession
 import org.bitlap.network.proto.driver.BExecuteStatement
 import org.bitlap.network.proto.driver.BFetchResults
@@ -19,8 +23,6 @@ import org.bitlap.network.proto.driver.BSessionHandle
 import org.bitlap.network.proto.driver.BStatus
 import org.bitlap.network.proto.driver.BStatusCode
 import org.bitlap.network.proto.driver.BTableSchema
-import java.sql.SQLException
-import java.util.Properties
 
 /**
  * Wrap the rpc invoked
@@ -29,12 +31,10 @@ import java.util.Properties
  * @since 2021/8/22
  * @version 1.0
  */
-object BitlapClient : RpcServiceSupport {
+object BitlapClient : NetworkHelper {
 
     private const val groupId: String = "bitlap-cluster"
     private const val timeout = 5000L
-
-    // TODO we should verify status
 
     fun CliClientServiceImpl.openSession(
         conf: Configuration,
@@ -50,6 +50,7 @@ object BitlapClient : RpcServiceSupport {
         )
         result as BOpenSession.BOpenSessionResp
         verifySuccess(result.status)
+        println(SessionHandle(result.sessionHandle))
         return result.sessionHandle
     }
 
@@ -171,10 +172,10 @@ object BitlapClient : RpcServiceSupport {
     }
 
     fun beforeInit() {
-        registerMessageInstances(RpcServiceSupport.requestInstances()) {
+        registerMessageInstances(NetworkHelper.requestInstances()) {
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
         }
-        registerMessageInstances(RpcServiceSupport.responseInstances()) {
+        registerMessageInstances(NetworkHelper.responseInstances()) {
             MarshallerHelper.registerRespInstance(it.first, it.second)
         }
     }

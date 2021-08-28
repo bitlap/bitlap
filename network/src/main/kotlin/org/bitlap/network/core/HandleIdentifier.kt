@@ -55,10 +55,10 @@ open class HandleIdentifier(
         if (other !is HandleIdentifier) {
             return false
         }
-        if (publicId.compareTo(other.publicId) != 0) {
+        if (publicId != other.publicId) {
             return false
         }
-        if (secretId.compareTo(other.secretId) != 0) {
+        if (secretId != other.secretId) {
             return false
         }
         return true

@@ -90,6 +90,13 @@ object BitlapCatalog : LifeCycleWrapper() {
         return cleanName
     }
 
+    fun listSchemas(): List<String> {
+        return fs.listStatus(dataPath).asSequence()
+            .filter { it.isDirectory }
+            .map { it.path.name }
+            .toList()
+    }
+
     /**
      * create [DataSource] with [name].
      *

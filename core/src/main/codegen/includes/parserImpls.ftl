@@ -181,10 +181,14 @@ SqlShowSchemas SqlShowSchemas() :
 
 SqlShowDataSources SqlShowDataSources() :
 {
+    SqlIdentifier schemaName = null;
 }
 {
     <SHOW> ( <DATASOURCES> | <TABLES> )
+    [
+        <IN> schemaName = CompoundIdentifier()
+    ]
     {
-        return new SqlShowDataSources(getPos());
+        return new SqlShowDataSources(getPos(), schemaName);
     }
 }

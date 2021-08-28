@@ -33,6 +33,5 @@ class SqlShowDataSources(val pos: SqlParserPos, val schema: SqlIdentifier?) : Sq
     }
 
     override fun run(catalog: BitlapCatalog) {
-
     }
 }

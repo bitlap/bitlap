@@ -1,6 +1,5 @@
 package org.bitlap.core.sql
 
-import com.google.common.collect.ImmutableList
 import org.apache.calcite.adapter.java.AbstractQueryableTable
 import org.apache.calcite.avatica.util.Casing
 import org.apache.calcite.avatica.util.Quoting
@@ -8,8 +7,6 @@ import org.apache.calcite.linq4j.QueryProvider
 import org.apache.calcite.linq4j.Queryable
 import org.apache.calcite.rel.type.RelDataType
 import org.apache.calcite.rel.type.RelDataTypeFactory
-import org.apache.calcite.rel.type.RelDataTypeSystem
-import org.apache.calcite.runtime.SqlFunctions
 import org.apache.calcite.schema.SchemaPlus
 import org.apache.calcite.schema.impl.ScalarFunctionImpl
 import org.apache.calcite.sql.SqlIdentifier
@@ -21,18 +18,13 @@ import org.apache.calcite.sql.parser.bitlap.BitlapSqlParserImpl
 import org.apache.calcite.sql.type.InferTypes
 import org.apache.calcite.sql.type.OperandTypes
 import org.apache.calcite.sql.type.ReturnTypes
-import org.apache.calcite.sql.type.SqlTypeFactoryImpl
 import org.apache.calcite.sql.type.SqlTypeFamily
 import org.apache.calcite.sql.type.SqlTypeName
-import org.apache.calcite.sql.util.ChainedSqlOperatorTable
 import org.apache.calcite.sql.util.ListSqlOperatorTable
 import org.apache.calcite.sql.util.SqlOperatorTables
 import org.apache.calcite.sql.validate.SqlUserDefinedFunction
 import org.apache.calcite.tools.Frameworks
 import org.apache.calcite.tools.RelRunners
-import org.bitlap.core.sql.parser.SqlShowDataSources
-import java.util.function.Function
-
 
 /**
  * Desc:
@@ -63,15 +55,19 @@ class QueryExecution(private val sql: String) {
         )
 
         val listSqlOperatorTable = ListSqlOperatorTable()
-        listSqlOperatorTable.add(SqlUserDefinedFunction(
-            SqlIdentifier("hello", SqlParserPos.ZERO),
-            SqlKind.OTHER_FUNCTION,
-            ReturnTypes.VARCHAR_2000,
-            InferTypes.FIRST_KNOWN,
-            OperandTypes.operandMetadata(listOf(SqlTypeFamily.STRING),
-                { t -> t.builder().add("a", SqlTypeName.VARCHAR, 15).build().fieldList.map { it.type } }, { "a" }) { false },
-            ScalarFunctionImpl.create(Functions::class.java, "hello")
-        ))
+        listSqlOperatorTable.add(
+            SqlUserDefinedFunction(
+                SqlIdentifier("hello", SqlParserPos.ZERO),
+                SqlKind.OTHER_FUNCTION,
+                ReturnTypes.VARCHAR_2000,
+                InferTypes.FIRST_KNOWN,
+                OperandTypes.operandMetadata(
+                    listOf(SqlTypeFamily.STRING),
+                    { t -> t.builder().add("a", SqlTypeName.VARCHAR, 15).build().fieldList.map { it.type } }, { "a" }
+                ) { false },
+                ScalarFunctionImpl.create(Functions::class.java, "hello")
+            )
+        )
 
         val config = Frameworks.newConfigBuilder()
             .parserConfig(

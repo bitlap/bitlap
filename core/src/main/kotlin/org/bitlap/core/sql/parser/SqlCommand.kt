@@ -13,5 +13,4 @@ interface SqlCommand {
      * run command
      */
     fun run(catalog: BitlapCatalog)
-
 }

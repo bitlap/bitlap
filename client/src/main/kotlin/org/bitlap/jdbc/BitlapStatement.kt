@@ -17,7 +17,7 @@ import java.sql.Statement
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapStatement(
+open class BitlapStatement(
     private val sessHandle: BSessionHandle,
     private val client: CliClientServiceImpl
 ) : Statement {
@@ -139,7 +139,7 @@ class BitlapStatement(
                 return false
             }
         } catch (ex: Exception) {
-            throw SQLException(ex.toString())
+            throw SQLException(ex.toString(), ex)
         }
         resultSet = BitlapQueryResultSet.builder().setClient(client).setSessionHandle(sessHandle)
             .setStmtHandle(stmtHandle!!).setMaxRows(maxRows).setFetchSize(fetchSize)

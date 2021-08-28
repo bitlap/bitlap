@@ -13,17 +13,17 @@ import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.utils.withPaths
-import org.bitlap.network.client.RpcServiceSupport
-import org.bitlap.network.core.BCLIService
+import org.bitlap.network.NetworkHelper
+import org.bitlap.network.core.NetworkServiceImpl
 import org.bitlap.network.core.SessionManager
-import org.bitlap.network.rpc.CloseSessionProcessor
-import org.bitlap.network.rpc.ExecuteStatementProcessor
-import org.bitlap.network.rpc.FetchResultsProcessor
-import org.bitlap.network.rpc.GetColumnsProcessor
-import org.bitlap.network.rpc.GetResultSetMetaDataProcessor
-import org.bitlap.network.rpc.GetSchemasProcessor
-import org.bitlap.network.rpc.GetTablesProcessor
-import org.bitlap.network.rpc.OpenSessionProcessor
+import org.bitlap.network.processor.CloseSessionProcessor
+import org.bitlap.network.processor.ExecuteStatementProcessor
+import org.bitlap.network.processor.FetchResultsProcessor
+import org.bitlap.network.processor.GetColumnsProcessor
+import org.bitlap.network.processor.GetResultSetMetaDataProcessor
+import org.bitlap.network.processor.GetSchemasProcessor
+import org.bitlap.network.processor.GetTablesProcessor
+import org.bitlap.network.processor.OpenSessionProcessor
 import java.io.File
 
 /**
@@ -33,7 +33,7 @@ import java.io.File
  * Created by IceMimosa
  * Date: 2021/4/22
  */
-open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper(), RpcServiceSupport {
+open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper(), NetworkHelper {
 
     private lateinit var node: Node
 
@@ -49,10 +49,10 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper
         val serverId = PeerId().apply {
             require(parse(serverIdStr)) { "Fail to parse serverId:$serverIdStr" }
         }
-        registerMessageInstances(RpcServiceSupport.requestInstances()) {
+        registerMessageInstances(NetworkHelper.requestInstances()) {
             RpcFactoryHelper.rpcFactory().registerProtobufSerializer(it.first, it.second)
         }
-        registerMessageInstances(RpcServiceSupport.responseInstances()) {
+        registerMessageInstances(NetworkHelper.responseInstances()) {
             MarshallerHelper.registerRespInstance(it.first, it.second)
         }
         val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.endpoint)
@@ -69,8 +69,8 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper
     }
 }
 
-private fun BitlapServerEndpoint.registerProcessor(rpcServer: RpcServer) {
-    val cliService = BCLIService(SessionManager())
+private fun registerProcessor(rpcServer: RpcServer) {
+    val cliService = NetworkServiceImpl(SessionManager())
     listOf(
         CloseSessionProcessor(cliService),
         OpenSessionProcessor(cliService),
@@ -83,7 +83,7 @@ private fun BitlapServerEndpoint.registerProcessor(rpcServer: RpcServer) {
     ).forEach { rpcServer.registerProcessor(it) }
 }
 
-private fun BitlapServerEndpoint.extractOptions(conf: BitlapConf): NodeOptions {
+private fun extractOptions(conf: BitlapConf): NodeOptions {
     val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)!!
     val initConfStr = conf.get(BitlapConf.NODE_BIND_PEERS)
     FileUtils.forceMkdir(File(dataPath))

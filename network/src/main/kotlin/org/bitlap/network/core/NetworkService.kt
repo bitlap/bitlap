@@ -1,15 +1,12 @@
 package org.bitlap.network.core
 
-import org.bitlap.network.proto.driver.BRowSet
-import org.bitlap.network.proto.driver.BTableSchema
-
 /**
  * Interface definition of driver RPC.
  * @author 梦境迷离
  * @since 2021/6/6
  * @version 1.0
  */
-interface CLIService {
+interface NetworkService {
 
     fun openSession(username: String, password: String, configuration: Map<String, String>?): SessionHandle
 
@@ -28,11 +25,26 @@ interface CLIService {
         queryTimeout: Long
     ): OperationHandle
 
-    fun fetchResults(opHandle: OperationHandle): BRowSet
+    fun fetchResults(opHandle: OperationHandle): RowSet
 
     fun getResultSetMetadata(
         opHandle: OperationHandle,
-    ): BTableSchema // convert BTableSchema to kotlin class
+    ): TableSchema
 
-    // other methods
+    fun getColumns(
+        sessionHandle: SessionHandle,
+        tableName: String?,
+        schemaName: String?,
+        columnName: String?
+    ): OperationHandle
+
+    fun getTables(
+        sessionHandle: SessionHandle,
+        tableName: String?,
+        schemaName: String?
+    ): OperationHandle
+
+    fun getSchemas(
+        sessionHandle: SessionHandle,
+    ): OperationHandle
 }

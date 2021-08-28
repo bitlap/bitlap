@@ -6,8 +6,6 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import java.sql.SQLException
-import java.util.Properties
 import org.bitlap.network.NetworkHelper
 import org.bitlap.network.proto.driver.BCloseSession
 import org.bitlap.network.proto.driver.BExecuteStatement
@@ -22,6 +20,8 @@ import org.bitlap.network.proto.driver.BSessionHandle
 import org.bitlap.network.proto.driver.BStatus
 import org.bitlap.network.proto.driver.BStatusCode
 import org.bitlap.network.proto.driver.BTableSchema
+import java.sql.SQLException
+import java.util.Properties
 
 /**
  * Wrap the rpc invoked

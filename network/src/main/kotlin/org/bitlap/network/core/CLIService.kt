@@ -47,5 +47,4 @@ interface CLIService {
     fun getSchemas(
         sessionHandle: SessionHandle,
     ): OperationHandle
-
 }

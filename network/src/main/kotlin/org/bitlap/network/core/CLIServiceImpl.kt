@@ -53,7 +53,8 @@ open class CLIServiceImpl(private val sessionManager: SessionManager) : CLIServi
                         ByteString.copyFromUtf8("张三"),
                         ByteString.copyFromUtf8(12222.3232.toString())
                     )
-                ), Row(
+                ),
+                Row(
                     listOf(
                         ByteString.copyFromUtf8(12222.toString()),
                         ByteString.copyFromUtf8("李四"),

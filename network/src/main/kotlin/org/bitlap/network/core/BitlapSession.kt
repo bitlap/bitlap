@@ -1,7 +1,7 @@
 package org.bitlap.network.core
 
-import java.util.concurrent.atomic.AtomicBoolean
 import org.bitlap.common.BitlapConf
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Bitlap Session

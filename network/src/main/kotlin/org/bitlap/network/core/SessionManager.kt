@@ -1,9 +1,9 @@
 package org.bitlap.network.core
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 /**
  *

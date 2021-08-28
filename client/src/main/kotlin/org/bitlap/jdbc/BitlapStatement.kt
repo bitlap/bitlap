@@ -17,7 +17,7 @@ import org.bitlap.network.proto.driver.BSessionHandle
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapStatement(
+open class BitlapStatement(
     private val sessHandle: BSessionHandle,
     private val client: CliClientServiceImpl
 ) : Statement {

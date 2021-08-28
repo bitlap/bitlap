@@ -33,6 +33,4 @@ open class SessionHandle(override val handleId: HandleIdentifier) : Handle(handl
         result = 31 * result + handleId.hashCode()
         return result
     }
-
-
 }

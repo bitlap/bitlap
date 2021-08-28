@@ -1,6 +1,7 @@
+
+import junit.framework.TestCase
 import java.sql.DriverManager
 import java.sql.Statement
-import junit.framework.TestCase
 
 /**
  *
@@ -34,7 +35,6 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
         val salary1 = resultSet.getDouble(3)
         println(salary1)
 
-
         // 获取第二行记录
         resultSet.next()
         // 获取第二行的列
@@ -47,7 +47,6 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
         val salary2 = resultSet.getDouble(3)
         println(salary2)
 
-
         // 按列名获取第二行记录
         // 获取第二行的列
         val id3 = resultSet.getInt("ID")
@@ -58,6 +57,5 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
 
         val salary3 = resultSet.getDouble("SALARY")
         println(salary3)
-
     }
 }

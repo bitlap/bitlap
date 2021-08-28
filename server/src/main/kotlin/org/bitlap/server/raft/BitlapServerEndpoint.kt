@@ -9,7 +9,6 @@ import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.rpc.RpcServer
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import java.io.File
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
@@ -25,6 +24,7 @@ import org.bitlap.network.processor.GetResultSetMetaDataProcessor
 import org.bitlap.network.processor.GetSchemasProcessor
 import org.bitlap.network.processor.GetTablesProcessor
 import org.bitlap.network.processor.OpenSessionProcessor
+import java.io.File
 
 /**
  * Desc: Endpoint of bitlap server

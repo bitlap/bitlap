@@ -1,9 +1,9 @@
 package org.bitlap.network.core
 
 import com.google.protobuf.ByteString
+import org.bitlap.network.proto.driver.BHandleIdentifier
 import java.nio.ByteBuffer
 import java.util.UUID
-import org.bitlap.network.proto.driver.BHandleIdentifier
 
 /**
  * Abstract descriptor

@@ -9,4 +9,4 @@ import java.sql.SQLException
  * @since 2021/6/6
  * @version 1.0
  */
-data class BSQLException(val msg: String = "SQL Exception") : SQLException(msg)
+data class BSQLException(val msg: String = "Bitlap SQL Exception") : SQLException(msg)

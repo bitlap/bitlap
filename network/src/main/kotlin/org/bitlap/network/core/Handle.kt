@@ -9,9 +9,7 @@ import org.bitlap.network.proto.driver.BHandleIdentifier
  * @since 2021/6/6
  * @version 1.0
  */
-abstract class Handle(private val handleId: HandleIdentifier = HandleIdentifier()) {
-
-    open fun getHandleIdentifier(): HandleIdentifier = handleId
+abstract class Handle(open val handleId: HandleIdentifier = HandleIdentifier()) {
 
     constructor(bHandleIdentifier: BHandleIdentifier) : this(HandleIdentifier(bHandleIdentifier))
 

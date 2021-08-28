@@ -18,23 +18,23 @@ open class HandleIdentifier(
 ) {
 
     constructor(bHandleId: BHandleIdentifier) : this() {
-        var bb = ByteBuffer.wrap(ByteString.copyFromUtf8(bHandleId.guid).toByteArray())
+        var bb = ByteBuffer.wrap(bHandleId.guid.toByteArray())
         this.publicId = UUID(bb.long, bb.long)
-        bb = ByteBuffer.wrap(ByteString.copyFromUtf8(bHandleId.secret).toByteArray())
+        bb = ByteBuffer.wrap(bHandleId.secret.toByteArray())
         this.secretId = UUID(bb.long, bb.long)
     }
 
-    open fun toBHandleIdentifier(): BHandleIdentifier {
+    fun toBHandleIdentifier(): BHandleIdentifier {
         val guid = ByteArray(16)
         val secret = ByteArray(16)
         val guidBB = ByteBuffer.wrap(guid)
         val secretBB = ByteBuffer.wrap(secret)
-        guidBB.putLong(publicId.mostSignificantBits)
-        guidBB.putLong(publicId.leastSignificantBits)
-        secretBB.putLong(secretId.mostSignificantBits)
-        secretBB.putLong(secretId.leastSignificantBits)
-        return BHandleIdentifier.newBuilder().setGuid(ByteString.copyFrom(guid).toStringUtf8())
-            .setSecret(ByteString.copyFrom(secret).toStringUtf8()).build()
+        guidBB.putLong(this.publicId.mostSignificantBits)
+        guidBB.putLong(this.publicId.leastSignificantBits)
+        secretBB.putLong(this.secretId.mostSignificantBits)
+        secretBB.putLong(this.secretId.leastSignificantBits)
+        return BHandleIdentifier.newBuilder().setGuid(ByteString.copyFrom(guid))
+            .setSecret(ByteString.copyFrom(secret)).build()
     }
 
     override fun hashCode(): Int {

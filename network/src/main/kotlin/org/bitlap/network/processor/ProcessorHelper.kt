@@ -1,4 +1,4 @@
-package org.bitlap.network.rpc
+package org.bitlap.network.processor
 
 import org.bitlap.network.proto.driver.BStatus
 import org.bitlap.network.proto.driver.BStatusCode
@@ -9,7 +9,7 @@ import org.bitlap.network.proto.driver.BStatusCode
  * @since 2021/6/6
  * @version 1.0
  */
-interface BaseProcessor {
+interface ProcessorHelper {
 
     fun success(): BStatus = BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS).build()
 

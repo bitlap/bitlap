@@ -1,4 +1,4 @@
-package org.bitlap.network.client
+package org.bitlap.network
 
 import com.google.protobuf.GeneratedMessageV3
 
@@ -8,7 +8,7 @@ import com.google.protobuf.GeneratedMessageV3
  * @since 2021/6/13
  * @version 1.0
  */
-interface RpcServiceSupport {
+interface NetworkHelper {
 
     fun registerMessageInstances(
         service: List<Pair<String, GeneratedMessageV3>>,

@@ -1,3 +1,4 @@
+
 import junit.framework.TestCase
 import java.sql.DriverManager
 import java.sql.Statement
@@ -19,14 +20,42 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
         val stmt: Statement = con.createStatement()
         assertNotNull("Statement is null", stmt)
 
+        // 执行SQL
         stmt.execute("select * from hello_table;")
         val resultSet = stmt.resultSet
+        // 获取记录
         resultSet.next()
-        val id = resultSet.getString(1)
-        println(id)
+        // 获取第一行的列
+        val id1 = resultSet.getInt(1)
+        println(id1)
 
+        val name1 = resultSet.getString(2)
+        println(name1)
+
+        val salary1 = resultSet.getDouble(3)
+        println(salary1)
+
+        // 获取第二行记录
         resultSet.next()
-        val name = resultSet.getString(2)
-        println(name)
+        // 获取第二行的列
+        val id2 = resultSet.getInt(1)
+        println(id2)
+
+        val name2 = resultSet.getString(2)
+        println(name2)
+
+        val salary2 = resultSet.getDouble(3)
+        println(salary2)
+
+        // 按列名获取第二行记录
+        // 获取第二行的列
+        val id3 = resultSet.getInt("ID")
+        println(id3)
+
+        val name3 = resultSet.getString("NAME")
+        println(name3)
+
+        val salary3 = resultSet.getDouble("SALARY")
+        println(salary3)
     }
 }

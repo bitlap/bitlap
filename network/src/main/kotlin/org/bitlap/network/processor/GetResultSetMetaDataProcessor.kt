@@ -20,7 +20,7 @@ class GetResultSetMetaDataProcessor(private val cliService: CLIService) :
     override fun handleRequest(rpcCtx: RpcContext, request: BGetResultSetMetadata.BGetResultSetMetadataReq) {
         val operationHandle = request.operationHandle
         val resp: BGetResultSetMetadata.BGetResultSetMetadataResp = try {
-            val result = cliService.getResultSetMetadata(OperationHandle((operationHandle)))
+            val result = cliService.getResultSetMetadata(OperationHandle(operationHandle))
             BGetResultSetMetadata.BGetResultSetMetadataResp.newBuilder()
                 .setStatus(success()).setSchema(result.toBTableSchema()).build()
         } catch (e: BitlapException) {

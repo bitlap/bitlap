@@ -4,7 +4,6 @@ import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.network.core.CLIService
-import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BOpenSession
 
 /**
@@ -23,7 +22,6 @@ class OpenSessionProcessor(private val cliService: CLIService) :
         val configurationMap = request.configurationMap
         val resp: BOpenSession.BOpenSessionResp = try {
             val sessionHandle = cliService.openSession(username, password, configurationMap)
-            println("Open Session: $sessionHandle, ${SessionHandle(sessionHandle.toBSessionHandle())}")
             BOpenSession.BOpenSessionResp.newBuilder()
                 .setSessionHandle(sessionHandle.toBSessionHandle())
                 .setStatus(success()).build()

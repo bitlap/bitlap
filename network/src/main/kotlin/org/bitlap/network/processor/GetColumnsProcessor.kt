@@ -21,7 +21,7 @@ class GetColumnsProcessor(private val cliService: CLIService) :
         val resp: BGetColumns.BGetColumnsResp = try {
             val result =
                 cliService.getColumns(
-                    SessionHandle((request.sessionHandle)),
+                    SessionHandle(request.sessionHandle),
                     request.tableName,
                     request.schemaName,
                     request.columnName

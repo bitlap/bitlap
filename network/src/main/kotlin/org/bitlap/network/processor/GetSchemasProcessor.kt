@@ -20,7 +20,7 @@ class GetSchemasProcessor(private val cliService: CLIService) :
     override fun handleRequest(rpcCtx: RpcContext, request: BGetSchemas.BGetSchemasReq) {
         val sessionHandle = request.sessionHandle
         val resp: BGetSchemas.BGetSchemasResp = try {
-            val result = cliService.getSchemas(SessionHandle((sessionHandle)))
+            val result = cliService.getSchemas(SessionHandle(sessionHandle))
             BGetSchemas.BGetSchemasResp.newBuilder()
                 .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
         } catch (e: BitlapException) {

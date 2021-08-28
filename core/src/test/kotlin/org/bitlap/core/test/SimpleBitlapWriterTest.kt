@@ -24,7 +24,7 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
 
         "test SimpleBitlapWriter" {
             val dsName = "test_datasource"
-            BitlapContext.dataSourceManager.createDataSource(dsName, true)
+            BitlapContext.catalog.createDataSource(dsName, ifNotExists = true)
             val writer = SimpleBitlapWriter(dsName)
 
             val testTime = DateTime.parse("2021-01-01").millis

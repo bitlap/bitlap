@@ -11,11 +11,6 @@
 
     <artifactId>bitlap-core</artifactId>
 
-    <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
@@ -25,11 +20,17 @@
             <groupId>org.apache.calcite</groupId>
             <artifactId>calcite-core</artifactId>
             <version>${calcite.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.carbondata</groupId>
             <artifactId>carbondata-sdk</artifactId>
-            <version>2.1.1</version>
+            <version>2.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.hadoop</groupId>
@@ -51,4 +52,103 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution> <!-- copy all templates/data in the same location to compile them at once -->
+                        <id>copy-fmpp-resources</id>
+                        <phase>initialize</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/codegen</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/codegen</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- Extract parser grammar template from calcite-core.jar and put
+                      it under ${project.build.directory}/codegen/templates where all freemarker templates are. -->
+                    <execution>
+                        <id>unpack-parser-template</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.calcite</groupId>
+                                    <artifactId>calcite-core</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                    <!--
+                                      Example from https://github.com/apache/drill/blob/master/exec/java-exec/pom.xml
+                                      Drill fmpp plugin (https://github.com/apache/drill/blob/master/tools/fmpp/pom.xml) does not support default_config.fmpp,
+                                      just copy default_config.fmpp to src/main/codegen/config.fmpp
+                                    -->
+                                    <includes>codegen/default_config.fmpp,codegen/templates/Parser.jj</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> <!-- generate sources from fmpp -->
+                <groupId>org.apache.drill.tools</groupId>
+                <artifactId>drill-fmpp-maven-plugin</artifactId>
+                <version>1.19.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-fmpp</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <config>${project.build.directory}/codegen/config.fmpp</config>
+                            <output>${project.build.directory}/generated-sources</output>
+                            <templates>${project.build.directory}/codegen/templates</templates>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>javacc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javacc</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/generated-sources/</sourceDirectory>
+                            <includes>
+                                <include>**/Parser.jj</include>
+                            </includes>
+                            <lookAhead>2</lookAhead>
+                            <isStatic>false</isStatic>
+                            <outputDirectory>${project.build.directory}/generated-sources/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

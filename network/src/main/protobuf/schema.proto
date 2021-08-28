@@ -5,7 +5,8 @@ option java_multiple_files = true;
 option java_outer_classname = "Schema";
 
 message DataSourcePB {
-    string name = 1;
-    int64 createTime = 2;
-    int64 updateTime = 3;
+    string schema = 1;
+    string name = 2;
+    int64 createTime = 3;
+    int64 updateTime = 4;
 }

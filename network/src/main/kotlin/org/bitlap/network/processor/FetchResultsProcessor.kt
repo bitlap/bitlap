@@ -3,7 +3,7 @@ package org.bitlap.network.processor
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.core.CLIService
+import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.OperationHandle
 import org.bitlap.network.proto.driver.BFetchResults
 
@@ -14,13 +14,13 @@ import org.bitlap.network.proto.driver.BFetchResults
  * @since 2021/6/5
  * @version 1.0
  */
-class FetchResultsProcessor(private val cliService: CLIService) :
+class FetchResultsProcessor(private val networkService: NetworkService) :
     RpcProcessor<BFetchResults.BFetchResultsReq>,
     ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BFetchResults.BFetchResultsReq) {
         val operationHandle = request.operationHandle
         val resp: BFetchResults.BFetchResultsResp = try {
-            val result = cliService.fetchResults(OperationHandle(operationHandle))
+            val result = networkService.fetchResults(OperationHandle(operationHandle))
             BFetchResults.BFetchResultsResp.newBuilder()
                 .setHasMoreRows(false)
                 .setStatus(success()).setResults(result.toBRowSet()).build()

@@ -3,7 +3,7 @@ package org.bitlap.network.processor
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.core.CLIService
+import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BGetSchemas
 
@@ -14,13 +14,13 @@ import org.bitlap.network.proto.driver.BGetSchemas
  * @since 2021/6/5
  * @version 1.0
  */
-class GetSchemasProcessor(private val cliService: CLIService) :
+class GetSchemasProcessor(private val networkService: NetworkService) :
     RpcProcessor<BGetSchemas.BGetSchemasReq>,
     ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BGetSchemas.BGetSchemasReq) {
         val sessionHandle = request.sessionHandle
         val resp: BGetSchemas.BGetSchemasResp = try {
-            val result = cliService.getSchemas(SessionHandle(sessionHandle))
+            val result = networkService.getSchemas(SessionHandle(sessionHandle))
             BGetSchemas.BGetSchemasResp.newBuilder()
                 .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
         } catch (e: BitlapException) {

@@ -14,7 +14,7 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.utils.withPaths
 import org.bitlap.network.NetworkHelper
-import org.bitlap.network.core.CLIServiceImpl
+import org.bitlap.network.core.NetworkServiceImpl
 import org.bitlap.network.core.SessionManager
 import org.bitlap.network.processor.CloseSessionProcessor
 import org.bitlap.network.processor.ExecuteStatementProcessor
@@ -70,7 +70,7 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper
 }
 
 private fun registerProcessor(rpcServer: RpcServer) {
-    val cliService = CLIServiceImpl(SessionManager())
+    val cliService = NetworkServiceImpl(SessionManager())
     listOf(
         CloseSessionProcessor(cliService),
         OpenSessionProcessor(cliService),

@@ -6,7 +6,7 @@ package org.bitlap.network.core
  * @since 2021/6/6
  * @version 1.0
  */
-interface CLIService {
+interface NetworkService {
 
     fun openSession(username: String, password: String, configuration: Map<String, String>?): SessionHandle
 

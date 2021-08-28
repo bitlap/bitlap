@@ -3,7 +3,7 @@ package org.bitlap.network.processor
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.core.CLIService
+import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BGetColumns
 
@@ -14,13 +14,13 @@ import org.bitlap.network.proto.driver.BGetColumns
  * @since 2021/6/5
  * @version 1.0
  */
-class GetColumnsProcessor(private val cliService: CLIService) :
+class GetColumnsProcessor(private val networkService: NetworkService) :
     RpcProcessor<BGetColumns.BGetColumnsReq>,
     ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BGetColumns.BGetColumnsReq) {
         val resp: BGetColumns.BGetColumnsResp = try {
             val result =
-                cliService.getColumns(
+                networkService.getColumns(
                     SessionHandle(request.sessionHandle),
                     request.tableName,
                     request.schemaName,

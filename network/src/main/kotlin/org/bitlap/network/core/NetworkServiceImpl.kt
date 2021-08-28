@@ -8,7 +8,7 @@ import com.google.protobuf.ByteString
  * @since 2021/6/6
  * @version 1.0
  */
-open class CLIServiceImpl(private val sessionManager: SessionManager) : CLIService {
+open class NetworkServiceImpl(private val sessionManager: SessionManager) : NetworkService {
 
     override fun openSession(
         username: String,

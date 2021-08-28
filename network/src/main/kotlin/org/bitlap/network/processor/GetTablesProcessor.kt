@@ -3,7 +3,7 @@ package org.bitlap.network.processor
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.core.CLIService
+import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BGetTables
 
@@ -14,13 +14,13 @@ import org.bitlap.network.proto.driver.BGetTables
  * @since 2021/6/5
  * @version 1.0
  */
-class GetTablesProcessor(private val cliService: CLIService) :
+class GetTablesProcessor(private val networkService: NetworkService) :
     RpcProcessor<BGetTables.BGetTablesReq>,
     ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BGetTables.BGetTablesReq) {
         val resp: BGetTables.BGetTablesResp = try {
             val result =
-                cliService.getTables(SessionHandle((request.sessionHandle)), request.tableName, request.schemaName)
+                networkService.getTables(SessionHandle((request.sessionHandle)), request.tableName, request.schemaName)
             BGetTables.BGetTablesResp.newBuilder()
                 .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
         } catch (e: BitlapException) {

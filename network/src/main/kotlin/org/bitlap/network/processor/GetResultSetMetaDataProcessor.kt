@@ -3,7 +3,7 @@ package org.bitlap.network.processor
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcProcessor
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.core.CLIService
+import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.OperationHandle
 import org.bitlap.network.proto.driver.BGetResultSetMetadata
 
@@ -14,13 +14,13 @@ import org.bitlap.network.proto.driver.BGetResultSetMetadata
  * @since 2021/6/5
  * @version 1.0
  */
-class GetResultSetMetaDataProcessor(private val cliService: CLIService) :
+class GetResultSetMetaDataProcessor(private val networkService: NetworkService) :
     RpcProcessor<BGetResultSetMetadata.BGetResultSetMetadataReq>,
     ProcessorHelper {
     override fun handleRequest(rpcCtx: RpcContext, request: BGetResultSetMetadata.BGetResultSetMetadataReq) {
         val operationHandle = request.operationHandle
         val resp: BGetResultSetMetadata.BGetResultSetMetadataResp = try {
-            val result = cliService.getResultSetMetadata(OperationHandle(operationHandle))
+            val result = networkService.getResultSetMetadata(OperationHandle(operationHandle))
             BGetResultSetMetadata.BGetResultSetMetadataResp.newBuilder()
                 .setStatus(success()).setSchema(result.toBTableSchema()).build()
         } catch (e: BitlapException) {

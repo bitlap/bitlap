@@ -3,6 +3,7 @@ package org.bitlap.network.core
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.logger
 
 /**
  *
@@ -12,33 +13,35 @@ import org.bitlap.common.exception.BitlapException
  */
 class SessionManager {
 
+    private val log = logger { }
+
     private val handleToSession = ConcurrentHashMap<SessionHandle, Session>()
     private val sessionAddLock = Any()
     private val sessionThread = Thread { // register center
         while (true) {
             val iterator = handleToSession.iterator()
-            println("There are [${handleToSession.size}] surviving sessions")
+            log.info("There are [${handleToSession.size}] surviving sessions")
             try {
                 while (iterator.hasNext()) {
                     val element = iterator.next()
                     val sessionHandle = element.key
                     if (!element.value.sessionState.get()) {
                         iterator.remove()
-                        println("Session state is false, remove session: $sessionHandle")
+                        log.info("Session state is false, remove session: $sessionHandle")
                     }
 
                     val now = System.currentTimeMillis()
                     if (element.value.lastAccessTime + 20 * 60 * 1000 < now) {
                         iterator.remove()
-                        println("Session has not been visited for 20 minutes, remove session: $sessionHandle")
+                        log.info("Session has not been visited for 20 minutes, remove session: $sessionHandle")
                     } else {
-                        println("SessionId: ${sessionHandle.handleId}")
+                        log.info("SessionId: ${sessionHandle.handleId}")
                     }
                 }
 
                 TimeUnit.SECONDS.sleep(3)
             } catch (e: Exception) {
-                println("Failed to listen for session error: $e.localizedMessage")
+                log.error("Failed to listen for session, error: $e.localizedMessage", e)
             }
         }
     }
@@ -57,7 +60,7 @@ class SessionManager {
         sessionConf: Map<String, String>
     ): BitlapSession {
 
-        println("Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
+        log.info("Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
         synchronized(sessionAddLock) {
             val session = BitlapSession(
                 username,
@@ -66,7 +69,7 @@ class SessionManager {
                 this
             )
             handleToSession[session.sessionHandle] = session
-            println("Create session: ${session.sessionHandle}")
+            log.info("Create session: ${session.sessionHandle}")
             return session
         }
     }
@@ -74,9 +77,9 @@ class SessionManager {
     fun closeSession(sessionHandle: SessionHandle) {
         synchronized(sessionAddLock) {
             handleToSession.remove(sessionHandle) ?: throw BitlapException("Session does not exist: $sessionHandle")
-            println("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
+            log.info("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
             if (getOpenSessionCount() == 0) {
-                println(
+                log.warn(
                     "This instance of Bitlap has been removed from the list of server " +
                         "instances available for dynamic service discovery. " +
                         "The last client session has ended - will shutdown now."

@@ -15,7 +15,7 @@ open class CLIServiceImpl(private val sessionManager: SessionManager) : CLIServi
         password: String,
         configuration: Map<String, String>?
     ): SessionHandle {
-        val session = sessionManager.openSession( username, password, configuration ?: mapOf())
+        val session = sessionManager.openSession(username, password, configuration ?: mapOf())
         return session.sessionHandle
     }
 
@@ -52,6 +52,12 @@ open class CLIServiceImpl(private val sessionManager: SessionManager) : CLIServi
                         ByteString.copyFromUtf8(1112.toString()),
                         ByteString.copyFromUtf8("张三"),
                         ByteString.copyFromUtf8(12222.3232.toString())
+                    )
+                ), Row(
+                    listOf(
+                        ByteString.copyFromUtf8(12222.toString()),
+                        ByteString.copyFromUtf8("李四"),
+                        ByteString.copyFromUtf8(10089.3232.toString())
                     )
                 )
             )

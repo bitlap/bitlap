@@ -1,13 +1,13 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import java.sql.SQLException
 import org.bitlap.network.BSQLException
 import org.bitlap.network.client.BitlapClient.fetchResults
 import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
-import java.sql.SQLException
 
 /**
  *
@@ -78,8 +78,10 @@ class BitlapQueryResultSet(
                 }
                 val columnName = columns[pos].columnName
                 columnNames.add(columnName)
-                val columnTypeName = TypeNameMapping.typeNames[columns[pos].typeDesc]!! // TODO types
+                val columnTypeName = TypeNameMapping.typeNames[columns[pos].typeDesc]!!
                 columnTypes.add(columnTypeName)
+                namesSb.append(columnName)
+                typesSb.append(columnTypeName)
             }
             println("retrieveSchema => names: $namesSb, types: $typesSb")
         } catch (e: SQLException) {

@@ -1,9 +1,5 @@
 package org.bitlap.jdbc
 
-import org.bitlap.network.BSQLException
-import org.bitlap.network.proto.driver.BRow
-import org.bitlap.network.proto.driver.BTableSchema
-import org.bitlap.network.proto.driver.BTypeId
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -22,6 +18,10 @@ import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
 import java.util.Calendar
+import org.bitlap.network.BSQLException
+import org.bitlap.network.proto.driver.BRow
+import org.bitlap.network.proto.driver.BTableSchema
+import org.bitlap.network.proto.driver.BTypeId
 
 /**
  *
@@ -59,8 +59,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getString(columnIndex: Int): String {
-        val value = getColumnValue(columnIndex)
-        return value.toString()
+        return getColumnValue(columnIndex)
     }
 
     override fun getString(columnLabel: String?): String {
@@ -92,11 +91,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getInt(columnIndex: Int): Int {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getInt(columnLabel: String?): Int {
-        TODO("Not yet implemented")
+        return getInt(findColumn(columnLabel))
     }
 
     override fun getLong(columnIndex: Int): Long {
@@ -116,11 +115,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getDouble(columnIndex: Int): Double {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getDouble(columnLabel: String?): Double {
-        TODO("Not yet implemented")
+        return getDouble(findColumn(columnLabel))
     }
 
     override fun getBigDecimal(columnIndex: Int, scale: Int): BigDecimal {
@@ -808,7 +807,8 @@ abstract class BitlapBaseResultSet : ResultSet {
         TODO("Not yet implemented")
     }
 
-    private fun getColumnValue(columnIndex: Int): Any {
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> getColumnValue(columnIndex: Int): T {
         if (row == null) {
             throw BSQLException("No row found.")
         }
@@ -818,17 +818,16 @@ abstract class BitlapBaseResultSet : ResultSet {
         }
 
         val bColumnValue = colVals[columnIndex - 1]
-        val columnType = getSchema().getColumns(columnIndex - 1).typeDesc
-        when (columnType) {
+        return when (val columnType = getSchema().getColumns(columnIndex - 1).typeDesc) {
             BTypeId.B_TYPE_ID_STRING_TYPE ->
-                return bColumnValue.toStringUtf8()
+                bColumnValue.toStringUtf8() as T
             BTypeId.B_TYPE_ID_INT_TYPE ->
                 if (bColumnValue.toStringUtf8().isNotEmpty())
-                    return Integer.parseInt(bColumnValue.toStringUtf8())
+                    Integer.parseInt(bColumnValue.toStringUtf8()) as T
                 else throw BSQLException("Column value can not be null for column type: $columnType")
             BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
                 if (bColumnValue.toStringUtf8().isNotEmpty())
-                    return java.lang.Double.parseDouble(bColumnValue.toStringUtf8())
+                    java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) as T
                 else throw BSQLException("Column value can not be null for column type: $columnType")
 
             else -> throw BSQLException("Unrecognized column type:$columnType")

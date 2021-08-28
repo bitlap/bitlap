@@ -46,6 +46,6 @@ open class OperationHandle(
     }
 
     override fun toString(): String {
-        return "OperationHandle [opType=" + opType + ", getHandleIdentifier()=" + super.handleId + "]"
+        return "OperationHandle [opType=" + opType + ", handleId()=" + super.handleId + "]"
     }
 }

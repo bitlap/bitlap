@@ -9,7 +9,6 @@ import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import java.sql.SQLException
 import java.util.Properties
 import org.bitlap.network.NetworkHelper
-import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.proto.driver.BCloseSession
 import org.bitlap.network.proto.driver.BExecuteStatement
 import org.bitlap.network.proto.driver.BFetchResults
@@ -50,7 +49,6 @@ object BitlapClient : NetworkHelper {
         )
         result as BOpenSession.BOpenSessionResp
         verifySuccess(result.status)
-        println(SessionHandle(result.sessionHandle))
         return result.sessionHandle
     }
 

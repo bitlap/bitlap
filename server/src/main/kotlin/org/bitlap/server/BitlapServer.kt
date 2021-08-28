@@ -5,7 +5,6 @@ import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.proto.rpc.HelloRpcPB
 import org.bitlap.server.raft.BitlapServerEndpoint
 
 /**
@@ -42,12 +41,4 @@ fun main() {
     check(RouteTable.getInstance().refreshLeader(cli, groupId, 1000).isOk) { "Refresh leader failed" }
     val leader = RouteTable.getInstance().selectLeader(groupId)
     println("Leader is $leader")
-    cli.rpcClient.invokeAsync(
-        leader.endpoint, HelloRpcPB.Req.newBuilder().setPing("Bitlap Ping").build(),
-        { result, err ->
-            result as HelloRpcPB.Res
-            println("==========================> ${result.pong}")
-        },
-        5000
-    )
 }

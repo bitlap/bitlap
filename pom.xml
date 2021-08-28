@@ -44,6 +44,7 @@
         <module>client</module>
         <module>integration/cli</module>
         <module>integration/spark3</module>
+        <module>network</module>
     </modules>
 
     <properties>
@@ -207,6 +208,11 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>bitlap-spark3</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-network</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

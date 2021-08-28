@@ -96,7 +96,7 @@ open class RBM : AbsBM {
         (0 until array.size()).forEach { i ->
             val key = array.keys[i]
             val value = doIf(copy, array.values[i]) { it.clone() }
-            val idx = key.code % splitSize
+            val idx = key.toInt() % splitSize
             if (results.containsKey(idx)) {
                 results[idx]!!._rbm.append(key, value)
             } else {

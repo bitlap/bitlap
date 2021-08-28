@@ -1,8 +1,10 @@
 package org.bitlap.jdbc
 
+import org.bitlap.network.BSQLException
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo
+import java.sql.SQLException
 import java.util.Properties
 import java.util.logging.Logger
 
@@ -13,134 +15,118 @@ import java.util.logging.Logger
  * Created by IceMimosa
  * Date: 2021/4/16
  */
-class BitlapDriver : Driver {
-    /**
-     * Attempts to make a database connection to the given URL.
-     * The driver should return "null" if it realizes it is the wrong kind
-     * of driver to connect to the given URL.  This will be common, as when
-     * the JDBC driver manager is asked to connect to a given URL it passes
-     * the URL to each loaded driver in turn.
-     *
-     * <P>The driver should throw an `SQLException` if it is the right
-     * driver to connect to the given URL but has trouble connecting to
-     * the database.
-     *
-     </P> * <P>The `Properties` argument can be used to pass
-     * arbitrary string tag/value pairs as connection arguments.
-     * Normally at least "user" and "password" properties should be
-     * included in the `Properties` object.
-     </P> *
-     *
-     * <B>Note:</B> If a property is specified as part of the `url` and
-     * is also specified in the `Properties` object, it is
-     * implementation-defined as to which value will take precedence. For
-     * maximum portability, an application should only specify a property once.
-     *
-     * @param url the URL of the database to which to connect
-     * @param info a list of arbitrary string tag/value pairs as
-     * connection arguments. Normally at least a "user" and
-     * "password" property should be included.
-     * @return a `Connection` object that represents a
-     * connection to the URL
-     * @exception SQLException if a database access error occurs or the url is
-     * `null`
-     */
-    override fun connect(url: String?, info: Properties?): Connection {
-        TODO("Not yet implemented")
+open class BitlapDriver : Driver {
+
+    companion object {
+        val driver = java.sql.DriverManager.registerDriver(BitlapDriver())
+    }
+
+    override fun connect(url: String, info: Properties): Connection {
+        return try {
+            BitlapConnection(url, info)
+        } catch (ex: Exception) {
+            throw BSQLException(ex.toString())
+        }
     }
 
     /**
-     * Retrieves whether the driver thinks that it can open a connection
-     * to the given URL.  Typically drivers will return `true` if they
-     * understand the sub-protocol specified in the URL and `false` if
-     * they do not.
+     * Checks whether a given url is in a valid format.
      *
-     * @param url the URL of the database
-     * @return `true` if this driver understands the given URL;
-     * `false` otherwise
-     * @exception SQLException if a database access error occurs or the url is
-     * `null`
+     * The current uri format is:
+     * jdbc:bitlap://[host[:port]]
+     *
+     * jdbc:bitlap://                 - run in embedded mode
+     * jdbc:bitlap://localhost        - connect to localhost default port (10000)
+     * jdbc:bitlap://localhost:5050   - connect to localhost port 5050
+     *
+     * TODO: - write a better regex.
+     *       - decide on uri format
      */
     override fun acceptsURL(url: String?): Boolean {
-        TODO("Not yet implemented")
+        return url?.startsWith(Utils.URL_PREFIX) ?: false
     }
 
-    /**
-     * Gets information about the possible properties for this driver.
-     * <P>
-     * The `getPropertyInfo` method is intended to allow a generic
-     * GUI tool to discover what properties it should prompt
-     * a human for in order to get
-     * enough information to connect to a database.  Note that depending on
-     * the values the human has supplied so far, additional values may become
-     * necessary, so it may be necessary to iterate though several calls
-     * to the `getPropertyInfo` method.
-     *
-     * @param url the URL of the database to which to connect
-     * @param info a proposed list of tag/value pairs that will be sent on
-     * connect open
-     * @return an array of `DriverPropertyInfo` objects describing
-     * possible properties.  This array may be an empty array if
-     * no properties are required.
-     * @exception SQLException if a database access error occurs
-     </P> */
     override fun getPropertyInfo(url: String?, info: Properties?): Array<DriverPropertyInfo> {
-        TODO("Not yet implemented")
+        var curInfo: Properties = info ?: Properties()
+        if (url != null && url.startsWith(Utils.URL_PREFIX)) {
+            curInfo = parseURL(url, curInfo)
+        }
+
+        val hostProp = DriverPropertyInfo(
+            Utils.HOST_PROPERTY_KEY,
+            curInfo.getProperty(Utils.HOST_PROPERTY_KEY, "")
+        )
+        hostProp.required = false
+        hostProp.description = "Hostname of Bitlap Server"
+
+        val portProp = DriverPropertyInfo(
+            Utils.PORT_PROPERTY_KEY,
+            curInfo.getProperty(Utils.PORT_PROPERTY_KEY, "")
+        )
+        portProp.required = false
+        portProp.description = "Port number of Bitlap Server"
+
+        val dbProp = DriverPropertyInfo(
+            Utils.DBNAME_PROPERTY_KEY,
+            curInfo.getProperty(Utils.DBNAME_PROPERTY_KEY, "default")
+        )
+        dbProp.required = false
+        dbProp.description = "Database name"
+        return arrayOf(hostProp, portProp, dbProp)
     }
 
-    /**
-     * Retrieves the driver's major version number. Initially this should be 1.
-     *
-     * @return this driver's major version number
-     */
     override fun getMajorVersion(): Int {
-        TODO("Not yet implemented")
+        return Utils.MAJOR_VERSION
     }
 
-    /**
-     * Gets the driver's minor version number. Initially this should be 0.
-     * @return this driver's minor version number
-     */
     override fun getMinorVersion(): Int {
-        TODO("Not yet implemented")
+        return Utils.MINOR_VERSION
     }
 
-    /**
-     * Reports whether this driver is a genuine JDBC
-     * Compliant driver.
-     * A driver may only report `true` here if it passes the JDBC
-     * compliance tests; otherwise it is required to return `false`.
-     * <P>
-     * JDBC compliance requires full support for the JDBC API and full support
-     * for SQL 92 Entry Level.  It is expected that JDBC compliant drivers will
-     * be available for all the major commercial databases.
-     </P> * <P>
-     * This method is not intended to encourage the development of non-JDBC
-     * compliant drivers, but is a recognition of the fact that some vendors
-     * are interested in using the JDBC API and framework for lightweight
-     * databases that do not support full database functionality, or for
-     * special databases such as document information retrieval where a SQL
-     * implementation may not be feasible.
-     * @return `true` if this driver is JDBC Compliant; `false`
-     * otherwise
-     </P> */
     override fun jdbcCompliant(): Boolean {
-        TODO("Not yet implemented")
+        return Utils.JDBC_COMPLIANT
+    }
+
+    override fun getParentLogger(): Logger {
+        throw SQLException("Method not supported")
     }
 
     /**
-     * Return the parent Logger of all the Loggers used by this driver. This
-     * should be the Logger farthest from the root Logger that is
-     * still an ancestor of all of the Loggers used by this driver. Configuring
-     * this Logger will affect all of the log messages generated by the driver.
-     * In the worst case, this may be the root Logger.
+     * Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
      *
-     * @return the parent Logger for this driver
-     * @throws SQLFeatureNotSupportedException if the driver does not use
-     * `java.util.logging`.
-     * @since 1.7
+     * @param url
+     * @param defaults
+     * @return
      */
-    override fun getParentLogger(): Logger {
-        TODO("Not yet implemented")
+    private fun parseURL(url: String, defaults: Properties?): Properties {
+        val urlProps = if (defaults != null) Properties(defaults) else Properties()
+        if (!url.startsWith(Utils.URL_PREFIX)) {
+            throw SQLException("Invalid connection url: $url")
+        }
+        if (url.length <= Utils.URL_PREFIX.length) return urlProps
+
+        // [hostname]:[port]/[db_name]
+        val connectionInfo: String = url.substring(Utils.URL_PREFIX.length)
+
+        // [hostname]:[port]/[db_name]
+        val hostPortAndDatabase = connectionInfo.split("/", limit = 2).toTypedArray()
+
+        // [hostname]:[port]
+        if (hostPortAndDatabase[0].isNotEmpty()) {
+            val hostAndPort = hostPortAndDatabase[0].split(":", limit = 2).toTypedArray()
+            urlProps[Utils.HOST_PROPERTY_KEY] = hostAndPort[0]
+            if (hostAndPort.size > 1) {
+                urlProps[Utils.PORT_PROPERTY_KEY] = hostAndPort[1]
+            } else {
+                urlProps[Utils.PORT_PROPERTY_KEY] =
+                    Utils.DEFAULT_PORT
+            }
+        }
+
+        // [db_name]
+        if (hostPortAndDatabase.size > 1) {
+            urlProps[Utils.DBNAME_PROPERTY_KEY] = hostPortAndDatabase[1]
+        }
+        return urlProps
     }
 }

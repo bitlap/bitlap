@@ -4,6 +4,7 @@ import cn.hutool.setting.Setting
 import org.bitlap.common.conf.BitlapConfKey
 import org.bitlap.common.conf.Validators
 import org.bitlap.common.utils.withPaths
+import org.slf4j.LoggerFactory
 import java.io.Serializable
 
 /**
@@ -22,9 +23,19 @@ import java.io.Serializable
  * Created by IceMimosa
  * Date: 2021/5/28
  */
-open class BitlapConf : Serializable {
+open class BitlapConf() : Serializable {
 
-    private val log = logger { }
+    private val log = LoggerFactory.getLogger(BitlapConf::class.java)
+
+    @Volatile
+    private lateinit var sessionConf: Map<String, String>
+
+    // for session
+    constructor(sessionConf: Map<String, String>) : this() {
+        this.sessionConf = sessionConf
+    }
+
+    fun getSessionConfig(): Map<String, String> = this.sessionConf
 
     /**
      * core properties

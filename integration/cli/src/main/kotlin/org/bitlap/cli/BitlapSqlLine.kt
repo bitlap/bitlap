@@ -1,10 +1,11 @@
 package org.bitlap.cli
 
+import org.bitlap.cli.cmd.BitlapCommandParser
 import org.bitlap.cli.extension.BitlapCliApplication
+import org.bitlap.common.BitlapConf
 import sqlline.SqlLine
 import sqlline.SqlLineOpts
 import java.io.File
-import java.util.Locale
 import kotlin.system.exitProcess
 
 /**
@@ -18,18 +19,25 @@ object BitlapSqlLine {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        // TODO: 引入 https://github.com/ajalt/mordant
+
+        val conf = BitlapConf()
+        val projectName = conf.get(BitlapConf.PROJECT_NAME)!!
+        val parser = BitlapCommandParser(projectName, arrayOf()).execute()
+
         val baseDir = File(
             System.getProperty("user.home"),
             (
-                if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) ""
+                if (System.getProperty("os.name").lowercase().contains("windows")) ""
                 else "."
-                ) + "bitlap"
+                ) + projectName
         ).absolutePath
         System.setProperty("x.sqlline.basedir", baseDir)
         val sqlline = SqlLine().apply {
 //            opts.set(BuiltInProperty.PROMPT, "bitlap> ")
 //            updateCommandHandlers()
         }
+        BitlapCliApplication.conf.set(conf)
         val status = sqlline.begin(
             arrayOf(
                 "-d", "org.h2.Driver",

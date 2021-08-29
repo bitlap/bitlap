@@ -1,5 +1,8 @@
 package org.bitlap.core.model.query
 
+import org.bitlap.common.TimeRange
+import org.joda.time.DateTime
+
 /**
  * Desc: Time for query
  *
@@ -7,10 +10,7 @@ package org.bitlap.core.model.query
  * Created by IceMimosa
  * Date: 2021/3/19
  */
-data class QueryTime(
-    val start: Long,
-    val end: Long? = null,
-    val include: Pair<Boolean, Boolean> = true to true
-) {
-    private val hasEnd = end != null
+data class QueryTime(val timeRange: TimeRange) {
+
+    constructor(start: Long) : this(TimeRange(DateTime(start)))
 }

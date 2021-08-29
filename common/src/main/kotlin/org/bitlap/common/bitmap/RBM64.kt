@@ -79,9 +79,9 @@ open class RBM64 : AbsBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, RBM64> {
         if (splitSize <= 1 || _rbm.isEmpty) {
-            return mutableMapOf(0 to doIf(copy, this) { it.clone() })
+            return hashMapOf(0 to doIf(copy, this) { it.clone() })
         }
-        val results = mutableMapOf<Int, RBM64>()
+        val results = hashMapOf<Int, RBM64>()
 //        val array = _rbm.highLowContainer.highKeyIterator()
 //        (0 until array.size()).forEach { i ->
 //            val key = array.keys[i]

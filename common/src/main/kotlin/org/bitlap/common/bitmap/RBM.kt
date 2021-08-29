@@ -14,6 +14,8 @@ import kotlin.math.max
  * Desc:
  *   Build from RoaringBitmap[commit: fc3754f2]
  *
+ * RBM number: support: 0, 1, ..., 2147483647, -2147483648, -2147483647,..., -1
+ *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2020/11/16
@@ -87,14 +89,14 @@ open class RBM : AbsBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, RBM> {
         if (splitSize <= 1 || _rbm.isEmpty) {
-            return mutableMapOf(0 to doIf(copy, this) { it.clone() })
+            return hashMapOf(0 to doIf(copy, this) { it.clone() })
         }
-        val results = mutableMapOf<Int, RBM>()
+        val results = hashMapOf<Int, RBM>()
         val array = _rbm.highLowContainer
         (0 until array.size()).forEach { i ->
             val key = array.keys[i]
             val value = doIf(copy, array.values[i]) { it.clone() }
-            val idx = key.toShort() % splitSize
+            val idx = key.toInt() % splitSize
             if (results.containsKey(idx)) {
                 results[idx]!!._rbm.append(key, value)
             } else {
@@ -138,7 +140,9 @@ open class RBM : AbsBM {
     }
 
     override fun hashCode(): Int = _rbm.hashCode()
-    override fun toString(): String = _rbm.toString()
+    override fun toString(): String {
+        return "RBM(count=${this.getCount()}, uniqueCount=${this.getCountUnique()})"
+    }
 
     override fun and(bm: BM): RBM = resetModify {
         this.also { _rbm.and(bm.getRBM()._rbm) }
@@ -201,9 +205,22 @@ open class RBM : AbsBM {
     /**
      * operator functions
      */
-    operator fun plus(o: RBM) = this.clone().or(o)
+    operator fun plusAssign(o: BM) {
+        this.or(o)
+    }
+    operator fun plusAssign(dat: Int) {
+        this.add(dat)
+    }
+    operator fun plus(o: BM) = this.clone().or(o)
     operator fun plus(dat: Int) = this.clone().add(dat)
-    operator fun minus(o: RBM) = this.clone().andNot(o)
+
+    operator fun minusAssign(o: BM) {
+        this.andNot(o)
+    }
+    operator fun minusAssign(dat: Int) {
+        this.remove(dat)
+    }
+    operator fun minus(o: BM) = this.clone().andNot(o)
     operator fun minus(dat: Int) = this.clone().remove(dat)
 
     companion object {

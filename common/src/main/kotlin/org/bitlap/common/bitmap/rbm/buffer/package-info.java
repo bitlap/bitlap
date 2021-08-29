@@ -6,8 +6,8 @@
 
 /**
  * The org.roaringbitmap.buffer package  provides
- * two classes ({@link org.roaringbitmap.buffer.MutableRoaringBitmap} and 
- * ({@link org.roaringbitmap.buffer.ImmutableRoaringBitmap}) that   users
+ * two classes ({@link org.bitlap.common.bitmap.rbm.buffer.MutableRoaringBitmap} and
+ * ({@link org.bitlap.common.bitmap.rbm.buffer.MutableRoaringBitmap}) that   users
  * can rely upon for fast set of integers.
  * It differs from the org.roaringbitmap in that
  * the backing stores are ByteBuffers. 

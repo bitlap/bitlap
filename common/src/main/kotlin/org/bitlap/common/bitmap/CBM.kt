@@ -22,7 +22,7 @@ import kotlin.math.min
 
 class CBM : AbsBM, ComparableBM {
 
-    val container = mutableMapOf<Int, BBM>()
+    val container = hashMapOf<Int, BBM>()
     private var _bbm = BBM()
     var maxBit = 0
         private set
@@ -91,9 +91,9 @@ class CBM : AbsBM, ComparableBM {
 
     override fun split(splitSize: Int, copy: Boolean): Map<Int, CBM> {
         if (splitSize <= 1) {
-            return mutableMapOf(0 to doIf(copy, this) { this.clone() })
+            return hashMapOf(0 to doIf(copy, this) { this.clone() })
         }
-        val results = mutableMapOf<Int, CBM>()
+        val results = hashMapOf<Int, CBM>()
         container.forEach { (bit, bbm) ->
             val bs = bbm.split(splitSize, copy)
             bs.forEach { (index, b) ->
@@ -171,7 +171,7 @@ class CBM : AbsBM, ComparableBM {
     }
 
     override fun toString(): String {
-        return "CBM(weight=$weight, maxBit=$maxBit, container=$container)"
+        return "CBM(weight=$weight, maxBit=$maxBit, count=${this.getCount()}, uniqueCount=${this.getCountUnique()})"
     }
 
     /**
@@ -179,55 +179,53 @@ class CBM : AbsBM, ComparableBM {
      */
     fun add(dat: Int, count: Long): CBM = this.add(0, dat, count)
     fun add(bucket: Int, dat: Int, count: Long): CBM = resetModify {
-        if (dat < 0 || count <= 0) {
-            this
-        } else {
-            val bits = BMUtils.oneBitPositions(count)
-            var carrier = false
-            var currentIndex = 0
-            var currentBit1 = bits[currentIndex]
-            var currentBit2 = 0
+        PreConditions.checkExpression(count > 0, "CBM count should be greater than 0")
 
-            while (currentBit2 <= maxBit || currentIndex < bits.size || carrier) {
-                val bbm = container.computeIfAbsent(currentBit2) { BBM() }
-                if (currentBit1 == currentBit2) {
-                    if (!carrier) {
-                        if (bbm.contains(bucket, dat)) {
-                            bbm.remove(bucket, dat)
-                            carrier = true
-                        } else {
-                            bbm.add(bucket, dat)
-                        }
-                    }
-                    currentIndex += 1
-                    if (currentIndex < bits.size) {
-                        currentBit1 = bits[currentIndex]
-                    }
-                } else if (currentBit2 > currentBit1) {
-                    if (carrier) {
-                        if (bbm.contains(bucket, dat)) {
-                            bbm.remove(bucket, dat)
-                        } else {
-                            bbm.add(bucket, dat)
-                            carrier = false
-                        }
+        val bits = BMUtils.oneBitPositions(count)
+        var carrier = false
+        var currentIndex = 0
+        var currentBit1 = bits[currentIndex]
+        var currentBit2 = 0
+
+        while (currentBit2 <= maxBit || currentIndex < bits.size || carrier) {
+            val bbm = container.computeIfAbsent(currentBit2) { BBM() }
+            if (currentBit1 == currentBit2) {
+                if (!carrier) {
+                    if (bbm.contains(bucket, dat)) {
+                        bbm.remove(bucket, dat)
+                        carrier = true
                     } else {
-                        break
+                        bbm.add(bucket, dat)
                     }
-                } else if (carrier) {
+                }
+                currentIndex += 1
+                if (currentIndex < bits.size) {
+                    currentBit1 = bits[currentIndex]
+                }
+            } else if (currentBit2 > currentBit1) {
+                if (carrier) {
                     if (bbm.contains(bucket, dat)) {
                         bbm.remove(bucket, dat)
                     } else {
                         bbm.add(bucket, dat)
                         carrier = false
                     }
+                } else {
+                    break
                 }
-                currentBit2 += 1
+            } else if (carrier) {
+                if (bbm.contains(bucket, dat)) {
+                    bbm.remove(bucket, dat)
+                } else {
+                    bbm.add(bucket, dat)
+                    carrier = false
+                }
             }
-            // maxBit = currentBit2 - 1
-            maxBit = container.keys.maxOrNull() ?: 0
-            this
+            currentBit2 += 1
         }
+        // maxBit = currentBit2 - 1
+        maxBit = container.keys.maxOrNull() ?: 0
+        this
     }
 
     override fun and(bm: BM): CBM = resetModify {
@@ -535,6 +533,18 @@ class CBM : AbsBM, ComparableBM {
         return if (equals) result.and(rbm) else result.andNot(rbm)
     }
 
+    /**
+     * operator functions
+     */
+    operator fun plusAssign(o: BM) {
+        this.or(o)
+    }
+    operator fun plus(o: BM) = this.clone().or(o)
+    operator fun minusAssign(o: BM) {
+        this.andNot(o)
+    }
+    operator fun minus(o: BM) = this.clone().andNot(o)
+
     companion object {
 
         @JvmStatic
@@ -581,10 +591,10 @@ class CBM : AbsBM, ComparableBM {
             val bucketIds = cbm.container.values.flatMap { it.container.keys }.distinct().sorted()
             val cbms = mutableListOf<CBM>()
             bucketIds.forEach { bid ->
-                val tempCBMContainer = mutableMapOf<Int, BBM>()
+                val tempCBMContainer = hashMapOf<Int, BBM>()
                 cbm.container.forEach { (k, v) ->
-                    val tempBBMContainer = mutableMapOf<Int, RBM>()
-                    tempBBMContainer[-1] = v.container[bid] ?: RBM() // TODO: support -1
+                    val tempBBMContainer = hashMapOf<Int, RBM>()
+                    tempBBMContainer[BBM.MAGIC_BUCKET] = v.container[bid] ?: RBM()
                     tempCBMContainer[k] = BBM(tempBBMContainer, true)
                 }
                 cbms.add(CBM(tempCBMContainer, true))
@@ -607,7 +617,7 @@ class CBM : AbsBM, ComparableBM {
 
         @JvmStatic
         fun shift(cbm: CBM, bit: Int): CBM {
-            val results = mutableMapOf<Int, BBM>()
+            val results = hashMapOf<Int, BBM>()
             cbm.container.forEach { (k, v) ->
                 val shiftedBit = k + bit
                 if (shiftedBit >= 0) {

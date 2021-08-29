@@ -5,8 +5,8 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY
 import org.apache.hadoop.fs.Path
-import org.bitlap.common.BitlapProperties
-import org.bitlap.common.BitlapProperties.DEFAULT_ROOT_DIR
+import org.bitlap.common.BitlapConf
+import org.bitlap.core.BitlapContext
 
 /**
  * Mail: chk19940609@gmail.com
@@ -17,20 +17,21 @@ import org.bitlap.common.BitlapProperties.DEFAULT_ROOT_DIR
 abstract class BaseLocalFsTest : StringSpec() {
     protected lateinit var workPath: Path
     protected lateinit var localFS: FileSystem
+    protected lateinit var conf: BitlapConf
 
     init {
         beforeSpec {
-            val conf = Configuration()
-            conf.set(FS_DEFAULT_NAME_KEY, "file:///")
-            localFS = FileSystem.getLocal(conf)
+            val hadoopConf = Configuration()
+            hadoopConf.set(FS_DEFAULT_NAME_KEY, "file:///")
+            localFS = FileSystem.getLocal(hadoopConf)
             workPath = Path(localFS.workingDirectory, "target/bitlap-test")
             if (localFS.exists(workPath)) {
                 localFS.delete(workPath, true)
             }
             localFS.mkdirs(workPath)
             // set bitlap properties
-            BitlapProperties.setDefault(DEFAULT_ROOT_DIR, workPath.toString())
-            BitlapProperties.init()
+            conf = BitlapContext.bitlapConf
+            conf.set(BitlapConf.DEFAULT_ROOT_DIR_DATA, workPath.toString())
         }
 
         afterSpec {

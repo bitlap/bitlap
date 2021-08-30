@@ -7,6 +7,7 @@ import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
+import java.sql.ResultSetMetaData
 import java.sql.SQLException
 
 /**
@@ -129,11 +130,24 @@ open class BitlapQueryResultSet(
         return this.isClosed
     }
 
+    override fun getMetaData(): ResultSetMetaData {
+        if (isClosed) {
+            throw SQLException("Resultset is closed")
+        }
+        return super.getMetaData()
+    }
+
     override fun getFetchSize(): Int {
+        if (isClosed) {
+            throw SQLException("Resultset is closed")
+        }
         return this.fetchSize
     }
 
     override fun setFetchSize(rows: Int) {
+        if (isClosed) {
+            throw BSQLException("Resultset is closed")
+        }
         this.fetchSize = rows
     }
 
@@ -162,42 +176,24 @@ open class BitlapQueryResultSet(
             var colTypes: MutableList<String> = mutableListOf()
             var fetchSize = 50
             var emptyResultSet = false
-            fun setClient(client: CliClientServiceImpl): Builder {
-                this.client = client
-                return this
-            }
 
-            fun setStmtHandle(stmtHandle: BOperationHandle): Builder {
-                this.stmtHandle = stmtHandle
-                return this
-            }
+            fun setClient(client: CliClientServiceImpl) = this.also { this.client = client }
 
-            fun setSessionHandle(sessHandle: BSessionHandle): Builder {
-                this.sessHandle = sessHandle
-                return this
-            }
+            fun setStmtHandle(stmtHandle: BOperationHandle) = this.also { this.stmtHandle = stmtHandle }
 
-            fun setMaxRows(maxRows: Int): Builder {
-                this.maxRows = maxRows
-                return this
-            }
+            fun setSessionHandle(sessHandle: BSessionHandle) = this.also { this.sessHandle = sessHandle }
 
-            fun setSchema(colNames: List<String>, colTypes: List<String>): Builder {
+            fun setMaxRows(maxRows: Int) = this.also { this.maxRows = maxRows }
+
+            fun setSchema(colNames: List<String>, colTypes: List<String>) = this.also {
                 this.colNames.addAll(colNames)
                 this.colTypes.addAll(colTypes)
                 retrieveSchema = false
-                return this
             }
 
-            fun setFetchSize(fetchSize: Int): Builder {
-                this.fetchSize = fetchSize
-                return this
-            }
+            fun setFetchSize(fetchSize: Int) = this.also { this.fetchSize = fetchSize }
 
-            fun setEmptyResultSet(emptyResultSet: Boolean): Builder {
-                this.emptyResultSet = emptyResultSet
-                return this
-            }
+            fun setEmptyResultSet(emptyResultSet: Boolean) = this.also { this.emptyResultSet = emptyResultSet }
 
             fun build(): BitlapQueryResultSet {
                 return BitlapQueryResultSet(this)

@@ -21,6 +21,7 @@ import java.sql.SQLXML
 import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
+import java.time.Instant
 import java.util.Calendar
 
 /**
@@ -42,6 +43,8 @@ abstract class BitlapBaseResultSet : ResultSet {
 
     private lateinit var schema: BTableSchema
 
+    private var wasNull: Boolean = false
+
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
     }
@@ -55,7 +58,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun wasNull(): Boolean {
-        return false // This is kotlin
+        return wasNull
     }
 
     override fun getString(columnIndex: Int): String {
@@ -67,11 +70,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getBoolean(columnIndex: Int): Boolean {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getBoolean(columnLabel: String?): Boolean {
-        TODO("Not yet implemented")
+        return getBoolean(findColumn(columnLabel))
     }
 
     override fun getByte(columnIndex: Int): Byte {
@@ -83,11 +86,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getShort(columnIndex: Int): Short {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getShort(columnLabel: String?): Short {
-        TODO("Not yet implemented")
+        return getShort(findColumn(columnLabel))
     }
 
     override fun getInt(columnIndex: Int): Int {
@@ -99,11 +102,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getLong(columnIndex: Int): Long {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getLong(columnLabel: String?): Long {
-        TODO("Not yet implemented")
+        return getLong(findColumn(columnLabel))
     }
 
     override fun getFloat(columnIndex: Int): Float {
@@ -179,11 +182,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getTimestamp(columnIndex: Int): Timestamp {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getTimestamp(columnLabel: String?): Timestamp {
-        TODO("Not yet implemented")
+        return getTimestamp(findColumn(columnLabel))
     }
 
     override fun getTimestamp(columnIndex: Int, cal: Calendar?): Timestamp {
@@ -231,7 +234,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getMetaData(): ResultSetMetaData {
-        TODO("Not yet implemented")
+        return BitlapResultSetMetaData(columnNames, columnTypes)
     }
 
     override fun getObject(columnIndex: Int): Any {
@@ -340,7 +343,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getType(): Int {
-        TODO("Not yet implemented")
+        return ResultSet.TYPE_FORWARD_ONLY
     }
 
     override fun getConcurrency(): Int {
@@ -817,20 +820,42 @@ abstract class BitlapBaseResultSet : ResultSet {
             throw BSQLException("Invalid columnIndex: $columnIndex")
         }
 
+        // we should support null in the future.
+        // In kotlin, We can not use e.g. Int?,Long?,Double? to override the java interface here.
         val bColumnValue = colVals[columnIndex - 1]
-        return when (val columnType = getSchema().getColumns(columnIndex - 1).typeDesc) {
-            BTypeId.B_TYPE_ID_STRING_TYPE ->
-                bColumnValue.toStringUtf8() as T
-            BTypeId.B_TYPE_ID_INT_TYPE ->
-                if (bColumnValue.toStringUtf8().isNotEmpty())
-                    Integer.parseInt(bColumnValue.toStringUtf8()) as T
-                else throw BSQLException("Column value can not be null for column type: $columnType")
-            BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
-                if (bColumnValue.toStringUtf8().isNotEmpty())
-                    java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) as T
-                else throw BSQLException("Column value can not be null for column type: $columnType")
-
-            else -> throw BSQLException("Unrecognized column type:$columnType")
+        try {
+            return when (val columnType = getSchema().getColumns(columnIndex - 1).typeDesc) {
+                BTypeId.B_TYPE_ID_STRING_TYPE ->
+                    bColumnValue.toStringUtf8() as T
+                BTypeId.B_TYPE_ID_INT_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        Integer.parseInt(bColumnValue.toStringUtf8()) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                BTypeId.B_TYPE_ID_SHORT_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        java.lang.Short.parseShort(bColumnValue.toStringUtf8()) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                BTypeId.B_TYPE_ID_LONG_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        java.lang.Long.parseLong(bColumnValue.toStringUtf8()) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                BTypeId.B_TYPE_ID_BOOLEAN_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        java.lang.Boolean.valueOf(bColumnValue.toStringUtf8()) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                BTypeId.B_TYPE_ID_TIMESTAMP_TYPE ->
+                    if (bColumnValue.toStringUtf8().isNotEmpty())
+                        Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(bColumnValue.toStringUtf8()))) as T
+                    else throw BSQLException("Column value can not be null for column type: $columnType")
+                else -> throw BSQLException("Unrecognized column type:$columnType")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
         }
     }
 

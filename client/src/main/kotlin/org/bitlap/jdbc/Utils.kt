@@ -54,7 +54,11 @@ object Utils {
         mapOf(
             Pair(BTypeId.B_TYPE_ID_STRING_TYPE, "STRING"),
             Pair(BTypeId.B_TYPE_ID_INT_TYPE, "INT"),
-            Pair(BTypeId.B_TYPE_ID_DOUBLE_TYPE, "DOUBLE")
+            Pair(BTypeId.B_TYPE_ID_DOUBLE_TYPE, "DOUBLE"),
+            Pair(BTypeId.B_TYPE_ID_SHORT_TYPE, "SHORT"),
+            Pair(BTypeId.B_TYPE_ID_BOOLEAN_TYPE, "BOOLEAN"),
+            Pair(BTypeId.B_TYPE_ID_LONG_TYPE, "LONG"),
+            Pair(BTypeId.B_TYPE_ID_TIMESTAMP_TYPE, "TIMESTAMP")
         )
     }
 }

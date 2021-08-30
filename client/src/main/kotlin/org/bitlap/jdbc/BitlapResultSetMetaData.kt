@@ -11,8 +11,8 @@ import java.sql.Types
  * @version 1.0
  */
 open class BitlapResultSetMetaData(
-    private var columnNames: MutableList<String>,
-    private var columnTypes: MutableList<String>
+    private val columnNames: List<String>,
+    private val columnTypes: List<String>
 ) : ResultSetMetaData {
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {

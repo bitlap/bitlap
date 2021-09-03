@@ -1,14 +1,14 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import java.sql.ResultSetMetaData
+import java.sql.SQLException
 import org.bitlap.network.BSQLException
 import org.bitlap.network.client.BitlapClient.fetchResults
 import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
-import java.sql.ResultSetMetaData
-import java.sql.SQLException
 
 /**
  *
@@ -16,7 +16,7 @@ import java.sql.SQLException
  * @since 2021/6/12
  * @version 1.0
  */
-open class BitlapQueryResultSet(
+class BitlapQueryResultSet(
     private var client: CliClientServiceImpl?,
     private var maxRows: Int,
     override var row: BRow? = null
@@ -41,8 +41,6 @@ open class BitlapQueryResultSet(
         this.stmtHandle = builder.stmtHandle
         this.sessHandle = builder.sessHandle
         this.fetchSize = builder.fetchSize
-        this.columnNames = builder.colNames
-        this.columnTypes = builder.colTypes
         if (builder.retrieveSchema) {
             retrieveSchema()
         } else {
@@ -79,7 +77,7 @@ open class BitlapQueryResultSet(
                 }
                 val columnName = columns[pos].columnName
                 columnNames.add(columnName)
-                val columnTypeName = Utils.typeNames[columns[pos].typeDesc]!!
+                val columnTypeName = Utils.SERVER_TYPE_NAMES[columns[pos].typeDesc]!!
                 columnTypes.add(columnTypeName)
                 namesSb.append(columnName)
                 typesSb.append(columnTypeName)
@@ -172,8 +170,8 @@ open class BitlapQueryResultSet(
              */
             var maxRows = 0
             var retrieveSchema = true
-            var colNames: MutableList<String> = mutableListOf()
-            var colTypes: MutableList<String> = mutableListOf()
+            val colNames: MutableList<String> by lazy { mutableListOf() }
+            val colTypes: MutableList<String> by lazy { mutableListOf() }
             var fetchSize = 50
             var emptyResultSet = false
 

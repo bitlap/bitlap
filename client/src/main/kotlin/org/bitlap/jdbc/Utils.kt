@@ -50,7 +50,7 @@ object Utils {
      */
     const val PORT_PROPERTY_KEY = "PORT"
 
-    val typeNames by lazy {
+    val SERVER_TYPE_NAMES by lazy {
         mapOf(
             Pair(BTypeId.B_TYPE_ID_STRING_TYPE, "STRING"),
             Pair(BTypeId.B_TYPE_ID_INT_TYPE, "INT"),

@@ -37,6 +37,7 @@ open class BitlapConnection(uri: String, info: Properties = Properties()) : Conn
     }
 
     private var session: BSessionHandle? = null
+    // TODO Consider replace it
     private val client: CliClientServiceImpl by lazy { CliClientServiceImpl() }
     private var isClosed = true
     private var warningChain: SQLWarning? = null
@@ -54,7 +55,7 @@ open class BitlapConnection(uri: String, info: Properties = Properties()) : Conn
         val parts = hosts.map { it.split("/").toTypedArray() }
         try {
             val conf = Configuration()
-            parts.forEach { conf.parse(it[0]) }
+            parts.forEach { conf.parse(it[0]) } // Not tested
             session = client.openSession(conf, info)
             isClosed = false
         } catch (e: Exception) {

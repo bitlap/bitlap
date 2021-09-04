@@ -1,9 +1,5 @@
 package org.bitlap.jdbc
 
-import org.bitlap.network.BSQLException
-import org.bitlap.network.proto.driver.BRow
-import org.bitlap.network.proto.driver.BTableSchema
-import org.bitlap.network.proto.driver.BTypeId
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -21,7 +17,13 @@ import java.sql.SQLXML
 import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
+import java.time.Instant
 import java.util.Calendar
+import org.apache.commons.lang.StringUtils
+import org.bitlap.network.BSQLException
+import org.bitlap.network.proto.driver.BRow
+import org.bitlap.network.proto.driver.BTableSchema
+import org.bitlap.network.proto.driver.BTypeId
 
 /**
  *
@@ -36,11 +38,13 @@ abstract class BitlapBaseResultSet : ResultSet {
 
     protected open var row: BRow? = null
 
-    protected open lateinit var columnNames: MutableList<String>
+    protected open val columnNames: MutableList<String> by lazy { mutableListOf() }
 
-    protected open lateinit var columnTypes: MutableList<String>
+    protected open val columnTypes: MutableList<String> by lazy { mutableListOf() }
 
     private lateinit var schema: BTableSchema
+
+    private var wasNull: Boolean = false
 
     override fun <T : Any?> unwrap(iface: Class<T>?): T {
         TODO("Not yet implemented")
@@ -55,7 +59,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun wasNull(): Boolean {
-        return false // This is kotlin
+        return wasNull
     }
 
     override fun getString(columnIndex: Int): String {
@@ -67,11 +71,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getBoolean(columnIndex: Int): Boolean {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getBoolean(columnLabel: String?): Boolean {
-        TODO("Not yet implemented")
+        return getBoolean(findColumn(columnLabel))
     }
 
     override fun getByte(columnIndex: Int): Byte {
@@ -83,11 +87,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getShort(columnIndex: Int): Short {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getShort(columnLabel: String?): Short {
-        TODO("Not yet implemented")
+        return getShort(findColumn(columnLabel))
     }
 
     override fun getInt(columnIndex: Int): Int {
@@ -99,11 +103,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getLong(columnIndex: Int): Long {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getLong(columnLabel: String?): Long {
-        TODO("Not yet implemented")
+        return getLong(findColumn(columnLabel))
     }
 
     override fun getFloat(columnIndex: Int): Float {
@@ -179,11 +183,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getTimestamp(columnIndex: Int): Timestamp {
-        TODO("Not yet implemented")
+        return getColumnValue(columnIndex)
     }
 
     override fun getTimestamp(columnLabel: String?): Timestamp {
-        TODO("Not yet implemented")
+        return getTimestamp(findColumn(columnLabel))
     }
 
     override fun getTimestamp(columnIndex: Int, cal: Calendar?): Timestamp {
@@ -231,7 +235,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getMetaData(): ResultSetMetaData {
-        TODO("Not yet implemented")
+        return BitlapResultSetMetaData(columnNames, columnTypes)
     }
 
     override fun getObject(columnIndex: Int): Any {
@@ -340,7 +344,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     override fun getType(): Int {
-        TODO("Not yet implemented")
+        return ResultSet.TYPE_FORWARD_ONLY
     }
 
     override fun getConcurrency(): Int {
@@ -808,7 +812,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> getColumnValue(columnIndex: Int): T {
+    private inline fun <reified T> getColumnValue(columnIndex: Int): T {
         if (row == null) {
             throw BSQLException("No row found.")
         }
@@ -817,28 +821,53 @@ abstract class BitlapBaseResultSet : ResultSet {
             throw BSQLException("Invalid columnIndex: $columnIndex")
         }
 
+        // In kotlin, We can not use e.g. Int?,Long?,Double? to override the java interface here.
         val bColumnValue = colVals[columnIndex - 1]
-        return when (val columnType = getSchema().getColumns(columnIndex - 1).typeDesc) {
-            BTypeId.B_TYPE_ID_STRING_TYPE ->
-                bColumnValue.toStringUtf8() as T
-            BTypeId.B_TYPE_ID_INT_TYPE ->
-                if (bColumnValue.toStringUtf8().isNotEmpty())
-                    Integer.parseInt(bColumnValue.toStringUtf8()) as T
-                else throw BSQLException("Column value can not be null for column type: $columnType")
-            BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
-                if (bColumnValue.toStringUtf8().isNotEmpty())
-                    java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) as T
-                else throw BSQLException("Column value can not be null for column type: $columnType")
+        try {
+            if (bColumnValue.isEmpty) {
+                wasNull = true
+            }
 
-            else -> throw BSQLException("Unrecognized column type:$columnType")
+            val columnType = getSchema().getColumns(columnIndex - 1).typeDesc
+            return (when (columnType) {
+                BTypeId.B_TYPE_ID_STRING_TYPE ->
+                        if (bColumnValue.toStringUtf8().isEmpty()) StringUtils.EMPTY else bColumnValue.toStringUtf8()
+                BTypeId.B_TYPE_ID_INT_TYPE ->
+                        if (bColumnValue.toStringUtf8().isNotEmpty()) Integer.parseInt(bColumnValue.toStringUtf8()) else 0
+                BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
+                        if (bColumnValue.toStringUtf8()
+                            .isNotEmpty()
+                        ) java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) else 0.0
+                BTypeId.B_TYPE_ID_SHORT_TYPE ->
+                        if (bColumnValue.toStringUtf8()
+                            .isNotEmpty()
+                        ) java.lang.Short.parseShort(bColumnValue.toStringUtf8()) else 0
+                BTypeId.B_TYPE_ID_LONG_TYPE ->
+                        if (bColumnValue.toStringUtf8()
+                            .isNotEmpty()
+                        ) java.lang.Long.parseLong(bColumnValue.toStringUtf8()) else 0
+                BTypeId.B_TYPE_ID_BOOLEAN_TYPE ->
+                        if (bColumnValue.toStringUtf8()
+                            .isNotEmpty()
+                        ) java.lang.Boolean.valueOf(bColumnValue.toStringUtf8()) else false
+                BTypeId.B_TYPE_ID_TIMESTAMP_TYPE ->
+                        if (bColumnValue.toStringUtf8()
+                            .isNotEmpty()
+                        ) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(bColumnValue.toStringUtf8()))) else Timestamp.from(Instant.now())
+                else -> throw BSQLException("Unrecognized column type:$columnType")
+
+            }) as T
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
         }
     }
 
-    protected open fun setSchema(schema: BTableSchema) {
+    fun setSchema(schema: BTableSchema) {
         this.schema = schema
     }
 
-    protected open fun getSchema(): BTableSchema {
+    fun getSchema(): BTableSchema {
         return this.schema
     }
 }

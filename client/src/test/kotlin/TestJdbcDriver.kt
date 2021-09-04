@@ -47,6 +47,18 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
         val salary2 = resultSet.getDouble(3)
         println(salary2)
 
+        val short = resultSet.getShort(4)
+        println(short)
+
+        val long = resultSet.getLong(5)
+        println(long)
+
+        val boolean = resultSet.getBoolean(6)
+        println(boolean)
+
+        val timestamp = resultSet.getTimestamp(7)
+        println(timestamp)
+
         // 按列名获取第二行记录
         // 获取第二行的列
         val id3 = resultSet.getInt("ID")

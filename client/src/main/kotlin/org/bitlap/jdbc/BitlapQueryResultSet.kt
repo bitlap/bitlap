@@ -1,13 +1,14 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import java.sql.ResultSetMetaData
+import java.sql.SQLException
 import org.bitlap.network.BSQLException
 import org.bitlap.network.client.BitlapClient.fetchResults
 import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
-import java.sql.SQLException
 
 /**
  *
@@ -15,7 +16,7 @@ import java.sql.SQLException
  * @since 2021/6/12
  * @version 1.0
  */
-open class BitlapQueryResultSet(
+class BitlapQueryResultSet(
     private var client: CliClientServiceImpl?,
     private var maxRows: Int,
     override var row: BRow? = null
@@ -40,8 +41,6 @@ open class BitlapQueryResultSet(
         this.stmtHandle = builder.stmtHandle
         this.sessHandle = builder.sessHandle
         this.fetchSize = builder.fetchSize
-        this.columnNames = builder.colNames
-        this.columnTypes = builder.colTypes
         if (builder.retrieveSchema) {
             retrieveSchema()
         } else {
@@ -78,7 +77,7 @@ open class BitlapQueryResultSet(
                 }
                 val columnName = columns[pos].columnName
                 columnNames.add(columnName)
-                val columnTypeName = Utils.typeNames[columns[pos].typeDesc]!!
+                val columnTypeName = Utils.SERVER_TYPE_NAMES[columns[pos].typeDesc]!!
                 columnTypes.add(columnTypeName)
                 namesSb.append(columnName)
                 typesSb.append(columnTypeName)
@@ -129,11 +128,24 @@ open class BitlapQueryResultSet(
         return this.isClosed
     }
 
+    override fun getMetaData(): ResultSetMetaData {
+        if (isClosed) {
+            throw SQLException("Resultset is closed")
+        }
+        return super.getMetaData()
+    }
+
     override fun getFetchSize(): Int {
+        if (isClosed) {
+            throw SQLException("Resultset is closed")
+        }
         return this.fetchSize
     }
 
     override fun setFetchSize(rows: Int) {
+        if (isClosed) {
+            throw BSQLException("Resultset is closed")
+        }
         this.fetchSize = rows
     }
 
@@ -158,46 +170,28 @@ open class BitlapQueryResultSet(
              */
             var maxRows = 0
             var retrieveSchema = true
-            var colNames: MutableList<String> = mutableListOf()
-            var colTypes: MutableList<String> = mutableListOf()
+            val colNames: MutableList<String> by lazy { mutableListOf() }
+            val colTypes: MutableList<String> by lazy { mutableListOf() }
             var fetchSize = 50
             var emptyResultSet = false
-            fun setClient(client: CliClientServiceImpl): Builder {
-                this.client = client
-                return this
-            }
 
-            fun setStmtHandle(stmtHandle: BOperationHandle): Builder {
-                this.stmtHandle = stmtHandle
-                return this
-            }
+            fun setClient(client: CliClientServiceImpl) = this.also { this.client = client }
 
-            fun setSessionHandle(sessHandle: BSessionHandle): Builder {
-                this.sessHandle = sessHandle
-                return this
-            }
+            fun setStmtHandle(stmtHandle: BOperationHandle) = this.also { this.stmtHandle = stmtHandle }
 
-            fun setMaxRows(maxRows: Int): Builder {
-                this.maxRows = maxRows
-                return this
-            }
+            fun setSessionHandle(sessHandle: BSessionHandle) = this.also { this.sessHandle = sessHandle }
 
-            fun setSchema(colNames: List<String>, colTypes: List<String>): Builder {
+            fun setMaxRows(maxRows: Int) = this.also { this.maxRows = maxRows }
+
+            fun setSchema(colNames: List<String>, colTypes: List<String>) = this.also {
                 this.colNames.addAll(colNames)
                 this.colTypes.addAll(colTypes)
                 retrieveSchema = false
-                return this
             }
 
-            fun setFetchSize(fetchSize: Int): Builder {
-                this.fetchSize = fetchSize
-                return this
-            }
+            fun setFetchSize(fetchSize: Int) = this.also { this.fetchSize = fetchSize }
 
-            fun setEmptyResultSet(emptyResultSet: Boolean): Builder {
-                this.emptyResultSet = emptyResultSet
-                return this
-            }
+            fun setEmptyResultSet(emptyResultSet: Boolean) = this.also { this.emptyResultSet = emptyResultSet }
 
             fun build(): BitlapQueryResultSet {
                 return BitlapQueryResultSet(this)

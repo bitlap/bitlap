@@ -1,14 +1,14 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import java.sql.ResultSetMetaData
-import java.sql.SQLException
 import org.bitlap.network.BSQLException
 import org.bitlap.network.client.BitlapClient.fetchResults
 import org.bitlap.network.client.BitlapClient.getResultSetMetadata
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
+import java.sql.ResultSetMetaData
+import java.sql.SQLException
 
 /**
  *

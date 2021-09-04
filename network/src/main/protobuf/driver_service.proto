@@ -128,8 +128,9 @@ message BSessionHandle {
 // Client-side reference to a task running
 // asynchronously on the server.
 message BOperationHandle {
-    BHandleIdentifier operation_id = 1;
-    BOperationType operation_type = 2;
+    BSessionHandle session_handle = 1;
+    BHandleIdentifier operation_id = 2;
+    BOperationType operation_type = 3;
 
     // If hasResultSet = TRUE, then this operation
     // generates a result set that can be fetched.
@@ -139,7 +140,7 @@ message BOperationHandle {
     // does not generate a result set, and calling
     // GetResultSetMetadata or FetchResults against
     // this OperationHandle will generate an error.
-    bool has_result_set = 3;
+    bool has_result_set = 4;
 
     // For operations that don't generate result sets,
     // modifiedRowCount is either:
@@ -158,7 +159,7 @@ message BOperationHandle {
     //
     // modifiedRowCount is unset if the operation generates
     // a result set.
-    double modified_row_count = 4;
+    double modified_row_count = 5;
 }
 
 // The subtype of an OperationHandle.

@@ -1,4 +1,4 @@
-package org.bitlap.core.sql.parser
+package org.bitlap.core.sql.parser.ddl
 
 import org.apache.calcite.sql.SqlDrop
 import org.apache.calcite.sql.SqlIdentifier

@@ -1,5 +1,10 @@
 package org.bitlap.jdbc
 
+import org.apache.commons.lang.StringUtils
+import org.bitlap.network.BSQLException
+import org.bitlap.network.proto.driver.BRow
+import org.bitlap.network.proto.driver.BTableSchema
+import org.bitlap.network.proto.driver.BTypeId
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
@@ -19,11 +24,6 @@ import java.sql.Time
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.Calendar
-import org.apache.commons.lang.StringUtils
-import org.bitlap.network.BSQLException
-import org.bitlap.network.proto.driver.BRow
-import org.bitlap.network.proto.driver.BTableSchema
-import org.bitlap.network.proto.driver.BTypeId
 
 /**
  *
@@ -829,34 +829,35 @@ abstract class BitlapBaseResultSet : ResultSet {
             }
 
             val columnType = getSchema().getColumns(columnIndex - 1).typeDesc
-            return (when (columnType) {
-                BTypeId.B_TYPE_ID_STRING_TYPE ->
+            return (
+                when (columnType) {
+                    BTypeId.B_TYPE_ID_STRING_TYPE ->
                         if (bColumnValue.toStringUtf8().isEmpty()) StringUtils.EMPTY else bColumnValue.toStringUtf8()
-                BTypeId.B_TYPE_ID_INT_TYPE ->
+                    BTypeId.B_TYPE_ID_INT_TYPE ->
                         if (bColumnValue.toStringUtf8().isNotEmpty()) Integer.parseInt(bColumnValue.toStringUtf8()) else 0
-                BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
+                    BTypeId.B_TYPE_ID_DOUBLE_TYPE ->
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) java.lang.Double.parseDouble(bColumnValue.toStringUtf8()) else 0.0
-                BTypeId.B_TYPE_ID_SHORT_TYPE ->
+                    BTypeId.B_TYPE_ID_SHORT_TYPE ->
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) java.lang.Short.parseShort(bColumnValue.toStringUtf8()) else 0
-                BTypeId.B_TYPE_ID_LONG_TYPE ->
+                    BTypeId.B_TYPE_ID_LONG_TYPE ->
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) java.lang.Long.parseLong(bColumnValue.toStringUtf8()) else 0
-                BTypeId.B_TYPE_ID_BOOLEAN_TYPE ->
+                    BTypeId.B_TYPE_ID_BOOLEAN_TYPE ->
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) java.lang.Boolean.valueOf(bColumnValue.toStringUtf8()) else false
-                BTypeId.B_TYPE_ID_TIMESTAMP_TYPE ->
+                    BTypeId.B_TYPE_ID_TIMESTAMP_TYPE ->
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(bColumnValue.toStringUtf8()))) else Timestamp.from(Instant.now())
-                else -> throw BSQLException("Unrecognized column type:$columnType")
-
-            }) as T
+                    else -> throw BSQLException("Unrecognized column type:$columnType")
+                }
+                ) as T
         } catch (e: Exception) {
             e.printStackTrace()
             throw e

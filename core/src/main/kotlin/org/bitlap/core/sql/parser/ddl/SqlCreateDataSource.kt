@@ -1,6 +1,6 @@
-package org.bitlap.core.sql.parser
+package org.bitlap.core.sql.parser.ddl
 
-import org.apache.calcite.sql.SqlDrop
+import org.apache.calcite.sql.SqlCreate
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlNode
@@ -10,28 +10,29 @@ import org.apache.calcite.sql.parser.SqlParserPos
 
 /**
  * Desc:
- *   Parse tree for `DROP (DATASOURCE | TABLE) IF EXISTS datasource_name` statement.
+ *   Parse tree for `CREATE (DATASOURCE | TABLE) IF NOT EXISTS datasource_name` statement.
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
- * Date: 2021/8/25
+ * Date: 2021/8/23
  */
-class SqlDropDataSource(
+class SqlCreateDataSource(
     val pos: SqlParserPos,
     val name: SqlIdentifier,
-    val ifExists: Boolean,
-) : SqlDrop(OPERATOR, pos, ifExists) {
+    val ifNotExists: Boolean,
+    replace: Boolean = false,
+) : SqlCreate(OPERATOR, pos, replace, ifNotExists) {
 
     companion object {
-        val OPERATOR = SqlSpecialOperator("DROP TABLE", SqlKind.DROP_TABLE)
+        val OPERATOR = SqlSpecialOperator("CREATE DATASOURCE", SqlKind.CREATE_TABLE)
     }
 
     override fun getOperandList(): List<SqlNode> = listOf(name)
 
     override fun unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) {
-        writer.keyword("DROP TABLE")
-        if (ifExists) {
-            writer.keyword("IF EXISTS")
+        writer.keyword("CREATE DATASOURCE")
+        if (ifNotExists) {
+            writer.keyword("IF NOT EXISTS")
         }
         name.unparse(writer, leftPrec, rightPrec)
     }

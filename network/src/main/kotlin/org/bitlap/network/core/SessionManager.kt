@@ -1,5 +1,6 @@
 package org.bitlap.network.core
 
+import cn.hutool.core.util.ServiceLoaderUtil
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
 import java.util.concurrent.ConcurrentHashMap
@@ -45,6 +46,7 @@ class SessionManager {
             }
         }
     }
+    private val sessionFactory = ServiceLoaderUtil.loadFirst(SessionFactory::class.java)!!
 
     init {
         sessionThread.isDaemon = true
@@ -58,11 +60,11 @@ class SessionManager {
         username: String,
         password: String,
         sessionConf: Map<String, String>
-    ): BitlapSession {
+    ): Session {
 
         log.info("Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
         synchronized(sessionAddLock) {
-            val session = BitlapSession(
+            val session = this.sessionFactory.create(
                 username,
                 password,
                 sessionConf,

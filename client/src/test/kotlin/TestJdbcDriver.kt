@@ -1,5 +1,6 @@
 
 import junit.framework.TestCase
+import org.junit.Test
 import java.sql.DriverManager
 import java.sql.Statement
 
@@ -69,5 +70,19 @@ class TestJdbcDriver(name: String?) : TestCase(name) {
 
         val salary3 = resultSet.getDouble("SALARY")
         println(salary3)
+    }
+
+    @Test
+    fun test2() {
+        Class.forName(driverName)
+        val con = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", "root", "root")
+        val stmt: Statement = con.createStatement()
+
+        // 执行SQL
+        stmt.execute("show tables in test_db")
+        val rs = stmt.resultSet
+        while (rs.next()) {
+            println(rs.getString("table_name"))
+        }
     }
 }

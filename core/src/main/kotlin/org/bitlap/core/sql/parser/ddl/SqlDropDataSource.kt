@@ -1,6 +1,6 @@
-package org.bitlap.core.sql.parser
+package org.bitlap.core.sql.parser.ddl
 
-import org.apache.calcite.sql.SqlCreate
+import org.apache.calcite.sql.SqlDrop
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlNode
@@ -10,31 +10,28 @@ import org.apache.calcite.sql.parser.SqlParserPos
 
 /**
  * Desc:
- *   Parse tree for `CREATE (SCHEMA | DATABASE) IF NOT EXISTS schema_name` statement.
- *
- * see [org.apache.calcite.sql.ddl.SqlCreateSchema], you can also use [org.apache.calcite.sql.ddl.SqlDdlNodes]
+ *   Parse tree for `DROP (DATASOURCE | TABLE) IF EXISTS datasource_name` statement.
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
- * Date: 2021/8/23
+ * Date: 2021/8/25
  */
-class SqlCreateSchema(
+class SqlDropDataSource(
     val pos: SqlParserPos,
     val name: SqlIdentifier,
-    val ifNotExists: Boolean,
-    replace: Boolean = false,
-) : SqlCreate(OPERATOR, pos, replace, ifNotExists) {
+    val ifExists: Boolean,
+) : SqlDrop(OPERATOR, pos, ifExists) {
 
     companion object {
-        val OPERATOR = SqlSpecialOperator("CREATE SCHEMA", SqlKind.CREATE_SCHEMA)
+        val OPERATOR = SqlSpecialOperator("DROP TABLE", SqlKind.DROP_TABLE)
     }
 
     override fun getOperandList(): List<SqlNode> = listOf(name)
 
     override fun unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) {
-        writer.keyword("CREATE SCHEMA")
-        if (ifNotExists) {
-            writer.keyword("IF NOT EXISTS")
+        writer.keyword("DROP TABLE")
+        if (ifExists) {
+            writer.keyword("IF EXISTS")
         }
         name.unparse(writer, leftPrec, rightPrec)
     }

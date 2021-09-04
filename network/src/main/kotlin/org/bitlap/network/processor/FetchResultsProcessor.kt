@@ -1,11 +1,13 @@
 package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
-import com.alipay.sofa.jraft.rpc.RpcProcessor
-import org.bitlap.common.exception.BitlapException
+import com.alipay.sofa.jraft.rpc.RpcRequestClosure
+import com.google.protobuf.Message
 import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.OperationHandle
-import org.bitlap.network.proto.driver.BFetchResults
+import org.bitlap.network.proto.driver.BFetchResults.BFetchResultsReq
+import org.bitlap.network.proto.driver.BFetchResults.BFetchResultsResp
+import java.util.concurrent.Executor
 
 /**
  * FetchResults
@@ -14,22 +16,23 @@ import org.bitlap.network.proto.driver.BFetchResults
  * @since 2021/6/5
  * @version 1.0
  */
-class FetchResultsProcessor(private val networkService: NetworkService) :
-    RpcProcessor<BFetchResults.BFetchResultsReq>,
-    ProcessorHelper {
-    override fun handleRequest(rpcCtx: RpcContext, request: BFetchResults.BFetchResultsReq) {
+class FetchResultsProcessor(
+    private val networkService: NetworkService,
+    executor: Executor? = null,
+) : BitlapRpcProcessor<BFetchResultsReq>(executor, BFetchResultsResp.getDefaultInstance()) {
+
+    override fun processRequest(request: BFetchResultsReq, done: RpcRequestClosure): Message {
+        val sessionHandle = request.operationHandle.sessionHandle
         val operationHandle = request.operationHandle
-        val resp: BFetchResults.BFetchResultsResp = try {
-            val result = networkService.fetchResults(OperationHandle(operationHandle))
-            BFetchResults.BFetchResultsResp.newBuilder()
-                .setHasMoreRows(false)
-                .setStatus(success()).setResults(result.toBRowSet()).build()
-        } catch (e: BitlapException) {
-            e.printStackTrace()
-            BFetchResults.BFetchResultsResp.newBuilder().setStatus(error()).build()
-        }
-        rpcCtx.sendResponse(resp)
+        val result = networkService.fetchResults(OperationHandle(sessionHandle, operationHandle))
+        return BFetchResultsResp.newBuilder()
+            .setHasMoreRows(false)
+            .setStatus(success()).setResults(result.toBRowSet()).build()
     }
 
-    override fun interest(): String = BFetchResults.BFetchResultsReq::class.java.name
+    override fun processError(rpcCtx: RpcContext, exception: Exception): Message {
+        return BFetchResultsResp.newBuilder().setStatus(error(exception)).build()
+    }
+
+    override fun interest(): String = BFetchResultsReq::class.java.name
 }

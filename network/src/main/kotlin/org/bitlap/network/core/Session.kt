@@ -34,6 +34,7 @@ interface Session {
      * @return OperationHandle The Operate handle
      */
     fun executeStatement(
+        sessionHandle: SessionHandle,
         statement: String,
         confOverlay: Map<String, String>?
     ): OperationHandle
@@ -46,10 +47,15 @@ interface Session {
      * @return OperationHandle The Operate handle
      */
     fun executeStatement(
+        sessionHandle: SessionHandle,
         statement: String,
         confOverlay: Map<String, String>?,
         queryTimeout: Long
     ): OperationHandle
+
+    fun fetchResults(operationHandle: OperationHandle): RowSet
+    fun getResultSetMetadata(operationHandle: OperationHandle): TableSchema
+    // TODO: close OperationHandle
 
     /**
      * close Session

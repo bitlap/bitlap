@@ -91,6 +91,9 @@ private fun extractOptions(conf: BitlapConf): NodeOptions {
         logUri = dataPath.withPaths("raft", "log")
         raftMetaUri = dataPath.withPaths("raft", "meta")
         snapshotUri = dataPath.withPaths("raft", "snapshot")
+        FileUtils.forceMkdir(File(logUri))
+        FileUtils.forceMkdir(File(raftMetaUri))
+        FileUtils.forceMkdir(File(snapshotUri))
         electionTimeoutMs = 1000
         isDisableCli = false
         snapshotIntervalSecs = 30

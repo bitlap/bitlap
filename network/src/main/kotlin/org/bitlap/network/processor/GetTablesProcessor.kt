@@ -22,7 +22,7 @@ class GetTablesProcessor(private val networkService: NetworkService) :
             val result =
                 networkService.getTables(SessionHandle((request.sessionHandle)), request.tableName, request.schemaName)
             BGetTables.BGetTablesResp.newBuilder()
-                .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
+                .setStatus(success()).setOperationHandle(result.toBOperationHandle(request.sessionHandle)).build()
         } catch (e: BitlapException) {
             e.printStackTrace()
             BGetTables.BGetTablesResp.newBuilder().setStatus(error()).build()

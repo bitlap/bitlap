@@ -1,11 +1,13 @@
 package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
-import com.alipay.sofa.jraft.rpc.RpcProcessor
-import org.bitlap.common.exception.BitlapException
+import com.alipay.sofa.jraft.rpc.RpcRequestClosure
+import com.google.protobuf.Message
 import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.OperationHandle
-import org.bitlap.network.proto.driver.BGetResultSetMetadata
+import org.bitlap.network.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataReq
+import org.bitlap.network.proto.driver.BGetResultSetMetadata.BGetResultSetMetadataResp
+import java.util.concurrent.Executor
 
 /**
  * GetResultSetMetadata
@@ -14,21 +16,21 @@ import org.bitlap.network.proto.driver.BGetResultSetMetadata
  * @since 2021/6/5
  * @version 1.0
  */
-class GetResultSetMetaDataProcessor(private val networkService: NetworkService) :
-    RpcProcessor<BGetResultSetMetadata.BGetResultSetMetadataReq>,
-    ProcessorHelper {
-    override fun handleRequest(rpcCtx: RpcContext, request: BGetResultSetMetadata.BGetResultSetMetadataReq) {
+class GetResultSetMetaDataProcessor(
+    private val networkService: NetworkService,
+    executor: Executor? = null,
+) : BitlapRpcProcessor<BGetResultSetMetadataReq>(executor, BGetResultSetMetadataResp.getDefaultInstance()) {
+
+    override fun processRequest(request: BGetResultSetMetadataReq, done: RpcRequestClosure): Message {
+        val sessionHandle = request.operationHandle.sessionHandle
         val operationHandle = request.operationHandle
-        val resp: BGetResultSetMetadata.BGetResultSetMetadataResp = try {
-            val result = networkService.getResultSetMetadata(OperationHandle(operationHandle))
-            BGetResultSetMetadata.BGetResultSetMetadataResp.newBuilder()
-                .setStatus(success()).setSchema(result.toBTableSchema()).build()
-        } catch (e: BitlapException) {
-            e.printStackTrace()
-            BGetResultSetMetadata.BGetResultSetMetadataResp.newBuilder().setStatus(error()).build()
-        }
-        rpcCtx.sendResponse(resp)
+        val result = networkService.getResultSetMetadata(OperationHandle(sessionHandle, operationHandle))
+        return BGetResultSetMetadataResp.newBuilder().setStatus(success()).setSchema(result.toBTableSchema()).build()
     }
 
-    override fun interest(): String = BGetResultSetMetadata.BGetResultSetMetadataReq::class.java.name
+    override fun processError(rpcCtx: RpcContext, exception: Exception): Message {
+        return BGetResultSetMetadataResp.newBuilder().setStatus(error(exception)).build()
+    }
+
+    override fun interest(): String = BGetResultSetMetadataReq::class.java.name
 }

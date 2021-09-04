@@ -1,11 +1,13 @@
 package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
-import com.alipay.sofa.jraft.rpc.RpcProcessor
-import org.bitlap.common.exception.BitlapException
+import com.alipay.sofa.jraft.rpc.RpcRequestClosure
+import com.google.protobuf.Message
 import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.SessionHandle
-import org.bitlap.network.proto.driver.BExecuteStatement
+import org.bitlap.network.proto.driver.BExecuteStatement.BExecuteStatementReq
+import org.bitlap.network.proto.driver.BExecuteStatement.BExecuteStatementResp
+import java.util.concurrent.Executor
 
 /**
  * ExecuteStatement
@@ -14,23 +16,24 @@ import org.bitlap.network.proto.driver.BExecuteStatement
  * @since 2021/6/5
  * @version 1.0
  */
-class ExecuteStatementProcessor(private val networkService: NetworkService) :
-    RpcProcessor<BExecuteStatement.BExecuteStatementReq>, ProcessorHelper {
-    override fun handleRequest(rpcCtx: RpcContext, request: BExecuteStatement.BExecuteStatementReq) {
+class ExecuteStatementProcessor(
+    private val networkService: NetworkService,
+    executor: Executor? = null
+) : BitlapRpcProcessor<BExecuteStatementReq>(executor, BExecuteStatementResp.getDefaultInstance()) {
+
+    override fun processRequest(request: BExecuteStatementReq, done: RpcRequestClosure): Message {
         val sessionHandle = request.sessionHandle
         val statement = request.statement
         val confOverlayMap = request.confOverlayMap
-        val resp: BExecuteStatement.BExecuteStatementResp = try {
-            val operationHandle = networkService.executeStatement(SessionHandle(sessionHandle), statement, confOverlayMap)
-            BExecuteStatement.BExecuteStatementResp.newBuilder()
-                .setOperationHandle(operationHandle.toBOperationHandle())
-                .setStatus(success()).build()
-        } catch (e: BitlapException) {
-            e.printStackTrace()
-            BExecuteStatement.BExecuteStatementResp.newBuilder().setStatus(error()).build()
-        }
-        rpcCtx.sendResponse(resp)
+        val operationHandle = networkService.executeStatement(SessionHandle(sessionHandle), statement, confOverlayMap)
+        return BExecuteStatementResp.newBuilder()
+            .setOperationHandle(operationHandle.toBOperationHandle(sessionHandle))
+            .setStatus(success()).build()
     }
 
-    override fun interest(): String = BExecuteStatement.BExecuteStatementReq::class.java.name
+    override fun processError(rpcCtx: RpcContext, exception: Exception): Message {
+        return BExecuteStatementResp.newBuilder().setStatus(error(exception)).build()
+    }
+
+    override fun interest(): String = BExecuteStatementReq::class.java.name
 }

@@ -1,6 +1,16 @@
-package org.bitlap.network.core
+package org.bitlap.server.core
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.core.sql.QueryExecution
+import org.bitlap.core.sql.QueryResult
+import org.bitlap.network.core.HandleIdentifier
+import org.bitlap.network.core.OperationHandle
+import org.bitlap.network.core.OperationType
+import org.bitlap.network.core.RowSet
+import org.bitlap.network.core.Session
+import org.bitlap.network.core.SessionHandle
+import org.bitlap.network.core.SessionManager
+import org.bitlap.network.core.TableSchema
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -22,6 +32,8 @@ class BitlapSession() : Session {
     override lateinit var sessionManager: SessionManager // TODO add operationManager
     override val sessionState: AtomicBoolean = AtomicBoolean(false)
 
+    private val cache: MutableMap<HandleIdentifier, QueryResult> = mutableMapOf() // TODO optimize by operationManager
+
     constructor(
         username: String,
         password: String,
@@ -41,16 +53,30 @@ class BitlapSession() : Session {
         TODO("Not yet implemented")
     }
 
-    override fun executeStatement(statement: String, confOverlay: Map<String, String>?): OperationHandle {
-        return OperationHandle(OperationType.EXECUTE_STATEMENT, true)
+    override fun executeStatement(sessionHandle: SessionHandle, statement: String, confOverlay: Map<String, String>?): OperationHandle {
+        val op = OperationHandle(sessionHandle, HandleIdentifier(), OperationType.EXECUTE_STATEMENT, true)
+        cache[op.handleId] = QueryExecution(statement).execute()
+        return op
     }
 
     override fun executeStatement(
+        sessionHandle: SessionHandle,
         statement: String,
         confOverlay: Map<String, String>?,
         queryTimeout: Long
     ): OperationHandle {
-        return executeStatement(statement, confOverlay)
+        return executeStatement(sessionHandle, statement, confOverlay)
+    }
+
+    override fun fetchResults(operationHandle: OperationHandle): RowSet {
+        val rows = cache[operationHandle.handleId]?.rows ?: RowSet()
+        // TODO: remove cache
+        cache.remove(operationHandle.handleId)
+        return rows
+    }
+
+    override fun getResultSetMetadata(operationHandle: OperationHandle): TableSchema {
+        return cache[operationHandle.handleId]?.tableSchema ?: TableSchema()
     }
 
     override fun close() {

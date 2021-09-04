@@ -25,10 +25,13 @@ fun main1() {
 }
 
 fun main() {
+//    val sql = "run example 'asdasd'"
     // val sql = "select 1+2*3, id, name from test where id < 5 and name = 'mimosa'"
 //    val sql = "select name, count(1) cnt from test where id < 5 and name = 'mimosa' group by name"
     // val sql = "drop schema if exists a"
-//    val sql = "show datasources in a"
-    val sql = "select hello('hhhhqweqeqeqweq')"
-    val parser = QueryExecution(sql)
+    val sql = "show datasources in a"
+//    val sql = "select hello('hhhhqweqeqeqweq')"
+    val r = QueryExecution(sql).execute()
+
+    println(r)
 }

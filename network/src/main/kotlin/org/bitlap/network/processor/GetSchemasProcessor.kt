@@ -22,7 +22,7 @@ class GetSchemasProcessor(private val networkService: NetworkService) :
         val resp: BGetSchemas.BGetSchemasResp = try {
             val result = networkService.getSchemas(SessionHandle(sessionHandle))
             BGetSchemas.BGetSchemasResp.newBuilder()
-                .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
+                .setStatus(success()).setOperationHandle(result.toBOperationHandle(sessionHandle)).build()
         } catch (e: BitlapException) {
             e.printStackTrace()
             BGetSchemas.BGetSchemasResp.newBuilder().setStatus(error()).build()

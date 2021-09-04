@@ -25,5 +25,9 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-network</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

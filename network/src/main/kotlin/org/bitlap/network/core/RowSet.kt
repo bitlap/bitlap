@@ -11,7 +11,7 @@ import org.bitlap.network.proto.driver.BRowSet
  * @since 2021/8/27
  * @version 1.0
  */
-class RowSet(private val rows: List<Row> = listOf(), private val startOffset: Long = 0) {
+class RowSet(val rows: List<Row> = listOf(), val startOffset: Long = 0) {
 
     fun toBRowSet(): BRowSet {
         return BRowSet.newBuilder().setStartRowOffset(startOffset).addAllRows(rows.map { it.toBRow() }).build()

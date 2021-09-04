@@ -27,7 +27,7 @@ class GetColumnsProcessor(private val networkService: NetworkService) :
                     request.columnName
                 )
             BGetColumns.BGetColumnsResp.newBuilder()
-                .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
+                .setStatus(success()).setOperationHandle(result.toBOperationHandle(request.sessionHandle)).build()
         } catch (e: BitlapException) {
             e.printStackTrace()
             BGetColumns.BGetColumnsResp.newBuilder().setStatus(error()).build()

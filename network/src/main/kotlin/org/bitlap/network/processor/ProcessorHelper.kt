@@ -13,7 +13,15 @@ interface ProcessorHelper {
 
     fun success(): BStatus = BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS).build()
 
-    fun error(): BStatus = BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_ERROR_STATUS).build()
+    fun error(msg: String? = ""): BStatus = BStatus.newBuilder()
+        .setStatusCode(BStatusCode.B_STATUS_CODE_ERROR_STATUS)
+        .setErrorMessage(msg)
+        .build()
+
+    fun error(exception: Exception): BStatus = BStatus.newBuilder()
+        .setStatusCode(BStatusCode.B_STATUS_CODE_ERROR_STATUS)
+        .setErrorMessage(exception.message ?: "")
+        .build()
 
     fun executing(): BStatus =
         BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS).build()

@@ -3,6 +3,7 @@ package org.bitlap.network.core
 import cn.hutool.core.util.ServiceLoaderUtil
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
+import org.bitlap.network.core.operation.OperationManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -14,10 +15,11 @@ import java.util.concurrent.TimeUnit
  */
 class SessionManager {
 
-    private val log = logger { }
+    val operationManager by lazy { OperationManager() }
 
-    private val handleToSession = ConcurrentHashMap<SessionHandle, Session>()
-    private val sessionAddLock = Any()
+    private val log = logger { }
+    private val handleToSession by lazy { ConcurrentHashMap<SessionHandle, Session>() }
+    private val sessionAddLock by lazy { Any() }
     private val sessionThread = Thread { // register center
         while (true) {
             val iterator = handleToSession.iterator()
@@ -71,6 +73,9 @@ class SessionManager {
                 this
             )
             handleToSession[session.sessionHandle] = session
+
+            session.operationManager = operationManager
+
             log.info("Create session: ${session.sessionHandle}")
             return session
         }

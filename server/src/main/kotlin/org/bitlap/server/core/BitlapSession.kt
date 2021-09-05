@@ -1,17 +1,17 @@
 package org.bitlap.server.core
 
+import java.util.concurrent.atomic.AtomicBoolean
 import org.bitlap.common.BitlapConf
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.core.sql.QueryResult
 import org.bitlap.network.core.HandleIdentifier
-import org.bitlap.network.core.OperationHandle
-import org.bitlap.network.core.OperationType
 import org.bitlap.network.core.RowSet
 import org.bitlap.network.core.Session
 import org.bitlap.network.core.SessionHandle
 import org.bitlap.network.core.SessionManager
 import org.bitlap.network.core.TableSchema
-import java.util.concurrent.atomic.AtomicBoolean
+import org.bitlap.network.core.operation.OperationHandle
+import org.bitlap.network.core.operation.OperationManager
 
 /**
  * Bitlap Session
@@ -29,10 +29,14 @@ class BitlapSession() : Session {
     override lateinit var sessionHandle: SessionHandle
     override lateinit var sessionConf: BitlapConf
     override val creationTime: Long = System.currentTimeMillis()
-    override lateinit var sessionManager: SessionManager // TODO add operationManager
+    override lateinit var sessionManager: SessionManager
+    override lateinit var operationManager: OperationManager
+
     override val sessionState: AtomicBoolean = AtomicBoolean(false)
 
-    private val cache: MutableMap<HandleIdentifier, QueryResult> = mutableMapOf() // TODO optimize by operationManager
+    private val cache: MutableMap<OperationHandle, QueryResult> = mutableMapOf() // TODO optimize by operationManager
+
+    private val opHandleSet: MutableSet<OperationHandle> = mutableSetOf()
 
     constructor(
         username: String,
@@ -53,10 +57,15 @@ class BitlapSession() : Session {
         TODO("Not yet implemented")
     }
 
-    override fun executeStatement(sessionHandle: SessionHandle, statement: String, confOverlay: Map<String, String>?): OperationHandle {
-        val op = OperationHandle(sessionHandle, HandleIdentifier(), OperationType.EXECUTE_STATEMENT, true)
-        cache[op.handleId] = QueryExecution(statement).execute()
-        return op
+    override fun executeStatement(
+        sessionHandle: SessionHandle,
+        statement: String,
+        confOverlay: Map<String, String>?
+    ): OperationHandle {
+        val operation = operationManager.newExecuteStatementOperation(this, statement, confOverlay)
+        opHandleSet.add(operation.opHandle)
+        cache[operation.opHandle] = QueryExecution(statement).execute()
+        return operation.opHandle
     }
 
     override fun executeStatement(
@@ -69,14 +78,14 @@ class BitlapSession() : Session {
     }
 
     override fun fetchResults(operationHandle: OperationHandle): RowSet {
-        val rows = cache[operationHandle.handleId]?.rows ?: RowSet()
+        val rows = cache[operationHandle]?.rows ?: RowSet()
         // TODO: remove cache
-        cache.remove(operationHandle.handleId)
+        cache.remove(operationHandle)
         return rows
     }
 
     override fun getResultSetMetadata(operationHandle: OperationHandle): TableSchema {
-        return cache[operationHandle.handleId]?.tableSchema ?: TableSchema()
+        return cache[operationHandle]?.tableSchema ?: TableSchema()
     }
 
     override fun close() {

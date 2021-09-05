@@ -1,6 +1,8 @@
 package org.bitlap.network.core.operation
 
+import cn.hutool.core.util.ServiceLoaderUtil
 import org.bitlap.network.BSQLException
+import org.bitlap.network.core.OperationType
 import org.bitlap.network.core.Session
 
 /**
@@ -11,6 +13,7 @@ import org.bitlap.network.core.Session
  */
 class OperationManager {
 
+    private val operationFactory = ServiceLoaderUtil.loadFirst(OperationFactory::class.java)!!
     private val handleToOperation: MutableMap<OperationHandle, Operation> = mutableMapOf()
 
     fun newExecuteStatementOperation(
@@ -18,10 +21,12 @@ class OperationManager {
         statement: String,
         confOverlay: Map<String, String>?
     ): Operation {
-        val executeStatementOperation = Operation
-            .newExecuteStatementOperation(parentSession, statement, confOverlay)
-        addOperation(executeStatementOperation)
-        return executeStatementOperation
+        val operation = operationFactory.create(parentSession, OperationType.EXECUTE_STATEMENT, false)
+        operation.confOverlay = confOverlay
+        operation.statement = statement
+        operation.run()
+        addOperation(operation)
+        return operation
     }
 
     @Synchronized

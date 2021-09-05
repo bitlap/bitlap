@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit
 class SessionManager {
 
     val operationManager by lazy { OperationManager() }
+    private val sessionFactory = ServiceLoaderUtil.loadFirst(SessionFactory::class.java)!!
 
     private val log = logger { }
     private val handleToSession by lazy { ConcurrentHashMap<SessionHandle, Session>() }
@@ -48,7 +49,6 @@ class SessionManager {
             }
         }
     }
-    private val sessionFactory = ServiceLoaderUtil.loadFirst(SessionFactory::class.java)!!
 
     init {
         sessionThread.isDaemon = true

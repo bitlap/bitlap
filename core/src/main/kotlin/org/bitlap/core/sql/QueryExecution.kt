@@ -1,6 +1,7 @@
 package org.bitlap.core.sql
 
 import com.google.protobuf.ByteString
+import java.sql.Types
 import org.apache.calcite.adapter.java.AbstractQueryableTable
 import org.apache.calcite.avatica.util.Casing
 import org.apache.calcite.avatica.util.Quoting
@@ -28,12 +29,12 @@ import org.apache.calcite.sql.validate.SqlUserDefinedFunction
 import org.apache.calcite.tools.Frameworks
 import org.apache.calcite.tools.RelBuilder
 import org.apache.calcite.tools.RelRunners
+import org.bitlap.network.QueryResult
 import org.bitlap.network.core.ColumnDesc
 import org.bitlap.network.core.Row
 import org.bitlap.network.core.RowSet
 import org.bitlap.network.core.TableSchema
 import org.bitlap.network.core.TypeId
-import java.sql.Types
 
 /**
  * Desc:
@@ -141,5 +142,3 @@ class QueryExecution(
         return QueryResult(TableSchema(columns), RowSet(rows))
     }
 }
-
-data class QueryResult(val tableSchema: TableSchema, val rows: RowSet)

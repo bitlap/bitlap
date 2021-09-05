@@ -1,6 +1,5 @@
 package org.bitlap.server.core
 
-import java.util.concurrent.atomic.AtomicBoolean
 import org.bitlap.common.BitlapConf
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.core.sql.QueryResult
@@ -12,6 +11,7 @@ import org.bitlap.network.core.SessionManager
 import org.bitlap.network.core.TableSchema
 import org.bitlap.network.core.operation.OperationHandle
 import org.bitlap.network.core.operation.OperationManager
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Bitlap Session

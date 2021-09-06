@@ -21,7 +21,7 @@ class OperationManager {
         statement: String,
         confOverlay: Map<String, String>?
     ): Operation {
-        val operation = operationFactory.create(parentSession, OperationType.EXECUTE_STATEMENT, false)
+        val operation = operationFactory.create(parentSession, OperationType.EXECUTE_STATEMENT, true)
         operation.confOverlay = confOverlay
         operation.statement = statement
         operation.run()

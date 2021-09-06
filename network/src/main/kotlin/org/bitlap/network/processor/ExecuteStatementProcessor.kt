@@ -27,7 +27,7 @@ class ExecuteStatementProcessor(
         val confOverlayMap = request.confOverlayMap
         val operationHandle = networkService.executeStatement(SessionHandle(sessionHandle), statement, confOverlayMap)
         return BExecuteStatementResp.newBuilder()
-            .setOperationHandle(operationHandle.toBOperationHandle(sessionHandle))
+            .setOperationHandle(operationHandle.toBOperationHandle())
             .setStatus(success()).build()
     }
 

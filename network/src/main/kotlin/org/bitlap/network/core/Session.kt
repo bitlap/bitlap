@@ -1,6 +1,8 @@
 package org.bitlap.network.core
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.network.core.operation.OperationHandle
+import org.bitlap.network.core.operation.OperationManager
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -12,13 +14,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 interface Session {
 
     val sessionState: AtomicBoolean
-    var lastAccessTime: Long
     val sessionHandle: SessionHandle
     val password: String
     val username: String
     val creationTime: Long
     val sessionConf: BitlapConf
     val sessionManager: SessionManager
+
+    var lastAccessTime: Long
+    var operationManager: OperationManager
 
     /**
      * open Session

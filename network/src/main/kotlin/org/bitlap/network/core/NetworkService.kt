@@ -1,5 +1,7 @@
 package org.bitlap.network.core
 
+import org.bitlap.network.core.operation.OperationHandle
+
 /**
  * Interface definition of driver RPC.
  * @author 梦境迷离

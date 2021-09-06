@@ -1,5 +1,7 @@
 package org.bitlap.network.core
 
+import org.bitlap.network.core.operation.OperationHandle
+
 /**
  * Implementation of driver RPC core.
  * @author 梦境迷离
@@ -43,9 +45,9 @@ open class NetworkServiceImpl(private val sessionManager: SessionManager) : Netw
     }
 
     override fun fetchResults(opHandle: OperationHandle): RowSet {
-        val sessionHandle = opHandle.sessionHandle
-        val session = sessionManager.getSession(sessionHandle)
-        sessionManager.refreshSession(sessionHandle, session)
+        val operation = sessionManager.operationManager.getOperation(opHandle)
+        val session = operation.parentSession
+        sessionManager.refreshSession(session.sessionHandle, session)
 
         return session.fetchResults(opHandle)
 //        return RowSet(
@@ -78,9 +80,9 @@ open class NetworkServiceImpl(private val sessionManager: SessionManager) : Netw
     }
 
     override fun getResultSetMetadata(opHandle: OperationHandle): TableSchema {
-        val sessionHandle = opHandle.sessionHandle
-        val session = sessionManager.getSession(sessionHandle)
-        sessionManager.refreshSession(sessionHandle, session)
+        val operation = sessionManager.operationManager.getOperation(opHandle)
+        val session = operation.parentSession
+        sessionManager.refreshSession(session.sessionHandle, session)
         return session.getResultSetMetadata(opHandle)
 //        return TableSchema(
 //            listOf(
@@ -102,14 +104,14 @@ open class NetworkServiceImpl(private val sessionManager: SessionManager) : Netw
         schemaName: String?,
         columnName: String?
     ): OperationHandle {
-        return OperationHandle(sessionHandle, HandleIdentifier(), OperationType.GET_COLUMNS)
+        return OperationHandle(OperationType.GET_COLUMNS)
     }
 
     override fun getTables(sessionHandle: SessionHandle, tableName: String?, schemaName: String?): OperationHandle {
-        return OperationHandle(sessionHandle, HandleIdentifier(), OperationType.GET_TABLES)
+        return OperationHandle(OperationType.GET_TABLES)
     }
 
     override fun getSchemas(sessionHandle: SessionHandle): OperationHandle {
-        return OperationHandle(sessionHandle, HandleIdentifier(), OperationType.GET_SCHEMAS)
+        return OperationHandle(OperationType.GET_SCHEMAS)
     }
 }

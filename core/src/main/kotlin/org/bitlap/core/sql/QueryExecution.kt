@@ -1,7 +1,6 @@
 package org.bitlap.core.sql
 
 import com.google.protobuf.ByteString
-import java.sql.Types
 import org.apache.calcite.adapter.java.AbstractQueryableTable
 import org.apache.calcite.avatica.util.Casing
 import org.apache.calcite.avatica.util.Quoting
@@ -35,6 +34,7 @@ import org.bitlap.network.core.Row
 import org.bitlap.network.core.RowSet
 import org.bitlap.network.core.TableSchema
 import org.bitlap.network.core.TypeId
+import java.sql.Types
 
 /**
  * Desc:

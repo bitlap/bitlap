@@ -1,6 +1,7 @@
 package org.bitlap.network.core.operation
 
 import org.bitlap.network.core.Handle
+import org.bitlap.network.core.HandleIdentifier
 import org.bitlap.network.core.OperationType
 import org.bitlap.network.proto.driver.BOperationHandle
 
@@ -13,12 +14,14 @@ import org.bitlap.network.proto.driver.BOperationHandle
  */
 open class OperationHandle(
     private val opType: OperationType,
-    private val hasResultSet: Boolean = false
-) : Handle() {
+    private val hasResultSet: Boolean = false,
+    override val handleId: HandleIdentifier = HandleIdentifier(),
+) : Handle(handleId) {
 
     constructor(bOperationHandle: BOperationHandle) : this(
         OperationType.getOperationType(bOperationHandle.operationType),
-        bOperationHandle.hasResultSet
+        bOperationHandle.hasResultSet,
+        HandleIdentifier(bOperationHandle.operationId),
     )
 
     fun toBOperationHandle(): BOperationHandle {

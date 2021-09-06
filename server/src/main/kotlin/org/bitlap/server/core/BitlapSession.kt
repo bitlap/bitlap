@@ -1,6 +1,5 @@
 package org.bitlap.server.core
 
-import java.util.concurrent.atomic.AtomicBoolean
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.core.HandleIdentifier
 import org.bitlap.network.core.RowSet
@@ -10,6 +9,7 @@ import org.bitlap.network.core.SessionManager
 import org.bitlap.network.core.TableSchema
 import org.bitlap.network.core.operation.OperationHandle
 import org.bitlap.network.core.operation.OperationManager
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Bitlap Session
@@ -72,7 +72,10 @@ class BitlapSession() : Session {
     }
 
     override fun fetchResults(operationHandle: OperationHandle): RowSet {
-        return operationManager.getOperation(operationHandle).getNextResultSet()
+        val op = operationManager.getOperation(operationHandle)
+        val rows = op.getNextResultSet()
+        op.remove(operationHandle) // TODO: work with fetch offset & size
+        return rows
     }
 
     override fun getResultSetMetadata(operationHandle: OperationHandle): TableSchema {

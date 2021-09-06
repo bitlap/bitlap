@@ -1,11 +1,13 @@
 package org.bitlap.network.processor
 
 import com.alipay.sofa.jraft.rpc.RpcContext
-import com.alipay.sofa.jraft.rpc.RpcProcessor
-import org.bitlap.common.exception.BitlapException
+import com.alipay.sofa.jraft.rpc.RpcRequestClosure
+import com.google.protobuf.Message
 import org.bitlap.network.core.NetworkService
 import org.bitlap.network.core.SessionHandle
-import org.bitlap.network.proto.driver.BGetSchemas
+import org.bitlap.network.proto.driver.BGetSchemas.BGetSchemasReq
+import org.bitlap.network.proto.driver.BGetSchemas.BGetSchemasResp
+import java.util.concurrent.Executor
 
 /**
  * GetSchemas
@@ -14,21 +16,21 @@ import org.bitlap.network.proto.driver.BGetSchemas
  * @since 2021/6/5
  * @version 1.0
  */
-class GetSchemasProcessor(private val networkService: NetworkService) :
-    RpcProcessor<BGetSchemas.BGetSchemasReq>,
-    ProcessorHelper {
-    override fun handleRequest(rpcCtx: RpcContext, request: BGetSchemas.BGetSchemasReq) {
+class GetSchemasProcessor(
+    private val networkService: NetworkService,
+    executor: Executor? = null
+) : BitlapRpcProcessor<BGetSchemasReq>(executor, BGetSchemasResp.getDefaultInstance()) {
+
+    override fun processRequest(request: BGetSchemasReq, done: RpcRequestClosure): Message {
         val sessionHandle = request.sessionHandle
-        val resp: BGetSchemas.BGetSchemasResp = try {
-            val result = networkService.getSchemas(SessionHandle(sessionHandle))
-            BGetSchemas.BGetSchemasResp.newBuilder()
-                .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
-        } catch (e: BitlapException) {
-            e.printStackTrace()
-            BGetSchemas.BGetSchemasResp.newBuilder().setStatus(error()).build()
-        }
-        rpcCtx.sendResponse(resp)
+        val result = networkService.getSchemas(SessionHandle(sessionHandle))
+        return BGetSchemasResp.newBuilder()
+            .setStatus(success()).setOperationHandle(result.toBOperationHandle()).build()
     }
 
-    override fun interest(): String = BGetSchemas.BGetSchemasReq::class.java.name
+    override fun processError(rpcCtx: RpcContext, exception: Exception): Message {
+        return BGetSchemasResp.newBuilder().setStatus(error(exception)).build()
+    }
+
+    override fun interest(): String = BGetSchemasReq::class.java.name
 }

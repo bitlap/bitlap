@@ -3,7 +3,8 @@ package org.bitlap.network.core
 import org.bitlap.network.core.operation.OperationHandle
 
 /**
- * Implementation of driver RPC core.
+ * JDBC server implementation.
+ *
  * @author 梦境迷离
  * @since 2021/6/6
  * @version 1.0

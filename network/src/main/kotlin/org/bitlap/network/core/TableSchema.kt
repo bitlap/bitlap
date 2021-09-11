@@ -5,7 +5,8 @@ import org.bitlap.network.proto.driver.BTableSchema
 import org.bitlap.network.proto.driver.BTypeId
 
 /**
- * Wrapper for protoc buffer
+ * The wrapper class of the Proto buffer `BTableSchema`.
+ *
  * @author 梦境迷离
  * @since 2021/8/28
  * @version 1.0
@@ -16,6 +17,9 @@ class TableSchema(private val columns: List<ColumnDesc> = listOf()) {
     }
 }
 
+/**
+ * The wrapper class of the Proto buffer `BColumnDesc`.
+ */
 class ColumnDesc(
     private val columnName: String,
     private val typeDesc: TypeId
@@ -25,6 +29,9 @@ class ColumnDesc(
     }
 }
 
+/**
+ * The wrapper class of the Proto buffer `BTypeId`.
+ */
 enum class TypeId(val bTypeId: BTypeId) {
     B_TYPE_ID_UNSPECIFIED(BTypeId.B_TYPE_ID_UNSPECIFIED),
     B_TYPE_ID_STRING_TYPE(BTypeId.B_TYPE_ID_STRING_TYPE),

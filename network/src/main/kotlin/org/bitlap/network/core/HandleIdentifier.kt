@@ -3,10 +3,10 @@ package org.bitlap.network.core
 import com.google.protobuf.ByteString
 import org.bitlap.network.proto.driver.BHandleIdentifier
 import java.nio.ByteBuffer
-import java.util.UUID
+import java.util.*
 
 /**
- * Abstract descriptor
+ * Unique ID implementation for session id and operation id.
  *
  * @author 梦境迷离
  * @since 2021/6/6

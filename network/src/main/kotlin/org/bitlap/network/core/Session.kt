@@ -6,6 +6,7 @@ import org.bitlap.network.core.operation.OperationManager
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
+ * Bitlap Session interface.
  *
  * @author 梦境迷离
  * @since 2021/6/6

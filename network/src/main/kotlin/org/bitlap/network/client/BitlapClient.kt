@@ -7,24 +7,12 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.bitlap.network.NetworkHelper
-import org.bitlap.network.proto.driver.BCloseSession
-import org.bitlap.network.proto.driver.BExecuteStatement
-import org.bitlap.network.proto.driver.BFetchResults
-import org.bitlap.network.proto.driver.BGetColumns
-import org.bitlap.network.proto.driver.BGetResultSetMetadata
-import org.bitlap.network.proto.driver.BGetSchemas
-import org.bitlap.network.proto.driver.BGetTables
-import org.bitlap.network.proto.driver.BOpenSession
-import org.bitlap.network.proto.driver.BOperationHandle
-import org.bitlap.network.proto.driver.BSessionHandle
-import org.bitlap.network.proto.driver.BStatus
-import org.bitlap.network.proto.driver.BStatusCode
-import org.bitlap.network.proto.driver.BTableSchema
+import org.bitlap.network.proto.driver.*
 import java.sql.SQLException
-import java.util.Properties
+import java.util.*
 
 /**
- * Wrap the rpc invoked
+ * This class mainly wraps the RPC call procedure used inside JDBC.
  *
  * @author 梦境迷离
  * @since 2021/8/22
@@ -35,6 +23,9 @@ object BitlapClient : NetworkHelper {
     private const val groupId: String = "bitlap-cluster"
     private const val timeout = 5000L
 
+    /**
+     * Used to open a session during JDBC connection initialization》
+     */
     fun CliClientServiceImpl.openSession(
         conf: Configuration,
         info: Properties
@@ -52,6 +43,9 @@ object BitlapClient : NetworkHelper {
         return result.sessionHandle
     }
 
+    /**
+     * Used to close the session when the JDBC connection is closed.
+     */
     fun CliClientServiceImpl.closeSession(
         sessionHandle: BSessionHandle
     ) {
@@ -66,6 +60,9 @@ object BitlapClient : NetworkHelper {
         )
     }
 
+    /**
+     * Used to execute normal SQL by JDBC. Does not contain `?` placeholders.
+     */
     fun CliClientServiceImpl.executeStatement(
         sessionHandle: BSessionHandle,
         statement: String,
@@ -82,6 +79,9 @@ object BitlapClient : NetworkHelper {
         return result.operationHandle
     }
 
+    /**
+     *  Used for JDBC to get result set of the specified operation.
+     */
     fun CliClientServiceImpl.fetchResults(
         operationHandle: BOperationHandle
     ): BFetchResults.BFetchResultsResp {
@@ -149,6 +149,9 @@ object BitlapClient : NetworkHelper {
         return result.operationHandle
     }
 
+    /**
+     * Used for JDBC to get Schema of the specified operation.
+     */
     fun CliClientServiceImpl.getResultSetMetadata(
         operationHandle: BOperationHandle,
     ): BTableSchema {
@@ -163,6 +166,9 @@ object BitlapClient : NetworkHelper {
         return result.schema
     }
 
+    /**
+     * Used to initialize available nodes>
+     */
     private fun CliClientServiceImpl.init(conf: Configuration) {
         RouteTable.getInstance().updateConfiguration(groupId, conf)
         this.init(CliOptions())
@@ -178,6 +184,9 @@ object BitlapClient : NetworkHelper {
         }
     }
 
+    /**
+     * Used to verify whether the RPC result is correct.
+     */
     private fun verifySuccess(status: BStatus) {
         if (status.statusCode !== BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
             throw SQLException(

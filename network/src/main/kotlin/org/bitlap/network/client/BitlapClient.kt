@@ -7,9 +7,21 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.bitlap.network.NetworkHelper
-import org.bitlap.network.proto.driver.*
+import org.bitlap.network.proto.driver.BCloseSession
+import org.bitlap.network.proto.driver.BExecuteStatement
+import org.bitlap.network.proto.driver.BFetchResults
+import org.bitlap.network.proto.driver.BGetColumns
+import org.bitlap.network.proto.driver.BGetResultSetMetadata
+import org.bitlap.network.proto.driver.BGetSchemas
+import org.bitlap.network.proto.driver.BGetTables
+import org.bitlap.network.proto.driver.BOpenSession
+import org.bitlap.network.proto.driver.BOperationHandle
+import org.bitlap.network.proto.driver.BSessionHandle
+import org.bitlap.network.proto.driver.BStatus
+import org.bitlap.network.proto.driver.BStatusCode
+import org.bitlap.network.proto.driver.BTableSchema
 import java.sql.SQLException
-import java.util.*
+import java.util.Properties
 
 /**
  * This class mainly wraps the RPC call procedure used inside JDBC.

@@ -22,7 +22,7 @@ import org.bitlap.network.proto.driver.BStatus
 import org.bitlap.network.proto.driver.BStatusCode
 import org.bitlap.network.proto.driver.BTableSchema
 import java.sql.SQLException
-import java.util.*
+import java.util.Properties
 
 /**
  * This class mainly wraps the RPC call procedure used inside JDBC.

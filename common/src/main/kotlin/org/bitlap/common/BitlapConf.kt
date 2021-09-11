@@ -103,5 +103,22 @@ open class BitlapConf() : Serializable {
             .validator(Validators.NOT_BLANK)
         val NODE_BIND_PEERS = BitlapConfKey<String>("node.bind.peers")
             .validator(Validators.NOT_BLANK)
+        /**
+         * Sofa RPC cluster name.
+         */
+        val NODE_GROUP_ID = BitlapConfKey<String>("node.group.id")
+            .validator(Validators.NOT_BLANK)
+
+        /**
+         * Sofa RPC timeout, Unit: Second.
+         */
+        val NODE_RPC_TIMEOUT = BitlapConfKey<String>("node.rpc.timeout")
+            .validator(Validators.NOT_BLANK)
+
+        /**
+         * Sofa RAFT timeout, Unit: Second.
+         */
+        val NODE_RAFT_TIMEOUT = BitlapConfKey<String>("node.raft.timeout")
+            .validator(Validators.NOT_BLANK)
     }
 }

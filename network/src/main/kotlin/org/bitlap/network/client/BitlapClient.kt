@@ -6,6 +6,7 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
+import org.bitlap.common.BitlapConf
 import org.bitlap.network.NetworkHelper
 import org.bitlap.network.proto.driver.BCloseSession
 import org.bitlap.network.proto.driver.BExecuteStatement
@@ -21,7 +22,7 @@ import org.bitlap.network.proto.driver.BStatus
 import org.bitlap.network.proto.driver.BStatusCode
 import org.bitlap.network.proto.driver.BTableSchema
 import java.sql.SQLException
-import java.util.Properties
+import java.util.*
 
 /**
  * This class mainly wraps the RPC call procedure used inside JDBC.
@@ -32,11 +33,13 @@ import java.util.Properties
  */
 object BitlapClient : NetworkHelper {
 
-    private const val groupId: String = "bitlap-cluster"
-    private const val timeout = 5000L
+    private val defaultConf by lazy { BitlapConf() }
+    private val groupId: String = defaultConf.get(BitlapConf.NODE_GROUP_ID).let { if (it.isNullOrEmpty()) "bitlap-cluster" else it }
+    private val timeout: Long = defaultConf.get(BitlapConf.NODE_RPC_TIMEOUT).let { if (it.isNullOrEmpty()) 5L else it.toLong() } * 1000
+    private val raftTimeout: Int = defaultConf.get(BitlapConf.NODE_RAFT_TIMEOUT).let { if (it.isNullOrEmpty()) 1 else it.toInt() } * 1000
 
     /**
-     * Used to open a session during JDBC connection initialization》
+     * Used to open a session during JDBC connection initialization.
      */
     fun CliClientServiceImpl.openSession(
         conf: Configuration,
@@ -179,12 +182,12 @@ object BitlapClient : NetworkHelper {
     }
 
     /**
-     * Used to initialize available nodes>
+     * Used to initialize available nodes.
      */
     private fun CliClientServiceImpl.init(conf: Configuration) {
         RouteTable.getInstance().updateConfiguration(groupId, conf)
         this.init(CliOptions())
-        check(RouteTable.getInstance().refreshLeader(this, groupId, 1000).isOk) { "Refresh leader failed" }
+        check(RouteTable.getInstance().refreshLeader(this, groupId, raftTimeout).isOk) { "Refresh leader failed" }
     }
 
     fun beforeInit() {

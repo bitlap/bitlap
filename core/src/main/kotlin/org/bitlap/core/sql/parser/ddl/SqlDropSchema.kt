@@ -1,12 +1,14 @@
 package org.bitlap.core.sql.parser.ddl
 
-import org.apache.calcite.sql.SqlDrop
+import org.apache.calcite.DataContext
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlKind
-import org.apache.calcite.sql.SqlNode
+import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.SqlWriter
 import org.apache.calcite.sql.parser.SqlParserPos
+import org.apache.calcite.sql.type.SqlTypeName
+import org.bitlap.core.sql.parser.BitlapSqlDdlDropNode
 
 /**
  * Desc:
@@ -20,16 +22,18 @@ import org.apache.calcite.sql.parser.SqlParserPos
  * Date: 2021/8/25
  */
 class SqlDropSchema(
-    val pos: SqlParserPos,
+    override val pos: SqlParserPos,
     val name: SqlIdentifier,
-    val ifExists: Boolean,
-) : SqlDrop(OPERATOR, pos, ifExists) {
+    override val ifExists: Boolean,
+) : BitlapSqlDdlDropNode(
+    pos, SqlCreateSchema.OPERATOR,
+    listOf(SqlLiteral.createBoolean(ifExists, pos), name),
+    ifExists
+) {
 
     companion object {
         val OPERATOR = SqlSpecialOperator("DROP SCHEMA", SqlKind.DROP_SCHEMA)
     }
-
-    override fun getOperandList(): List<SqlNode> = listOf(name)
 
     override fun unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) {
         writer.keyword("DROP SCHEMA")
@@ -37,5 +41,16 @@ class SqlDropSchema(
             writer.keyword("IF EXISTS")
         }
         name.unparse(writer, leftPrec, rightPrec)
+    }
+
+    override val resultTypes: List<Pair<String, SqlTypeName>>
+        get() = listOf(
+            "result" to SqlTypeName.BOOLEAN
+        )
+
+    override fun operator(context: DataContext): List<Array<Any?>> {
+        return listOf(
+            arrayOf(catalog.dropSchema(name.simple, ifExists))
+        )
     }
 }

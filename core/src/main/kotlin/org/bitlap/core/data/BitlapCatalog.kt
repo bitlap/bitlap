@@ -17,10 +17,11 @@ import org.bitlap.core.storage.store.DataSourceStore
  * Created by IceMimosa
  * Date: 2021/8/18
  */
-object BitlapCatalog : LifeCycleWrapper() {
+open class BitlapCatalog(val conf: BitlapConf, val hadoopConf: Configuration) : LifeCycleWrapper() {
 
-    lateinit var conf: BitlapConf
-    lateinit var hadoopConf: Configuration
+    companion object {
+        const val DEFAULT_SCHEMA = "_default"
+    }
 
     private val fs: FileSystem by lazy {
         rootPath.getFileSystem(hadoopConf).also {
@@ -35,8 +36,6 @@ object BitlapCatalog : LifeCycleWrapper() {
         Path(rootPath, "data")
     }
 
-    const val DEFAULT = "_default"
-
     override fun start() {
         super.start()
         if (!fs.exists(dataPath)) {
@@ -44,20 +43,21 @@ object BitlapCatalog : LifeCycleWrapper() {
         }
     }
 
-    fun createSchema(name: String, ifNotExists: Boolean = false) {
-        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim()
+    fun createSchema(name: String, ifNotExists: Boolean = false): Boolean {
+        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim().lowercase()
         val p = Path(dataPath, cleanName)
         val exists = fs.exists(p)
         if (exists && ifNotExists) {
-            return
+            return false
         } else if (exists) {
             throw BitlapException("Unable to create schema $cleanName, it already exists.")
         }
         fs.mkdirs(p)
+        return true
     }
 
-    fun dropSchema(name: String, cascade: Boolean = false) {
-        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim()
+    fun dropSchema(name: String, cascade: Boolean = false): Boolean {
+        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim().lowercase()
         val p = Path(dataPath, cleanName)
         if (fs.exists(p)) {
             val files = fs.listStatus(p)
@@ -65,12 +65,14 @@ object BitlapCatalog : LifeCycleWrapper() {
                 throw BitlapException("Unable to drop schema $cleanName, it's not empty, retry with cascade.")
             }
             fs.delete(p, cascade)
+            return true
         }
+        return false
     }
 
     fun renameSchema(from: String, to: String) {
-        val cleanFrom = PreConditions.checkNotBlank(from, "Schema").trim()
-        val cleanTo = PreConditions.checkNotBlank(to, "Schema").trim()
+        val cleanFrom = PreConditions.checkNotBlank(from, "Schema").trim().lowercase()
+        val cleanTo = PreConditions.checkNotBlank(to, "Schema").trim().lowercase()
         val f = Path(dataPath, cleanFrom)
         val t = Path(dataPath, cleanTo)
         if (fs.exists(t)) {
@@ -82,7 +84,7 @@ object BitlapCatalog : LifeCycleWrapper() {
     }
 
     fun getSchema(name: String): String {
-        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim()
+        val cleanName = PreConditions.checkNotBlank(name, "Schema").trim().lowercase()
         val p = Path(dataPath, cleanName)
         if (!fs.exists(p)) {
             throw BitlapException("Unable to get schema $cleanName, it does not exist.")
@@ -103,9 +105,9 @@ object BitlapCatalog : LifeCycleWrapper() {
      * if [ifNotExists] is false, exception will be thrown when [DataSource] is exists
      * otherwise ignored.
      */
-    fun createDataSource(name: String, schema: String = DEFAULT, ifNotExists: Boolean = false) {
-        val cleanSchema = PreConditions.checkNotBlank(schema, "Schema").trim()
-        val cleanName = PreConditions.checkNotBlank(name, "DataSource").trim()
+    fun createDataSource(name: String, schema: String = DEFAULT_SCHEMA, ifNotExists: Boolean = false) {
+        val cleanSchema = PreConditions.checkNotBlank(schema, "Schema").trim().lowercase()
+        val cleanName = PreConditions.checkNotBlank(name, "DataSource").trim().lowercase()
         val store = DataSourceStore(cleanName, cleanSchema, hadoopConf, conf)
         val ds = DataSource(cleanSchema, cleanName)
         val exists = store.exists()
@@ -121,9 +123,9 @@ object BitlapCatalog : LifeCycleWrapper() {
     /**
      * get [DataSource] with [name]
      */
-    fun getDataSource(name: String, schema: String = DEFAULT): DataSource {
-        val cleanSchema = PreConditions.checkNotBlank(schema, "Schema").trim()
-        val cleanName = PreConditions.checkNotBlank(name, "DataSource").trim()
+    fun getDataSource(name: String, schema: String = DEFAULT_SCHEMA): DataSource {
+        val cleanSchema = PreConditions.checkNotBlank(schema, "Schema").trim().lowercase()
+        val cleanName = PreConditions.checkNotBlank(name, "DataSource").trim().lowercase()
         val store = DataSourceStore(cleanName, cleanSchema, hadoopConf, conf)
         if (!store.exists()) {
             throw BitlapException("DataSource [$cleanSchema.$cleanName] is not exists.")
@@ -131,8 +133,10 @@ object BitlapCatalog : LifeCycleWrapper() {
         return store.get()
     }
 
-    fun getDataSourceStore(name: String, schema: String = DEFAULT): DataSourceStore {
-        val store = DataSourceStore(name, schema, hadoopConf, conf)
+    fun getDataSourceStore(name: String, schema: String = DEFAULT_SCHEMA): DataSourceStore {
+        val cleanSchema = PreConditions.checkNotBlank(schema, "Schema").trim().lowercase()
+        val cleanName = PreConditions.checkNotBlank(name, "DataSource").trim().lowercase()
+        val store = DataSourceStore(cleanName, cleanSchema, hadoopConf, conf)
         if (!store.exists()) {
             throw BitlapException("DataSource [$name] is not exists.")
         }

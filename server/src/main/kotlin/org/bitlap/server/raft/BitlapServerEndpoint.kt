@@ -43,7 +43,6 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper
             return
         }
         super.start()
-        val groupId = "bitlap-cluster"
         val serverIdStr = conf.get(BitlapConf.NODE_BIND_HOST)
         val nodeOptions = extractOptions(conf)
         val serverId = PeerId().apply {
@@ -57,7 +56,7 @@ open class BitlapServerEndpoint(private val conf: BitlapConf) : LifeCycleWrapper
         }
         val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.endpoint)
         registerProcessor(rpcServer)
-        val raftGroupService = RaftGroupService(groupId, serverId, nodeOptions, rpcServer)
+        val raftGroupService = RaftGroupService(conf.get(BitlapConf.NODE_GROUP_ID), serverId, nodeOptions, rpcServer)
         this.node = raftGroupService.start()
         println("Started counter server at port:" + node.nodeId.peerId.port)
     }
@@ -86,6 +85,7 @@ private fun registerProcessor(rpcServer: RpcServer) {
 private fun extractOptions(conf: BitlapConf): NodeOptions {
     val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)!!
     val initConfStr = conf.get(BitlapConf.NODE_BIND_PEERS)
+    val raftTimeout: Int = conf.get(BitlapConf.NODE_RAFT_TIMEOUT).let { if (it.isNullOrEmpty()) 1 else it.toInt() } * 1000
     FileUtils.forceMkdir(File(dataPath))
     return NodeOptions().apply {
         logUri = dataPath.withPaths("raft", "log")
@@ -94,7 +94,7 @@ private fun extractOptions(conf: BitlapConf): NodeOptions {
         FileUtils.forceMkdir(File(logUri))
         FileUtils.forceMkdir(File(raftMetaUri))
         FileUtils.forceMkdir(File(snapshotUri))
-        electionTimeoutMs = 1000
+        electionTimeoutMs = raftTimeout
         isDisableCli = false
         snapshotIntervalSecs = 30
         fsm = MetaStateMachine()

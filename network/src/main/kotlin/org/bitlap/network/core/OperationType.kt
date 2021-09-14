@@ -3,7 +3,7 @@ package org.bitlap.network.core
 import org.bitlap.network.proto.driver.BOperationType
 
 /**
- * Operation Type
+ * The wrapper class of the Proto buffer `BOperationType`.
  *
  * @author 梦境迷离
  * @since 2021/6/6

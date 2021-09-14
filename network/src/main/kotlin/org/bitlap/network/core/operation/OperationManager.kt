@@ -6,6 +6,7 @@ import org.bitlap.network.core.OperationType
 import org.bitlap.network.core.Session
 
 /**
+ * Lifecycle management of operations.
  *
  * @author 梦境迷离
  * @since 2021/9/5
@@ -16,6 +17,9 @@ class OperationManager {
     private val operationFactory = ServiceLoaderUtil.loadFirst(OperationFactory::class.java)!!
     private val handleToOperation: MutableMap<OperationHandle, Operation> = mutableMapOf()
 
+    /**
+     * Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
+     */
     fun newExecuteStatementOperation(
         parentSession: Session,
         statement: String,

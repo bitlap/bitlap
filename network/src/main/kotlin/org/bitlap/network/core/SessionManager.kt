@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
+ * Lifecycle management of sessions.
  *
  * @author 梦境迷离
  * @since 2021/6/6

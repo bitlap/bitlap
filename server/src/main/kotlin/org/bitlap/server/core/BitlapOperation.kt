@@ -15,6 +15,7 @@ import java.sql.ResultSet
 import java.sql.Types
 
 /**
+ * Specific implementation of bitlap SQL operation.
  *
  * @author 梦境迷离
  * @since 2021/9/5
@@ -23,6 +24,10 @@ import java.sql.Types
 class BitlapOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false) :
     Operation(parentSession, opType, hasResultSet) {
 
+    /**
+     * We pass the SQL to the parser and executor, and store the results in memory.
+     * This is a temporary way.
+     */
     override fun run() {
         cache[super.opHandle] = wrapper(QueryExecution(super.statement).execute())
     }

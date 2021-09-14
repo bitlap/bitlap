@@ -16,7 +16,7 @@ import org.bitlap.server.raft.BitlapServerEndpoint
  */
 class BitlapServer {
 
-    private val conf = BitlapConf()
+    val conf = BitlapConf()
     private val server = BitlapServerEndpoint(conf)
 
     fun start() {
@@ -30,15 +30,17 @@ class BitlapServer {
 }
 
 fun main() {
-    BitlapServer().start()
+    val server = BitlapServer()
+    server.start()
+    val groupId = server.conf.get(BitlapConf.NODE_GROUP_ID)
+    val raftTimeout: Int = server.conf.get(BitlapConf.NODE_RAFT_TIMEOUT).let { if (it.isNullOrEmpty()) 1 else it.toInt() } * 1000
 
-    val groupId = "bitlap-cluster"
     val conf = Configuration()
     conf.parse("localhost:8001")
     RouteTable.getInstance().updateConfiguration(groupId, conf)
     val cli = CliClientServiceImpl()
     cli.init(CliOptions())
-    check(RouteTable.getInstance().refreshLeader(cli, groupId, 1000).isOk) { "Refresh leader failed" }
+    check(RouteTable.getInstance().refreshLeader(cli, groupId, raftTimeout).isOk) { "Refresh leader failed" }
     val leader = RouteTable.getInstance().selectLeader(groupId)
     println("Leader is $leader")
 }

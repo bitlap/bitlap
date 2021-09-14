@@ -5,7 +5,7 @@ import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BRowSet
 
 /**
- * Wrapper for protoc buffer
+ * The wrapper class of the Proto buffer `BRowSet`.
  *
  * @author 梦境迷离
  * @since 2021/8/27
@@ -18,6 +18,9 @@ class RowSet(val rows: List<Row> = listOf(), val startOffset: Long = 0) {
     }
 }
 
+/**
+ * The wrapper class of the Proto buffer `BRow`.
+ */
 class Row(private val values: List<ByteString> = listOf()) {
 
     fun toBRow(): BRow {

@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 /**
- * Abstract descriptor
+ * Unique ID implementation for session id and operation id.
  *
  * @author 梦境迷离
  * @since 2021/6/6

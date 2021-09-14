@@ -3,6 +3,7 @@ package org.bitlap.network.core
 import org.bitlap.network.proto.driver.BSessionHandle
 
 /**
+ * The wrapper class of the Proto buffer `BSessionHandle`.
  *
  * @author 梦境迷离
  * @since 2021/6/6

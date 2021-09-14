@@ -6,7 +6,7 @@ import org.bitlap.network.core.OperationType
 import org.bitlap.network.proto.driver.BOperationHandle
 
 /**
- * Operation Handle
+ * The wrapper class of the Proto buffer `BOperationHandle`.
  *
  * @author 梦境迷离
  * @since 2021/6/6

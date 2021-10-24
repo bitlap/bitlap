@@ -17,7 +17,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
         }
 
-        "common database ddl statements" {
+        "simple query2" {
             sql("create table test")
             val sql = "select 1+2*3, id, a from (select id, name as a from test) t where id < 5 limit 100"
 //    val sql = "select name, count(1), count(age) cnt from test where id < 5 and name = 'mimosa' group by name"

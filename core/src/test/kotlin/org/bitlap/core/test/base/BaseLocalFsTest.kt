@@ -24,7 +24,7 @@ abstract class BaseLocalFsTest : StringSpec() {
             val hadoopConf = Configuration()
             hadoopConf.set(FS_DEFAULT_NAME_KEY, "file:///")
             localFS = FileSystem.getLocal(hadoopConf)
-            workPath = Path(localFS.workingDirectory, "target/bitlap-test")
+            workPath = Path(localFS.workingDirectory, "target/bitlap-test/${it::class.simpleName}")
             if (localFS.exists(workPath)) {
                 localFS.delete(workPath, true)
             }
@@ -35,6 +35,9 @@ abstract class BaseLocalFsTest : StringSpec() {
         }
 
         afterSpec {
+            if (localFS.exists(workPath)) {
+                localFS.delete(workPath, true)
+            }
         }
     }
 }

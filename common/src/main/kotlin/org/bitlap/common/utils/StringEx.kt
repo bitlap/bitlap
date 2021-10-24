@@ -1,14 +1,13 @@
 package org.bitlap.common.utils
 
 import java.io.File
-import kotlin.String
 
 /**
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/4/30
  */
-object String {
+object StringEx {
 
     /**
      * Fix path, concat [subPaths] with [File.pathSeparator]

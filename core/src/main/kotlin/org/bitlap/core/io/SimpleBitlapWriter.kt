@@ -9,7 +9,7 @@ import org.bitlap.core.BitlapContext
 import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import java.util.*
+import java.util.Collections
 
 /**
  * Desc: Simple data row write to bitlap

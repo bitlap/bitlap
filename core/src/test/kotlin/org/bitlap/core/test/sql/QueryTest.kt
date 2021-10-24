@@ -18,11 +18,11 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "simple query2" {
-            sql("create table test")
-            val sql = "select 1+2*3, id, a from (select id, name as a from test) t where id < 5 limit 100"
+//            sql("create table test")
+//            val sql = "select 1+2*3, id, a from (select id, name as a from test) t where id < 5 limit 100"
 //    val sql = "select name, count(1), count(age) cnt from test where id < 5 and name = 'mimosa' group by name"
 //            val sql = "select a, b, count(c) from test group by a, b"
-            sql(sql).show()
+//            sql(sql).show()
         }
     }
 }

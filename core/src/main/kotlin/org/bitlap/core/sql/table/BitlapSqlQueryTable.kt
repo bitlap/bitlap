@@ -16,7 +16,7 @@ import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.sql.QueryContext
-import java.util.*
+import java.util.TreeSet
 
 /**
  * Desc: common bitlap table

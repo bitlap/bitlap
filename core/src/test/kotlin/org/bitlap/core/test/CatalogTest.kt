@@ -25,6 +25,7 @@ class CatalogTest : BaseLocalFsTest() {
             catalog.renameDatabase(testDatabase, "test_database_to")
             catalog.renameDatabase("test_database_to", testDatabase)
             catalog.getDatabase(testDatabase).name shouldBe testDatabase
+            catalog.dropDatabase(testDatabase, true)
         }
 
         "test table create" {
@@ -37,6 +38,7 @@ class CatalogTest : BaseLocalFsTest() {
             val getTable = catalog.getTable(testName)
             getTable.name shouldBe testName
             getTable.createTime shouldNotBe null
+            catalog.dropTable(testName)
         }
     }
 }

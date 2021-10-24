@@ -1,5 +1,7 @@
 package org.bitlap.core.model.query
 
+import org.bitlap.core.Constants
+
 /**
  * Desc: Base query
  *
@@ -8,10 +10,16 @@ package org.bitlap.core.model.query
  * Date: 2021/3/17
  */
 data class Query(
+
     /**
-     * @required datasource name
+     * @nullable database name
      */
-    val datasource: String,
+    val database: String = Constants.DEFAULT_DATABASE,
+
+    /**
+     * @required table name
+     */
+    val table: String,
 
     /**
      * @required time

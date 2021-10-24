@@ -18,7 +18,9 @@ import java.util.logging.Logger
 open class BitlapDriver : Driver {
 
     companion object {
-        val driver = java.sql.DriverManager.registerDriver(BitlapDriver())
+        init {
+            java.sql.DriverManager.registerDriver(BitlapDriver())
+        }
     }
 
     override fun connect(url: String, info: Properties): Connection {

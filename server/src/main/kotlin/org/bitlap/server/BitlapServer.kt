@@ -20,12 +20,12 @@ class BitlapServer {
     private val server = BitlapServerEndpoint(conf)
 
     fun start() {
-        this.server.start()
         Runtime.getRuntime().addShutdownHook(
             Thread {
                 this.server.use { it.close() }
             }
         )
+        this.server.start()
     }
 }
 

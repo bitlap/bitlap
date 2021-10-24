@@ -3,6 +3,7 @@ package org.bitlap.common.test
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.bitlap.common.BitlapEvent
 import org.bitlap.common.EventBus
@@ -40,6 +41,7 @@ class EventBusTest : StringSpec({
             }
         }
 
+        delay(100)
         count.get() shouldBe (1000 + 1000 * 2 + 500500)
         eventBus.isStarted() shouldBe true
         eventBus.isShutdown() shouldBe false

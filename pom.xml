@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <name>bitlap</name>
-    <description>A schema-less OLAP Analytics Engine for Big Data.</description>
+    <description>A table schema-less OLAP Analytics Engine for Big Data.</description>
     <url>https://github.com/bitlap/bitlap</url>
 
     <licenses>

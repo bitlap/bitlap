@@ -1,6 +1,6 @@
 package org.bitlap.core.sql.parser
 
-import org.apache.calcite.sql.SqlCall
+import org.apache.calcite.sql.SqlCreate
 import org.apache.calcite.sql.SqlNode
 import org.apache.calcite.sql.SqlOperator
 import org.apache.calcite.sql.parser.SqlParserPos
@@ -11,11 +11,13 @@ import org.bitlap.core.BitlapContext
  * Created by IceMimosa
  * Date: 2021/7/28
  */
-abstract class BitlapSqlDdlNode(
+abstract class BitlapSqlDdlCreateNode(
     open val pos: SqlParserPos,
     open val op: SqlOperator,
-    open val operands: List<SqlNode>
-) : SqlCall(pos), BitlapSqlDdlRel {
+    open val operands: List<SqlNode>,
+    open val _replace: Boolean,
+    open val ifNotExists: Boolean,
+) : SqlCreate(op, pos, _replace, ifNotExists), BitlapSqlDdlRel {
 
     protected val catalog = BitlapContext.catalog
 

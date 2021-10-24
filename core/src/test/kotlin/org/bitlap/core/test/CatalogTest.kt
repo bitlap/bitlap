@@ -15,28 +15,30 @@ import org.bitlap.core.test.base.BaseLocalFsTest
 class CatalogTest : BaseLocalFsTest() {
     init {
 
-        "test Schema" {
-            val testSchema = "test_schema"
+        "test database" {
+            val testDatabase = "test_database"
             val catalog = BitlapContext.catalog
-            catalog.createSchema(testSchema)
-            catalog.dropSchema(testSchema)
-            catalog.createSchema(testSchema, true)
-            shouldThrow<BitlapException> { catalog.createSchema(testSchema) }
-            catalog.renameSchema(testSchema, "test_schema_to")
-            catalog.renameSchema("test_schema_to", testSchema)
-            catalog.getSchema(testSchema) shouldBe testSchema
+            catalog.createDatabase(testDatabase)
+            catalog.dropDatabase(testDatabase)
+            catalog.createDatabase(testDatabase, true)
+            shouldThrow<BitlapException> { catalog.createDatabase(testDatabase) }
+            catalog.renameDatabase(testDatabase, "test_database_to")
+            catalog.renameDatabase("test_database_to", testDatabase)
+            catalog.getDatabase(testDatabase).name shouldBe testDatabase
+            catalog.dropDatabase(testDatabase, true)
         }
 
-        "test DataSource create" {
-            val testName = "test_datasource"
+        "test table create" {
+            val testName = "test_table"
             val catalog = BitlapContext.catalog
-            catalog.createDataSource(testName)
-            catalog.createDataSource(testName, ifNotExists = true)
-            // get datasource
-            shouldThrow<BitlapException> { catalog.getDataSource("xxx") }
-            val getDS = catalog.getDataSource(testName)
-            getDS.name shouldBe testName
-            getDS.createTime shouldNotBe null
+            catalog.createTable(testName)
+            catalog.createTable(testName, ifNotExists = true)
+            // get table
+            shouldThrow<BitlapException> { catalog.getTable("xxx") }
+            val getTable = catalog.getTable(testName)
+            getTable.name shouldBe testName
+            getTable.createTime shouldNotBe null
+            catalog.dropTable(testName)
         }
     }
 }

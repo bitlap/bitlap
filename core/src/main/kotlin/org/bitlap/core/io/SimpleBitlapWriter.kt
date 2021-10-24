@@ -6,6 +6,7 @@ import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
+import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
 import java.util.Collections
@@ -17,11 +18,11 @@ import java.util.Collections
  * Created by IceMimosa
  * Date: 2020/12/15
  */
-class SimpleBitlapWriter(datasource: String) : BitlapWriter<Event> {
+class SimpleBitlapWriter(table: String, database: String = DEFAULT_DATABASE) : BitlapWriter<Event> {
 
     private var closed = false
     private val rows = Collections.synchronizedList(mutableListOf<Event>())
-    private val dataSourceStore = BitlapContext.catalog.getDataSourceStore(datasource)
+    private val metricStore = BitlapContext.catalog.getMetricStore(table, database)
 
     override fun write(t: Event) {
         rows.add(t)
@@ -37,7 +38,6 @@ class SimpleBitlapWriter(datasource: String) : BitlapWriter<Event> {
             throw BitlapException("SimpleBitlapWriter has been closed.")
         }
         closed = true
-        val metricStore = this.dataSourceStore.getMetricStore()
         rows.groupBy { it.time }.forEach { (time, rs) ->
             // 1. agg metric
             val singleRows = rs

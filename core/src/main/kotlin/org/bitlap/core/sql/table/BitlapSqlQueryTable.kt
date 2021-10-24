@@ -1,48 +1,43 @@
 package org.bitlap.core.sql.table
 
 import org.apache.calcite.DataContext
-import org.apache.calcite.adapter.java.AbstractQueryableTable
 import org.apache.calcite.linq4j.Enumerable
-import org.apache.calcite.linq4j.Linq4j
-import org.apache.calcite.linq4j.QueryProvider
-import org.apache.calcite.linq4j.Queryable
 import org.apache.calcite.rel.type.RelDataType
 import org.apache.calcite.rel.type.RelDataTypeFactory
 import org.apache.calcite.rex.RexNode
 import org.apache.calcite.schema.ProjectableFilterableTable
-import org.apache.calcite.schema.ScannableTable
-import org.apache.calcite.schema.SchemaPlus
+import org.apache.calcite.schema.impl.AbstractTable
 import org.apache.calcite.sql.SqlAsOperator
 import org.apache.calcite.sql.SqlBasicCall
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlNode
 import org.apache.calcite.sql.SqlSelect
 import org.apache.calcite.sql.type.SqlTypeName
+import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.QueryContext
+import java.util.*
 
 /**
- * Desc common bitlap table
+ * Desc: common bitlap table
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/9/12
  */
-open class BitlapTable() : AbstractQueryableTable(Object::class.java), ProjectableFilterableTable, ScannableTable {
+open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), ProjectableFilterableTable {
 
-    companion object {
-        val query = ThreadLocal<SqlSelect>()
+    internal val selectNode: SqlSelect by lazy {
+        QueryContext.get().currentSelectNode!! // must not be null
     }
-
-    protected val mayCols = mutableSetOf<String>()
+    internal val mayCols = TreeSet<String>()
 
     /**
      * Returns this table's row type.
      */
-    @Synchronized
     override fun getRowType(typeFactory: RelDataTypeFactory): RelDataType {
-        if (query.get() != null) {
-            mayCols.addAll(getColNames(query.get()))
-            mayCols.removeIf { it.isBlank() }
-        }
+        mayCols.addAll(getColNames(selectNode))
+        mayCols.removeIf { it.isBlank() }
         val builder = typeFactory.builder()
         mayCols.forEach {
             builder.add(it, SqlTypeName.VARCHAR)
@@ -54,11 +49,12 @@ open class BitlapTable() : AbstractQueryableTable(Object::class.java), Projectab
         return when {
             node is SqlSelect -> {
                 mutableSetOf<String>().apply {
-                    addAll(node.selectList.flatMap(::getColNames))
+                    addAll(getColNames(node.from))
                     addAll(getColNames(node.where))
                     addAll(node.group?.flatMap(::getColNames) ?: emptySet())
                     addAll(getColNames(node.having))
-                    addAll(getColNames(node.from))
+                    addAll(node.selectList.flatMap(::getColNames))
+                    addAll(node.orderList?.flatMap(::getColNames) ?: emptySet())
                 }
             }
             node is SqlIdentifier && !node.isStar -> setOf(node.names.last())
@@ -73,16 +69,7 @@ open class BitlapTable() : AbstractQueryableTable(Object::class.java), Projectab
         }
     }
 
-    /** Converts this table into a [Queryable].  */
-    override fun <T : Any?> asQueryable(queryProvider: QueryProvider, schema: SchemaPlus, tableName: String): Queryable<T> {
-        TODO("Not yet implemented")
-    }
-
-    override fun scan(root: DataContext, filters: MutableList<RexNode>, projects: IntArray?): Enumerable<Array<Any>>? {
-        return Linq4j.asEnumerable(arrayOf(arrayOf("aa", "12"), arrayOf("aa", "mimosa")))
-    }
-
-    override fun scan(root: DataContext): Enumerable<Array<Any>> {
-        return Linq4j.asEnumerable(arrayOf(arrayOf("aa", "12")))
+    override fun scan(root: DataContext, filters: MutableList<RexNode>, projects: IntArray?): Enumerable<Array<Any?>> {
+        throw BitlapException("You need to implement this method in a subclass.")
     }
 }

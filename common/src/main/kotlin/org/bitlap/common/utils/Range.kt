@@ -1,6 +1,7 @@
 package org.bitlap.common.utils
 
 import java.io.Serializable
+import kotlin.String
 
 /**
  * Desc: Range utils, reference to guava Range.

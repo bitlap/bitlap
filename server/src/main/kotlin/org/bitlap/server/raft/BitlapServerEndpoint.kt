@@ -12,7 +12,7 @@ import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
-import org.bitlap.common.utils.withPaths
+import org.bitlap.common.utils.String.withPaths
 import org.bitlap.network.NetworkHelper
 import org.bitlap.network.core.NetworkServiceImpl
 import org.bitlap.network.core.SessionManager

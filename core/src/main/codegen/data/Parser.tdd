@@ -27,16 +27,16 @@
   # List of additional classes and packages to import.
   # Example: "org.apache.calcite.sql.*", "java.util.List".
   imports: [
-    "org.bitlap.core.sql.parser.SqlRunExampleNode"
+    "org.bitlap.core.sql.parser.cmd.SqlRunExample"
     "org.apache.calcite.sql.ddl.SqlDdlNodes"
     "org.apache.calcite.sql.SqlCreate"
     "org.apache.calcite.sql.SqlDrop"
-    "org.bitlap.core.sql.parser.ddl.SqlCreateSchema"
-    "org.bitlap.core.sql.parser.ddl.SqlCreateDataSource"
-    "org.bitlap.core.sql.parser.ddl.SqlDropSchema"
-    "org.bitlap.core.sql.parser.ddl.SqlDropDataSource"
-    "org.bitlap.core.sql.parser.ddl.SqlShowSchemas"
-    "org.bitlap.core.sql.parser.ddl.SqlShowDataSources"
+    "org.bitlap.core.sql.parser.ddl.SqlCreateDatabase"
+    "org.bitlap.core.sql.parser.ddl.SqlCreateTable"
+    "org.bitlap.core.sql.parser.ddl.SqlDropDatabase"
+    "org.bitlap.core.sql.parser.ddl.SqlDropTable"
+    "org.bitlap.core.sql.parser.ddl.SqlShowDatabases"
+    "org.bitlap.core.sql.parser.ddl.SqlShowTables"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -411,9 +411,9 @@
   # Return type of method implementation should be 'SqlNode'.
   # Example: "SqlShowDatabases()", "SqlShowTables()".
   statementParserMethods: [
-    "SqlRunExampleNode()"
-    "SqlShowSchemas()"
-    "SqlShowDataSources()"
+    "SqlRunExample()"
+    "SqlShowDatabases()"
+    "SqlShowTables()"
   ]
 
   # List of methods for parsing custom literals.

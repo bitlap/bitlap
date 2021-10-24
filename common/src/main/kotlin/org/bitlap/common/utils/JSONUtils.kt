@@ -1,6 +1,7 @@
 package org.bitlap.common.utils
 
 import com.google.gson.Gson
+import kotlin.String
 
 /**
  * Desc: json utils

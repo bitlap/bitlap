@@ -15,7 +15,7 @@
 // limitations under the License.
 -->
 
-SqlNode SqlRunExampleNode() :
+SqlNode SqlRunExample() :
 {
   SqlNode stringNode;
 }
@@ -23,7 +23,7 @@ SqlNode SqlRunExampleNode() :
   <RUN> <EXAMPLE>
   stringNode = StringLiteral()
   {
-    return new SqlRunExampleNode(getPos(), token.image);
+    return new SqlRunExample(getPos(), token.image);
   }
 }
 
@@ -70,18 +70,18 @@ SqlCreate SqlCreateExtended(Span s, boolean replace) :
 }
 {
     (
-        create = SqlCreateSchema(s, replace)
+        create = SqlCreateDatabase(s, replace)
         |
-        create = SqlCreateDataSource(s, replace)
+        create = SqlCreateTable(s, replace)
     )
     {
         return create;
     }
 }
 
-SqlCreate SqlCreateSchema(Span s, boolean replace) :
+SqlCreate SqlCreateDatabase(Span s, boolean replace) :
 {
-    SqlIdentifier schemaName;
+    SqlIdentifier dbName;
     boolean ifNotExists = false;
 }
 {
@@ -89,15 +89,15 @@ SqlCreate SqlCreateSchema(Span s, boolean replace) :
         <SCHEMA> | <DATABASE>
     )
     ifNotExists = IfNotExistsOpt()
-    schemaName = CompoundIdentifier()
+    dbName = CompoundIdentifier()
     {
-        return new SqlCreateSchema(s.pos(), schemaName, ifNotExists, replace);
+        return new SqlCreateDatabase(s.pos(), dbName, ifNotExists, replace);
     }
 }
 
-SqlCreate SqlCreateDataSource(Span s, boolean replace) :
+SqlCreate SqlCreateTable(Span s, boolean replace) :
 {
-    SqlIdentifier dsName;
+    SqlIdentifier tableName;
     boolean ifNotExists = false;
 }
 {
@@ -105,9 +105,9 @@ SqlCreate SqlCreateDataSource(Span s, boolean replace) :
         <DATASOURCE> | <TABLE>
     )
     ifNotExists = IfNotExistsOpt()
-    dsName = CompoundIdentifier()
+    tableName = CompoundIdentifier()
     {
-        return new SqlCreateDataSource(s.pos(), dsName, ifNotExists, replace);
+        return new SqlCreateTable(s.pos(), tableName, ifNotExists, replace);
     }
 }
 
@@ -125,70 +125,78 @@ SqlDrop SqlDropExtended(Span s, boolean replace) :
 }
 {
     (
-        drop = SqlDropSchema(s, replace)
+        drop = SqlDropDatabase(s, replace)
         |
-        drop = SqlDropDataSource(s, replace)
+        drop = SqlDropTable(s, replace)
     )
     {
         return drop;
     }
 }
 
-SqlDrop SqlDropSchema(Span s, boolean replace) :
+SqlDrop SqlDropDatabase(Span s, boolean replace) :
 {
-    SqlIdentifier schemaName = null;
+    SqlIdentifier dbName = null;
     boolean ifExists = false;
+    boolean cascade = false;
 }
 {
     (
         <SCHEMA> | <DATABASE>
     )
     ifExists = IfExistsOpt()
-    schemaName = CompoundIdentifier()
+    dbName = CompoundIdentifier()
+    [
+      <CASCADE> { cascade = true; }
+    ]
     {
-        return new SqlDropSchema(s.pos(), schemaName, ifExists);
+        return new SqlDropDatabase(s.pos(), dbName, ifExists, cascade);
     }
 }
 
-SqlDrop SqlDropDataSource(Span s, boolean replace) :
+SqlDrop SqlDropTable(Span s, boolean replace) :
 {
-    SqlIdentifier dsName = null;
+    SqlIdentifier tableName = null;
     boolean ifExists = false;
+    boolean cascade = false;
 }
 {
     (
         <DATASOURCE> | <TABLE>
     )
     ifExists = IfExistsOpt()
-    dsName = CompoundIdentifier()
+    tableName = CompoundIdentifier()
+    [
+      <CASCADE> { cascade = true; }
+    ]
     {
-        return new SqlDropDataSource(s.pos(), dsName, ifExists);
+        return new SqlDropTable(s.pos(), tableName, ifExists, cascade);
     }
 }
 
 /**
  * ********************************* SQL SHOW *********************************
  */
-SqlShowSchemas SqlShowSchemas() :
+SqlShowDatabases SqlShowDatabases() :
 {
 }
 {
     <SHOW> ( <SCHEMAS> | <DATABASES> )
     {
-        return new SqlShowSchemas(getPos());
+        return new SqlShowDatabases(getPos());
     }
 }
 
-SqlShowDataSources SqlShowDataSources() :
+SqlShowTables SqlShowTables() :
 {
-    SqlIdentifier schemaName = null;
+    SqlIdentifier dbName = null;
 }
 {
     <SHOW> ( <DATASOURCES> | <TABLES> )
     [
-        <IN> schemaName = CompoundIdentifier()
+        <IN> dbName = CompoundIdentifier()
     ]
     {
-        return new SqlShowDataSources(getPos(), schemaName);
+        return new SqlShowTables(getPos(), dbName);
     }
 }

@@ -7,6 +7,7 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.logical.LogicalTableScan
 import org.apache.calcite.sql.type.SqlTypeName
 import org.apache.calcite.tools.RelBuilder
+import org.bitlap.core.sql.table.BitlapSqlDdlTable
 
 /**
  * Mail: chk19940609@gmail.com

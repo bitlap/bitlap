@@ -23,6 +23,7 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.Range.BoundType
+import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowIterator
 import org.bitlap.core.storage.load.MetricRowMeta
@@ -35,9 +36,9 @@ import org.joda.time.DateTime
  * Created by IceMimosa
  * Date: 2021/1/26
  */
-class MetricStore(dsStore: DataSourceStore, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
+class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
 
-    override val dataDir: Path = Path(rootPath, "data/${dsStore.schema}/${dsStore.name}/metric")
+    override val dataDir: Path = Path(rootPath, "data/${table.database}/${table.name}/metric")
     private fun writerB() = CarbonWriter.builder()
         .withCsvInput(
             Schema(

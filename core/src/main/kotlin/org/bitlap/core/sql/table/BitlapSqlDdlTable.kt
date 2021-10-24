@@ -1,4 +1,4 @@
-package org.bitlap.core.sql.parser
+package org.bitlap.core.sql.table
 
 import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.Enumerable

@@ -10,20 +10,20 @@ import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
  * Desc:
- *    Parse tree for `SHOW (SCHEMAS | DATABASES)` statement.
+ *    Parse tree for `SHOW (DATABASES | SCHEMAS)` statement.
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/8/25
  */
-class SqlShowSchemas(pos: SqlParserPos) : BitlapSqlDdlNode(pos, OPERATOR, emptyList()) {
+class SqlShowDatabases(pos: SqlParserPos) : BitlapSqlDdlNode(pos, OPERATOR, emptyList()) {
 
     companion object {
-        val OPERATOR = SqlSpecialOperator("SHOW SCHEMAS", SqlKind.OTHER)
+        val OPERATOR = SqlSpecialOperator("SHOW DATABASES", SqlKind.OTHER)
     }
 
     override fun unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) {
-        writer.keyword("SHOW SCHEMAS")
+        writer.keyword("SHOW DATABASES")
     }
 
     override val resultTypes: List<Pair<String, SqlTypeName>>
@@ -32,6 +32,6 @@ class SqlShowSchemas(pos: SqlParserPos) : BitlapSqlDdlNode(pos, OPERATOR, emptyL
         )
 
     override fun operator(context: DataContext): List<Array<Any?>> {
-        return catalog.listSchemas().map { arrayOf(it) }
+        return catalog.listDatabases().map { arrayOf(it.name) }
     }
 }

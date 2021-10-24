@@ -1,6 +1,7 @@
 package org.bitlap.common.utils
 
 import org.bitlap.common.exception.BitlapException
+import kotlin.String
 
 /**
  * Mail: chk19940609@gmail.com

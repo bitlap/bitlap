@@ -1,6 +1,7 @@
 package org.bitlap.core.test.sql
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.Constants.DEFAULT_DATABASE
@@ -16,13 +17,14 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
 
     init {
         "common database ddl statements" {
-            val testDB = "test_database"
+            val testDB = "test_database_01"
             // create
             sql("create database $testDB") shouldBe listOf(listOf(true))
             shouldThrow<BitlapException> { sql("create database $testDB") }
             sql("create database if not exists $testDB") shouldBe listOf(listOf(false))
             // show
-            sql("show databases") shouldBe listOf(listOf(DEFAULT_DATABASE), listOf(testDB))
+            sql("show databases").result shouldContain listOf(DEFAULT_DATABASE)
+            sql("show databases").result shouldContain listOf(testDB)
             // drop
             sql("drop database $testDB") shouldBe listOf(listOf(true))
             sql("show databases") shouldBe listOf(listOf(DEFAULT_DATABASE))
@@ -36,7 +38,7 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "common table ddl statements" {
-            val testDB = "test_database"
+            val testDB = "test_database_02"
             val testTable = "test_table"
             // create
             sql("create database $testDB")

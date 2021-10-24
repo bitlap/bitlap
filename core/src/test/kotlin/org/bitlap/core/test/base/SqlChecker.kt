@@ -18,7 +18,7 @@ interface SqlChecker {
 
 class SqlResult(private val statement: String) {
 
-    private val result: List<List<Any?>> by lazy {
+    internal val result: List<List<Any?>> by lazy {
         mutableListOf<List<Any?>>().apply {
             val rs = QueryExecution(statement).execute()
             val colSize = rs.metaData.columnCount

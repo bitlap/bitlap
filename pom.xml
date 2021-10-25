@@ -58,9 +58,9 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <dokka.version>1.5.0</dokka.version>
-        <kotlin.version>1.5.30</kotlin.version>
-        <kotlinx.coroutines.version>1.5.1-native-mt</kotlinx.coroutines.version>
-        <kotest.version>4.6.2</kotest.version>
+        <kotlin.version>1.5.31</kotlin.version>
+        <kotlinx.coroutines.version>1.5.2-native-mt</kotlinx.coroutines.version>
+        <kotest.version>4.6.3</kotest.version>
         <kotlin.logging.version>2.0.11</kotlin.logging.version>
         <arrow.version>0.13.2</arrow.version>
         <slf4j.version>1.7.32</slf4j.version>
@@ -314,7 +314,7 @@
             <plugin>
                 <groupId>com.github.gantsign.maven</groupId>
                 <artifactId>ktlint-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>1.10.2</version>
                 <executions>
                     <execution>
                         <id>format-and-check</id>
@@ -421,7 +421,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
+                        <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>central</serverId>

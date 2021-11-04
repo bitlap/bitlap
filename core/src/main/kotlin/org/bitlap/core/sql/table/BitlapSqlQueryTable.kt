@@ -60,9 +60,9 @@ open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), Project
             node is SqlIdentifier && !node.isStar -> setOf(node.names.last())
             node is SqlBasicCall -> {
                 if (node.operator is SqlAsOperator) {
-                    getColNames(node.operands.first())
+                    getColNames(node.operandList.first())
                 } else {
-                    node.operands.flatMap(::getColNames).toSet()
+                    node.operandList.flatMap(::getColNames).toSet()
                 }
             }
             else -> emptySet()

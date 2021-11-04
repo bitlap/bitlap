@@ -17,6 +17,13 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
         }
 
+        "single metric query" {
+//            val table = randomString()
+//            sql("create table $table")
+//            sql("select count(a), count(distinct a), sum(b) from $table where _time=123").show()
+//            sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
+        }
+
         "simple query2" {
 //            sql("create table test")
 //            val sql = "select 1+2*3, id, a from (select id, name as a from test) t where id < 5 limit 100"

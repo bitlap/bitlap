@@ -72,7 +72,7 @@
         <sofa.jraft.version>1.3.8</sofa.jraft.version>
         <calcite.version>1.28.0</calcite.version>
         <kotlin.cli.version>0.3.3</kotlin.cli.version>
-        <sqlline.version>1.11.0</sqlline.version>
+        <sqlline.version>1.12.0</sqlline.version>
     </properties>
 
     <dependencies>

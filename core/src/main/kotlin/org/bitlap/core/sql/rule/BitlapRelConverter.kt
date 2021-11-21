@@ -28,6 +28,10 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
         if (rel != root) {
             return rel
         }
+        // has no table scan, return
+        if (!super.hasTableScanNode(rel)) {
+            return rel
+        }
         return this.convert00(rel, call)
     }
 

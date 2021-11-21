@@ -4,6 +4,7 @@ import org.apache.calcite.plan.Convention
 import org.apache.calcite.plan.RelOptRuleCall
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
+import org.apache.calcite.rel.core.TableScan
 import org.bitlap.common.logger
 
 abstract class AbsRelRule(config: Config) : ConverterRule(config) {
@@ -28,5 +29,12 @@ abstract class AbsRelRule(config: Config) : ConverterRule(config) {
 
     final override fun convert(rel: RelNode): RelNode? {
         throw NotImplementedError("Deprecated by function convert0(RelNode, RelOptRuleCall).")
+    }
+
+    protected fun hasTableScanNode(rel: RelNode): Boolean {
+        if (rel is TableScan) {
+            return true
+        }
+        return rel.inputs.mapNotNull { it.clean() }.any { this.hasTableScanNode(it) }
     }
 }

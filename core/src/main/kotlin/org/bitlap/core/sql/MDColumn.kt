@@ -14,8 +14,10 @@ data class MDColumn(val name: String, val type: ColumnType) {
     val aggs = mutableSetOf<Pair<SqlAggFunction, String>>()
 
     fun checkType(targetType: ColumnType): MDColumn {
-        PreConditions.checkExpression(type == targetType,
-            msg = "Unable to judge Column $name target type: $targetType should equals to current type: $type")
+        PreConditions.checkExpression(
+            type == targetType,
+            msg = "Unable to judge Column $name target type: $targetType should equals to current type: $type"
+        )
         return this
     }
 
@@ -26,5 +28,5 @@ data class MDColumn(val name: String, val type: ColumnType) {
 }
 
 sealed interface ColumnType
-object MetricCol: ColumnType
+object MetricCol : ColumnType
 object DimensionCol : ColumnType

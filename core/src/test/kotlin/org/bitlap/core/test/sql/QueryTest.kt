@@ -37,9 +37,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             val table = randomString()
             sql("create table $table")
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
-            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
 //             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
-            true shouldBe true
         }
 
         "simple query2" {

@@ -7,11 +7,9 @@ import org.apache.calcite.linq4j.Linq4j
 import org.apache.calcite.rex.RexBuilder
 import org.apache.calcite.rex.RexExecutorImpl
 import org.apache.calcite.rex.RexNode
-import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.core.data.metadata.Table
-import org.bitlap.core.sql.MDColumn
 import org.bitlap.core.sql.MDColumnAnalyzer
-import java.util.*
+import java.util.Arrays
 
 class BitlapSqlQueryMetricTable(
     override val table: Table,

@@ -1,4 +1,4 @@
-package org.bitlap.core.model.query
+package org.bitlap.core.mdm.model
 
 import org.bitlap.common.TimeRange
 import org.joda.time.DateTime

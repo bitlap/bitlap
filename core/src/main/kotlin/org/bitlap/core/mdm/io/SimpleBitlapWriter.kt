@@ -1,4 +1,4 @@
-package org.bitlap.core.io
+package org.bitlap.core.mdm.io
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM

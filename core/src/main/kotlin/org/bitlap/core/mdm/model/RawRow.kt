@@ -1,8 +1,8 @@
-package org.bitlap.core.model
+package org.bitlap.core.mdm.model
 
 import org.bitlap.common.bitmap.BM
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.io.DefaultBitlapReader
+import org.bitlap.core.mdm.io.DefaultBitlapReader
 import java.io.Serializable
 
 /**

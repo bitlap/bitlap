@@ -6,11 +6,11 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.io.DefaultBitlapReader
-import org.bitlap.core.io.SimpleBitlapWriter
-import org.bitlap.core.model.query.Query
-import org.bitlap.core.model.query.QueryMetric
-import org.bitlap.core.model.query.QueryTime
+import org.bitlap.core.mdm.io.DefaultBitlapReader
+import org.bitlap.core.mdm.io.SimpleBitlapWriter
+import org.bitlap.core.mdm.model.Query
+import org.bitlap.core.mdm.model.QueryMetric
+import org.bitlap.core.mdm.model.QueryTime
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.joda.time.DateTime
 

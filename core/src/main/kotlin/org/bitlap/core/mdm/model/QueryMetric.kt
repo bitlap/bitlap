@@ -1,4 +1,4 @@
-package org.bitlap.core.model.query
+package org.bitlap.core.mdm.model
 
 /**
  * Desc: metric for query
@@ -9,7 +9,8 @@ package org.bitlap.core.model.query
  */
 data class QueryMetric(
     val name: String,
-    val aggType: AggType = AggType.None
+    val aggType: AggType = AggType.None,
+    val numeric: Boolean = false,
 )
 
 enum class AggType {

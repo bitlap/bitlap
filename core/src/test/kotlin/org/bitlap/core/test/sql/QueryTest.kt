@@ -1,6 +1,8 @@
 package org.bitlap.core.test.sql
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
 
@@ -17,11 +19,27 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
         }
 
+        "forbidden queries" {
+            val table = randomString()
+            sql("create table $table")
+            shouldThrow<BitlapException> {
+                sql("select *, a, b from $table") // star is forbidden
+            }
+            shouldThrow<BitlapException> {
+                sql("select a, b from $table") // time filter is required
+            }
+            shouldThrow<BitlapException> {
+                sql("select a, b from $table where _time=123") // one aggregation metric
+            }
+        }
+
         "single metric query" {
-//            val table = randomString()
-//            sql("create table $table")
-//            sql("select count(a), count(distinct a), sum(b) from $table where _time=123").show()
-//            sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
+            val table = randomString()
+            sql("create table $table")
+//            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
+            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
+//             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
+            true shouldBe true
         }
 
         "simple query2" {

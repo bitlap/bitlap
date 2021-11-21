@@ -1,10 +1,10 @@
-package org.bitlap.core.io
+package org.bitlap.core.mdm.io
 
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.model.RawRow
-import org.bitlap.core.model.query.AggType
-import org.bitlap.core.model.query.Query
+import org.bitlap.core.mdm.model.AggType
+import org.bitlap.core.mdm.model.Query
+import org.bitlap.core.mdm.model.RawRow
 
 /**
  * Desc: Default bitlap reader

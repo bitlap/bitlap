@@ -1,4 +1,4 @@
-package org.bitlap.core.io
+package org.bitlap.core.mdm.io
 
 import java.io.Closeable
 

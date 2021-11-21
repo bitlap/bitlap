@@ -1,4 +1,4 @@
-package org.bitlap.core.model.query
+package org.bitlap.core.mdm.model
 
 import org.bitlap.core.Constants
 

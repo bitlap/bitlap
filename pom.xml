@@ -73,6 +73,10 @@
         <calcite.version>1.28.0</calcite.version>
         <kotlin.cli.version>0.3.3</kotlin.cli.version>
         <sqlline.version>1.11.0</sqlline.version>
+        <scala.version>2.13.6</scala.version>
+        <scala.log.version>2.14.1</scala.log.version>
+        <scala.logging.version>3.9.4</scala.logging.version>
+        <scalatest.version>3.3.0-SNAP3</scalatest.version>
     </properties>
 
     <dependencies>
@@ -176,7 +180,45 @@
             <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-compiler</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_2.13</artifactId>
+            <version>${scala.logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${scala.log.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${scala.log.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${scala.log.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.13</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--        <dependency>-->
 <!--            <groupId>io.kotest</groupId>-->
 <!--            <artifactId>kotest-property-jvm</artifactId>-->
 <!--            <version>${kotest.version}</version>-->
@@ -352,6 +394,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

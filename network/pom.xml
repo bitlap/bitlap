@@ -34,8 +34,8 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
 
         <plugins>
             <plugin>
@@ -49,7 +49,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <protocVersion>3.17.3</protocVersion>
+                            <protocVersion>3.11.4</protocVersion>
                             <inputDirectories>
                                 <include>src/main/protobuf</include>
                             </inputDirectories>

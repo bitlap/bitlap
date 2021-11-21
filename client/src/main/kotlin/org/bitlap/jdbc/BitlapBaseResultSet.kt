@@ -1,7 +1,6 @@
 package org.bitlap.jdbc
 
 import org.apache.commons.lang.StringUtils
-import org.bitlap.network.BSQLException
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BTableSchema
 import org.bitlap.network.proto.driver.BTypeId
@@ -24,6 +23,7 @@ import java.sql.Time
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.Calendar
+import org.bitlap.net.BSQLException
 
 /**
  *
@@ -265,7 +265,7 @@ abstract class BitlapBaseResultSet : ResultSet {
     override fun findColumn(columnLabel: String?): Int {
         var columnIndex = columnNames.indexOf(columnLabel)
         return if (columnIndex == -1) {
-            throw BSQLException()
+            throw BSQLException("Bitlap SQL Exception", null)
         } else {
             ++columnIndex
         }
@@ -814,11 +814,11 @@ abstract class BitlapBaseResultSet : ResultSet {
     @Suppress("UNCHECKED_CAST")
     private inline fun <reified T> getColumnValue(columnIndex: Int): T {
         if (row == null) {
-            throw BSQLException("No row found.")
+            throw BSQLException("No row found.", null)
         }
-        val colVals = row!!.colValsList ?: throw BSQLException("RowSet does not contain any columns!")
+        val colVals = row!!.colValsList ?: throw BSQLException("RowSet does not contain any columns!", null)
         if (columnIndex > colVals.size) {
-            throw BSQLException("Invalid columnIndex: $columnIndex")
+            throw BSQLException("Invalid columnIndex: $columnIndex", null)
         }
 
         // In kotlin, We can not use e.g. Int?,Long?,Double? to override the java interface here.
@@ -855,7 +855,7 @@ abstract class BitlapBaseResultSet : ResultSet {
                         if (bColumnValue.toStringUtf8()
                             .isNotEmpty()
                         ) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(bColumnValue.toStringUtf8()))) else Timestamp.from(Instant.now())
-                    else -> throw BSQLException("Unrecognized column type:$columnType")
+                    else -> throw BSQLException("Unrecognized column type:$columnType", null)
                 }
                 ) as T
         } catch (e: Exception) {

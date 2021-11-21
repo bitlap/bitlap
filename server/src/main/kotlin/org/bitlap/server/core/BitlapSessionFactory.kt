@@ -1,8 +1,6 @@
 package org.bitlap.server.core
 
-import org.bitlap.network.core.Session
-import org.bitlap.network.core.SessionFactory
-import org.bitlap.network.core.SessionManager
+import org.bitlap.net.session.SessionFactory
 
 /**
  * Mail: chk19940609@gmail.com

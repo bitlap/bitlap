@@ -13,18 +13,17 @@ import org.apache.commons.io.FileUtils
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.utils.StringEx.withPaths
-import org.bitlap.network.NetworkHelper
-import org.bitlap.network.core.NetworkServiceImpl
-import org.bitlap.network.core.SessionManager
-import org.bitlap.network.processor.CloseSessionProcessor
-import org.bitlap.network.processor.ExecuteStatementProcessor
-import org.bitlap.network.processor.FetchResultsProcessor
-import org.bitlap.network.processor.GetColumnsProcessor
-import org.bitlap.network.processor.GetResultSetMetaDataProcessor
-import org.bitlap.network.processor.GetSchemasProcessor
-import org.bitlap.network.processor.GetTablesProcessor
-import org.bitlap.network.processor.OpenSessionProcessor
 import java.io.File
+import org.bitlap.net.NetworkHelper
+import org.bitlap.net.NetworkServiceImpl
+import org.bitlap.net.processor.CloseSessionProcessor
+import org.bitlap.net.processor.ExecuteStatementProcessor
+import org.bitlap.net.processor.FetchResultsProcessor
+import org.bitlap.net.processor.GetColumnsProcessor
+import org.bitlap.net.processor.GetResultSetMetaDataProcessor
+import org.bitlap.net.processor.GetSchemasProcessor
+import org.bitlap.net.processor.GetTablesProcessor
+import org.bitlap.net.processor.OpenSessionProcessor
 
 /**
  * Desc: Endpoint of bitlap server

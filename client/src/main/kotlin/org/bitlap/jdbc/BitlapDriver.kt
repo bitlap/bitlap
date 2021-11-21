@@ -1,12 +1,12 @@
 package org.bitlap.jdbc
 
-import org.bitlap.network.BSQLException
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo
 import java.sql.SQLException
 import java.util.Properties
 import java.util.logging.Logger
+import org.bitlap.net.BSQLException
 
 /**
  * Desc: JDBC driver for bitlap
@@ -27,7 +27,7 @@ open class BitlapDriver : Driver {
         return try {
             BitlapConnection(url, info)
         } catch (ex: Exception) {
-            throw BSQLException(ex.toString())
+            throw BSQLException(ex.toString(), null)
         }
     }
 

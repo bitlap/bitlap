@@ -2,9 +2,6 @@ package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.network.BSQLException
-import org.bitlap.network.NetworkHelper
-import org.bitlap.network.client.BitlapClient
 import org.bitlap.network.client.BitlapClient.closeSession
 import org.bitlap.network.client.BitlapClient.openSession
 import org.bitlap.network.proto.driver.BSessionHandle
@@ -22,6 +19,9 @@ import java.sql.Statement
 import java.sql.Struct
 import java.util.Properties
 import java.util.concurrent.Executor
+import org.bitlap.net.BSQLException
+import org.bitlap.net.BitlapClient
+import org.bitlap.net.NetworkHelper
 
 /**
  * Bitlap Connection

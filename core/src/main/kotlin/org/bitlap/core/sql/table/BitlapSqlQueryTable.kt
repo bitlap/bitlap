@@ -6,6 +6,7 @@ import org.apache.calcite.rel.type.RelDataType
 import org.apache.calcite.rel.type.RelDataTypeFactory
 import org.apache.calcite.rex.RexNode
 import org.apache.calcite.schema.ProjectableFilterableTable
+import org.apache.calcite.schema.ScannableTable
 import org.apache.calcite.schema.impl.AbstractTable
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.exception.BitlapException
@@ -20,7 +21,7 @@ import org.bitlap.core.sql.QueryContext
  * Created by IceMimosa
  * Date: 2021/9/12
  */
-open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), ProjectableFilterableTable {
+open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), ProjectableFilterableTable, ScannableTable {
 
     internal open val analyzer: MDColumnAnalyzer by lazy {
         MDColumnAnalyzer(table, QueryContext.get().currentSelectNode!!) // must not be null
@@ -42,5 +43,9 @@ open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), Project
 
     override fun scan(root: DataContext, filters: MutableList<RexNode>, projects: IntArray?): Enumerable<Array<Any?>> {
         throw BitlapException("You need to implement this method in a subclass.")
+    }
+
+    override fun scan(root: DataContext): Enumerable<Array<Any?>> {
+        return this.scan(root, mutableListOf(), null)
     }
 }

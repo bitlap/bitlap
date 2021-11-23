@@ -5,4 +5,8 @@ package io.bitlap.spark
  * Created by IceMimosa
  * Date: 2021/7/22
  */
-class Test
+object Test {
+  def main(args: Array[String]): Unit = {
+    println("hello")
+  }
+}

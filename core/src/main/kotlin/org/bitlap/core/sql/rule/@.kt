@@ -9,6 +9,7 @@ import org.bitlap.core.sql.rel.BitlapNode
  */
 val RULES = listOf(
     BitlapRelConverter(),
+    BitlapAggConverter(),
     BitlapFilterTableScanRule(),
     ValidRule(),
     BitlapTableConverter(),

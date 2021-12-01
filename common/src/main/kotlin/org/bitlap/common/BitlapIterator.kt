@@ -24,6 +24,18 @@ abstract class BitlapIterator<E> : Iterator<E>, Closeable {
             override fun next(): R = throw NotImplementedError()
             override fun hasNext(): Boolean = false
         }
+
+        fun <R> of(rows: Iterable<R>) = object : BitlapIterator<R>() {
+            private val it = rows.iterator()
+            override fun next(): R = it.next()
+            override fun hasNext(): Boolean = it.hasNext()
+        }
+
+        fun <R> batch(rows: Iterable<R>, batchSize: Int = 100) = object : BitlapBatchIterator<R>() {
+            private val splits = rows.chunked(batchSize).iterator()
+            override fun hasNext() = splits.hasNext() || super.hasNext()
+            override fun nextBatch(): List<R> = splits.next()
+        }
     }
 }
 

@@ -35,4 +35,8 @@ class BitlapAggregate(
     override fun withHints(hintList: MutableList<RelHint>): RelNode {
         return BitlapAggregate(cluster, traitSet, hintList, input, groupSet, groupSets, aggCalls, parent)
     }
+
+    fun withAggCalls(aggCalls: List<AggregateCall>): BitlapAggregate {
+        return BitlapAggregate(cluster, traitSet, hints, input, groupSet, groupSets, aggCalls, parent)
+    }
 }

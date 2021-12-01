@@ -32,18 +32,18 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
             writer.use {
                 it.write(
                     listOf(
-                        Event.of(testTime, Entity("user", 1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 2.0)),
-                        Event.of(testTime, Entity("user", 1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 3.0)),
-                        Event.of(testTime, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 5.0)),
-                        Event.of(testTime, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 10.0))
+                        Event.of(testTime, Entity(1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 2.0)),
+                        Event.of(testTime, Entity(1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 3.0)),
+                        Event.of(testTime, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 5.0)),
+                        Event.of(testTime, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 10.0))
                     )
                 )
                 it.write(
                     listOf(
-                        Event.of(testTime2, Entity("user", 1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 20.0)),
-                        Event.of(testTime2, Entity("user", 1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 30.0)),
-                        Event.of(testTime2, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 50.0)),
-                        Event.of(testTime2, Entity("user", 2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 100.0))
+                        Event.of(testTime2, Entity(1), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 20.0)),
+                        Event.of(testTime2, Entity(1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 30.0)),
+                        Event.of(testTime2, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 50.0)),
+                        Event.of(testTime2, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 100.0))
                     )
                 )
             }

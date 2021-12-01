@@ -62,6 +62,9 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
                     cols[c.name] = c
                 }
             }
+            if (it is SqlIdentifier) {
+                cols[it.names.last()]!!.withPure(true)
+            }
         }
 
         return cols

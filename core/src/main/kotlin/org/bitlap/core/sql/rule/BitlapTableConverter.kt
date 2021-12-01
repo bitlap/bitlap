@@ -12,7 +12,7 @@ import org.bitlap.core.sql.table.BitlapSqlQueryTable
 class BitlapTableConverter : AbsRelRule(BitlapTableScan::class.java, "BitlapTableConverter") {
 
     override fun convert0(rel: RelNode, call: RelOptRuleCall): RelNode {
-        rel as BitlapTableScan
+        rel as BitlapTableFilterScan
         if (rel.converted) {
             return rel
         }
@@ -20,14 +20,10 @@ class BitlapTableConverter : AbsRelRule(BitlapTableScan::class.java, "BitlapTabl
         val oTable = optTable.table() as BitlapSqlQueryTable
         val analyzer = oTable.analyzer
 
-        // get filters
-        val filters = when (rel) {
-            is BitlapTableFilterScan -> rel.filters
-            else -> emptyList()
-        }
+        // convert to physical table scan
         val target = when {
             analyzer.hasNoTimeInQuery() ->
-                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, filters)
+                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.filters)
             else ->
                 // TODO: with dimensions
                 throw NotImplementedError()

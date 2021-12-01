@@ -24,6 +24,7 @@ import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.Range.BoundType
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.TimeFilterFun
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowIterator
 import org.bitlap.core.storage.load.MetricRowMeta
@@ -45,7 +46,7 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
                 arrayOf( // TODO: add enum & add shard_id if cbm is too big
                     Field("mk", DataTypes.STRING),
                     Field("t", DataTypes.LONG),
-                    Field("ek", DataTypes.STRING),
+                    // Field("ek", DataTypes.STRING),
                     // Field("m", DataTypes.createArrayType(DataTypes.BINARY)),
                     // Field("e", DataTypes.createArrayType(DataTypes.BINARY)),
                     Field("m", DataTypes.BINARY),
@@ -54,7 +55,7 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
                 )
             )
         )
-        .sortBy(arrayOf("mk", "t", "ek"))
+        .sortBy(arrayOf("mk", "t"))
         .withBlockletSize(8)
         .withPageSizeInMb(1)
         .writtenBy(projectName)
@@ -76,10 +77,10 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
             return t
         }
         val date = DateTime(tm)
-        val output = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}/${date.millis}"
+        val output = "${date.withTimeAtStartOfDay().millis}/${date.millis}"
         val writer = writerB().outputPath(Path(dataDir, output).toString()).build()
         metrics.forEach {
-            writer.write(arrayOf(it.metricKey, it.tm, it.entityKey, it.metric.getBytes(), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
+            writer.write(arrayOf(it.metricKey, it.tm, it.metric.getBytes(), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
         }
         writer.close()
         return t
@@ -88,22 +89,20 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
     fun query(
         time: TimeRange,
         metrics: List<String>,
-        entity: String,
     ): BitlapIterator<MetricRow> {
-        return this.query(time, metrics, entity, arrayOf("mk", "t", "ek", "m", "meta")) { row ->
-            val (mk, t, ek, m, meta) = row
+        return this.query(time, metrics, arrayOf("mk", "t", "m", "meta")) { row ->
+            val (mk, t, m, meta) = row
             val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
             // TODO: with BBM
-            MetricRow(t as Long, mk.toString(), ek.toString(), CBM(m as? ByteArray), BBM(), metaObj)
+            MetricRow(t as Long, mk.toString(), CBM(m as? ByteArray), BBM(), metaObj)
         }
     }
 
     fun queryMeta(
         time: TimeRange,
-        metrics: List<String>,
-        entity: String,
+        metrics: List<String>
     ): BitlapIterator<MetricRowMeta> {
-        return this.query(time, metrics, entity, arrayOf("meta")) { row ->
+        return this.query(time, metrics, arrayOf("meta")) { row ->
             val (meta) = row
             JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
         }
@@ -112,14 +111,12 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
     private fun <R> query(
         time: TimeRange,
         metrics: List<String>,
-        entity: String,
         projections: Array<String>,
         rowHandler: (Array<*>) -> R
     ): BitlapIterator<R> {
         // 1. get files
         val files = time.walkByDayStep { date ->
-            val monthDir = "${date.year}/${date.monthOfYear}/${date.dayOfMonth}"
-            val path = Path(dataDir, monthDir)
+            val path = Path(dataDir, "${date.withTimeAtStartOfDay().millis}")
             if (fs.exists(path)) {
                 fs.listStatus(path) { p ->
                     val millis = p.name.toLong()
@@ -140,10 +137,7 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
             .filter(
                 AndExpression(
                     AndExpression(timeExpr.first, timeExpr.second),
-                    AndExpression(
-                        FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics),
-                        FilterUtil.prepareEqualToExpression("ek", "string", entity)
-                    )
+                    FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics)
                 ),
             )
             .build<Any>()
@@ -165,5 +159,40 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
     }
 
     override fun close() {
+    }
+
+    fun queryMeta(
+        timeFilter: TimeFilterFun,
+        metrics: List<String>,
+    ): BitlapIterator<MetricRowMeta> {
+        return this.query(timeFilter, metrics, arrayOf("meta")) { row ->
+            val (meta) = row
+            JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+        }
+    }
+
+    private fun <R> query(
+        timeFilter: TimeFilterFun,
+        metrics: List<String>,
+        projections: Array<String>,
+        rowHandler: (Array<*>) -> R
+    ): BitlapIterator<R> {
+        // 1. get files
+        val files = fs.listStatus(dataDir)
+            .map { it.path }
+            .flatMap { subPath -> fs.listStatus(subPath) { timeFilter(it.name.toLong()) }.map { it.path } }
+            .flatMap { filePath -> fs.listStatus(filePath).map { it.path } }
+
+        if (files.isEmpty()) {
+            return BitlapIterator.empty()
+        }
+        // 2. build reader
+        val reader = readerB().withFileLists(files)
+            .projection(projections)
+            .filter(
+                FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics)
+            )
+            .build<Any>()
+        return MetricRowIterator(reader, rowHandler)
     }
 }

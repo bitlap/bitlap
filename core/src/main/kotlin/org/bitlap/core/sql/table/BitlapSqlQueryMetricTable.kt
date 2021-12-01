@@ -1,43 +1,54 @@
 package org.bitlap.core.sql.table
 
 import org.apache.calcite.DataContext
-import org.apache.calcite.DataContexts
 import org.apache.calcite.linq4j.Enumerable
 import org.apache.calcite.linq4j.Linq4j
 import org.apache.calcite.rex.RexBuilder
-import org.apache.calcite.rex.RexExecutorImpl
 import org.apache.calcite.rex.RexNode
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.mdm.fetch
+import org.bitlap.core.mdm.plan.MetricsPlan
+import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.MDColumnAnalyzer
-import java.util.Arrays
+import org.bitlap.core.sql.QueryContext
 
 class BitlapSqlQueryMetricTable(
     override val table: Table,
     override val analyzer: MDColumnAnalyzer,
-    val filters: List<RexNode>,
+    private val timeFilter: RexNode,
+    private val filters: RexNode,
 ) : BitlapSqlQueryTable(table) {
 
-    // filters is empty, pushed by BitlapFilterTableScanRule
+    // filters is empty here, pushed by BitlapFilterTableScanRule
     override fun scan(root: DataContext, filters: MutableList<RexNode>, projects: IntArray?): Enumerable<Array<Any?>> {
         return this.scan(root, projects)
     }
 
     fun scan(root: DataContext, projects: IntArray?): Enumerable<Array<Any?>> {
+        val tbl = this.table
         val rowType = super.getRowType(root.typeFactory)
-        if (filters.isNotEmpty()) {
-            val filter = filters.first()
-            val executor = RexExecutorImpl.getExecutable(
-                RexBuilder(root.typeFactory),
-                filters, rowType
-            )
-            // why inputRecord? see DataContextInputGetter
-            executor.setDataContext(DataContexts.of(mapOf("inputRecord" to arrayOf(0, 0, 123, "123"))))
-            val aa = executor.execute()
-            println(Arrays.toString(aa))
-            executor.setDataContext(DataContexts.of(mapOf("inputRecord" to arrayOf(0, 0, 123, "1234"))))
-            val aaa = executor.execute()
-            println(Arrays.toString(aaa))
+        val rexBuilder = RexBuilder(root.typeFactory)
+        // check if time filter is always true
+        val timeFilterFun = resolveTimeFilter(timeFilter, rowType, rexBuilder)
+        if (timeFilterFun.invoke(-1)) {
+            throw IllegalArgumentException("${Keyword.TIME} must be specified explicitly in where expression without always true.")
         }
-        return Linq4j.asEnumerable(arrayOf(arrayOf(6, 3), arrayOf(6, 5)))
+
+//        val executor = RexExecutorImpl.getExecutable(
+//            RexBuilder(root.typeFactory),
+//            listOf(filters), rowType
+//        )
+//        val precondition = executor.function
+
+        val metricCols = analyzer.getMetricColNames()
+        val metrics = projects?.map { metricCols[it] }!!
+        @Suppress("UNCHECKED_CAST")
+        return Linq4j.asEnumerable(
+            fetch {
+                runtimeConf = QueryContext.get().runtimeConf!!
+                table = tbl
+                plan = MetricsPlan(timeFilterFun, metrics, false)
+            }.asSequence().toList() as List<Array<Any?>>
+        )
     }
 }

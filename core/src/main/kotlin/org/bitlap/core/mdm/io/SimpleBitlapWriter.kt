@@ -65,14 +65,14 @@ class SimpleBitlapWriter(table: String, database: String = DEFAULT_DATABASE) : B
             // store metrics
             val metricRows = cleanRows.groupingBy { "${it.entity.key}${it.metric.key}" }
                 .fold({ _, r ->
-                    MetricRow(time, r.metric.key, r.entity.key, CBM(), BBM(), MetricRowMeta(time, r.metric.key, r.entity.key))
+                    MetricRow(time, r.metric.key, CBM(), BBM(), MetricRowMeta(time, r.metric.key))
                 }) { _, a, b ->
                     a.entity.add(b.dimId, b.entity.id)
                     a.metric.add(b.dimId, b.entity.id, b.metric.value.toLong()) // TODO double support
                     a
                 }
                 .map { (_, r) ->
-                    r.metadata = MetricRowMeta(r.tm, r.metricKey, r.entityKey, r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
+                    r.metadata = MetricRowMeta(r.tm, r.metricKey, r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
                     r
                 }
             metricStore.store(time to metricRows)

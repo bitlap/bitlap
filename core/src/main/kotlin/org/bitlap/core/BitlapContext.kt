@@ -16,9 +16,10 @@ import org.bitlap.core.sql.BitlapSqlPlanner
 object BitlapContext {
 
     val bitlapConf = BitlapConf()
+    val hadoopConf = Configuration()
 
     val catalog by lazy {
-        BitlapCatalogImpl(bitlapConf, Configuration()).apply {
+        BitlapCatalogImpl(bitlapConf, hadoopConf).apply {
             start()
         }
     }

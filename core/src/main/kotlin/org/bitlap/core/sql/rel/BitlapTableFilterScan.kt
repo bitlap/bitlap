@@ -16,21 +16,23 @@ class BitlapTableFilterScan(
     traitSet: RelTraitSet,
     hints: List<RelHint>,
     table: RelOptTable?,
-    val filters: List<RexNode>,
+    val timeFilter: RexNode,
+    val filters: RexNode,
     override var parent: RelNode? = null,
 ) : BitlapTableScan(cluster, traitSet, hints, table, parent), BitlapNode {
 
     override fun explainTerms(pw: RelWriter): RelWriter {
         return super.explainTerms(pw)
+            .item("timeFilter", timeFilter)
             .item("filters", filters)
     }
 
     override fun withHints(hintList: MutableList<RelHint>): RelNode {
-        return BitlapTableFilterScan(cluster, traitSet, hintList, table, filters, parent)
+        return BitlapTableFilterScan(cluster, traitSet, hintList, table, timeFilter, filters, parent)
     }
 
     override fun withTable(table: RelOptTable): BitlapTableFilterScan {
-        return BitlapTableFilterScan(cluster, traitSet, hints, table, filters, parent)
+        return BitlapTableFilterScan(cluster, traitSet, hints, table, timeFilter, filters, parent)
     }
 
     override fun copy(traitSet: RelTraitSet?, inputs: MutableList<RelNode>?): RelNode {

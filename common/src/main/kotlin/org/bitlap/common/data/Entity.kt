@@ -10,4 +10,4 @@ package org.bitlap.common.data
  * Created by IceMimosa
  * Date: 2021/7/8
  */
-data class Entity(val key: String, val id: Int)
+data class Entity(val id: Int, val key: String = "ENTITY")

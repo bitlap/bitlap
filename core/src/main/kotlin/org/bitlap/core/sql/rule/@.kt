@@ -11,8 +11,8 @@ val RULES = listOf(
     BitlapRelConverter(),
     BitlapAggConverter(),
     BitlapFilterTableScanRule(),
-    BitlapTableConverter(),
     ValidRule(),
+    BitlapTableConverter(),
 )
 
 /**

@@ -64,4 +64,5 @@ object FunctionRegistry {
 
     fun sqlFunctions() = this.functions.values
     fun getFunction(name: String) = this.functions[name]
+    fun contanis(name: String) = this.functions.containsKey(name)
 }

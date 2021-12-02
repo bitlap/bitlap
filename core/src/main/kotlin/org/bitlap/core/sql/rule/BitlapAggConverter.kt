@@ -6,6 +6,7 @@ import org.apache.calcite.rel.core.AggregateCall
 import org.apache.calcite.sql.SqlAggFunction
 import org.apache.calcite.sql.`fun`.SqlCountAggFunction
 import org.apache.calcite.sql.`fun`.SqlSumAggFunction
+import org.apache.calcite.sql.`fun`.SqlSumEmptyIsZeroAggFunction
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.udf.FunctionRegistry
@@ -17,14 +18,31 @@ import org.bitlap.core.sql.udf.UdafBMSum
  */
 class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggConverter") {
 
+    companion object {
+        private val NEED_CONVERTS = listOf(
+            SqlSumAggFunction::class.java,
+            SqlSumEmptyIsZeroAggFunction::class.java,
+            SqlCountAggFunction::class.java,
+            // SqlAvgAggFunction::class.java,
+        )
+    }
+
     override fun convert0(rel: RelNode, call: RelOptRuleCall): RelNode {
         val typeFactory = call.builder().typeFactory
         rel as BitlapAggregate
+        // check need converts
+        val need = rel.aggCallList.any { NEED_CONVERTS.contains(it.aggregation::class.java) }
+        if (!need) {
+            return rel
+        }
+
+        // convert aggregate functions
         val aggCalls = rel.aggCallList.map {
             val aggFunc = it.aggregation
             var type = it.type
             val func = when (aggFunc) {
-                is SqlSumAggFunction -> {
+                is SqlSumAggFunction,
+                is SqlSumEmptyIsZeroAggFunction -> {
                     type = typeFactory.createSqlType(SqlTypeName.DOUBLE)
                     FunctionRegistry.getFunction(UdafBMSum.NAME) as SqlAggFunction
                 }
@@ -36,7 +54,13 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                         aggFunc
                     }
                 }
-                else -> aggFunc
+                else -> {
+                    if (FunctionRegistry.contanis(aggFunc.name)) {
+                        aggFunc
+                    } else {
+                        throw IllegalArgumentException("${aggFunc.name} aggregate function is not supported.")
+                    }
+                }
             }
             AggregateCall.create(
                 func, it.isDistinct, it.isApproximate, it.ignoreNulls(),

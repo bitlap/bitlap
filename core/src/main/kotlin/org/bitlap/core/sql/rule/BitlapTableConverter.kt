@@ -6,6 +6,7 @@ import org.apache.calcite.prepare.RelOptTableImpl
 import org.apache.calcite.rel.RelNode
 import org.bitlap.core.sql.rel.BitlapTableFilterScan
 import org.bitlap.core.sql.rel.BitlapTableScan
+import org.bitlap.core.sql.table.BitlapSqlQueryEmptyTable
 import org.bitlap.core.sql.table.BitlapSqlQueryMetricTable
 import org.bitlap.core.sql.table.BitlapSqlQueryTable
 
@@ -22,6 +23,9 @@ class BitlapTableConverter : AbsRelRule(BitlapTableScan::class.java, "BitlapTabl
 
         // convert to physical table scan
         val target = when {
+            rel.timeFilter.isAlwaysFalse -> {
+                BitlapSqlQueryEmptyTable(oTable.table)
+            }
             analyzer.hasNoTimeInQuery() ->
                 BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.filters)
             else ->

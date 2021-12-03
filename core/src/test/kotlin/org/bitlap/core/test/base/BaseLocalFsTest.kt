@@ -1,5 +1,6 @@
 package org.bitlap.core.test.base
 
+import cn.hutool.core.util.RandomUtil
 import io.kotest.core.spec.style.StringSpec
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
@@ -41,5 +42,9 @@ abstract class BaseLocalFsTest : StringSpec() {
                 localFS.delete(workPath, true)
             }
         }
+    }
+
+    protected fun randomString(): String {
+        return "${this::class.java.simpleName.lowercase()}_${RandomUtil.randomString(10)}"
     }
 }

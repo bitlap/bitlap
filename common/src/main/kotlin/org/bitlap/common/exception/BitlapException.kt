@@ -5,4 +5,4 @@ package org.bitlap.common.exception
  * Created by IceMimosa
  * Date: 2020/12/15
  */
-open class BitlapException(msg: String, cause: Throwable? = null) : RuntimeException(msg, cause)
+open class BitlapException @JvmOverloads constructor(msg: String, cause: Throwable? = null) : RuntimeException(msg, cause)

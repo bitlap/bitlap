@@ -1,14 +1,13 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.network.client.BitlapClient.fetchResults
-import org.bitlap.network.client.BitlapClient.getResultSetMetadata
+import org.bitlap.net.BSQLException
+import org.bitlap.net.BitlapClient
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.ResultSetMetaData
 import java.sql.SQLException
-import org.bitlap.net.BSQLException
 
 /**
  *
@@ -58,12 +57,12 @@ class BitlapQueryResultSet(
     private fun retrieveSchema() {
         try {
             if (client == null || stmtHandle == null) {
-                throw BSQLException("Resultset is closed")
+                throw BSQLException("Resultset is closed", null)
             }
             val namesSb = StringBuilder()
             val typesSb = StringBuilder()
 
-            val schema = client?.getResultSetMetadata(stmtHandle!!)
+            val schema = BitlapClient.getResultSetMetadata(stmtHandle!!, client)
             if (schema == null || schema.columnsList.isEmpty()) {
                 return
             }
@@ -93,7 +92,7 @@ class BitlapQueryResultSet(
 
     override fun next(): Boolean {
         if (isClosed || client === null || stmtHandle == null) {
-            throw BSQLException("Resultset is closed")
+            throw BSQLException("Resultset is closed", null)
         }
         if (emptyResultSet || maxRows in 1..rowsFetched) {
             return false
@@ -101,7 +100,7 @@ class BitlapQueryResultSet(
         try {
 
             if (fetchedRows.isEmpty() || !fetchedRowsItr.hasNext()) {
-                val result = client?.fetchResults(stmtHandle!!)
+                val result = BitlapClient.fetchResults(stmtHandle!!, client)
                 if (result != null) {
                     fetchedRows = result.results?.rowsList.orEmpty()
                     fetchedRowsItr = fetchedRows.iterator()
@@ -144,7 +143,7 @@ class BitlapQueryResultSet(
 
     override fun setFetchSize(rows: Int) {
         if (isClosed) {
-            throw BSQLException("Resultset is closed")
+            throw BSQLException("Resultset is closed", null)
         }
         this.fetchSize = rows
     }

@@ -16,6 +16,7 @@ interface LifeCycle : Closeable {
 abstract class LifeCycleWrapper : LifeCycle {
 
     @Volatile
+    @JvmField
     protected var started = false
     @Volatile
     protected var shutdown = true

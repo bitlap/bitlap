@@ -1,6 +1,7 @@
 package org.bitlap.jdbc
 
 import org.apache.commons.lang.StringUtils
+import org.bitlap.net.BSQLException
 import org.bitlap.network.proto.driver.BRow
 import org.bitlap.network.proto.driver.BTableSchema
 import org.bitlap.network.proto.driver.BTypeId
@@ -23,7 +24,6 @@ import java.sql.Time
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.Calendar
-import org.bitlap.net.BSQLException
 
 /**
  *

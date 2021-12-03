@@ -33,9 +33,9 @@ import org.apache.calcite.tools.RelBuilder
 import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
-import org.bitlap.core.sql.rule.BitlapTableConverter
-import org.bitlap.core.sql.rule.ValidRule
+import org.bitlap.core.sql.rule.RULES
 import org.bitlap.core.sql.table.BitlapSqlQueryTable
+import org.bitlap.core.sql.udf.FunctionRegistry
 
 /**
  * Desc: link [PlannerImpl]
@@ -49,7 +49,9 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
     fun parse(statement: String): RelNode {
         // 1. init
         val schema = this.buildSchemas()
-        val listSqlOperatorTable = ListSqlOperatorTable() // Add udf: SqlUserDefinedFunction
+        val listSqlOperatorTable = ListSqlOperatorTable().apply {
+            FunctionRegistry.sqlFunctions().forEach { add(it) }
+        }
         val config = Frameworks.newConfigBuilder()
             .parserConfig(
                 SqlParser.config()
@@ -110,8 +112,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
 //                }
 
                 val builder = HepProgramBuilder()
-                builder.addRuleInstance(ValidRule.INSTANCE)
-                builder.addRuleInstance(BitlapTableConverter.INSTANCE)
+                builder.addRuleCollection(RULES)
                 val hepPlanner = HepPlanner(builder.build())
                 hepPlanner.root = relNode
                 relNode = hepPlanner.findBestExp()

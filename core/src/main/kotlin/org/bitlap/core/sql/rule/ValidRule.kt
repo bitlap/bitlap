@@ -1,24 +1,29 @@
 package org.bitlap.core.sql.rule
 
-import org.apache.calcite.plan.Convention
+import org.apache.calcite.plan.RelOptRuleCall
 import org.apache.calcite.rel.RelNode
-import org.apache.calcite.rel.convert.ConverterRule
-import org.apache.calcite.rel.logical.LogicalTableScan
-import org.bitlap.common.logger
+import org.bitlap.core.sql.Keyword
+import org.bitlap.core.sql.rel.BitlapNode
+import org.bitlap.core.sql.rel.BitlapTableScan
 
-class ValidRule(config: Config) : ConverterRule(config) {
+class ValidRule : AbsRelRule(BitlapNode::class.java, "ValidRule") {
 
-    private val log = logger { }
-
-    companion object {
-        val INSTANCE = ValidRule(
-            Config.INSTANCE
-                .withConversion(LogicalTableScan::class.java, Convention.NONE, Convention.NONE, "ValidRule")
-        )
-    }
-
-    override fun convert(rel: RelNode): RelNode? {
-        log.info("=================ValidRule===============")
-        return null
+    override fun convert0(rel: RelNode, call: RelOptRuleCall): RelNode {
+        when (rel) {
+            is BitlapTableScan -> {
+                val table = rel.getOTable()
+                val dimCols = table.analyzer.getFilterColNames()
+                // check time filter
+                if (!dimCols.contains(Keyword.TIME)) {
+                    throw IllegalArgumentException("Query must contain ${Keyword.TIME} filter")
+                }
+                // check metrics
+                val metricCols = table.analyzer.getMetricColNames()
+                if (metricCols.isEmpty()) {
+                    throw IllegalArgumentException("Query must contain at least one aggregation metric")
+                }
+            }
+        }
+        return rel
     }
 }

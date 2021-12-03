@@ -19,7 +19,17 @@ object operations {
 
   abstract class Operation(val parentSession: Session, val opType: OperationType, val hasResultSet: Boolean = false) extends LazyLogging {
 
-    var statement: String
+    private var statement: String = ???
+
+    // super不能用于字段    
+    def getStatement: String = statement
+    
+    def setStatement(statt: String): Unit = {
+      statement = statt
+    }
+
+    def getOpHandle: OperationHandle = opHandle
+
     lazy val opHandle: OperationHandle = new OperationHandle(opType, hasResultSet)
     lazy val confOverlay: mutable.Map[String, String] = mutable.HashMap[String, String]()
 

@@ -1,6 +1,7 @@
 package org.bitlap.core.test.base
 
-import org.bitlap.common.utils.Sql.show
+import org.bitlap.common.utils.Sql.toTable
+import org.bitlap.common.utils.internal.DBTable
 import org.bitlap.core.sql.QueryExecution
 
 /**
@@ -12,22 +13,17 @@ interface SqlChecker {
      * execute sql statement
      */
     fun sql(statement: String): SqlResult {
-        return SqlResult(statement)
+        val rs = QueryExecution(statement).execute()
+        return SqlResult(statement, rs.toTable())
     }
 }
 
-class SqlResult(private val statement: String) {
+class SqlResult(private val statement: String, private val table: DBTable) {
 
     internal val result: List<List<Any?>> by lazy {
         mutableListOf<List<Any?>>().apply {
-            val rs = QueryExecution(statement).execute()
-            val colSize = rs.metaData.columnCount
-            while (rs.next()) {
-                add(
-                    (1..colSize).map {
-                        rs.getObject(it)
-                    }
-                )
+            (0 until table.rowCount).forEach { r ->
+                add(table.columns.map { it.getTypeValue(r) })
             }
         }
     }
@@ -35,7 +31,7 @@ class SqlResult(private val statement: String) {
     val size = this.result.size
 
     fun show(): SqlResult {
-        QueryExecution(statement).execute().show()
+        table.show()
         return this
     }
 

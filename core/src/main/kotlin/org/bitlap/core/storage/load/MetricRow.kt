@@ -9,7 +9,6 @@ import org.bitlap.common.bitmap.CBM
 data class MetricRow(
     val tm: Long,
     val metricKey: String,
-    val entityKey: String,
     val metric: CBM,
     val entity: BBM,
     var metadata: MetricRowMeta,
@@ -18,7 +17,6 @@ data class MetricRow(
 data class MetricRowMeta(
     val tm: Long,
     val metricKey: String,
-    val entityKey: String,
     val entityUniqueCount: Long = 0,
     val entityCount: Long = 0,
     val metricCount: Double = 0.0

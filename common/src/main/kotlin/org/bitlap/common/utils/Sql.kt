@@ -1,5 +1,6 @@
 package org.bitlap.common.utils
 
+import org.bitlap.common.utils.internal.DBTable
 import org.bitlap.common.utils.internal.DBTablePrinter
 import java.sql.ResultSet
 
@@ -11,7 +12,7 @@ object Sql {
     /**
      * print sql result beautifully
      */
-    fun ResultSet.show() {
-        DBTablePrinter.printResultSet(this)
+    fun ResultSet.toTable(): DBTable {
+        return DBTablePrinter.getDBTable(this)
     }
 }

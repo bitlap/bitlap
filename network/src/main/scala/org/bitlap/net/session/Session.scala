@@ -17,12 +17,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 trait Session {
 
   val sessionState: AtomicBoolean
-  val sessionHandle: SessionHandle
-  val password: String
-  val username: String
+  var sessionHandle: SessionHandle
+  var password: String
+  var username: String
   val creationTime: Long
-  val sessionConf: BitlapConf
-  val sessionManager: SessionManager
+  var sessionConf: BitlapConf
+  var sessionManager: SessionManager
 
   var lastAccessTime: Long
   var operationManager: OperationManager

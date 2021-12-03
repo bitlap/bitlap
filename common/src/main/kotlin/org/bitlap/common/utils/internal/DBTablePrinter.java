@@ -145,6 +145,7 @@ public class DBTablePrinter {
          * Column values from each row of a <code>ResultSet</code>.
          */
         private List<String> values = new ArrayList<>();
+        private List<Object> typeValues = new ArrayList<>();
 
         /**
          * Flag for text justification using <code>String.format</code>.
@@ -238,6 +239,9 @@ public class DBTablePrinter {
         public void addValue(String value) {
             values.add(value);
         }
+        public void addTypeValue(Object value) {
+            typeValues.add(value);
+        }
 
         /**
          * Returns the column value at row index <code>i</code>.
@@ -252,6 +256,9 @@ public class DBTablePrinter {
          */
         public String getValue(int i) {
             return values.get(i);
+        }
+        public Object getTypeValue(int i) {
+            return typeValues.get(i);
         }
 
         /**
@@ -411,99 +418,126 @@ public class DBTablePrinter {
      */
     public static void printResultSet(ResultSet rs, int maxStringColWidth) {
         try {
-            if (rs == null) {
-                System.err.println("DBTablePrinter Error: Result set is null!");
+            DBTable t = getDBTable(rs, maxStringColWidth);
+            if (t == null) {
                 return;
             }
-            if (rs.isClosed()) {
-                System.err.println("DBTablePrinter Error: Result Set is closed!");
-                return;
+            printDBTable(t);
+        } catch (SQLException e) {
+            System.err.println("SQL exception in DBTablePrinter. Message:");
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public static DBTable getDBTable(ResultSet rs) throws SQLException {
+        return getDBTable(rs, DEFAULT_MAX_TEXT_COL_WIDTH);
+    }
+
+    public static DBTable getDBTable(ResultSet rs, int maxStringColWidth) throws SQLException {
+        if (rs == null) {
+            System.err.println("DBTablePrinter Error: Result set is null!");
+            return null;
+        }
+        if (rs.isClosed()) {
+            System.err.println("DBTablePrinter Error: Result Set is closed!");
+            return null;
+        }
+        if (maxStringColWidth < 1) {
+            System.err.println("DBTablePrinter Info: Invalid max. varchar column width. Using default!");
+            maxStringColWidth = DEFAULT_MAX_TEXT_COL_WIDTH;
+        }
+
+        // Get the meta data object of this ResultSet.
+        ResultSetMetaData rsmd;
+        rsmd = rs.getMetaData();
+
+        // Total number of columns in this ResultSet
+        int columnCount = rsmd.getColumnCount();
+
+        // List of Column objects to store each columns of the ResultSet
+        // and the String representation of their values.
+        List<Column> columns = new ArrayList<>(columnCount);
+
+        // List of table names. Can be more than one if it is a joined
+        // table query
+        List<String> tableNames = new ArrayList<>(columnCount);
+
+        // Get the columns and their meta data.
+        // NOTE: columnIndex for rsmd.getXXX methods STARTS AT 1 NOT 0
+        for (int i = 1; i <= columnCount; i++) {
+            Column c = new Column(rsmd.getColumnLabel(i),
+                    rsmd.getColumnType(i), rsmd.getColumnTypeName(i));
+            c.setWidth(c.getLabel().length());
+            c.setTypeCategory(whichCategory(c.getType()));
+            columns.add(c);
+
+            if (!tableNames.contains(rsmd.getTableName(i))) {
+                tableNames.add(rsmd.getTableName(i));
             }
-            if (maxStringColWidth < 1) {
-                System.err.println("DBTablePrinter Info: Invalid max. varchar column width. Using default!");
-                maxStringColWidth = DEFAULT_MAX_TEXT_COL_WIDTH;
-            }
+        }
 
-            // Get the meta data object of this ResultSet.
-            ResultSetMetaData rsmd;
-            rsmd = rs.getMetaData();
+        // Go through each row, get values of each column and adjust
+        // column widths.
+        int rowCount = 0;
+        while (rs.next()) {
 
-            // Total number of columns in this ResultSet
-            int columnCount = rsmd.getColumnCount();
+            // NOTE: columnIndex for rs.getXXX methods STARTS AT 1 NOT 0
+            for (int i = 0; i < columnCount; i++) {
+                Column c = columns.get(i);
+                String value;
+                int category = c.getTypeCategory();
 
-            // List of Column objects to store each columns of the ResultSet
-            // and the String representation of their values.
-            List<Column> columns = new ArrayList<>(columnCount);
+                if (category == CATEGORY_OTHER) {
 
-            // List of table names. Can be more than one if it is a joined
-            // table query
-            List<String> tableNames = new ArrayList<>(columnCount);
+                    // Use generic SQL type name instead of the actual value
+                    // for column types BLOB, BINARY etc.
+                    value = "(" + c.getTypeName() + ")";
 
-            // Get the columns and their meta data.
-            // NOTE: columnIndex for rsmd.getXXX methods STARTS AT 1 NOT 0
-            for (int i = 1; i <= columnCount; i++) {
-                Column c = new Column(rsmd.getColumnLabel(i),
-                        rsmd.getColumnType(i), rsmd.getColumnTypeName(i));
-                c.setWidth(c.getLabel().length());
-                c.setTypeCategory(whichCategory(c.getType()));
-                columns.add(c);
-
-                if (!tableNames.contains(rsmd.getTableName(i))) {
-                    tableNames.add(rsmd.getTableName(i));
+                } else {
+                    value = rs.getString(i+1) == null ? "NULL" : rs.getString(i+1);
                 }
-            }
+                switch (category) {
+                    case CATEGORY_DOUBLE:
 
-            // Go through each row, get values of each column and adjust
-            // column widths.
-            int rowCount = 0;
-            while (rs.next()) {
+                        // For real numbers, format the string value to have 3 digits
+                        // after the point. THIS IS TOTALLY ARBITRARY and can be
+                        // improved to be CONFIGURABLE.
+                        if (!value.equals("NULL")) {
+                            Double dValue = rs.getDouble(i+1);
+                            value = String.format("%.3f", dValue);
+                        }
+                        break;
 
-                // NOTE: columnIndex for rs.getXXX methods STARTS AT 1 NOT 0
-                for (int i = 0; i < columnCount; i++) {
-                    Column c = columns.get(i);
-                    String value;
-                    int category = c.getTypeCategory();
+                    case CATEGORY_STRING:
 
-                    if (category == CATEGORY_OTHER) {
+                        // Left justify the text columns
+                        c.justifyLeft();
 
-                        // Use generic SQL type name instead of the actual value
-                        // for column types BLOB, BINARY etc.
-                        value = "(" + c.getTypeName() + ")";
+                        // and apply the width limit
+                        if (value.length() > maxStringColWidth) {
+                            value = value.substring(0, maxStringColWidth - 3) + "...";
+                        }
+                        break;
+                }
 
-                    } else {
-                        value = rs.getString(i+1) == null ? "NULL" : rs.getString(i+1);
-                    }
-                    switch (category) {
-                        case CATEGORY_DOUBLE:
+                // Adjust the column width
+                c.setWidth(value.length() > c.getWidth() ? value.length() : c.getWidth());
+                c.addValue(value);
+                c.addTypeValue(rs.getObject(i+1));
+            } // END of for loop columnCount
+            rowCount++;
 
-                            // For real numbers, format the string value to have 3 digits
-                            // after the point. THIS IS TOTALLY ARBITRARY and can be
-                            // improved to be CONFIGURABLE.
-                            if (!value.equals("NULL")) {
-                                Double dValue = rs.getDouble(i+1);
-                                value = String.format("%.3f", dValue);
-                            }
-                            break;
+        } // END of while (rs.next)
+        return new DBTable(tableNames, rowCount, columns);
+    }
 
-                        case CATEGORY_STRING:
-
-                            // Left justify the text columns
-                            c.justifyLeft();
-
-                            // and apply the width limit
-                            if (value.length() > maxStringColWidth) {
-                                value = value.substring(0, maxStringColWidth - 3) + "...";
-                            }
-                            break;
-                    }
-
-                    // Adjust the column width
-                    c.setWidth(value.length() > c.getWidth() ? value.length() : c.getWidth());
-                    c.addValue(value);
-                } // END of for loop columnCount
-                rowCount++;
-
-            } // END of while (rs.next)
+    public static void printDBTable(DBTable table) {
+        if (table == null) {
+            return;
+        }
+        List<String> tableNames = table.getTableNames();
+        long rowCount = table.getRowCount();
+        List<Column> columns = table.getColumns();
 
             /*
             At this point we have gone through meta data, get the
@@ -514,9 +548,9 @@ public class DBTablePrinter {
             a row separator String.
              */
 
-            // For the fun of it, I will use StringBuilder
-            StringBuilder strToPrint = new StringBuilder();
-            StringBuilder rowSeparator = new StringBuilder();
+        // For the fun of it, I will use StringBuilder
+        StringBuilder strToPrint = new StringBuilder();
+        StringBuilder rowSeparator = new StringBuilder();
 
             /*
             Prepare column labels to print as well as the row separator.
@@ -526,83 +560,83 @@ public class DBTablePrinter {
             +--------+------------+------------+-----------+  (row separator)
              */
 
-            // Iterate over columns
+        // Iterate over columns
+        for (Column c : columns) {
+            int width = c.getWidth();
+
+            // Center the column label
+            String toPrint;
+            String name = c.getLabel();
+            int diff = width - name.length();
+
+            if ((diff%2) == 1) {
+                // diff is not divisible by 2, add 1 to width (and diff)
+                // so that we can have equal padding to the left and right
+                // of the column label.
+                width++;
+                diff++;
+                c.setWidth(width);
+            }
+
+            int paddingSize = diff/2; // InteliJ says casting to int is redundant.
+
+            // Cool String repeater code thanks to user102008 at stackoverflow.com
+            // (http://tinyurl.com/7x9qtyg) "Simple way to repeat a string in java"
+            String padding = new String(new char[paddingSize]).replace("\0", " ");
+
+            toPrint = "| " + padding + name + padding + " ";
+            // END centering the column label
+
+            strToPrint.append(toPrint);
+
+            rowSeparator.append("+");
+            rowSeparator.append(new String(new char[width + 2]).replace("\0", "-"));
+        }
+
+        String lineSeparator = System.getProperty("line.separator");
+
+        // Is this really necessary ??
+        lineSeparator = lineSeparator == null ? "\n" : lineSeparator;
+
+        rowSeparator.append("+").append(lineSeparator);
+
+        strToPrint.append("|").append(lineSeparator);
+        strToPrint.insert(0, rowSeparator);
+        strToPrint.append(rowSeparator);
+
+        StringJoiner sj = new StringJoiner(", ");
+        for (String name : tableNames) {
+            sj.add(name);
+        }
+
+        String info = "Printing " + rowCount;
+        info += rowCount > 1 ? " rows from " : " row from ";
+        info += tableNames.size() > 1 ? "tables " : "table ";
+        info += sj.toString();
+
+        System.out.println(info);
+
+        // Print out the formatted column labels
+        System.out.print(strToPrint.toString());
+
+        String format;
+
+        // Print out the rows
+        for (int i = 0; i < rowCount; i++) {
             for (Column c : columns) {
-                int width = c.getWidth();
 
-                // Center the column label
-                String toPrint;
-                String name = c.getLabel();
-                int diff = width - name.length();
-
-                if ((diff%2) == 1) {
-                    // diff is not divisible by 2, add 1 to width (and diff)
-                    // so that we can have equal padding to the left and right
-                    // of the column label.
-                    width++;
-                    diff++;
-                    c.setWidth(width);
-                }
-
-                int paddingSize = diff/2; // InteliJ says casting to int is redundant.
-
-                // Cool String repeater code thanks to user102008 at stackoverflow.com
-                // (http://tinyurl.com/7x9qtyg) "Simple way to repeat a string in java"
-                String padding = new String(new char[paddingSize]).replace("\0", " ");
-
-                toPrint = "| " + padding + name + padding + " ";
-                // END centering the column label
-
-                strToPrint.append(toPrint);
-
-                rowSeparator.append("+");
-                rowSeparator.append(new String(new char[width + 2]).replace("\0", "-"));
+                // This should form a format string like: "%-60s"
+                format = String.format("| %%%s%ds ", c.getJustifyFlag(), c.getWidth());
+                System.out.print(
+                        String.format(format, c.getValue(i))
+                );
             }
 
-            String lineSeparator = System.getProperty("line.separator");
+            System.out.println("|");
+            System.out.print(rowSeparator);
+        }
 
-            // Is this really necessary ??
-            lineSeparator = lineSeparator == null ? "\n" : lineSeparator;
-
-            rowSeparator.append("+").append(lineSeparator);
-
-            strToPrint.append("|").append(lineSeparator);
-            strToPrint.insert(0, rowSeparator);
-            strToPrint.append(rowSeparator);
-
-            StringJoiner sj = new StringJoiner(", ");
-            for (String name : tableNames) {
-                sj.add(name);
-            }
-
-            String info = "Printing " + rowCount;
-            info += rowCount > 1 ? " rows from " : " row from ";
-            info += tableNames.size() > 1 ? "tables " : "table ";
-            info += sj.toString();
-
-            System.out.println(info);
-
-            // Print out the formatted column labels
-            System.out.print(strToPrint.toString());
-
-            String format;
-
-            // Print out the rows
-            for (int i = 0; i < rowCount; i++) {
-                for (Column c : columns) {
-
-                    // This should form a format string like: "%-60s"
-                    format = String.format("| %%%s%ds ", c.getJustifyFlag(), c.getWidth());
-                    System.out.print(
-                            String.format(format, c.getValue(i))
-                    );
-                }
-
-                System.out.println("|");
-                System.out.print(rowSeparator);
-            }
-
-            System.out.println();
+        System.out.println();
 
             /*
                 Hopefully this should have printed something like this:
@@ -614,10 +648,6 @@ public class DBTablePrinter {
                 |  10002 | 1964-06-02 | Bezalel    | Simmel    | F      |  1985-11-21 |
                 +--------+------------+------------+-----------+--------+-------------+
              */
-        } catch (SQLException e) {
-            System.err.println("SQL exception in DBTablePrinter. Message:");
-            System.err.println(e.getMessage());
-        }
     }
 
     /**

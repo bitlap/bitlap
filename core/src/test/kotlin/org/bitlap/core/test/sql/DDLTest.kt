@@ -17,7 +17,7 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
 
     init {
         "common database ddl statements" {
-            val testDB = "test_database_01"
+            val testDB = randomString()
             // create
             sql("create database $testDB") shouldBe listOf(listOf(true))
             shouldThrow<BitlapException> { sql("create database $testDB") }
@@ -38,7 +38,7 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "common table ddl statements" {
-            val testDB = "test_database_02"
+            val testDB = randomString()
             val testTable = "test_table"
             // create
             sql("create database $testDB")

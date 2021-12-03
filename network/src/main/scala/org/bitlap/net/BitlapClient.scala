@@ -33,6 +33,46 @@ object BitlapClient extends NetworkHelper {
   private val timeout = 3000
   private val raftTimeout = 3000
 
+  // kotlin 兼容
+  def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle = {
+    cc.openSession(conf, info)
+  }
+
+  def closeSession(sessionHandle: BSessionHandle)(implicit cc: CliClientServiceImpl): Unit = {
+    cc.closeSession(sessionHandle)
+  }
+
+  def executeStatement(sessionHandle: BSessionHandle, statement: String)(implicit cc: CliClientServiceImpl): BOperationHandle = {
+    cc.executeStatement(sessionHandle, statement)
+  }
+
+  def fetchResults(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BFetchResults.BFetchResultsResp = {
+    cc.fetchResults(operationHandle)
+  }
+
+  def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
+    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+    cc.getSchemas(sessionHandle, catalogName, schemaName)
+  }
+
+  def getTables(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
+    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+    cc.getTables(sessionHandle, catalogName, schemaName)
+  }
+
+  def getColumns(sessionHandle: BSessionHandle, tableName: String = null, schemaName: String = null, columnName: String = null)
+    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+    cc.getColumns(sessionHandle, tableName, schemaName, columnName)
+  }
+
+  /**
+   * Used for JDBC to get Schema of the specified operation.
+   */
+  def getResultSetMetadata(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BTableSchema = {
+    cc.getResultSetMetadata(operationHandle)
+  }
+
+
   implicit class CliClientServiceImplWrapper(val cc: CliClientServiceImpl) {
 
     /**

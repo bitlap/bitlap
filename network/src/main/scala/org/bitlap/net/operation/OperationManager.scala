@@ -26,7 +26,7 @@ class OperationManager {
   def newExecuteStatementOperation(parentSession: Session, statement: String, confOverlay: Map[String, String] = Map.empty): Operation = {
     val operation = operationFactory.create(parentSession, OperationType.EXECUTE_STATEMENT, hasResultSet = true)
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
-    operation.statement = statement
+    operation.setStatement(statement)
     operation.run()
     addOperation(operation)
     operation

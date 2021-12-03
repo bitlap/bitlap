@@ -1,6 +1,5 @@
 package org.bitlap.net.operation
 
-import org.bitlap.net.operation.OperationType.OperationType
 import org.bitlap.net.operation.operations.Operation
 import org.bitlap.net.session.Session
 
@@ -12,6 +11,6 @@ import org.bitlap.net.session.Session
  */
 trait OperationFactory {
 
-  def create(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false): Operation
+  def create(parentSession: Session, opType: OperationType.OperationType, hasResultSet: Boolean = false): Operation
 
 }

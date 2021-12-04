@@ -87,6 +87,7 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
   }
 
   private def registerProcessor(rpcServer: RpcServer) {
+    import org.bitlap.net.processor
     val sessionManager = new SessionManager()
     Future {
       sessionManager.startListener()
@@ -94,7 +95,7 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
     val cliService = new NetworkServiceImpl(sessionManager)
     List(
       new CloseSessionProcessor(cliService),
-      new OpenSessionProcessor(cliService),
+      processor.openSession(cliService),
       new ExecuteStatementProcessor(cliService),
       new FetchResultsProcessor(cliService),
       new GetResultSetMetaDataProcessor(cliService),

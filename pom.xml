@@ -79,6 +79,7 @@
         <scala.logging.version>3.9.4</scala.logging.version> 
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
+        <scala-macro.version>0.3.3-SNAPSHOT</scala-macro.version>
     </properties>
 
     <dependencies>
@@ -96,6 +97,11 @@
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
             <version>${kotlinx.coroutines.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.jxnu-liguobin</groupId>
+            <artifactId>scala-macro-tools_2.13</artifactId>
+            <version>${scala-macro.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.microutils</groupId>

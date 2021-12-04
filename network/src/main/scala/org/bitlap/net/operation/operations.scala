@@ -19,7 +19,7 @@ object operations {
 
   abstract class Operation(val parentSession: Session, val opType: OperationType, val hasResultSet: Boolean = false) extends LazyLogging {
 
-    private var statement: String = ???
+    private var statement: String = _
 
     // super不能用于字段    
     def getStatement: String = statement

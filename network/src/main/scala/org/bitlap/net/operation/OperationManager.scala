@@ -4,6 +4,7 @@ import cn.hutool.core.util.ServiceLoaderUtil
 import org.bitlap.net.BSQLException
 import org.bitlap.net.handles.OperationHandle
 import org.bitlap.net.operation.operations.Operation
+import org.bitlap.net.session.Session
 
 import scala.collection.mutable
 
@@ -14,8 +15,6 @@ import scala.collection.mutable
  * @version 1.0
  */
 class OperationManager {
-
-  import org.bitlap.net.session.Session
 
   private val operationFactory: OperationFactory = ServiceLoaderUtil.loadFirst(classOf[OperationFactory])
   private val handleToOperation: mutable.HashMap[OperationHandle, Operation] = mutable.HashMap[OperationHandle, Operation]()
@@ -33,13 +32,13 @@ class OperationManager {
   }
 
   def addOperation(operation: Operation) {
-    handleToOperation.synchronized {
+    this.synchronized {
       handleToOperation.put(operation.opHandle, operation)
     }
   }
 
   def getOperation(operationHandle: OperationHandle): Operation = {
-    handleToOperation.synchronized {
+    this.synchronized {
       val op = handleToOperation.getOrElse(operationHandle, null)
       if (op == null) {
         throw BSQLException("Invalid OperationHandle: $operationHandle")

@@ -22,16 +22,13 @@ import java.util.Properties
  */
 object BitlapClient extends NetworkHelper {
 
-  //TODO remove kotlin
-  private val group = "bitlap-cluster"
-  private lazy val defaultConf = new BitlapConf()
-  private lazy val bc = new BitlapConf.Companion()
-  //  private lazy val groupId: String = defaultConf.get(group, bc.getNODE_GROUP_ID.getKey)
-  //  private lazy val timeout: Long = defaultConf.get(group, bc.getNODE_RPC_TIMEOUT.getKey).toLong * 1000
-  //  private lazy val raftTimeout: Int = defaultConf.get(group, bc.getNODE_RAFT_TIMEOUT.getKey).toInt * 1000
-  private val groupId = "bitlap-cluster"
-  private val timeout = 3000
-  private val raftTimeout = 3000
+  private val defaultConf: BitlapConf = new BitlapConf() // TODO 怎么拿不到 /conf/bitlap.setting?
+  private val groupId: String = Option(defaultConf.get(BitlapConf.getNODE_GROUP_ID.getGroup,
+    BitlapConf.getNODE_GROUP_ID.getKey)).getOrElse("bitlap-cluster")
+  private val timeout: Long = Option(defaultConf.get(BitlapConf.getNODE_RPC_TIMEOUT.getGroup,
+    BitlapConf.getNODE_RPC_TIMEOUT.getKey)).getOrElse("3").toLong * 1000
+  private val raftTimeout: Int = Option(defaultConf.get(BitlapConf.getNODE_RAFT_TIMEOUT.getGroup,
+    BitlapConf.getNODE_RAFT_TIMEOUT.getKey)).getOrElse("3").toInt * 1000
 
   // kotlin 兼容
   def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle = {
@@ -51,17 +48,17 @@ object BitlapClient extends NetworkHelper {
   }
 
   def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
-    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+                (implicit cc: CliClientServiceImpl): BOperationHandle = {
     cc.getSchemas(sessionHandle, catalogName, schemaName)
   }
 
   def getTables(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
-    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+               (implicit cc: CliClientServiceImpl): BOperationHandle = {
     cc.getTables(sessionHandle, catalogName, schemaName)
   }
 
   def getColumns(sessionHandle: BSessionHandle, tableName: String = null, schemaName: String = null, columnName: String = null)
-    (implicit cc: CliClientServiceImpl): BOperationHandle = {
+                (implicit cc: CliClientServiceImpl): BOperationHandle = {
     cc.getColumns(sessionHandle, tableName, schemaName, columnName)
   }
 
@@ -79,7 +76,7 @@ object BitlapClient extends NetworkHelper {
      * Used to open a session during JDBC connection initialization.
      */
     def openSession(conf: Configuration, info: Properties): BSessionHandle = {
-      init(conf)
+      cc.init(conf)
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
@@ -198,8 +195,17 @@ object BitlapClient extends NetworkHelper {
      */
     private def init(conf: Configuration) {
       RouteTable.getInstance().updateConfiguration(groupId, conf)
-      cc.getRpcClient.init(new CliOptions())
-      assert(RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout).isOk, "Refresh leader failed")
+      val cliOptions = new CliOptions
+      cliOptions.setMaxRetry(3)
+      cc.init(cliOptions)
+      while (true) { //首次连不上，，为什么？
+        try {
+          val ret = RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout).isOk
+          if (ret) return
+        } catch {
+          case e: Exception => println(e.getLocalizedMessage)
+        }
+      }
     }
 
     /**

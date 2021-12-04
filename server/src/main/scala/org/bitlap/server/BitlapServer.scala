@@ -45,6 +45,6 @@ object BitlapServer extends App {
   cli.init(new CliOptions())
   assert(RouteTable.getInstance().refreshLeader(cli, groupId, raftTimeout).isOk, "Refresh leader failed")
   val leader = RouteTable.getInstance().selectLeader(groupId)
-  println("Leader is $leader")
+  println(s"Leader is $leader")
 
 }

@@ -107,16 +107,16 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.logging.log4j</groupId>-->
+<!--            <artifactId>log4j-slf4j-impl</artifactId>-->
+<!--            <version>${log4j.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.logging.log4j</groupId>-->
+<!--            <artifactId>log4j-core</artifactId>-->
+<!--            <version>${log4j.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -309,7 +309,7 @@
                 <plugin>
                     <groupId>com.github.gantsign.maven</groupId>
                     <artifactId>ktlint-maven-plugin</artifactId>
-                    <version>1.11.1</version>
+                    <version>1.10.2</version>
                     <executions>
                         <execution>
                             <id>format-and-check</id>

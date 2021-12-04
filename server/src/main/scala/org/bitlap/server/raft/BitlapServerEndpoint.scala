@@ -1,19 +1,21 @@
 package org.bitlap.server.raft
 
 import com.alipay.sofa.jraft.conf.Configuration
-import com.alipay.sofa.jraft.{ Node, RaftGroupService }
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.option.NodeOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.{ RaftRpcServerFactory, RpcServer }
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
+import com.alipay.sofa.jraft.{ Node, RaftGroupService }
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.{ BitlapConf, LifeCycleWrapper }
-import org.bitlap.net.{ NetworkHelper, NetworkServiceImpl }
 import org.bitlap.net.processor._
 import org.bitlap.net.session.SessionManager
+import org.bitlap.net.{ NetworkHelper, NetworkServiceImpl }
 
 import java.io.File
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
  *
@@ -62,20 +64,22 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
     val timeout = conf.get(BitlapConf.getNODE_RAFT_TIMEOUT.getGroup, BitlapConf.getNODE_RAFT_TIMEOUT.getKey)
     val raftTimeout = if (timeout != null) timeout.toInt * 1000 else 1000
     FileUtils.forceMkdir(new File(dataPath))
-    val nodeOptions = new NodeOptions()
     val logUri = "raft" + File.separator + "log"
     val raftMetaUri = "raft" + File.separator + "meta"
     val snapshotUri = "raft" + File.separator + "snapshot"
+
+    val nodeOptions = new NodeOptions()
     nodeOptions.setLogUri(logUri)
     nodeOptions.setRaftMetaUri(raftMetaUri)
     nodeOptions.setSnapshotUri(snapshotUri)
     nodeOptions.setFsm(new MetaStateMachine)
     nodeOptions.setElectionTimeoutMs(raftTimeout)
     nodeOptions.setDisableCli(false)
-    nodeOptions.setSnapshotIntervalSecs(30)
+
     val cc = new Configuration()
     cc.parse(initConfStr)
     nodeOptions.setInitialConf(cc)
+
     FileUtils.forceMkdir(new File(logUri))
     FileUtils.forceMkdir(new File(raftMetaUri))
     FileUtils.forceMkdir(new File(snapshotUri))
@@ -83,7 +87,11 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
   }
 
   private def registerProcessor(rpcServer: RpcServer) {
-    val cliService = new NetworkServiceImpl(new SessionManager())
+    val sessionManager = new SessionManager()
+    Future {
+      sessionManager.startListener()
+    }
+    val cliService = new NetworkServiceImpl(sessionManager)
     List(
       new CloseSessionProcessor(cliService),
       new OpenSessionProcessor(cliService),

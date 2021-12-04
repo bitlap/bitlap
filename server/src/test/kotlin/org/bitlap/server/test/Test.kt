@@ -3,6 +3,7 @@ package org.bitlap.server.test
 import com.alipay.sofa.jraft.RouteTable
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.option.CliOptions
+import com.alipay.sofa.jraft.rpc.RpcRequests.PingRequest
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import org.bitlap.server.BitlapServer
 
@@ -27,6 +28,11 @@ object Test {
         check(RouteTable.getInstance().refreshLeader(cli, groupId, 3000).isOk) { "Refresh leader failed" }
         val leader = RouteTable.getInstance().selectLeader(groupId)
         println("Leader is $leader")
+
+        val req = PingRequest.newBuilder().setSendTimestamp(System.currentTimeMillis()).build()
+        val resp = cli.rpcClient.invokeSync(leader.endpoint, req, 3000)
+        print(resp.toString())
+
         Thread.currentThread().join()
     }
 }

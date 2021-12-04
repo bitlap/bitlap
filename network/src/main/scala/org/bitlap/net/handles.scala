@@ -130,7 +130,7 @@ object handles {
       BSessionHandle.newBuilder().setSessionId(super.getHandleId().toBHandleIdentifier()).build()
     }
 
-    override def toString(): String = "SessionHandle [$handleId]"
+    override def toString(): String = s"SessionHandle [$handleId]"
 
     override def equals(other: Any): Boolean = {
       if (this.eq(other.asInstanceOf[AnyRef])) return true

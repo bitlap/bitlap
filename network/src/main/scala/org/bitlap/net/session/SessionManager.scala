@@ -16,17 +16,16 @@ import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
  */
 class SessionManager extends LazyLogging {
 
-  lazy val operationManager: OperationManager = new OperationManager()
+  val operationManager: OperationManager = new OperationManager()
   private val sessionFactory: SessionFactory = ServiceLoaderUtil.loadFirst(classOf[SessionFactory])
 
   private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] = new ConcurrentHashMap[SessionHandle, Session]()
-  private lazy val sessionAddLock: Object = new Object
 
-  private val sessionThread: Thread = new Thread { // register center
+  private lazy val sessionThread: Thread = new Thread { // register center
     while (true) {
       import scala.collection.convert.ImplicitConversions.{ `iterator asJava`, `map AsScalaConcurrentMap` }
       val iterator = handleToSession.iterator
-      logger.info("There are [${handleToSession.size}] surviving sessions")
+      logger.info(s"There are [${handleToSession.size}] surviving sessions")
       try {
         while (iterator.hasNext) {
           val element = iterator.next()
@@ -48,18 +47,22 @@ class SessionManager extends LazyLogging {
         TimeUnit.SECONDS.sleep(3)
       } catch {
         case e: Exception =>
-          logger.error("Failed to listen for session, error: $e.localizedMessage", e)
+          logger.error(s"Failed to listen for session, error: $e.localizedMessage", e)
       }
     }
   }
-  sessionThread.setDaemon(true)
-  sessionThread.start()
+
+  def startListener():Unit = {
+    sessionThread.setDaemon(true)
+    sessionThread.start()
+  }
+
   // service, provider, conf, discover
   // session life cycle manage
 
   def openSession(username: String, password: String, sessionConf: Map[String, String]): Session = {
-    logger.info("Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
-    sessionAddLock.synchronized {
+    logger.info(s"Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
+    SessionManager.sessionAddLock.synchronized {
       val session = this.sessionFactory.create(
         username,
         password,
@@ -68,16 +71,16 @@ class SessionManager extends LazyLogging {
       )
       handleToSession.put(session.sessionHandle, session)
       session.operationManager = operationManager
-      logger.info("Create session: ${session.sessionHandle}")
+      logger.info(s"Create session: ${session.sessionHandle}")
       return session
     }
   }
 
   def closeSession(sessionHandle: SessionHandle) = {
-    sessionAddLock.synchronized {
+    SessionManager.sessionAddLock.synchronized {
       val v = handleToSession.remove(sessionHandle)
       if (v == null) {
-        throw new BitlapException("Session does not exist: $sessionHandle")
+        throw new BitlapException(s"Session does not exist: $sessionHandle")
       } else {
         v
       }
@@ -98,25 +101,28 @@ class SessionManager extends LazyLogging {
   }
 
   def getSession(sessionHandle: SessionHandle): Session = {
-    val session: Session = sessionAddLock.synchronized {
+    val session: Session = SessionManager.sessionAddLock.synchronized {
       handleToSession.get(sessionHandle)
     }
     if (session == null) {
       // scala调用kotlin，默认参数被IDE忽略 显示红色。但是maven插件编译是有默认参数的，插件编译通过
-      throw new BitlapException("Invalid SessionHandle: $sessionHandle")
+      throw new BitlapException(s"Invalid SessionHandle: $sessionHandle")
     }
     session
   }
 
   def refreshSession(sessionHandle: SessionHandle, session: Session): Session = {
-    sessionAddLock.synchronized {
+    SessionManager.sessionAddLock.synchronized {
       session.lastAccessTime = System.currentTimeMillis()
       if (handleToSession.containsKey(sessionHandle)) {
         handleToSession.put(sessionHandle, session)
       } else {
-        throw new BitlapException("Invalid SessionHandle: $sessionHandle")
+        throw new BitlapException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
   }
 
+}
+object SessionManager {
+  private val sessionAddLock: Object = new Object
 }

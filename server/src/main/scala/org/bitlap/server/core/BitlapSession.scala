@@ -23,7 +23,7 @@ class BitlapSession extends Session {
   override var password: String = _
   override var username: String = _
   override val creationTime: Long = System.currentTimeMillis()
-  override var sessionConf: BitlapConf = _
+  override var sessionConf: BitlapConf = new BitlapConf
   override var sessionManager: SessionManager = _
   override var lastAccessTime: Long = System.currentTimeMillis()
   override var operationManager: OperationManager = _

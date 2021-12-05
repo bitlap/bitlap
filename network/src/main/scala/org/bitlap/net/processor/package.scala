@@ -24,9 +24,8 @@ package object processor {
   def success(): BStatus = BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS).build()
 
   // 没有发布到中央仓库
-  def openSession: NetworkService => CustomRpcProcessor[BOpenSessionReq] = {
-    (networkService: NetworkService) =>
-      Processable[BOpenSessionReq, NetworkService, Executor](
+  def openSession(networkService: NetworkService): CustomRpcProcessor[BOpenSessionReq] = {
+      Processable[NetworkService, BOpenSessionReq, BOpenSessionResp](networkService)(
         (service, _, req) => {
           val username = req.getUsername
           val password = req.getPassword
@@ -36,8 +35,7 @@ package object processor {
         },
         (_, _, exception) => {
           BOpenSessionResp.newBuilder().setStatus(error(exception)).build()
-        },
-        networkService, BOpenSessionResp.getDefaultInstance, null
+        }
       )
   }
 }

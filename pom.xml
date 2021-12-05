@@ -79,7 +79,7 @@
         <scala.logging.version>3.9.4</scala.logging.version> 
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <scala-macro.version>0.3.3-SNAPSHOT</scala-macro.version>
+        <scala-macro.version>0.3.3</scala-macro.version>
     </properties>
 
     <dependencies>

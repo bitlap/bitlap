@@ -1,7 +1,7 @@
 package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.network.client.BitlapClient.executeStatement
+import org.bitlap.net.BitlapClient
 import org.bitlap.network.proto.driver.BOperationHandle
 import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.Connection
@@ -134,7 +134,7 @@ open class BitlapStatement(
         if (isClosed) throw SQLException("Can't execute after statement has been closed")
         try {
             resultSet = null
-            stmtHandle = client.executeStatement(sessHandle, sql)
+            stmtHandle = BitlapClient.executeStatement(sessHandle, sql, client)
             if (stmtHandle == null || !stmtHandle!!.hasResultSet) {
                 return false
             }

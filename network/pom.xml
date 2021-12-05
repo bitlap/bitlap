@@ -31,28 +31,30 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.jxnu-liguobin</groupId>
+            <artifactId>scala-macro-tools_2.13</artifactId>
+            <version>${scala-macro.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
 
         <plugins>
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.gantsign.maven</groupId>
-                <artifactId>ktlint-maven-plugin</artifactId>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <configuration>
+                    <args>
+                        <arg>-Ymacro-annotations</arg>
+                    </args>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>com.github.os72</groupId>
@@ -65,7 +67,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <protocVersion>3.17.3</protocVersion>
+                            <protocVersion>3.11.4</protocVersion>
                             <inputDirectories>
                                 <include>src/main/protobuf</include>
                             </inputDirectories>

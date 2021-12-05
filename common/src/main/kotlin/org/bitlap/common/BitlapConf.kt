@@ -37,6 +37,10 @@ open class BitlapConf() : Serializable {
 
     fun getSessionConfig(): Map<String, String> = this.sessionConf
 
+    fun setSessionConfig(conf: Map<String, String>) {
+        this.sessionConf = conf
+    }
+
     /**
      * core properties
      */
@@ -80,6 +84,7 @@ open class BitlapConf() : Serializable {
         /**
          * Project name, default is bitlap
          */
+        @JvmStatic
         val PROJECT_NAME = BitlapConfKey("project.name", "bitlap")
             .sys("bitlap.project.name")
             .env("BITLAP_PROJECT_NAME")
@@ -87,10 +92,13 @@ open class BitlapConf() : Serializable {
         /**
          * Data dir and local dir
          */
+        @JvmStatic
         val DEFAULT_ROOT_DIR_DATA = BitlapConfKey<String>("root.dir.data")
             .validator(Validators.NOT_BLANK)
+        @JvmStatic
         val DEFAULT_ROOT_DIR_LOCAL = BitlapConfKey<String>("root.dir.local")
             .validator(Validators.NOT_BLANK)
+        @JvmStatic
         val DEFAULT_ROOT_DIR_LOCAL_META = BitlapConfKey<String>("root.dir.local.meta")
             .defaultBy {
                 it.get(DEFAULT_ROOT_DIR_LOCAL)?.withPaths("meta")
@@ -99,25 +107,30 @@ open class BitlapConf() : Serializable {
         /**
          * Node address
          */
+        @JvmStatic
         val NODE_BIND_HOST = BitlapConfKey<String>("node.bind.host")
             .validator(Validators.NOT_BLANK)
+        @JvmStatic
         val NODE_BIND_PEERS = BitlapConfKey<String>("node.bind.peers")
             .validator(Validators.NOT_BLANK)
         /**
          * Sofa RPC cluster name.
          */
+        @JvmStatic
         val NODE_GROUP_ID = BitlapConfKey<String>("node.group.id")
             .validator(Validators.NOT_BLANK)
 
         /**
          * Sofa RPC timeout, Unit: Second.
          */
+        @JvmStatic
         val NODE_RPC_TIMEOUT = BitlapConfKey<String>("node.rpc.timeout")
             .validator(Validators.NOT_BLANK)
 
         /**
          * Sofa RAFT timeout, Unit: Second.
          */
+        @JvmStatic
         val NODE_RAFT_TIMEOUT = BitlapConfKey<String>("node.raft.timeout")
             .validator(Validators.NOT_BLANK)
     }

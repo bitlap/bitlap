@@ -2,11 +2,9 @@ package org.bitlap.jdbc
 
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.network.BSQLException
-import org.bitlap.network.NetworkHelper
-import org.bitlap.network.client.BitlapClient
-import org.bitlap.network.client.BitlapClient.closeSession
-import org.bitlap.network.client.BitlapClient.openSession
+import org.bitlap.net.BSQLException
+import org.bitlap.net.BitlapClient
+import org.bitlap.net.NetworkHelper
 import org.bitlap.network.proto.driver.BSessionHandle
 import java.sql.Blob
 import java.sql.CallableStatement
@@ -56,7 +54,7 @@ open class BitlapConnection(uri: String, info: Properties = Properties()) : Conn
         try {
             val conf = Configuration()
             parts.forEach { conf.parse(it[0]) } // Not tested
-            session = client.openSession(conf, info)
+            session = BitlapClient.openSession(conf, info, client)
             isClosed = false
         } catch (e: Exception) {
             e.printStackTrace()
@@ -73,7 +71,7 @@ open class BitlapConnection(uri: String, info: Properties = Properties()) : Conn
 
     override fun close() {
         try {
-            session?.let { client.closeSession(it) }
+            session?.let { BitlapClient.closeSession(it, client) }
         } finally {
             isClosed = true
         }
@@ -83,7 +81,7 @@ open class BitlapConnection(uri: String, info: Properties = Properties()) : Conn
         if (session != null) {
             return BitlapStatement(session!!, client)
         } else {
-            throw BSQLException("Statement is closed")
+            throw BSQLException("Statement is closed", null)
         }
     }
 

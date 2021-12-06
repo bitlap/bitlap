@@ -20,8 +20,8 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
 
     init {
         this.mdColumnMap = this.analyseMDColumns(select)
-        this.mdColumnNames = this.mdColumnMap.keys.toList()
-        this.mdColumns = this.mdColumnMap.values.toList()
+        this.mdColumnNames = this.mdColumnMap.keys.toList().sorted()
+        this.mdColumns = this.mdColumnMap.values.toList().sortedBy { it.name }
     }
 
     /**
@@ -100,13 +100,42 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
         }
     }
 
-    fun getMetricColNames() = this.mdColumns.filter { it.type is MetricCol }.map { it.name }.sorted().distinct()
-    fun getDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol }.map { it.name }.sorted().distinct()
-    fun getFilterColNames() = this.mdColumns.filter { it.filter }.map { it.name }.sorted().distinct()
+    fun getMetricColNames() = this.mdColumns.filter { it.type is MetricCol }.map { it.name }.distinct()
+    fun getDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol }.map { it.name }.distinct()
+    fun getFilterColNames() = this.mdColumns.filter { it.filter }.map { it.name }.distinct()
+    fun getQueryDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol && it.project }.map { it.name }.distinct()
 
     /**
      * no time dimension in query
      */
     fun hasNoTimeInQuery() = this.mdColumns
         .none { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
+
+    fun getFromIndex(vararg idx: Int): List<MDColumn> {
+        return this.mdColumns.filter { it.project }.filterIndexed { index, _ -> idx.contains(index) }
+    }
+
+    /**
+     * check if materialize
+     */
+    fun shouldMaterialize(): Boolean {
+        val dimensions = this.getDimensionColNames()
+        // there are more than or equal to 2 dimensions except time
+        val noTimeDims = dimensions.filter { it != Keyword.TIME }
+        if (noTimeDims.size >= 2) {
+            return true
+        }
+        // no dimensions includes time
+        if (dimensions.isEmpty()) {
+            return true
+        }
+        // has no pure dimensions includes time
+        // 1) dimension is complex expression
+        // 2) dimension is not in group by
+        val hasNoPureDims = this.mdColumns.any { it.type is DimensionCol && !it.pure }
+        if (hasNoPureDims) {
+            return true
+        }
+        return false
+    }
 }

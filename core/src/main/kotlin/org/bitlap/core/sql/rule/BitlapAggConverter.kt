@@ -4,7 +4,9 @@ import org.apache.calcite.plan.RelOptRuleCall
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.core.AggregateCall
 import org.apache.calcite.sql.SqlAggFunction
+import org.apache.calcite.sql.`fun`.SqlAbstractGroupFunction
 import org.apache.calcite.sql.`fun`.SqlCountAggFunction
+import org.apache.calcite.sql.`fun`.SqlMinMaxAggFunction
 import org.apache.calcite.sql.`fun`.SqlSumAggFunction
 import org.apache.calcite.sql.`fun`.SqlSumEmptyIsZeroAggFunction
 import org.apache.calcite.sql.type.SqlTypeName
@@ -19,6 +21,7 @@ import org.bitlap.core.sql.udf.UdafBMSum
 class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggConverter") {
 
     companion object {
+        // TODO: see AggregateReduceFunctionsRule, support other aggregate functions
         private val NEED_CONVERTS = listOf(
             SqlSumAggFunction::class.java,
             SqlSumEmptyIsZeroAggFunction::class.java,
@@ -28,6 +31,10 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
     }
 
     override fun convert0(rel: RelNode, call: RelOptRuleCall): RelNode {
+        // if it has no table scan, no need to convert
+        if (!this.hasTableScanNode(rel)) {
+            return rel
+        }
         val typeFactory = call.builder().typeFactory
         rel as BitlapAggregate
         // check need converts
@@ -53,6 +60,10 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                     } else {
                         aggFunc
                     }
+                }
+                is SqlMinMaxAggFunction,
+                is SqlAbstractGroupFunction -> {
+                    aggFunc
                 }
                 else -> {
                     if (FunctionRegistry.contanis(aggFunc.name)) {

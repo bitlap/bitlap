@@ -30,7 +30,7 @@ class BitlapSqlQueryMetricTable(
         val rexBuilder = RexBuilder(root.typeFactory)
         // check if time filter is always true
         val timeFilterFun = resolveTimeFilter(timeFilter, rowType, rexBuilder)
-        if (timeFilterFun.invoke(-1)) {
+        if (timeFilterFun.invoke(-23333L)) {
             throw IllegalArgumentException("${Keyword.TIME} must be specified explicitly in where expression without always true.")
         }
 
@@ -40,14 +40,17 @@ class BitlapSqlQueryMetricTable(
 //        )
 //        val precondition = executor.function
 
+        val materialize = analyzer.shouldMaterialize()
+        val dimensions = analyzer.getQueryDimensionColNames()
         val metricCols = analyzer.getMetricColNames()
-        val metrics = projects?.map { metricCols[it] }!!
+        val projections = analyzer.getFromIndex(*projects!!).map { it.name }
+
         @Suppress("UNCHECKED_CAST")
         return Linq4j.asEnumerable(
             fetch {
                 runtimeConf = QueryContext.get().runtimeConf!!
                 table = tbl
-                plan = MetricsPlan(timeFilterFun, metrics, false)
+                plan = MetricsPlan(timeFilterFun, projections, dimensions, metricCols, materialize)
             }.asSequence().toList() as List<Array<Any?>>
         )
     }

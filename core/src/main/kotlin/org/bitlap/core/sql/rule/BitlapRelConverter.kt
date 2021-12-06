@@ -10,12 +10,16 @@ import org.apache.calcite.rel.logical.LogicalFilter
 import org.apache.calcite.rel.logical.LogicalProject
 import org.apache.calcite.rel.logical.LogicalSort
 import org.apache.calcite.rel.logical.LogicalTableScan
+import org.apache.calcite.rel.logical.LogicalUnion
+import org.apache.calcite.rel.logical.LogicalValues
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.rel.BitlapFilter
 import org.bitlap.core.sql.rel.BitlapNode
 import org.bitlap.core.sql.rel.BitlapProject
 import org.bitlap.core.sql.rel.BitlapSort
 import org.bitlap.core.sql.rel.BitlapTableScan
+import org.bitlap.core.sql.rel.BitlapUnion
+import org.bitlap.core.sql.rel.BitlapValues
 
 /**
  * Convert calcite rel node to bitlap rel node.
@@ -26,10 +30,6 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
         val root = call.planner.root.clean()
         // only convert root rel node
         if (rel != root) {
-            return rel
-        }
-        // has no table scan, return
-        if (!super.hasTableScanNode(rel)) {
             return rel
         }
         return this.convert00(rel, call)
@@ -70,8 +70,18 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
                     BitlapFilter(rel.cluster, rel.traitSet, it, rel.condition, rel.variablesSet)
                 }
             }
+            is LogicalUnion -> {
+                rel.inputs.map {
+                    this.convert00(it, call).injectParent {
+                        BitlapUnion(rel.cluster, rel.traitSet, rel.inputs, rel.all)
+                    }
+                }.first()
+            }
             is LogicalTableScan -> {
                 BitlapTableScan(rel.cluster, rel.traitSet, rel.hints, rel.table)
+            }
+            is LogicalValues -> {
+                BitlapValues(rel.cluster, rel.traitSet, rel.rowType, rel.tuples)
             }
             else -> {
                 when (rel) {

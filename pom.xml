@@ -46,11 +46,11 @@
     <modules>
         <module>common</module>
         <module>core</module>
+        <module>network</module>
         <module>server</module>
         <module>client</module>
         <module>integration/cli</module>
         <module>integration/spark3</module>
-        <module>network</module>
     </modules>
 
     <properties>
@@ -60,7 +60,7 @@
         <dokka.version>1.6.0</dokka.version>
         <kotlin.version>1.6.0</kotlin.version>
         <kotlinx.coroutines.version>1.5.2-native-mt</kotlinx.coroutines.version>
-        <kotest.version>4.6.3</kotest.version>
+        <kotest.version>5.0.1</kotest.version>
         <kotlin.logging.version>2.1.0</kotlin.logging.version>
         <arrow.version>1.0.1</arrow.version>
         <slf4j.version>1.7.32</slf4j.version>
@@ -75,7 +75,7 @@
         <sqlline.version>1.11.0</sqlline.version>
         <scala.version>2.13.5</scala.version>
         <scala.log.version>2.14.1</scala.log.version>
-            <!--  日志最新依赖Scala2.13.5  -->
+        <!--  日志最新依赖Scala2.13.5  -->
         <scala.logging.version>3.9.4</scala.logging.version> 
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>

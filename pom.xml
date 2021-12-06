@@ -73,7 +73,7 @@
         <calcite.version>1.28.0</calcite.version>
         <kotlin.cli.version>0.3.3</kotlin.cli.version>
         <sqlline.version>1.11.0</sqlline.version>
-        <scala.version>2.13.5</scala.version>
+        <scala.version>2.13.7</scala.version>
         <scala.log.version>2.14.1</scala.log.version>
             <!--  日志最新依赖Scala2.13.5  -->
         <scala.logging.version>3.9.4</scala.logging.version> 

@@ -15,6 +15,7 @@ import org.apache.calcite.plan.hep.HepProgramBuilder
 import org.apache.calcite.plan.volcano.VolcanoPlanner
 import org.apache.calcite.prepare.CalciteCatalogReader
 import org.apache.calcite.prepare.PlannerImpl
+import org.apache.calcite.rel.RelCollationTraitDef
 import org.apache.calcite.rel.RelDistributionTraitDef
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rex.RexBuilder
@@ -33,6 +34,7 @@ import org.apache.calcite.tools.RelBuilder
 import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
+import org.bitlap.core.sql.rule.ENUMERABLE_RULES
 import org.bitlap.core.sql.rule.RULES
 import org.bitlap.core.sql.table.BitlapSqlQueryTable
 import org.bitlap.core.sql.udf.FunctionRegistry
@@ -62,7 +64,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
                     .withUnquotedCasing(Casing.TO_LOWER)
             )
             .defaultSchema(schema)
-            .traitDefs(ConventionTraitDef.INSTANCE, RelDistributionTraitDef.INSTANCE)
+            .traitDefs(ConventionTraitDef.INSTANCE, RelDistributionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE)
             .operatorTable(SqlOperatorTables.chain(listSqlOperatorTable, SqlStdOperatorTable.instance()))
             .build()
         val queryContext = QueryContext.get()
@@ -88,6 +90,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
                 planner.clearRelTraitDefs()
                 config.traitDefs?.forEach { planner.addRelTraitDef(it) }
                 planner.addRelTraitDef(ConventionTraitDef.INSTANCE)
+                ENUMERABLE_RULES.forEach { planner.addRule(it) }
 
                 val cluster = RelOptCluster.create(planner, RexBuilder(validator.typeFactory))
                 val sqlToRelConverterConfig = config.sqlToRelConverterConfig.withTrimUnusedFields(false)

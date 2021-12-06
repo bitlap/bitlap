@@ -3,16 +3,40 @@ package org.bitlap.core.sql.rule
 import org.apache.calcite.plan.hep.HepRelVertex
 import org.apache.calcite.rel.RelNode
 import org.bitlap.core.sql.rel.BitlapNode
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableAggregateRule
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableAggregateSortedRule
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableFilterRule
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableProjectRule
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableUnionMergeRule
+import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableUnionRule
 
 /**
  * Entrance functions for sql rules.
  */
+
+/**
+ * @see [org.apache.calcite.rel.rules.CoreRules]
+ */
 val RULES = listOf(
     BitlapRelConverter(),
+    BitlapUnionMergeRule(),
     BitlapAggConverter(),
     BitlapFilterTableScanRule(),
     ValidRule(),
     BitlapTableConverter(),
+)
+
+/**
+ * @see [org.apache.calcite.tools.Programs.RULE_SET]
+ * @see [org.apache.calcite.adapter.enumerable.EnumerableRules.ENUMERABLE_RULES]
+ */
+val ENUMERABLE_RULES = listOf(
+    BitlapEnumerableAggregateRule(),
+    BitlapEnumerableAggregateSortedRule(),
+    BitlapEnumerableProjectRule(),
+    BitlapEnumerableFilterRule(),
+    BitlapEnumerableUnionRule(),
+    BitlapEnumerableUnionMergeRule(),
 )
 
 /**

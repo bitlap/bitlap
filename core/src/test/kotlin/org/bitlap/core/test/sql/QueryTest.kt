@@ -22,6 +22,8 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 
         "simple query" {
             sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
+            sql("select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t") shouldBe listOf(listOf(12L))
+            sql("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t") shouldBe listOf(listOf(6))
         }
 
         "forbidden queries" {
@@ -34,7 +36,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 sql("select a, b from $table") // time filter is required
             }
             shouldThrow<BitlapException> {
-                sql("select a, b from $table where _time=123") // one aggregation metric
+                sql("select a, b from $table where _time=123") // one aggregation metric is required
             }
         }
 
@@ -43,9 +45,13 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             val table = randomString()
             sql("create table $table")
             prepareTestData(table, 100L)
+            prepareTestData(table, 200L)
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123").show()
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
-            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
+//            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
+            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time>=100").show()
+            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time>=100 group by _time").show()
+
 //            sql("select _time, count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123' group by _time").show()
 //             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
         }

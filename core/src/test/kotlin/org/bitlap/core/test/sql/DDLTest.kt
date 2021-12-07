@@ -2,6 +2,8 @@ package org.bitlap.core.test.sql
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.Constants.DEFAULT_DATABASE
@@ -27,7 +29,7 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
             sql("show databases").result shouldContain listOf(testDB)
             // drop
             sql("drop database $testDB") shouldBe listOf(listOf(true))
-            sql("show databases") shouldBe listOf(listOf(DEFAULT_DATABASE))
+            sql("show databases").result shouldNotContain listOf(testDB)
             shouldThrow<BitlapException> { sql("drop database $testDB") }
             sql("drop database if exists $testDB") shouldBe listOf(listOf(false))
         }
@@ -46,7 +48,7 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
             shouldThrow<BitlapException> { sql("create table $testDB.$testTable") }
             sql("create table if not exists $testDB.$testTable")
             // show
-            sql("show tables") shouldBe emptyList<Any>()
+            sql("show tables").size shouldBeGreaterThanOrEqual 0
             sql("show tables in $testDB").size shouldBe 1
             // drop
             sql("drop table $testDB.$testTable")

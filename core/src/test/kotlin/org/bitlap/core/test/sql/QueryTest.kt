@@ -43,15 +43,16 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 
         "single metric query" {
 //            System.setProperty("calcite.debug", "true")
+            val db = randomString()
             val table = randomString()
-            sql("create table $table")
-            prepareTestData(table, 100L)
-            prepareTestData(table, 200L)
+            sql("create table $db.$table")
+            prepareTestData(db, table, 100L)
+            prepareTestData(db, table, 200L)
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123").show()
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time>=100").show()
-            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time>=100 group by _time").show()
+            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100").show()
+            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
 
 //            sql("select _time, count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123' group by _time").show()
 //             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
@@ -66,8 +67,8 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
     }
 
-    private fun prepareTestData(tableName: String, time: Long) {
-        val writer = SimpleBitlapWriter(tableName)
+    private fun prepareTestData(database: String, tableName: String, time: Long) {
+        val writer = SimpleBitlapWriter(tableName, database)
         writer.use {
             it.write(
                 listOf(

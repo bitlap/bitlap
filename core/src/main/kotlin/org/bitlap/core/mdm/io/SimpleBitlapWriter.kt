@@ -18,7 +18,7 @@ import java.util.Collections
  * Created by IceMimosa
  * Date: 2020/12/15
  */
-class SimpleBitlapWriter(table: String, database: String = DEFAULT_DATABASE) : BitlapWriter<Event> {
+class SimpleBitlapWriter(table: String, database: String) : BitlapWriter<Event> {
 
     private var closed = false
     private val rows = Collections.synchronizedList(mutableListOf<Event>())

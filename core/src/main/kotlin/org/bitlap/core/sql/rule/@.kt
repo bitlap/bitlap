@@ -2,6 +2,7 @@ package org.bitlap.core.sql.rule
 
 import org.apache.calcite.plan.hep.HepRelVertex
 import org.apache.calcite.rel.RelNode
+import org.apache.calcite.rel.rules.CoreRules
 import org.bitlap.core.sql.rel.BitlapNode
 import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableAggregateRule
 import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableAggregateSortedRule
@@ -18,12 +19,18 @@ import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableUnionRule
  * @see [org.apache.calcite.rel.rules.CoreRules]
  */
 val RULES = listOf(
-    BitlapRelConverter(),
-    BitlapUnionMergeRule(),
-    BitlapAggConverter(),
-    BitlapFilterTableScanRule(),
-    ValidRule(),
-    BitlapTableConverter(),
+    // rules to transform calcite logical node plan
+    listOf(
+        CoreRules.UNION_MERGE,
+        BitlapAggConverter(),
+    ),
+    // rules to transform bitlap node plan
+    listOf(
+        BitlapRelConverter(),
+        BitlapFilterTableScanRule(),
+        ValidRule(),
+        BitlapTableConverter(),
+    )
 )
 
 /**

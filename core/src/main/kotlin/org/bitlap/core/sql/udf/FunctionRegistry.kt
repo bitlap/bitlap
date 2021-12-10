@@ -40,7 +40,7 @@ object FunctionRegistry {
             SqlIdentifier(func.name, SqlParserPos.ZERO),
             SqlKind.OTHER_FUNCTION,
             ReturnTypes.explicit(func.resultType),
-            InferTypes.RETURN_TYPE,
+            InferTypes.FIRST_KNOWN,
             OperandTypes.operandMetadata(
                 listOf(SqlTypeFamily.ANY),
                 { t -> func.inputTypes.map { t.createSqlType(it) } },

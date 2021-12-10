@@ -111,10 +111,6 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun hasNoTimeInQuery() = this.mdColumns
         .none { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
 
-    fun getFromIndex(vararg idx: Int): List<MDColumn> {
-        return this.mdColumns.filter { it.project }.filterIndexed { index, _ -> idx.contains(index) }
-    }
-
     /**
      * check if materialize
      */

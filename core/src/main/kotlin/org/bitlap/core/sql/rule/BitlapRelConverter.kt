@@ -62,7 +62,7 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
             }
             is LogicalProject -> {
                 this.convert00(rel.input, call).injectParent {
-                    BitlapProject(rel.cluster, rel.traitSet, rel.hints, it, rel.projects, rel.rowType)
+                    BitlapProject.of(rel.cluster, rel.traitSet, rel.hints, it, rel.projects, rel.rowType)
                 }
             }
             is LogicalFilter -> {

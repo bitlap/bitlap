@@ -51,8 +51,10 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123").show()
 //            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100").show()
-            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
+//            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100").show()
+//            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
+            sql("select sum(vv) as vv1, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
+//            sql("select sum(vv) from (select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time ) t").show()
 
 //            sql("select _time, count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123' group by _time").show()
 //             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()

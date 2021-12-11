@@ -41,31 +41,68 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             }
         }
 
-        "single metric query" {
+        "only metrics query with one dimension time" {
+            val db = randomString()
+            val table = randomString()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 100L)
+            prepareTestData(db, table, 200L)
+            sql(
+                """
+                select count(a) as a, count(distinct a) as a_dis, sum(b) as b 
+                from $db.$table
+                where _time=123
+                """.trimIndent()
+            ).show() shouldBe listOf(listOf(0L, 0L, 0.0))
+            sql(
+                """
+                select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                from $db.$table 
+                where _time=100
+                """.trimIndent()
+            ) shouldBe listOf(listOf(3.0, 10.0, 2L))
+            sql(
+                """
+                select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                from $db.$table 
+                where _time=100
+                group by _time
+                """.trimIndent()
+            ) shouldBe listOf(listOf(100L, 3.0, 10.0, 2L))
+            sql(
+                """
+                select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv 
+                from $db.$table 
+                where _time=100
+                group by _time
+                """.trimIndent()
+            ) shouldBe listOf(listOf(3.0, 10.0, 100L, 2L))
+            sql(
+                """
+                select
+                  sum(vv) vv, sum(pv) pv
+                from (
+                  select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv 
+                  from $db.$table 
+                  where _time=100
+                  group by _time
+                ) t
+                """.trimIndent()
+            ) shouldBe listOf(listOf(3.0, 10.0))
+
+        }
+
+        "single metric query2" {
 //            System.setProperty("calcite.debug", "true")
             val db = randomString()
             val table = randomString()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
-//            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123").show()
-//            sql("select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123'").show()
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100").show()
-//            sql("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
-            sql("select sum(vv) as vv1, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
-//            sql("select sum(vv) from (select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time ) t").show()
-
-//            sql("select _time, count(a) as a, count(distinct a) as a_dis, sum(b) as b from $table where _time=123 and c='123' group by _time").show()
-//             sql("select 1+2*3, id, a from (select id, name as a from $table) t where id < 5 limit 100").show()
-        }
-
-        "simple query2" {
-//            sql("create table test")
-//            val sql = "select 1+2*3, id, a from (select id, name as a from test) t where id < 5 limit 100"
-//    val sql = "select name, count(1), count(age) cnt from test where id < 5 and name = 'mimosa' group by name"
-//            val sql = "select a, b, count(c) from test group by a, b"
-//            sql(sql).show()
+//            sql("select _time, sum(vv) as vv1, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
+            sql("select sum(vv) from (select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time ) t").show()
         }
     }
 

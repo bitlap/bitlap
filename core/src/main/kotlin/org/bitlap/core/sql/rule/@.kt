@@ -20,17 +20,16 @@ import org.bitlap.core.sql.rule.enumerable.BitlapEnumerableUnionRule
  */
 val RULES = listOf(
     // rules to transform calcite logical node plan
-    listOf(
-        CoreRules.UNION_MERGE,
-        BitlapAggConverter(),
-    ),
+    listOf(CoreRules.UNION_MERGE),
     // rules to transform bitlap node plan
     listOf(
         BitlapRelConverter(),
+        BitlapAggConverter(),
         BitlapFilterTableScanRule(),
         ValidRule(),
         BitlapTableConverter(),
-    )
+    ),
+    listOf(BitlapRowTypeConverter()),
 )
 
 /**
@@ -58,6 +57,8 @@ fun RelNode?.clean(): RelNode? {
 
 /**
  * inject parent node
+ *
+ * @return parent node
  */
 fun RelNode.injectParent(parent: (RelNode) -> RelNode): RelNode {
     val p = parent(this)

@@ -39,4 +39,8 @@ class BitlapAggregate(
     fun withAggCalls(aggCalls: List<AggregateCall>): BitlapAggregate {
         return BitlapAggregate(cluster, traitSet, hints, input, groupSet, groupSets, aggCalls, parent)
     }
+
+    fun copy(input: RelNode, aggCalls: List<AggregateCall>): BitlapAggregate {
+        return BitlapAggregate(cluster, traitSet, hints, input, groupSet, groupSets, aggCalls, parent)
+    }
 }

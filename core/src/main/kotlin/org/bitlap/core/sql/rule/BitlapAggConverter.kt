@@ -31,12 +31,13 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
     }
 
     override fun convert0(rel: RelNode, call: RelOptRuleCall): RelNode {
-        // if it has no table scan, no need to convert
-        if (!this.hasTableScanNode(rel)) {
+        rel as BitlapAggregate
+        // 1. if it has no table scan, no need to convert
+        // 2. if current is not first BitlapAggregate deeply, maybe sub query, no need to convert
+        if (!this.hasTableScanNode(rel) || this.hasSecondAggregate(rel)) {
             return rel
         }
         val typeFactory = call.builder().typeFactory
-        rel as BitlapAggregate
         // check need converts
         val need = rel.aggCallList.any { NEED_CONVERTS.contains(it.aggregation::class.java) }
         if (!need) {
@@ -80,5 +81,12 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
             )
         }
         return rel.withAggCalls(aggCalls)
+    }
+
+    private fun hasSecondAggregate(rel: RelNode, inputs: Boolean = false): Boolean {
+        if (rel is BitlapAggregate && inputs) {
+            return true
+        }
+        return rel.inputs.mapNotNull { it.clean() }.any { this.hasSecondAggregate(it, true) }
     }
 }

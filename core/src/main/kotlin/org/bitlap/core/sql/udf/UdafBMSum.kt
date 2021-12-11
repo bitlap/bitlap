@@ -2,7 +2,7 @@ package org.bitlap.core.sql.udf
 
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.core.storage.load.MetricRowMetaSimple
+import org.bitlap.core.sql.RowValueMeta
 
 /**
  * compute sum metric from bitmap or metadata.
@@ -19,8 +19,8 @@ class UdafBMSum : UDAF<Number, Any, Number> {
     override fun init(): Number = 0.0
     override fun add(accumulator: Number, input: Any): Number {
         return when (input) {
-            is MetricRowMetaSimple -> {
-                accumulator.toDouble() + (input.metricCount as Number).toDouble()
+            is RowValueMeta -> {
+                accumulator.toDouble() + (input[2]).toDouble()
             }
             is CBM -> {
                 accumulator.toDouble() + input.getCount()

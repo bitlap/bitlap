@@ -114,12 +114,13 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
 //                    relNode = cluster.getPlanner().changeTraits(relNode, desiredTraits)
 //                }
 
-                val builder = HepProgramBuilder()
-                builder.addRuleCollection(RULES)
-                val hepPlanner = HepPlanner(builder.build())
-                hepPlanner.root = relNode
-                relNode = hepPlanner.findBestExp()
-
+                relNode = RULES.fold(relNode) { rel, rules ->
+                    val builder = HepProgramBuilder()
+                    builder.addRuleCollection(rules)
+                    val hepPlanner = HepPlanner(builder.build())
+                    hepPlanner.root = rel
+                    hepPlanner.findBestExp()
+                }
                 println(relNode.explain())
                 relNode
             }

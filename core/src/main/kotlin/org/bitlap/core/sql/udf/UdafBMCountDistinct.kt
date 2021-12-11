@@ -2,7 +2,7 @@ package org.bitlap.core.sql.udf
 
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.bitmap.BM
-import org.bitlap.core.storage.load.MetricRowMetaSimple
+import org.bitlap.core.sql.RowValueMeta
 
 /**
  * compute count metric from bitmap or metadata.
@@ -19,8 +19,8 @@ class UdafBMCountDistinct : UDAF<Number, Any, Number> {
     override fun init(): Number = 0L
     override fun add(accumulator: Number, input: Any): Number {
         return when (input) {
-            is MetricRowMetaSimple -> {
-                accumulator.toLong() + (input.entityUniqueCount as Number).toLong()
+            is RowValueMeta -> {
+                accumulator.toLong() + input[0].toLong()
             }
             is BM -> {
                 accumulator.toLong() + input.getCountUnique()

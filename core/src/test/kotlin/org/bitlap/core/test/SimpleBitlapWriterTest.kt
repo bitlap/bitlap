@@ -23,9 +23,10 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
     init {
 
         "test SimpleBitlapWriter" {
-            val dsName = "test_datasource"
-            BitlapContext.catalog.createTable(dsName, ifNotExists = true)
-            val writer = SimpleBitlapWriter(dsName)
+            val db = randomString()
+            val dsName = randomString()
+            BitlapContext.catalog.createTable(dsName, db, true)
+            val writer = SimpleBitlapWriter(dsName, db)
 
             val testTime = DateTime.parse("2021-01-01").millis
             val testTime2 = DateTime.parse("2021-01-02").millis
@@ -50,7 +51,7 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
 
             val reader = DefaultBitlapReader()
             val rows = reader.use {
-                it.read(Query("default", dsName, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
+                it.read(Query(db, dsName, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
             }
             rows.size shouldBe 1
             val pv = rows.first().getBM("pv")

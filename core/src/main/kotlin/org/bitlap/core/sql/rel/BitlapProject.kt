@@ -5,7 +5,6 @@ import org.apache.calcite.plan.RelTraitSet
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.core.Project
 import org.apache.calcite.rel.hint.RelHint
-import org.apache.calcite.rel.logical.LogicalProject
 import org.apache.calcite.rel.type.RelDataType
 import org.apache.calcite.rex.RexNode
 
@@ -27,12 +26,12 @@ class BitlapProject(
         input: RelNode,
         projects: MutableList<RexNode>,
         rowType: RelDataType,
-    ): Project {
+    ): BitlapProject {
         return BitlapProject(cluster, traitSet, hints, input, projects, rowType, parent)
     }
 
     override fun withHints(hintList: List<RelHint>): RelNode {
-        return LogicalProject(cluster, traitSet, hintList, input, projects, getRowType())
+        return BitlapProject(cluster, traitSet, hintList, input, projects, getRowType())
     }
 
     override fun deepHashCode(): Int {
@@ -41,5 +40,9 @@ class BitlapProject(
 
     override fun deepEquals(obj: Any?): Boolean {
         return super.deepEquals0(obj)
+    }
+
+    fun copy(input: RelNode, rowType: RelDataType, projects: List<RexNode>): BitlapProject {
+        return BitlapProject(cluster, traitSet, hints, input, projects, rowType, parent)
     }
 }

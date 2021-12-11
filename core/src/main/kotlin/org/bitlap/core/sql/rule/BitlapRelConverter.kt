@@ -71,9 +71,10 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
                 }
             }
             is LogicalUnion -> {
+                val union = BitlapUnion(rel.cluster, rel.traitSet, rel.inputs, rel.all)
                 rel.inputs.map {
                     this.convert00(it, call).injectParent {
-                        BitlapUnion(rel.cluster, rel.traitSet, rel.inputs, rel.all)
+                        union
                     }
                 }.first()
             }

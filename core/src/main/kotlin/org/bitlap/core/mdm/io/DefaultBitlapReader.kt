@@ -16,7 +16,10 @@ import org.bitlap.core.mdm.model.RawRow
 class DefaultBitlapReader : BitlapReader {
 
     override fun read(query: Query): List<RawRow> {
-        val metricStore = BitlapContext.catalog.getMetricStore(PreConditions.checkNotBlank(query.table))
+        val metricStore = BitlapContext.catalog.getMetricStore(
+            PreConditions.checkNotBlank(query.table),
+            PreConditions.checkNotBlank(query.database)
+        )
 
         if (query.hasDimensions()) {
             // TODO: with dimensions

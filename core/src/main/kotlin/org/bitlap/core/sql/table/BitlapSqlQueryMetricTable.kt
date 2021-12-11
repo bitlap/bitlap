@@ -43,7 +43,7 @@ class BitlapSqlQueryMetricTable(
         val materialize = analyzer.shouldMaterialize()
         val dimensions = analyzer.getQueryDimensionColNames()
         val metricCols = analyzer.getMetricColNames()
-        val projections = analyzer.getFromIndex(*projects!!).map { it.name }
+        val projections = projects!!.map { rowType.fieldList[it].name }
 
         @Suppress("UNCHECKED_CAST")
         return Linq4j.asEnumerable(

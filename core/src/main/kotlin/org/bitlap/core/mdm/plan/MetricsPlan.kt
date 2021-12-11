@@ -4,8 +4,8 @@ import org.bitlap.common.BitlapIterator
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.sql.Keyword
+import org.bitlap.core.sql.RowValueMeta
 import org.bitlap.core.sql.TimeFilterFun
-import org.bitlap.core.storage.load.MetricRowMetaSimple
 
 /**
  * plan to fetch metrics
@@ -22,16 +22,15 @@ class MetricsPlan(
         PreConditions.checkExpression(dimensions.size <= 2)
         val hasTime = dimensions.contains(Keyword.TIME)
         val rawRows = withFetcher(context) { fetcher ->
-            val rows = LinkedHashMap<Long, MutableMap<String, MetricRowMetaSimple>>()
+            val rows = LinkedHashMap<Long, MutableMap<String, RowValueMeta>>()
             fetcher.fetchMetricsMeta(context.table, timeFilter, metrics)
                 .asSequence()
                 .forEach {
                     val row = rows.computeIfAbsent(it.tm) { mutableMapOf() }
                     if (row.containsKey(it.metricKey)) {
-                        row[it.metricKey]!!.addEntityUniqueCount(it.entityUniqueCount).addEntityCount(it.entityCount)
-                            .addMetricCount(it.metricCount)
+                        row[it.metricKey]!!.add0(it.entityUniqueCount).add1(it.entityCount).add2(it.metricCount)
                     } else {
-                        row[it.metricKey] = MetricRowMetaSimple(it.entityUniqueCount, it.entityCount, it.metricCount)
+                        row[it.metricKey] = RowValueMeta.of(it.entityUniqueCount, it.entityCount, it.metricCount)
                     }
                 }
             rows.map { rs ->
@@ -39,7 +38,7 @@ class MetricsPlan(
                     projects.mapIndexed { i, p ->
                         when (p) {
                             Keyword.TIME -> set(i, rs.key)
-                            else -> set(i, rs.value[p] ?: MetricRowMetaSimple())
+                            else -> set(i, rs.value[p] ?: RowValueMeta.empty())
                         }
                     }
                 }
@@ -52,11 +51,10 @@ class MetricsPlan(
             hasTime -> BitlapIterator.of(rawRows)
             else -> {
                 val rs = rawRows.reduce { acc, an ->
-                    acc.forEachIndexed { i, e ->
-                        val m1 = e as MetricRowMetaSimple
-                        val m2 = an[i] as MetricRowMetaSimple
-                        m1.addEntityUniqueCount(m2.entityUniqueCount).addEntityCount(m2.entityCount)
-                            .addMetricCount(m2.metricCount)
+                    for (i in acc.indices) {
+                        val c1 = acc[i] as RowValueMeta
+                        val (v0, v1, v2) = an[i] as RowValueMeta
+                        c1.add0(v0).add1(v1).add2(v2)
                     }
                     acc
                 }

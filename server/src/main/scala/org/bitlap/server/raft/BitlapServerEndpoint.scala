@@ -1,17 +1,17 @@
 package org.bitlap.server.raft
 
+import com.alipay.sofa.jraft.{ Node, RaftGroupService }
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.option.NodeOptions
-import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.{ RaftRpcServerFactory, RpcServer }
+import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import com.alipay.sofa.jraft.{ Node, RaftGroupService }
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.{ BitlapConf, LifeCycleWrapper }
+import org.bitlap.net.{ NetworkHelper, NetworkServiceImpl }
 import org.bitlap.net.processor._
 import org.bitlap.net.session.SessionManager
-import org.bitlap.net.{ NetworkHelper, NetworkServiceImpl }
 
 import java.io.File
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -87,21 +87,21 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
   }
 
   private def registerProcessor(rpcServer: RpcServer) {
-    import org.bitlap.net.processor
     val sessionManager = new SessionManager()
     Future {
       sessionManager.startListener()
     }
     val cliService = new NetworkServiceImpl(sessionManager)
+    val processors = ProcessorsManager(cliService, null)
     List(
-      new CloseSessionProcessor(cliService),
-      processor.openSession(cliService),
-      new ExecuteStatementProcessor(cliService),
-      new FetchResultsProcessor(cliService),
-      new GetResultSetMetaDataProcessor(cliService),
-      new GetSchemasProcessor(cliService),
-      new GetTablesProcessor(cliService),
-      new GetColumnsProcessor(cliService),
+      processors.closeSession,
+      processors.openSession,
+      processors.executeStatement,
+      processors.fetchResults,
+      processors.getResultSet,
+      processors.getSchemas,
+      processors.getColumns,
+      processors.getTables
     ).foreach {
       rpcServer.registerProcessor(_)
     }

@@ -79,7 +79,7 @@
         <scala.logging.version>3.9.4</scala.logging.version> 
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <scala-macro.version>0.3.3</scala-macro.version>
+        <scala-macro.version>0.3.4</scala-macro.version>
     </properties>
 
     <dependencies>
@@ -99,7 +99,7 @@
             <version>${kotlinx.coroutines.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.jxnu-liguobin</groupId>
+            <groupId>org.bitlap</groupId>
             <artifactId>scala-macro-tools_2.13</artifactId>
             <version>${scala-macro.version}</version>
         </dependency>

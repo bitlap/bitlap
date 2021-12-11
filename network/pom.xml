@@ -32,7 +32,7 @@
             <artifactId>bitlap-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.jxnu-liguobin</groupId>
+            <groupId>org.bitlap</groupId>
             <artifactId>scala-macro-tools_2.13</artifactId>
             <version>${scala-macro.version}</version>
         </dependency>

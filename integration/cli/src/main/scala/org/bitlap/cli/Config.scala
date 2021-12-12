@@ -11,8 +11,8 @@ import org.backuity.clist._
  */
 case class Config(cmd: String = "", sql: String = "", kwargs: Map[String, String] = Map.empty)
 
-class SQL extends Command(description = "cli SQL command") {
-  var s: List[String] = args[List[String]]()
-  // TODO 参数有问题
-  var kvargs: String = opt[String](default = "")
+class bql extends Command(description = "Bitlap sql command") {
+  var sql: List[String] = args[List[String]]()
+  //--kvargs=k1=v1,k2=v2
+  var kvargs: String = opt[String](default = "", description = "Statement SQL parameters to replace \"?\"")
 }

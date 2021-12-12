@@ -1,8 +1,10 @@
 package org.bitlap.cli.parser
 
 import org.backuity.clist.Cli
-import org.bitlap.cli.{ CLICommand, Config, SQL }
+import org.bitlap.cli.{ CLICommand, Config, bql }
 import zio.UIO
+
+import scala.collection.mutable
 
 /**
  * 命令行解析层
@@ -26,8 +28,27 @@ trait CLICommandParserLive extends CLICommandParser {
 
 
   private def parseArgs(args: Seq[String]): Option[Config] = {
-    Cli.parse(args.toArray).withCommand(new SQL) { sql =>
-      Config(cmd = sql.s.head, sql = sql.s.tail.tail.tail.mkString(" "), Map("args" -> sql.kvargs))
+    Cli.parse(args.toArray).version("1.0-SNAPSHOT").withCommand(new bql) { bql =>
+      bql.sql.tail match {
+        // bsql --kvargs=key=1,key2=value2 select * from table
+        case (head: String) :: (sql: List[String]) if head.startsWith("--kvargs") =>
+          val propertiesStr = head.replaceFirst("--kvargs=", "")
+          println(s"properties => $propertiesStr")
+          val args = propertiesStr.split(",").foldLeft[mutable.Map[String, String]](new mutable.HashMap[String, String]())((map, e) => {
+            if (e.contains("=")) {
+              val Array(k, v) = e.split("=")
+              map += k -> v
+            } else {
+              map += "args" -> e
+            }
+          }).toMap
+          val conf = Config(cmd = if (args.isEmpty) "sql" else "stmt", sql = sql.mkString(" "), args)
+          println(s"cli conf => $conf")
+          conf
+        // bsql select * from table
+        case sql: List[String] if sql.isEmpty => Config(cmd = "sql", sql = sql.mkString(" "))
+        case _ => Config("sql", "select 1")
+      }
     }
   }
 }

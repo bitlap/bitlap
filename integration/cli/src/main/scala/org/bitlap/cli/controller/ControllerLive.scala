@@ -20,10 +20,13 @@ trait ControllerLive extends Controller {
 
     override def process(input: String, cliContext: CLIContext): UIO[CLIContext] = {
       cliCommandParser.parse(input).map {
-        case CLICommand.ExecuteStatement(sql, args) => cliContext
+        case CLICommand.ExecuteStatement(sql, args) =>
+          println(s"stmt cmd => sql")
+          println(s"stmt args => $args")
+          cliContext
         case CLICommand.ExecuteNativeSQL(sql, args) =>
-          println("sql =>" + sql)
-          println("args =>" + args)
+          println(s"sql cmd => sql")
+          println(s"sql args => $args")
           cliContext
         case CLICommand.ExecuteDDL(sql, args) => cliContext
         case CLICommand.Invalid => cliContext

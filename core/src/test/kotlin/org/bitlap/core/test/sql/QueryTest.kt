@@ -89,7 +89,6 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 ) t
                 """.trimIndent()
             ) shouldBe listOf(listOf(3.0, 10.0))
-
         }
 
         "single metric query2" {

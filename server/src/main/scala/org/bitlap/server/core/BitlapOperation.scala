@@ -3,19 +3,22 @@ package org.bitlap.server.core
 import org.bitlap.net.operation.OperationType.OperationType
 import org.bitlap.net.operation.operations
 import org.bitlap.net.session.Session
-
 import org.bitlap.net.models
+
 import java.sql.Types
 import com.google.protobuf.ByteString
+
 import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer
 import org.bitlap.core.sql.QueryExecution
+import org.bitlap.tools.apply
 
 /**
  *
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
+@apply
 class BitlapOperation(
   parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
   extends operations.Operation(parentSession, opType, hasResultSet) {
@@ -52,11 +55,5 @@ class BitlapOperation(
   override def run(): Unit = {
     cache.put(super.getOpHandle, wrapper(new QueryExecution(super.getStatement).execute()))
 
-  }
-}
-
-object BitlapOperation {
-  def apply(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false): BitlapOperation = {
-    new BitlapOperation(parentSession, opType, hasResultSet)
   }
 }

@@ -14,5 +14,5 @@ case class Config(cmd: String = "", sql: String = "", kwargs: Map[String, String
 class bql extends Command(description = "Bitlap sql command") {
   var sql: List[String] = args[List[String]]()
   //--kvargs=k1=v1,k2=v2
-  var kvargs: String = opt[String](default = "", description = "Statement SQL parameters to replace \"?\"")
+  var kvargs: String = opt[String](default = "", description = "Statement SQL parameters to replace \"?\", e.g. key1=value1,key2=value2")
 }

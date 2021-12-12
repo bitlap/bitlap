@@ -18,61 +18,50 @@
             <artifactId>bitlap-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-cli-jvm</artifactId>
-            <version>${kotlin.cli.version}</version>
+            <groupId>org.backuity.clist</groupId>
+            <artifactId>clist-macros_2.13</artifactId>
+            <version>${clist.version}</version>
         </dependency>
         <dependency>
-            <groupId>sqlline</groupId>
-            <artifactId>sqlline</artifactId>
-            <version>${sqlline.version}</version>
+            <groupId>org.backuity.clist</groupId>
+            <artifactId>clist-core_2.13</artifactId>
+            <version>${clist.version}</version>
         </dependency>
+        <dependency>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio_2.13</artifactId>
+            <version>${zio.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/dev.zio/zio-macros-core -->
+        <dependency>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio-macros-core_2.13</artifactId>
+            <version>${zio-macro-core.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.gantsign.maven</groupId>
-                <artifactId>ktlint-maven-plugin</artifactId>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <configuration>
+                    <args>
+                        <arg>-Ymacro-annotations</arg>
+                    </args>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
-                <version>${dokka.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>org.bitlap.cli.BitlapSqlLine</mainClass>
-                    <arguments>
-                        <argument>foo</argument>
-                        <argument>bar</argument>
-                    </arguments>
-                </configuration>
             </plugin>
         </plugins>
     </build>

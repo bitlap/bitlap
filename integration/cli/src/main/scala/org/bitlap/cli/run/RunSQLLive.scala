@@ -1,6 +1,8 @@
-package org.bitlap.cli
+package org.bitlap.cli.run
 
-
+import org.bitlap.cli.CLIContext
+import org.bitlap.cli.controller.Controller
+import org.bitlap.cli.terminal.Terminal
 import zio.RIO
 
 /**

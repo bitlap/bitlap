@@ -1,6 +1,7 @@
-package org.bitlap.cli
+package org.bitlap.cli.parser
 
 import org.backuity.clist.Cli
+import org.bitlap.cli.{ CLICommand, Config, SQL }
 import zio.UIO
 
 /**

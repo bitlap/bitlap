@@ -1,5 +1,6 @@
-package org.bitlap.cli
+package org.bitlap.cli.parser
 
+import org.bitlap.cli.CLICommand
 import zio.ZIO
 
 /**
@@ -17,7 +18,6 @@ trait CLICommandParser {
 object CLICommandParser {
 
   trait Service[R] {
-
     def parse(input: String): ZIO[R, Nothing, CLICommand]
   }
 }

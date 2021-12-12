@@ -1,5 +1,6 @@
-package org.bitlap.cli
+package org.bitlap.cli.terminal
 
+import org.bitlap.cli.CLIContext
 import zio.ZIO
 import zio.macros.annotation.accessible
 
@@ -13,15 +14,12 @@ import java.io.IOException
  */
 @accessible(">")
 trait Terminal {
-
   val terminal: Terminal.Service[Any]
-
 }
 
 object Terminal {
 
   trait Service[R] {
-
     val getUserInput: ZIO[R, IOException, String]
 
     def display(cliContext: CLIContext): ZIO[R, IOException, Unit]

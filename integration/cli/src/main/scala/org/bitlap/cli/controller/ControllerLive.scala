@@ -1,5 +1,7 @@
-package org.bitlap.cli
+package org.bitlap.cli.controller
 
+import org.bitlap.cli.parser.CLICommandParser
+import org.bitlap.cli.{ CLICommand, CLIContext }
 import zio.UIO
 
 /**

@@ -1,5 +1,6 @@
-package org.bitlap.cli
+package org.bitlap.cli.run
 
+import org.bitlap.cli.CLIContext
 import zio.{ RIO, ZIO }
 
 /**

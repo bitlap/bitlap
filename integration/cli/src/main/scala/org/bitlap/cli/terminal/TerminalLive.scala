@@ -1,5 +1,6 @@
-package org.bitlap.cli
+package org.bitlap.cli.terminal
 
+import org.bitlap.cli.CLIContext
 import zio.console.Console
 
 /**

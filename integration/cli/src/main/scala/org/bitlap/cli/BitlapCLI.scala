@@ -1,5 +1,9 @@
 package org.bitlap.cli
 
+import org.bitlap.cli.controller.ControllerLive
+import org.bitlap.cli.parser.CLICommandParserLive
+import org.bitlap.cli.run.{ RunSQL, RunSQLLive }
+import org.bitlap.cli.terminal.TerminalLive
 import zio.console.Console
 import zio.{ App, CanFail, UIO, ZIO, console }
 

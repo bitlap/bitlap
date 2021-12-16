@@ -16,12 +16,13 @@ open class RowValueMeta : Serializable {
 
     companion object {
         fun empty() = RowValueMeta()
-        fun of(v1: Long, v2: Long, v3: Double) = RowValueMeta().add0(v1).add1(v2).add2(v3)
+        fun of(v0: Long, v1: Long, v2: Double) = RowValueMeta().add0(v0).add1(v1).add2(v2)
     }
 
     fun add0(v: Number) = this.also { it.values[0] = v.toLong() + it.values[0].toLong() }
     fun add1(v: Number) = this.also { it.values[1] = v.toLong() + it.values[1].toLong() }
     fun add2(v: Number) = this.also { it.values[2] = v.toDouble() + it.values[2].toDouble() }
+    fun add(v0: Number, v1: Number, v2: Number) = this.add0(v0).add1(v1).add2(v2)
 
     operator fun component1(): Number = this.values[0]
     operator fun component2(): Number = this.values[1]

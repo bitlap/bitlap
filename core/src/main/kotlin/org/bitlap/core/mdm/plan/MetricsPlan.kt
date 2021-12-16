@@ -38,7 +38,7 @@ class MetricsPlan(
                     for (i in acc.indices) {
                         val c1 = acc[i] as RowValueMeta
                         val (v0, v1, v2) = an[i] as RowValueMeta
-                        c1.add0(v0).add1(v1).add2(v2)
+                        c1.add(v0, v1, v2)
                     }
                     acc
                 }

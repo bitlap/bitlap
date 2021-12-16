@@ -29,7 +29,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             .map {
                 val row = rows.computeIfAbsent(it.tm) { mutableMapOf() }
                 if (row.containsKey(it.metricKey)) {
-                    row[it.metricKey]!!.add0(it.entityUniqueCount).add1(it.entityCount).add2(it.metricCount)
+                    row[it.metricKey]!!.add(it.entityUniqueCount, it.entityCount, it.metricCount)
                 } else {
                     row[it.metricKey] = RowValueMeta.of(it.entityUniqueCount, it.entityCount, it.metricCount)
                 }

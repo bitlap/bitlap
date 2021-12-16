@@ -3,8 +3,8 @@ package org.bitlap.core.mdm.plan
 import org.bitlap.common.BitlapIterator
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.mdm.FetchContext
+import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.Keyword
-import org.bitlap.core.sql.RowValueMeta
 import org.bitlap.core.sql.TimeFilterFun
 
 /**
@@ -22,27 +22,11 @@ class MetricsPlan(
         PreConditions.checkExpression(dimensions.size <= 2)
         val hasTime = dimensions.contains(Keyword.TIME)
         val rawRows = withFetcher(context) { fetcher ->
-            val rows = LinkedHashMap<Long, MutableMap<String, RowValueMeta>>()
             fetcher.fetchMetricsMeta(context.table, timeFilter, metrics)
-                .asSequence()
-                .forEach {
-                    val row = rows.computeIfAbsent(it.tm) { mutableMapOf() }
-                    if (row.containsKey(it.metricKey)) {
-                        row[it.metricKey]!!.add0(it.entityUniqueCount).add1(it.entityCount).add2(it.metricCount)
-                    } else {
-                        row[it.metricKey] = RowValueMeta.of(it.entityUniqueCount, it.entityCount, it.metricCount)
-                    }
-                }
-            rows.map { rs ->
-                arrayOfNulls<Any>(projects.size).apply {
-                    projects.mapIndexed { i, p ->
-                        when (p) {
-                            Keyword.TIME -> set(i, rs.key)
-                            else -> set(i, rs.value[p] ?: RowValueMeta.empty())
-                        }
-                    }
-                }
-            }
+                .transform(projects)
+                .rows
+                .asSequence().toList()
+                .map { it.data }
         }
 
         @Suppress("UNCHECKED_CAST")

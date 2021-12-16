@@ -1,6 +1,7 @@
-package org.bitlap.core.sql
+package org.bitlap.core.mdm.model
 
 import org.bitlap.common.utils.PreConditions
+import java.io.Serializable
 
 /**
  * wrapper a cell metric value
@@ -9,7 +10,7 @@ import org.bitlap.common.utils.PreConditions
  * 1: count (Long)
  * 2: sum (Double)
  */
-class RowValueMeta {
+open class RowValueMeta : Serializable {
 
     private val values: Array<Number> = arrayOf(0L, 0L, 0.0)
 
@@ -29,5 +30,21 @@ class RowValueMeta {
     operator fun get(idx: Int): Number {
         PreConditions.checkExpression(idx in 0..2)
         return this.values[idx]
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as RowValueMeta
+        if (!values.contentEquals(other.values)) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return values.contentHashCode()
+    }
+
+    override fun toString(): String {
+        return this.values.contentToString()
     }
 }

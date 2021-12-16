@@ -92,22 +92,23 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null) {
         }
 
         val result = if (value == null) {
-            (value ?: this.defaultBy(conf)) as R?
+            this.defaultBy(conf) as R?
         } else {
+            value = value.trim()
             when (R::class) {
                 String::class -> value
-                Byte::class -> Convert.toByte(value.trim())
-                Short::class -> Convert.toShort(value.trim())
-                Int::class -> Convert.toInt(value.trim())
-                Long::class -> Convert.toLong(value.trim())
-                Float::class -> Convert.toFloat(value.trim())
-                Double::class -> Convert.toDouble(value.trim())
-                Char::class -> Convert.toChar(value.trim())
+                Byte::class -> Convert.toByte(value)
+                Short::class -> Convert.toShort(value)
+                Int::class -> Convert.toInt(value)
+                Long::class -> Convert.toLong(value)
+                Float::class -> Convert.toFloat(value)
+                Double::class -> Convert.toDouble(value)
+                Char::class -> Convert.toChar(value)
                 Boolean::class -> {
-                    if (value.isNullOrBlank()) {
+                    if (value.isBlank()) {
                         false
                     } else {
-                        Convert.toBool(value.trim())
+                        Convert.toBool(value)
                     }
                 }
                 else -> throw IllegalArgumentException("Illegal value type: ${R::class}")

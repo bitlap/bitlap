@@ -1,10 +1,9 @@
 package org.bitlap.core.mdm.plan
 
-import org.bitlap.common.BitlapIterator
-import org.bitlap.common.utils.PreConditions
+import arrow.core.None
+import arrow.core.Option
 import org.bitlap.core.mdm.FetchContext
-import org.bitlap.core.mdm.model.RowValueMeta
-import org.bitlap.core.sql.Keyword
+import org.bitlap.core.mdm.model.RowIterator
 import org.bitlap.core.sql.TimeFilterFun
 
 /**
@@ -12,37 +11,17 @@ import org.bitlap.core.sql.TimeFilterFun
  */
 class MetricsPlan(
     private val timeFilter: TimeFilterFun,
-    private val projects: List<String>,
-    private val dimensions: List<String>,
+    private val materialize: Boolean,
     private val metrics: List<String>,
-    private val materialize: Boolean
+    private val dimension: Option<String> = None,
 ) : AbsFetchPlan() {
 
-    override fun execute(context: FetchContext): BitlapIterator<Array<*>> {
-        PreConditions.checkExpression(dimensions.size <= 2)
-        val hasTime = dimensions.contains(Keyword.TIME)
-        val rawRows = withFetcher(context) { fetcher ->
-            fetcher.fetchMetricsMeta(context.table, timeFilter, metrics)
-                .transform(projects)
-                .rows
-                .asSequence().toList()
-                .map { it.data }
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return when {
-            rawRows.isEmpty() -> BitlapIterator.empty()
-            hasTime -> BitlapIterator.of(rawRows)
-            else -> {
-                val rs = rawRows.reduce { acc, an ->
-                    for (i in acc.indices) {
-                        val c1 = acc[i] as RowValueMeta
-                        val (v0, v1, v2) = an[i] as RowValueMeta
-                        c1.add(v0, v1, v2)
-                    }
-                    acc
-                }
-                BitlapIterator.of(listOf(rs))
+    override fun execute(context: FetchContext): RowIterator {
+        return withFetcher(context) { fetcher ->
+            if (materialize) {
+                fetcher.fetchMetrics(context.table, timeFilter, metrics)
+            } else {
+                fetcher.fetchMetricsMeta(context.table, timeFilter, metrics)
             }
         }
     }

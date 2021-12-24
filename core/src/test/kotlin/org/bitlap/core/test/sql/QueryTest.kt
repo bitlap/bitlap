@@ -22,8 +22,12 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 
         "simple query" {
             sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
-            sql("select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t") shouldBe listOf(listOf(12L))
-            sql("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t") shouldBe listOf(listOf(6))
+            sql("select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t") shouldBe listOf(
+                listOf(12L)
+            )
+            sql("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t") shouldBe listOf(
+                listOf(6)
+            )
         }
 
         "forbidden queries" {
@@ -42,44 +46,31 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "only metrics query with one dimension time" {
+            // System.setProperty("calcite.debug", "true")
             val db = randomString()
             val table = randomString()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
-            sql(
+            checkRows(
+                "select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $db.$table where _time = 123",
+                listOf(listOf(0, 0, 0))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100",
+                listOf(listOf(3.0, 10.0, 2L))
+            )
+            checkRows(
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 group by _time",
+                listOf(listOf(100, 3, 10, 2))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time = 100 group by _time",
+                listOf(listOf(3, 10, 100, 2))
+            )
+            checkRows(
                 """
-                select count(a) as a, count(distinct a) as a_dis, sum(b) as b 
-                from $db.$table
-                where _time=123
-                """.trimIndent()
-            ).show() shouldBe listOf(listOf(0L, 0L, 0.0))
-            sql(
-                """
-                select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                from $db.$table 
-                where _time=100
-                """.trimIndent()
-            ) shouldBe listOf(listOf(3.0, 10.0, 2L))
-            sql(
-                """
-                select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                from $db.$table 
-                where _time=100
-                group by _time
-                """.trimIndent()
-            ) shouldBe listOf(listOf(100L, 3.0, 10.0, 2L))
-            sql(
-                """
-                select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv 
-                from $db.$table 
-                where _time=100
-                group by _time
-                """.trimIndent()
-            ) shouldBe listOf(listOf(3.0, 10.0, 100L, 2L))
-            sql(
-                """
-                select
+                select 
                   sum(vv) vv, sum(pv) pv
                 from (
                   select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv 
@@ -87,21 +78,31 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                   where _time=100
                   group by _time
                 ) t
-                """.trimIndent()
-            ) shouldBe listOf(listOf(3.0, 10.0))
+                """.trimIndent(),
+                listOf(listOf(3, 10))
+            )
+            checkRows(
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time",
+                listOf(listOf(100, 3, 10, 2), listOf(200, 3, 10, 2))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time",
+                listOf(listOf(3, 10, 100, 2), listOf(3, 10, 200, 2))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                listOf(listOf(6, 20, 2))
+            )
         }
 
-        "single metric query2" {
-//            System.setProperty("calcite.debug", "true")
+        "only metrics query with one dimension that is not time" {
             val db = randomString()
             val table = randomString()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-//            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100").show()
-//            sql("select _time, sum(vv) as vv1, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time").show()
-            sql("select sum(vv) from (select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time ) t").show()
+            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'").show()
         }
     }
 

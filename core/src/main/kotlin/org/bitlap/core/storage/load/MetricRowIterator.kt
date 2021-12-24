@@ -11,14 +11,14 @@ import org.bitlap.common.utils.PreConditions
  * Created by IceMimosa
  * Date: 2021/7/14
  */
-open class MetricRowIterator<R>(private val reader: CarbonReader<Any>, private val rowHandler: (Array<*>) -> R) : BitlapBatchIterator<R>() {
+open class MetricRowIterator<R>(private val reader: CarbonReader<Any>, private val rowHandler: (Array<*>) -> R?) : BitlapBatchIterator<R>() {
 
     @Volatile
     private var close = false
 
     override fun nextBatch(): List<R> {
         this.checkOpen()
-        return this.reader.readNextBatchRow().map {
+        return this.reader.readNextBatchRow().mapNotNull {
             this.rowHandler.invoke(it as Array<*>)
         }
     }

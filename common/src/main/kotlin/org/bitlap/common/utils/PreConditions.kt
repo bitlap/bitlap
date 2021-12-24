@@ -1,7 +1,5 @@
 package org.bitlap.common.utils
 
-import org.bitlap.common.exception.BitlapException
-
 /**
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
@@ -28,9 +26,21 @@ object PreConditions {
     @JvmOverloads
     fun checkNotBlank(str: String?, key: String = "string", msg: String = "$key cannot be null or blank."): String {
         if (str.isNullOrBlank()) {
-            throw BitlapException(msg)
+            throw IllegalArgumentException(msg)
         }
         return str
+    }
+
+    /**
+     * check [collection] cannot be empty
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun <T> checkNotEmpty(collection: Collection<T>?, key: String = "collection", msg: String = "$key cannot be empty."): Collection<T> {
+        if (collection.isNullOrEmpty()) {
+            throw IllegalArgumentException(msg)
+        }
+        return collection
     }
 
     /**
@@ -40,7 +50,7 @@ object PreConditions {
     @JvmOverloads
     fun checkExpression(expr: Boolean, key: String = "expr", msg: String = "$key cannot be false") {
         if (!expr) {
-            throw BitlapException(msg)
+            throw IllegalArgumentException(msg)
         }
     }
 }

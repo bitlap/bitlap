@@ -1,11 +1,11 @@
 package org.bitlap.core.mdm
 
-import org.bitlap.common.BitlapIterator
+import org.bitlap.core.mdm.model.RowIterator
 
 /**
  * fetch function
  */
-fun fetch(ctx: FetchContext.() -> Unit): BitlapIterator<Array<*>> {
+fun fetch(ctx: FetchContext.() -> Unit): RowIterator {
     val context = FetchContext().apply(ctx)
     val plan = context.findBestPlan()
     return plan.execute(context)

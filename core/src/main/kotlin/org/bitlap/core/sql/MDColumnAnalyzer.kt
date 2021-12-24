@@ -112,24 +112,32 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
         .none { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
 
     /**
-     * check if materialize
+     * check if one metric should materialize
      */
-    fun shouldMaterialize(): Boolean {
+    fun shouldMaterialize(metricName: String): Boolean {
+        val metric = this.mdColumnMap[metricName]!!
         val dimensions = this.getDimensionColNames()
         // there are more than or equal to 2 dimensions except time
         val noTimeDims = dimensions.filter { it != Keyword.TIME }
         if (noTimeDims.size >= 2) {
             return true
         }
+
         // no dimensions includes time
+        // 1) distinct aggregation: true
+        // 2) sum, count aggregation: false
         if (dimensions.isEmpty()) {
-            return true
+            if (metric.isDistinct()) {
+                return true
+            }
+            return false
         }
+
         // has no pure dimensions includes time
         // 1) dimension is complex expression
         // 2) dimension is not in group by
         val hasNoPureDims = this.mdColumns.any { it.type is DimensionCol && !it.pure }
-        if (hasNoPureDims) {
+        if (hasNoPureDims && metric.isDistinct()) {
             return true
         }
         return false

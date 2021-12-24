@@ -23,6 +23,7 @@ open class RowValueMeta : Serializable {
     fun add1(v: Number) = this.also { it.values[1] = v.toLong() + it.values[1].toLong() }
     fun add2(v: Number) = this.also { it.values[2] = v.toDouble() + it.values[2].toDouble() }
     fun add(v0: Number, v1: Number, v2: Number) = this.add0(v0).add1(v1).add2(v2)
+    fun add(v: RowValueMeta) = this.add0(v.component1()).add1(v.component2()).add2(v.component3())
 
     operator fun component1(): Number = this.values[0]
     operator fun component2(): Number = this.values[1]

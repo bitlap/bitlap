@@ -31,6 +31,13 @@ data class MDColumn(val name: String, val type: ColumnType) {
     fun withPure(p: Boolean) = this.also { it.pure = p }
     fun withAgg(vararg agg: Pair<SqlAggFunction, String>) = this.also { it.aggs.addAll(agg) }
     fun withAgg(agg: Set<Pair<SqlAggFunction, String>>) = this.also { it.aggs.addAll(agg) }
+
+    fun isDistinct(): Boolean {
+        if (this.aggs.isEmpty()) {
+            return false
+        }
+        return this.aggs.any { it.second.lowercase() == "distinct" }
+    }
 }
 
 sealed interface ColumnType

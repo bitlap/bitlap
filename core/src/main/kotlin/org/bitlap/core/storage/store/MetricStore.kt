@@ -161,13 +161,34 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
     override fun close() {
     }
 
+    fun query(
+        timeFilter: TimeFilterFun,
+        metrics: List<String>,
+    ): BitlapIterator<MetricRow> {
+        return this.query(timeFilter, metrics, arrayOf("mk", "t", "m", "meta")) { row ->
+            val (mk, t, m, meta) = row
+            val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+            // TODO: with BBM
+            if (timeFilter(t as Long)) {
+                MetricRow(t, mk.toString(), CBM(m as? ByteArray), BBM(), metaObj)
+            } else {
+                null
+            }
+        }
+    }
+
     fun queryMeta(
         timeFilter: TimeFilterFun,
         metrics: List<String>,
     ): BitlapIterator<MetricRowMeta> {
         return this.query(timeFilter, metrics, arrayOf("meta")) { row ->
             val (meta) = row
-            JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+            val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+            if (timeFilter(metaObj.tm)) {
+                metaObj
+            } else {
+                null
+            }
         }
     }
 
@@ -175,7 +196,7 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
         timeFilter: TimeFilterFun,
         metrics: List<String>,
         projections: Array<String>,
-        rowHandler: (Array<*>) -> R
+        rowHandler: (Array<*>) -> R?
     ): BitlapIterator<R> {
         // 1. get files
         val files = fs.listStatus(dataDir)

@@ -2,7 +2,7 @@ package org.bitlap.core.sql.udf
 
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.core.sql.RowValueMeta
+import org.bitlap.core.mdm.model.RowValueMeta
 
 /**
  * compute sum metric from bitmap or metadata.

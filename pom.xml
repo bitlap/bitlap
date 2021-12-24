@@ -163,11 +163,6 @@
             <artifactId>joda-time</artifactId>
             <version>${joda.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-fx-coroutines</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
 
         <!-- test  -->
         <dependency>

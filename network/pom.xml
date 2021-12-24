@@ -31,11 +31,6 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>scala-macro-tools_2.13</artifactId>
-            <version>${scala-macro.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

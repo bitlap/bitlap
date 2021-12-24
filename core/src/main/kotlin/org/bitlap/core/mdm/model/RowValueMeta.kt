@@ -47,6 +47,7 @@ open class RowValueMeta : Serializable {
     }
 
     override fun toString(): String {
-        return this.values.contentToString()
+        val (v0, v1, v2) = this
+        return "[v0=$v0, v1=$v1, v2=$v2]"
     }
 }

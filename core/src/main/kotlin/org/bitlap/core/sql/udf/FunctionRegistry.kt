@@ -1,6 +1,5 @@
 package org.bitlap.core.sql.udf
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Boolean
 import org.apache.calcite.schema.impl.AggregateFunctionImpl
 import org.apache.calcite.schema.impl.ScalarFunctionImpl
 import org.apache.calcite.sql.SqlFunction

@@ -25,7 +25,8 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 "select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t",
                 listOf(listOf(12L))
             )
-            checkRows("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t",
+            checkRows(
+                "select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t",
                 listOf(listOf(6))
             )
         }

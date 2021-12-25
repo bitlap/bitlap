@@ -9,7 +9,7 @@ import org.bitlap.core.mdm.model.RowValueMeta
  */
 class UdafBMSum : UDAF<Number, Any, Number> {
     companion object {
-        val NAME = "bm_sum"
+        const val NAME = "bm_sum"
     }
 
     override val name: String = NAME

@@ -1,7 +1,6 @@
 package org.bitlap.core.test.sql
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import org.bitlap.common.data.Dimension
 import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
@@ -21,12 +20,13 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
     init {
 
         "simple query" {
-            sql("select 1 as a, '2' as b, (1+2)*3 as c") shouldBe listOf(listOf(1, "2", 9))
-            sql("select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t") shouldBe listOf(
-                listOf(12L)
+            checkRows("select 1 as a, '2' as b, (1+2)*3 as c", listOf(listOf(1, "2", 9)))
+            checkRows(
+                "select (a + cast(b as bigint) + c) as r from (select 1 as a, '2' as b, (1+2)*3 as c) t",
+                listOf(listOf(12L))
             )
-            sql("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t") shouldBe listOf(
-                listOf(6)
+            checkRows("select sum(a) r from (select 1 as a union all select 2 as a union all select 3 as a) t",
+                listOf(listOf(6))
             )
         }
 
@@ -41,7 +41,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 sql("select a, b from $db.$table") // time filter is required
             }
             shouldThrow<BitlapException> {
-                sql("select a, b from $db.$table where _time=123") // one aggregation metric is required
+                sql("select a, b from $db.$table where _time = 123") // one aggregation metric is required
             }
         }
 
@@ -58,15 +58,15 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             )
             checkRows(
                 "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100",
-                listOf(listOf(3.0, 10.0, 2L))
+                listOf(listOf(4.0, 12.0, 3L))
             )
             checkRows(
                 "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 group by _time",
-                listOf(listOf(100, 3, 10, 2))
+                listOf(listOf(100, 4, 12, 3))
             )
             checkRows(
                 "select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time = 100 group by _time",
-                listOf(listOf(3, 10, 100, 2))
+                listOf(listOf(4, 12, 100, 3))
             )
             checkRows(
                 """
@@ -75,23 +75,40 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 from (
                   select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv 
                   from $db.$table 
-                  where _time=100
+                  where _time = 100
                   group by _time
                 ) t
                 """.trimIndent(),
-                listOf(listOf(3, 10))
+                listOf(listOf(4, 12))
             )
             checkRows(
-                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time>=100 group by _time",
-                listOf(listOf(100, 3, 10, 2), listOf(200, 3, 10, 2))
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                listOf(listOf(100, 4, 12, 3), listOf(200, 4, 12, 3))
             )
             checkRows(
-                "select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time>=100 group by _time",
-                listOf(listOf(3, 10, 100, 2), listOf(3, 10, 200, 2))
+                "select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                listOf(listOf(4, 12, 100, 3), listOf(4, 12, 200, 3))
             )
             checkRows(
                 "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
-                listOf(listOf(6, 20, 2))
+                listOf(listOf(8, 24, 3))
+            )
+        }
+
+        "only metrics query with one complex dimension time" {
+            val db = randomString()
+            val table = randomString()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 100L)
+            prepareTestData(db, table, 200)
+            checkRows(
+                """
+                    select if (_time > 0, 'ALL', '0') _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time >= 100 
+                    group by if (_time > 0, 'ALL', '0')
+                """.trimIndent(),
+                listOf(listOf("ALL", 8, 24, 3))
             )
         }
 
@@ -117,6 +134,8 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                     Event.of(time, Entity(1), Dimension("city" to "北京", "os" to "Windows"), Metric("pv", 3.0)),
                     Event.of(time, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 1.0)),
                     Event.of(time, Entity(2), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 5.0)),
+                    Event.of(time, Entity(3), Dimension("city" to "北京", "os" to "Mac"), Metric("vv", 1.0)),
+                    Event.of(time, Entity(3), Dimension("city" to "北京", "os" to "Mac"), Metric("pv", 2.0)),
                 )
             )
         }

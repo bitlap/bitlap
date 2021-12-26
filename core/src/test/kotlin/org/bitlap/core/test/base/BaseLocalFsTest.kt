@@ -19,10 +19,11 @@ abstract class BaseLocalFsTest : StringSpec() {
     protected lateinit var workPath: Path
     protected lateinit var localFS: FileSystem
     protected lateinit var conf: BitlapConf
+    protected lateinit var hadoopConf: Configuration
 
     init {
         beforeSpec {
-            val hadoopConf = Configuration()
+            hadoopConf = BitlapContext.hadoopConf
             hadoopConf.set(FS_DEFAULT_NAME_KEY, "file:///")
             localFS = FileSystem.getLocal(hadoopConf)
             workPath = Path(localFS.workingDirectory, "target/bitlap-test")

@@ -2,11 +2,11 @@ package org.bitlap.core.mdm.model
 
 import org.bitlap.common.bitmap.BM
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.mdm.io.DefaultBitlapReader
+import org.bitlap.core.mdm.BitlapReader
 import java.io.Serializable
 
 /**
- * Desc: raw data row for [DefaultBitlapReader]
+ * Desc: raw data row for [BitlapReader]
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa

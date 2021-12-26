@@ -1,43 +1,52 @@
-package org.bitlap.core.mdm.io
+package org.bitlap.core.mdm
 
+import org.apache.hadoop.conf.Configuration
+import org.bitlap.common.BitlapConf
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.BitlapContext
+import org.bitlap.common.logger
+import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import java.util.Collections
+import org.bitlap.core.storage.store.MetricStore
+import java.io.Closeable
+import java.io.Serializable
+import kotlin.system.measureTimeMillis
 
 /**
- * Desc: Simple data row write to bitlap
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/12/15
+ * bitmap mdm [Event] writer
  */
-class SimpleBitlapWriter(table: String, database: String) : BitlapWriter<Event> {
+class BitlapWriter(
+    val table: Table,
+    private val conf: BitlapConf,
+    private val hadoopConf: Configuration,
+) : Serializable, Closeable {
 
+    @Volatile
     private var closed = false
-    private val rows = Collections.synchronizedList(mutableListOf<Event>())
-    private val metricStore = BitlapContext.catalog.getMetricStore(table, database)
+    private val log = logger { }
+    private val metricStore = MetricStore(this.table, this.hadoopConf, this.conf)
 
-    override fun write(t: Event) {
-        rows.add(t)
-    }
-
-    override fun write(ts: List<Event>) {
-        rows.addAll(ts)
-    }
-
-    @Synchronized
-    override fun close() {
-        if (closed) {
-            throw BitlapException("SimpleBitlapWriter has been closed.")
+    /**
+     * write mdm events
+     */
+    fun write(events: List<Event>) {
+        this.checkOpen()
+        log.info { "Start writing ${events.size} events." }
+        if (events.isEmpty()) {
+            return
         }
-        closed = true
-        rows.groupBy { it.time }.forEach { (time, rs) ->
+        val elapsed = measureTimeMillis {
+            this.write0(events)
+        }
+        log.info { "End writing ${events.size} events, elapsed ${elapsed}ms." }
+    }
+
+    private fun write0(events: List<Event>) {
+        events.groupBy { it.time }.forEach { (time, rs) ->
             // 1. agg metric
             val singleRows = rs
                 .groupingBy { "${it.entity}${it.dimension}${it.metric.key}" }
@@ -56,7 +65,7 @@ class SimpleBitlapWriter(table: String, database: String) : BitlapWriter<Event> 
                     } else {
                         sRow.dimId = counter
                         temps[dim] = counter
-                        counter ++
+                        counter++
                     }
                     sRow
                 }
@@ -71,7 +80,10 @@ class SimpleBitlapWriter(table: String, database: String) : BitlapWriter<Event> 
                     a
                 }
                 .map { (_, r) ->
-                    r.metadata = MetricRowMeta(r.tm, r.metricKey, r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount())
+                    r.metadata = MetricRowMeta(
+                        r.tm, r.metricKey,
+                        r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount()
+                    )
                     r
                 }
             metricStore.store(time to metricRows)
@@ -81,6 +93,21 @@ class SimpleBitlapWriter(table: String, database: String) : BitlapWriter<Event> 
 
             // store metric with high cardinality dimensions
             // TODO
+        }
+    }
+
+    private fun checkOpen() {
+        if (closed) {
+            throw BitlapException("BitlapWriter has been closed.")
+        }
+    }
+
+    override fun close() {
+        closed = true
+        runCatching {
+            this.metricStore.close()
+        }.onFailure {
+            log.error("Error when closing BitlapWriter, cause: ", it)
         }
     }
 }

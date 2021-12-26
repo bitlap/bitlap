@@ -6,7 +6,8 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.mdm.io.SimpleBitlapWriter
+import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
 
@@ -125,7 +126,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
     }
 
     private fun prepareTestData(database: String, tableName: String, time: Long) {
-        val writer = SimpleBitlapWriter(tableName, database)
+        val writer = BitlapWriter(Table(database, tableName), conf, hadoopConf)
         writer.use {
             it.write(
                 listOf(

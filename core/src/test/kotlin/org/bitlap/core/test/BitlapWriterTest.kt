@@ -6,8 +6,9 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.mdm.io.DefaultBitlapReader
-import org.bitlap.core.mdm.io.SimpleBitlapWriter
+import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.mdm.BitlapReader
+import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.QueryMetric
 import org.bitlap.core.mdm.model.QueryTime
@@ -19,14 +20,14 @@ import org.joda.time.DateTime
  * Created by IceMimosa
  * Date: 2021/3/5
  */
-class SimpleBitlapWriterTest : BaseLocalFsTest() {
+class BitlapWriterTest : BaseLocalFsTest() {
     init {
 
         "test SimpleBitlapWriter" {
-            val db = randomString()
-            val dsName = randomString()
-            BitlapContext.catalog.createTable(dsName, db, true)
-            val writer = SimpleBitlapWriter(dsName, db)
+            val database = randomString()
+            val table = randomString()
+            BitlapContext.catalog.createTable(table, database, true)
+            val writer = BitlapWriter(Table(database, table), conf, hadoopConf)
 
             val testTime = DateTime.parse("2021-01-01").millis
             val testTime2 = DateTime.parse("2021-01-02").millis
@@ -49,9 +50,9 @@ class SimpleBitlapWriterTest : BaseLocalFsTest() {
                 )
             }
 
-            val reader = DefaultBitlapReader()
+            val reader = BitlapReader()
             val rows = reader.use {
-                it.read(Query(db, dsName, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
+                it.read(Query(database, table, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
             }
             rows.size shouldBe 1
             val pv = rows.first().getBM("pv")

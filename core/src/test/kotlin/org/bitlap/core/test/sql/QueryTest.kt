@@ -101,7 +101,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             val table = randomString()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
-            prepareTestData(db, table, 200)
+            prepareTestData(db, table, 200L)
             checkRows(
                 """
                     select if (_time > 0, 'ALL', '0') _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 

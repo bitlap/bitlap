@@ -26,9 +26,9 @@ class QueryExecution(private val statement: String) {
                 val plan = planner.parse(statement)
                 RelRunners.run(plan).executeQuery()
             }
-        } catch (e: Exception) {
-            when (e.cause) {
-                is BitlapException -> throw e.cause!!
+        } catch (e: Throwable) {
+            when (e) {
+                is BitlapException -> throw e
                 else -> throw BitlapException(statement, e)
             }
         }

@@ -1,5 +1,6 @@
 package org.bitlap.core.sql.udf
 
+import org.apache.calcite.sql.type.SqlReturnTypeInference
 import org.apache.calcite.sql.type.SqlTypeName
 
 /**
@@ -24,7 +25,7 @@ interface UDAF<A, V, R> {
     /**
      * agg result type
      */
-    val resultType: SqlTypeName
+    val resultType: SqlReturnTypeInference
 
     /**
      * agg init value

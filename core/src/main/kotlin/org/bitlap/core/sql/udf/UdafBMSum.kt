@@ -1,20 +1,22 @@
 package org.bitlap.core.sql.udf
 
+import org.apache.calcite.sql.type.SqlReturnTypeInference
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.core.mdm.model.RowValueMeta
+import org.bitlap.core.sql.infer
 
 /**
  * compute sum metric from bitmap or metadata.
  */
 class UdafBMSum : UDAF<Number, Any, Number> {
     companion object {
-        val NAME = "bm_sum"
+        const val NAME = "bm_sum"
     }
 
     override val name: String = NAME
     override val inputTypes: List<SqlTypeName> = listOf(SqlTypeName.ANY)
-    override val resultType: SqlTypeName = SqlTypeName.DOUBLE
+    override val resultType: SqlReturnTypeInference = SqlTypeName.DOUBLE.infer()
 
     override fun init(): Number = 0.0
     override fun add(accumulator: Number, input: Any): Number {

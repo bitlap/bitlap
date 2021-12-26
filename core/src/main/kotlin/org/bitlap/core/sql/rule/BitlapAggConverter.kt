@@ -48,6 +48,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
         val aggCalls = rel.aggCallList.map {
             val aggFunc = it.aggregation
             var type = it.type
+            var distinct = it.isDistinct
             val func = when (aggFunc) {
                 is SqlSumAggFunction,
                 is SqlSumEmptyIsZeroAggFunction -> {
@@ -57,6 +58,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                 is SqlCountAggFunction -> {
                     if (it.isDistinct) {
                         type = typeFactory.createSqlType(SqlTypeName.BIGINT)
+                        distinct = false
                         FunctionRegistry.getFunction(UdafBMCountDistinct.NAME) as SqlAggFunction
                     } else {
                         aggFunc
@@ -67,7 +69,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                     aggFunc
                 }
                 else -> {
-                    if (FunctionRegistry.contanis(aggFunc.name)) {
+                    if (FunctionRegistry.contains(aggFunc.name)) {
                         aggFunc
                     } else {
                         throw IllegalArgumentException("${aggFunc.name} aggregate function is not supported.")
@@ -75,7 +77,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                 }
             }
             AggregateCall.create(
-                func, it.isDistinct, it.isApproximate, it.ignoreNulls(),
+                func, distinct, it.isApproximate, it.ignoreNulls(),
                 it.argList, it.filterArg, it.distinctKeys,
                 it.collation, type, it.name
             )

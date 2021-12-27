@@ -8,6 +8,11 @@ import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlNode
 import org.apache.calcite.sql.SqlSelect
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.mdm.format.DataType
+import org.bitlap.core.mdm.format.DataTypeBBM
+import org.bitlap.core.mdm.format.DataTypeCBM
+import org.bitlap.core.mdm.format.DataTypeRBM
+import org.bitlap.core.mdm.format.DataTypeRowValueMeta
 
 /**
  * analyzer for [MDColumn] from [SqlSelect]
@@ -35,7 +40,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
                 if (cols.contains(c.name)) {
                     cols[c.name]!!.checkType(c.type)
                         .withProject(true)
-                        .withAgg(c.aggs)
+                        .withAgg(c.aggregates)
                 } else {
                     cols[c.name] = c.withProject(true)
                 }
@@ -103,7 +108,6 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun getMetricColNames() = this.mdColumns.filter { it.type is MetricCol }.map { it.name }.distinct()
     fun getDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol }.map { it.name }.distinct()
     fun getFilterColNames() = this.mdColumns.filter { it.filter }.map { it.name }.distinct()
-    fun getQueryDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol && it.project }.map { it.name }.distinct()
 
     /**
      * no time dimension in query
@@ -117,9 +121,9 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun shouldMaterialize(metricName: String): Boolean {
         val metric = this.mdColumnMap[metricName]!!
         val dimensions = this.getDimensionColNames()
-        // there are more than or equal to 2 dimensions except time
-        val noTimeDims = dimensions.filter { it != Keyword.TIME }
-        if (noTimeDims.size >= 2) {
+
+        // check whether the metric is Cartesian Product
+        if (this.shouldCartesian()) {
             return true
         }
 
@@ -141,5 +145,53 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
             return true
         }
         return false
+    }
+
+    /**
+     * check whether the metric is Cartesian Product
+     */
+    fun shouldCartesian(): Boolean {
+        val dimensions = this.getDimensionColNames()
+        // there are more than or equal to 2 dimensions except time
+        val noTimeDims = dimensions.filter { it != Keyword.TIME }
+        if (noTimeDims.size >= 2) {
+            return true
+        }
+        return false
+    }
+
+    /**
+     * get metric materialize type
+     */
+    fun materializeType(metricName: String, dimension: Int = 0): DataType {
+        val metric = this.mdColumnMap[metricName]!!
+        val materialize = this.shouldMaterialize(metricName)
+
+        // not materialize
+        if (!materialize) {
+            return DataTypeRowValueMeta(metricName, -1)
+        }
+
+        //  materialize & Cartesian Product
+        if (this.shouldCartesian()) {
+            if (metric.isSum()) {
+                return when (dimension) {
+                    0 -> DataTypeCBM(metricName, -1)
+                    else -> DataTypeBBM(metricName, -1)
+                }
+            }
+            if (metric.isDistinct()) {
+                return DataTypeRBM(metricName, -1)
+            }
+        }
+
+        // materialize & not Cartesian Product
+        if (metric.isSum() && metric.isDistinct()) {
+            return DataTypeCBM(metricName, -1)
+        }
+        if (metric.isDistinct()) {
+            return DataTypeRBM(metricName, -1)
+        }
+        throw IllegalArgumentException("Invalid input metric type, metric is $metric")
     }
 }

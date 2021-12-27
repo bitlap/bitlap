@@ -61,6 +61,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                         distinct = false
                         FunctionRegistry.getFunction(UdafBMCountDistinct.NAME) as SqlAggFunction
                     } else {
+                        // TODO: support _count built-in metric
                         aggFunc
                     }
                 }

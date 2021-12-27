@@ -1,6 +1,7 @@
 package org.bitlap.common.utils
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /**
  * Desc: json utils
@@ -21,5 +22,10 @@ object JSONUtils {
     @JvmStatic
     fun <T> fromJson(json: String, type: Class<T>): T {
         return gson.fromJson(json, type)
+    }
+
+    @JvmStatic
+    fun fromJsonAsMap(json: String): Map<String, String> {
+        return gson.fromJson(json, object : TypeToken<Map<String, String>>() {}.type)
     }
 }

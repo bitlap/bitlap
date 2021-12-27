@@ -61,6 +61,23 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
             pv.getCountUnique() shouldBe 2
         }
 
+        "test csv writer" {
+            val db = randomString()
+            val table = randomString()
+            sql("create table $db.$table")
+            val writer = BitlapWriter(Table(db, table), conf, hadoopConf)
+            val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.csv")!!
+            writer.writeCsv(input)
+            checkRows(
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                listOf(listOf(100, 4, 12, 3), listOf(200, 4, 12, 3))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                listOf(listOf(8, 24, 3))
+            )
+        }
+
         "test excel writer" {
             val db = randomString()
             val table = randomString()

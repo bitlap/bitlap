@@ -15,3 +15,7 @@ OLAP
 # Architecture
 
 ![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
+
+# Quick Start
+
+* [Test Data File Example](https://docs.google.com/spreadsheets/d/13KNvNTGYRjdPSsp9PSrIMU_2uKqKkJa-BgL4Q236Ky0/edit?usp=sharing)

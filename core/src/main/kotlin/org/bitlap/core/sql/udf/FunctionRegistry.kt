@@ -104,7 +104,7 @@ object FunctionRegistry {
     fun <P1, P2, P3, P4, R> register(_name: String, func: Function4<P1, P2, P3, P4, R>) = this.register0(_name, func)
     fun <P1, P2, P3, P4, P5, R> register(_name: String, func: Function5<P1, P2, P3, P4, P5, R>) = this.register0(_name, func)
     fun <R> register0(_name: String, func: Function<R>): FunctionRegistry {
-        val name = PreConditions.checkNotBlank(_name)
+        val name = PreConditions.checkNotBlank(_name).trim()
         if (functions.containsKey(name)) {
             throw IllegalArgumentException("$name function already exists.")
         }

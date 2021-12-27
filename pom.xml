@@ -99,14 +99,14 @@
             <version>${kotlinx.coroutines.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>scala-macro-tools_2.13</artifactId>
-            <version>${scala-macro.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
             <version>${kotlin.logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-fx-coroutines-jvm</artifactId>
+            <version>${arrow.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -154,6 +154,17 @@
             <version>${hutool.version}</version>
         </dependency>
         <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-poi</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
@@ -197,6 +208,11 @@
             <groupId>com.typesafe.scala-logging</groupId>
             <artifactId>scala-logging_2.13</artifactId>
             <version>${scala.logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>scala-macro-tools_2.13</artifactId>
+            <version>${scala-macro.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>

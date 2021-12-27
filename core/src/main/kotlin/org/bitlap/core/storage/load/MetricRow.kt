@@ -11,7 +11,7 @@ data class MetricRow(
     val metricKey: String,
     val metric: CBM,
     val entity: BBM,
-    var metadata: MetricRowMeta,
+    var metadata: MetricRowMeta = MetricRowMeta(tm, metricKey),
 )
 
 data class MetricRowMeta(

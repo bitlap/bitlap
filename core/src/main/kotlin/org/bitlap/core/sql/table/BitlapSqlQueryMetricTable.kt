@@ -42,14 +42,16 @@ class BitlapSqlQueryMetricTable(
 //        val precondition = executor.function
 
         val projections = projects!!.map { rowType.fieldList[it].name!! }
-        val metricCols = analyzer.getMetricColNames().groupBy { analyzer.shouldMaterialize(it) }
+        val metricCols = analyzer.getMetricColNames()
+            .map { analyzer.materializeType(it) }
+            .groupBy { it::class.java }
 
         val rows = fetch {
             queryContext = QueryContext.get()
             table = tbl
             plan = MetricsMergePlan(
                 subPlans = metricCols.map { e ->
-                    MetricsPlan(timeFilterFun, e.key, e.value)
+                    MetricsPlan(timeFilterFun, e.value, e.key)
                 }
             )
         }

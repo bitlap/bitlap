@@ -13,6 +13,7 @@ import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.QueryMetric
 import org.bitlap.core.mdm.model.QueryTime
 import org.bitlap.core.test.base.BaseLocalFsTest
+import org.bitlap.core.test.base.SqlChecker
 import org.joda.time.DateTime
 
 /**
@@ -20,7 +21,7 @@ import org.joda.time.DateTime
  * Created by IceMimosa
  * Date: 2021/3/5
  */
-class BitlapWriterTest : BaseLocalFsTest() {
+class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
     init {
 
         "test SimpleBitlapWriter" {
@@ -58,6 +59,23 @@ class BitlapWriterTest : BaseLocalFsTest() {
             val pv = rows.first().getBM("pv")
             pv.getCount() shouldBe 100
             pv.getCountUnique() shouldBe 2
+        }
+
+        "test excel writer" {
+            val db = randomString()
+            val table = randomString()
+            sql("create table $db.$table")
+            val writer = BitlapWriter(Table(db, table), conf, hadoopConf)
+            val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.xlsx")!!
+            writer.writeExcel(input)
+            checkRows(
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                listOf(listOf(100, 4, 12, 3), listOf(200, 4, 12, 3))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                listOf(listOf(8, 24, 3))
+            )
         }
     }
 }

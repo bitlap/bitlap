@@ -1,18 +1,26 @@
 package org.bitlap.core.mdm
 
+import cn.hutool.core.convert.Convert
+import cn.hutool.core.io.FileUtil
 import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.data.Dimension
+import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
+import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
+import org.bitlap.common.utils.Excel.readExcel
+import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
 import org.bitlap.core.storage.store.MetricStore
 import java.io.Closeable
+import java.io.InputStream
 import java.io.Serializable
 import kotlin.system.measureTimeMillis
 
@@ -43,6 +51,29 @@ class BitlapWriter(
             this.write0(events)
         }
         log.info { "End writing ${events.size} events, elapsed ${elapsed}ms." }
+    }
+
+    /**
+     * write mdm events from excel
+     */
+    fun writeExcel(path: String) {
+        this.writeExcel(FileUtil.file(path).inputStream())
+    }
+
+    fun writeExcel(input: InputStream) {
+        val rows = input.readExcel { header ->
+            header == listOf("time", "entity", "dimensions", "metric_name", "metric_value")
+        }
+        val events = rows.map { row ->
+            val (time, entity, dimensions, metricName, metricValue) = row
+            Event.of(
+                Convert.toLong(time),
+                Entity(Convert.toInt(entity)),
+                Dimension(JSONUtils.fromJsonAsMap(Convert.toStr(dimensions))),
+                Metric(Convert.toStr(metricName), Convert.toDouble(metricValue))
+            )
+        }
+        this.write(events)
     }
 
     private fun write0(events: List<Event>) {

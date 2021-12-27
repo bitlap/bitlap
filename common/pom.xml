@@ -11,14 +11,6 @@
 
     <artifactId>bitlap-common</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-fx-coroutines-jvm</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>

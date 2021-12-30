@@ -1,4 +1,4 @@
-package org.bitlap.common.utils
+package org.bitlap.core.utils
 
 import cn.hutool.core.io.FileUtil
 import cn.hutool.core.text.csv.CsvReadConfig

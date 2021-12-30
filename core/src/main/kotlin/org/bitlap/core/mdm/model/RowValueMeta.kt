@@ -6,9 +6,9 @@ import java.io.Serializable
 /**
  * wrapper a cell metric value
  *
- * 0: distinct count (Long)
- * 1: count (Long)
- * 2: sum (Double)
+ * * 0: distinct count (Long)
+ * * 1: count (Long)
+ * * 2: sum (Double)
  */
 open class RowValueMeta : Serializable {
 

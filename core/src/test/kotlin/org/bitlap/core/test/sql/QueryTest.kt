@@ -45,6 +45,12 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             shouldThrow<BitlapException> {
                 sql("select a, b from $db.$table where _time = 123") // one aggregation metric is required
             }
+            shouldThrow<BitlapException> {
+                sql("select count(1) cnt from $db.$table where _time = 123") // one special aggregation metric is required
+            }
+            shouldThrow<BitlapException> {
+                sql("select count(*) cnt from $db.$table where _time = 123") // one special aggregation metric is required
+            }
         }
 
         "only metrics query with one dimension time" {
@@ -54,6 +60,10 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
+            checkRows(
+                "select count(vv) cvv, count(pv) cpv from $db.$table where _time = 100",
+                listOf(listOf(4, 4))
+            )
             checkRows(
                 "select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $db.$table where _time = 123",
                 listOf(listOf(0, 0, 0))

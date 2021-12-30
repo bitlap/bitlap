@@ -31,6 +31,7 @@ object FunctionRegistry {
         )
         register(
             UdafBMSum(),
+            UdafBMCount(),
             UdafBMCountDistinct(),
         )
     }

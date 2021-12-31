@@ -37,7 +37,7 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                 val oFilter = RexSimplify(rexBuilder, RelOptPredicateList.EMPTY, RexUtil.EXECUTOR)
                     .simplifyUnknownAsFalse(filter)
 
-                // if condition is always false, just return
+                // if condition is always false, just push to [BitlapTableConverter] and return
                 if (oFilter.isAlwaysFalse) {
                     BitlapTableFilterScan(
                         scan.cluster, scan.traitSet, scan.hints, scan.table,

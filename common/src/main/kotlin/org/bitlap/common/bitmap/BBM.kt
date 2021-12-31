@@ -33,7 +33,7 @@ class BBM : AbsBM {
             container.putAll(rbms)
         }
     }
-    constructor(bytes: ByteArray) {
+    constructor(bytes: ByteArray?) {
         this.setBytes(bytes)
     }
 

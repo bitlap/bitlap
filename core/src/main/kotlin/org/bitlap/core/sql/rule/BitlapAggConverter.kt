@@ -12,6 +12,7 @@ import org.apache.calcite.sql.`fun`.SqlSumEmptyIsZeroAggFunction
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.udf.FunctionRegistry
+import org.bitlap.core.sql.udf.UdafBMCount
 import org.bitlap.core.sql.udf.UdafBMCountDistinct
 import org.bitlap.core.sql.udf.UdafBMSum
 
@@ -48,6 +49,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
         val aggCalls = rel.aggCallList.map {
             val aggFunc = it.aggregation
             var type = it.type
+            var distinct = it.isDistinct
             val func = when (aggFunc) {
                 is SqlSumAggFunction,
                 is SqlSumEmptyIsZeroAggFunction -> {
@@ -57,9 +59,11 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                 is SqlCountAggFunction -> {
                     if (it.isDistinct) {
                         type = typeFactory.createSqlType(SqlTypeName.BIGINT)
+                        distinct = false
                         FunctionRegistry.getFunction(UdafBMCountDistinct.NAME) as SqlAggFunction
                     } else {
-                        aggFunc
+                        type = typeFactory.createSqlType(SqlTypeName.BIGINT)
+                        FunctionRegistry.getFunction(UdafBMCount.NAME) as SqlAggFunction
                     }
                 }
                 is SqlMinMaxAggFunction,
@@ -67,7 +71,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                     aggFunc
                 }
                 else -> {
-                    if (FunctionRegistry.contanis(aggFunc.name)) {
+                    if (FunctionRegistry.contains(aggFunc.name)) {
                         aggFunc
                     } else {
                         throw IllegalArgumentException("${aggFunc.name} aggregate function is not supported.")
@@ -75,7 +79,7 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                 }
             }
             AggregateCall.create(
-                func, it.isDistinct, it.isApproximate, it.ignoreNulls(),
+                func, distinct, it.isApproximate, it.ignoreNulls(),
                 it.argList, it.filterArg, it.distinctKeys,
                 it.collation, type, it.name
             )

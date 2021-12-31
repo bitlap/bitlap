@@ -1,16 +1,27 @@
 package org.bitlap.core.sql.udf
 
+import org.apache.calcite.sql.type.SqlReturnTypeInference
+import org.apache.calcite.sql.type.SqlTypeName
+
 /**
  * A generic interface for defining user-defined functions.
  *
- * [V]: input value type
- * [R]: result type
+ * for more inputs, see [org.apache.calcite.schema.impl.ScalarFunctionImpl.create]
  */
-interface UDF<V, R> {
+interface UDF {
 
     /**
-     * eval with one input.
-     * for more inputs, see [org.apache.calcite.schema.impl.ScalarFunctionImpl.create]
+     * function name
      */
-    fun eval(input: V): R
+    val name: String
+
+    /**
+     * input types
+     */
+    val inputTypes: List<SqlTypeName>
+
+    /**
+     * result type
+     */
+    val resultType: SqlReturnTypeInference
 }

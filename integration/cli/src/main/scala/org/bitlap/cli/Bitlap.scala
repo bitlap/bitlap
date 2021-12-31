@@ -16,15 +16,9 @@ import java.util.concurrent.Callable
   version = Array("bitlap 1.0"),
   description = Array("Connect to bitlap cluster."),
   usageHelpAutoWidth = true,
-  subcommands = Array(classOf[BitlapServer], classOf[BitlapSql], classOf[HelpCommand])
+  subcommands = Array(classOf[BitlapServer], classOf[BitlapSql], classOf[HelpCommand]),
 )
 class Bitlap extends Callable[Int] {
-
-//  @Option(names = Array("--help"),
-//    usageHelp = true,
-//    description = Array("display a help message")
-//  )
-//  var help: Boolean = false
 
   @Option(names = Array("-v", "--version"),
     versionHelp = true,
@@ -33,6 +27,7 @@ class Bitlap extends Callable[Int] {
   var version = false
 
   override def call(): Int = {
+    println(" >")
     0
   }
 

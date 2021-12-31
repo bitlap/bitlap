@@ -1,10 +1,12 @@
-package org.bitlap.core.mdm.io
+package org.bitlap.core.mdm
 
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.model.AggType
 import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.RawRow
+import java.io.Closeable
+import java.io.Serializable
 
 /**
  * Desc: Default bitlap reader
@@ -13,9 +15,9 @@ import org.bitlap.core.mdm.model.RawRow
  * Created by IceMimosa
  * Date: 2021/3/17
  */
-class DefaultBitlapReader : BitlapReader {
+class BitlapReader : Serializable, Closeable {
 
-    override fun read(query: Query): List<RawRow> {
+    fun read(query: Query): List<RawRow> {
         val metricStore = BitlapContext.catalog.getMetricStore(
             PreConditions.checkNotBlank(query.table),
             PreConditions.checkNotBlank(query.database)

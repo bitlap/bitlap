@@ -1,6 +1,6 @@
 package org.bitlap.core.mdm
 
-import org.bitlap.common.BitlapIterator
+import org.bitlap.core.mdm.model.RowIterator
 
 /**
  * Fetch plan
@@ -15,5 +15,5 @@ interface FetchPlan {
     /**
      * execute current plan
      */
-    fun execute(context: FetchContext): BitlapIterator<Array<*>>
+    fun execute(context: FetchContext): RowIterator
 }

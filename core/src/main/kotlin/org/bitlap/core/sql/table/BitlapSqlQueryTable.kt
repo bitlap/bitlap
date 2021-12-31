@@ -40,7 +40,7 @@ open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), Project
     override fun getRowType(typeFactory: RelDataTypeFactory): RelDataType {
         val builder = typeFactory.builder()
         analyzer.getMetricColNames().forEach {
-            builder.add(it, SqlTypeName.ANY)
+            builder.add(it, SqlTypeName.ANY).nullable(true)
         }
         analyzer.getDimensionColNames().forEach {
             if (it == Keyword.TIME) {

@@ -7,6 +7,7 @@ import org.apache.calcite.rex.RexBuilder
 import org.apache.calcite.rex.RexNode
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.mdm.fetch
+import org.bitlap.core.mdm.plan.MetricsMergePlan
 import org.bitlap.core.mdm.plan.MetricsPlan
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.MDColumnAnalyzer
@@ -40,18 +41,20 @@ class BitlapSqlQueryMetricTable(
 //        )
 //        val precondition = executor.function
 
-        val materialize = analyzer.shouldMaterialize()
-        val dimensions = analyzer.getQueryDimensionColNames()
+        val projections = projects!!.map { rowType.fieldList[it].name!! }
         val metricCols = analyzer.getMetricColNames()
-        val projections = projects!!.map { rowType.fieldList[it].name }
+            .map { analyzer.materializeType(it) }
+            .groupBy { it::class.java }
 
-        @Suppress("UNCHECKED_CAST")
-        return Linq4j.asEnumerable(
-            fetch {
-                runtimeConf = QueryContext.get().runtimeConf!!
-                table = tbl
-                plan = MetricsPlan(timeFilterFun, projections, dimensions, metricCols, materialize)
-            }.asSequence().toList() as List<Array<Any?>>
-        )
+        val rows = fetch {
+            queryContext = QueryContext.get()
+            table = tbl
+            plan = MetricsMergePlan(
+                subPlans = metricCols.map { e ->
+                    MetricsPlan(timeFilterFun, e.value, e.key)
+                }
+            )
+        }
+        return Linq4j.asEnumerable(rows.toRows(projections))
     }
 }

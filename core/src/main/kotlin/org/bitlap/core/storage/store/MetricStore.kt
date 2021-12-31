@@ -9,7 +9,6 @@ import org.apache.carbondata.core.scan.expression.conditional.GreaterThanEqualTo
 import org.apache.carbondata.core.scan.expression.conditional.GreaterThanExpression
 import org.apache.carbondata.core.scan.expression.conditional.LessThanEqualToExpression
 import org.apache.carbondata.core.scan.expression.conditional.LessThanExpression
-import org.apache.carbondata.core.scan.expression.logical.AndExpression
 import org.apache.carbondata.core.scan.filter.FilterUtil
 import org.apache.carbondata.sdk.file.CarbonReader
 import org.apache.carbondata.sdk.file.CarbonWriter
@@ -31,19 +30,22 @@ import org.bitlap.core.storage.load.MetricRowMeta
 import org.joda.time.DateTime
 
 /**
- * Desc:
- *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/1/26
  */
-class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
+class MetricStore(
+    table: Table,
+    hadoopConf: Configuration,
+    conf: BitlapConf,
+) : AbsBitlapStore<Pair<Long, List<MetricRow>>>(hadoopConf, conf) {
 
     override val dataDir: Path = Path(rootPath, "data/${table.database}/${table.name}/metric")
     private fun writerB() = CarbonWriter.builder()
         .withCsvInput(
             Schema(
-                arrayOf( // TODO: add enum & add shard_id if cbm is too big
+                arrayOf(
+                    // TODO: add enum & add shard_id if cbm is too big
                     Field("mk", DataTypes.STRING),
                     Field("t", DataTypes.LONG),
                     // Field("ek", DataTypes.STRING),
@@ -80,94 +82,65 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
         val output = "${date.withTimeAtStartOfDay().millis}/${date.millis}"
         val writer = writerB().outputPath(Path(dataDir, output).toString()).build()
         metrics.forEach {
-            writer.write(arrayOf(it.metricKey, it.tm, it.metric.getBytes(), it.entity.getBytes(), JSONUtils.toJson(it.metadata)))
+            writer.write(
+                arrayOf(
+                    it.metricKey,
+                    it.tm,
+                    it.metric.getBytes(),
+                    it.entity.getBytes(),
+                    JSONUtils.toJson(it.metadata)
+                )
+            )
         }
         writer.close()
         return t
     }
 
-    fun query(
-        time: TimeRange,
-        metrics: List<String>,
-    ): BitlapIterator<MetricRow> {
-        return this.query(time, metrics, arrayOf("mk", "t", "m", "meta")) { row ->
-            val (mk, t, m, meta) = row
-            val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
-            // TODO: with BBM
-            MetricRow(t as Long, mk.toString(), CBM(m as? ByteArray), BBM(), metaObj)
+    fun query(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRow> {
+        val timeFilter = { tm: Long ->
+            time.contains(DateTime(tm))
         }
+        return this.queryCBM(timeFilter, metrics)
     }
 
-    fun queryMeta(
-        time: TimeRange,
-        metrics: List<String>
-    ): BitlapIterator<MetricRowMeta> {
-        return this.query(time, metrics, arrayOf("meta")) { row ->
-            val (meta) = row
-            JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+    fun queryMeta(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRowMeta> {
+        val timeFilter = { tm: Long ->
+            time.contains(DateTime(tm))
         }
+        return this.queryMeta(timeFilter, metrics)
     }
 
-    private fun <R> query(
-        time: TimeRange,
-        metrics: List<String>,
-        projections: Array<String>,
-        rowHandler: (Array<*>) -> R
-    ): BitlapIterator<R> {
-        // 1. get files
-        val files = time.walkByDayStep { date ->
-            val path = Path(dataDir, "${date.withTimeAtStartOfDay().millis}")
-            if (fs.exists(path)) {
-                fs.listStatus(path) { p ->
-                    val millis = p.name.toLong()
-                    time.contains(DateTime(millis))
-                }.map { it.path }
-            } else {
-                emptyList()
-            }
-        }.flatten().flatMap { p -> fs.listStatus(p).map { it.path } }
-
-        if (files.isEmpty()) {
-            return BitlapIterator.empty()
-        }
-        // 2. build reader
-        val timeExpr = buildTimeExpression(time)
-        val reader = readerB().withFileLists(files)
-            .projection(projections)
-            .filter(
-                AndExpression(
-                    AndExpression(timeExpr.first, timeExpr.second),
-                    FilterUtil.prepareEqualToExpressionSet("mk", "string", metrics)
-                ),
-            )
-            .build<Any>()
-        return MetricRowIterator(reader, rowHandler)
-    }
-
-    private fun buildTimeExpression(time: TimeRange): Pair<Expression, Expression> {
-        val (startTime, endTime) = time
-        val columnExpr = ColumnExpression("t", DataTypes.LONG)
-        val startExpr = LiteralExpression(startTime.millis, DataTypes.LONG)
-        val endExpr = LiteralExpression(endTime.millis, DataTypes.LONG)
-        return when (time.lower.boundType to time.upper.boundType) {
-            BoundType.OPEN to BoundType.OPEN -> GreaterThanExpression(columnExpr, startExpr) to LessThanExpression(columnExpr, endExpr)
-            BoundType.OPEN to BoundType.CLOSE -> GreaterThanExpression(columnExpr, startExpr) to LessThanEqualToExpression(columnExpr, endExpr)
-            BoundType.CLOSE to BoundType.OPEN -> GreaterThanEqualToExpression(columnExpr, startExpr) to LessThanExpression(columnExpr, endExpr)
-            BoundType.CLOSE to BoundType.CLOSE -> GreaterThanEqualToExpression(columnExpr, startExpr) to LessThanEqualToExpression(columnExpr, endExpr)
-            else -> throw IllegalArgumentException("Illegal arguments time: $time")
-        }
-    }
-
-    override fun close() {
-    }
-
-    fun queryMeta(
-        timeFilter: TimeFilterFun,
-        metrics: List<String>,
-    ): BitlapIterator<MetricRowMeta> {
+    fun queryMeta(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRowMeta> {
         return this.query(timeFilter, metrics, arrayOf("meta")) { row ->
             val (meta) = row
-            JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+            val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
+            if (timeFilter(metaObj.tm)) {
+                metaObj
+            } else {
+                null
+            }
+        }
+    }
+
+    fun queryBBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow> {
+        return this.query(timeFilter, metrics, arrayOf("mk", "t", "e")) { row ->
+            val (mk, t, e) = row
+            if (timeFilter(t as Long)) {
+                MetricRow(t, mk.toString(), CBM(), BBM(e as? ByteArray))
+            } else {
+                null
+            }
+        }
+    }
+
+    fun queryCBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow> {
+        return this.query(timeFilter, metrics, arrayOf("mk", "t", "m")) { row ->
+            val (mk, t, m) = row
+            if (timeFilter(t as Long)) {
+                MetricRow(t, mk.toString(), CBM(m as? ByteArray), BBM())
+            } else {
+                null
+            }
         }
     }
 
@@ -175,7 +148,7 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
         timeFilter: TimeFilterFun,
         metrics: List<String>,
         projections: Array<String>,
-        rowHandler: (Array<*>) -> R
+        rowHandler: (Array<*>) -> R?
     ): BitlapIterator<R> {
         // 1. get files
         val files = fs.listStatus(dataDir)
@@ -194,5 +167,35 @@ class MetricStore(table: Table, hadoopConf: Configuration, conf: BitlapConf) : A
             )
             .build<Any>()
         return MetricRowIterator(reader, rowHandler)
+    }
+
+    // for pushed down timeFilter
+    private fun buildTimeExpression(time: TimeRange): Pair<Expression, Expression> {
+        val (startTime, endTime) = time
+        val columnExpr = ColumnExpression("t", DataTypes.LONG)
+        val startExpr = LiteralExpression(startTime.millis, DataTypes.LONG)
+        val endExpr = LiteralExpression(endTime.millis, DataTypes.LONG)
+        return when (time.lower.boundType to time.upper.boundType) {
+            BoundType.OPEN to BoundType.OPEN -> GreaterThanExpression(columnExpr, startExpr) to LessThanExpression(
+                columnExpr,
+                endExpr
+            )
+            BoundType.OPEN to BoundType.CLOSE -> GreaterThanExpression(
+                columnExpr,
+                startExpr
+            ) to LessThanEqualToExpression(columnExpr, endExpr)
+            BoundType.CLOSE to BoundType.OPEN -> GreaterThanEqualToExpression(
+                columnExpr,
+                startExpr
+            ) to LessThanExpression(columnExpr, endExpr)
+            BoundType.CLOSE to BoundType.CLOSE -> GreaterThanEqualToExpression(
+                columnExpr,
+                startExpr
+            ) to LessThanEqualToExpression(columnExpr, endExpr)
+            else -> throw IllegalArgumentException("Illegal arguments time: $time")
+        }
+    }
+
+    override fun close() {
     }
 }

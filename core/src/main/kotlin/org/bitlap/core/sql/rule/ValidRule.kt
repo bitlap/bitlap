@@ -20,7 +20,7 @@ class ValidRule : AbsRelRule(BitlapNode::class.java, "ValidRule") {
                 // check metrics
                 val metricCols = table.analyzer.getMetricColNames()
                 if (metricCols.isEmpty()) {
-                    throw IllegalArgumentException("Query must contain at least one aggregation metric")
+                    throw IllegalArgumentException("Query must contain at least one aggregation metric, aggregation column must be specified")
                 }
             }
         }

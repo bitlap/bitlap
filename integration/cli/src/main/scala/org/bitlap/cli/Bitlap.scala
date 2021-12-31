@@ -27,7 +27,6 @@ class Bitlap extends Callable[Int] {
   var version = false
 
   override def call(): Int = {
-    println(" >")
     0
   }
 
@@ -36,7 +35,8 @@ class Bitlap extends Callable[Int] {
 object Bitlap {
 
   def main(args: Array[String]): Unit = {
-    val safeVarargs = Array("sql", "help")
+    // example
+    val safeVarargs = Array("sql")
     System.exit(new CommandLine(new Bitlap()).execute(safeVarargs: _*))
   }
 }

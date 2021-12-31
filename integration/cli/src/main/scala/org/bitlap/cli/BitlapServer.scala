@@ -32,16 +32,3 @@ class BitlapServer extends Runnable {
   }
 
 }
-
-/**
- * Usage: bitlap server [-c=CONF] OPERATE [COMMAND]
- * A bitlap subcommand for server.
- * OPERATE       start or stop
- * -c, --conf=CONF   Config file path
- * Commands:
- * help  Displays help information about the specified command
- *
- * Process finished with exit code 0
- *
- */
-

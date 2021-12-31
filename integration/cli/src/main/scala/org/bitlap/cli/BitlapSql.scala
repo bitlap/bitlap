@@ -49,7 +49,7 @@ class BitlapSql extends Runnable {
   )
   var password: String = _
 
-  @Parameters(paramLabel = "SQL", description = Array("SQL to execute"))
+  @Parameters(paramLabel = "SQL", description = Array("SQL to execute"), defaultValue = "")
   var args: String = _
 
   override def run(): Unit = {
@@ -57,18 +57,3 @@ class BitlapSql extends Runnable {
   }
 
 }
-
-/**
- * Usage: bitlap sql [-h=HOST] [-p=PASSWORD] [-P=PORT] [-u=USERNAME] SQL [COMMAND]
- * A bitlap subcommand for sql.
- * SQL                   Input your sql
- * -h, --host=HOST           Server host
- * -p, --password=PASSWORD   User password
- * -P, --port=PORT           Server port
- * -u, --user=USERNAME       User name
- * Commands:
- * help  Displays help information about the specified command
- *
- * Process finished with exit code 0
- *
- */

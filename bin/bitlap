@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+bin=`which $0`
+bin=`dirname ${bin}`
+bin=`cd "$bin"; pwd`
+export BITLAP_HOME="$bin"/..
+
+. $BITLAP_HOME/bin/bitlap-env.sh
+
+function print_usage(){
+  echo "Usage: bitlap [-hV] [COMMAND]"
+  echo "bitlap cli command."
+  echo "  -h, --help      Show this help message and exit."
+  echo "  -V, --version   Print version information and exit."
+  echo "Commands:"
+  echo "  server  A bitlap subcommand for server."
+  echo "  sql     A bitlap subcommand for sql."
+  echo "Most commands print help when invoked w/o parameters."
+}
+
+if [ $# = 0 ]; then
+  print_usage
+  exit
+fi
+
+COMMAND=$1
+case $COMMAND in
+  # usage flags
+  --help|-help|-h)
+    print_usage
+    exit
+    ;;
+
+  # core comamnds
+  *)
+    ## server
+    if [ "$COMMAND" = "server" ] ; then
+      CLASS="org.bitlap.cli.BitlapServerCli"
+      OPTS="$BITLAP_SERVER_OPTS"
+      shift
+    ## sql
+    elif [ "$COMMAND" = "sql" ] ; then
+      CLASS="org.bitlap.cli.BitlapSqlCli"
+      OPTS="$BITLAP_CLIENT_OPTS"
+      shift
+    ## others
+    else
+      CLASS="org.bitlap.cli.BitlapCli"
+      OPTS="$BITLAP_CLIENT_OPTS"
+    fi
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $@"
+    echo $CMD
+    # exec $CMD
+
+    ;;
+
+esac

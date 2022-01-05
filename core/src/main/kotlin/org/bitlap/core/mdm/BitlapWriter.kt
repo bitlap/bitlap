@@ -66,7 +66,7 @@ class BitlapWriter(
     fun writeExcel(path: String) = this.writeExcel0(path.readExcel())
     fun writeExcel(input: InputStream) = this.writeExcel0(input.readExcel())
 
-    fun writeExcel0(excel: Pair<List<String>, List<List<Any?>>>) {
+    private fun writeExcel0(excel: Pair<List<String>, List<List<Any?>>>) {
         val (header, rows) = excel
         PreConditions.checkExpression(
             header == listOf("time", "entity", "dimensions", "metric_name", "metric_value"),

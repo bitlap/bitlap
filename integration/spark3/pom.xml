@@ -17,11 +17,6 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

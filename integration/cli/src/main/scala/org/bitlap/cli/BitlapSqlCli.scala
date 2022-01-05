@@ -13,7 +13,7 @@ import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
   description = Array("A bitlap subcommand for sql."),
   subcommands = Array(classOf[HelpCommand])
 )
-class BitlapSql extends Runnable {
+class BitlapSqlCli extends Runnable {
 
   @Option(names = Array("-h", "--host"),
     paramLabel = "HOST",

@@ -13,7 +13,7 @@ import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
   description = Array("A bitlap subcommand for server."),
   subcommands = Array(classOf[HelpCommand])
 )
-class BitlapServer extends Runnable {
+class BitlapServerCli extends Runnable {
 
   @Option(names = Array("-c", "--conf"),
     paramLabel = "CONF",

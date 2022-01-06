@@ -33,11 +33,6 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <configuration>
-                    <args>
-                        <arg>-Ymacro-annotations</arg>
-                    </args>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

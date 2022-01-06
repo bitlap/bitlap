@@ -345,6 +345,11 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <args>
+                            <arg>-Ymacro-annotations</arg>
+                        </args>
+                    </configuration>
                 </plugin>
                 <!-- common -->
                 <plugin>

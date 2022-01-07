@@ -23,12 +23,9 @@ import java.util.Properties
 object BitlapClient extends NetworkHelper {
 
   private val defaultConf: BitlapConf = new BitlapConf() // TODO 怎么拿不到 /conf/bitlap.setting?
-  private val groupId: String = Option(defaultConf.get(BitlapConf.getNODE_GROUP_ID.getGroup,
-    BitlapConf.getNODE_GROUP_ID.getKey)).getOrElse("bitlap-cluster")
-  private val timeout: Long = Option(defaultConf.get(BitlapConf.getNODE_RPC_TIMEOUT.getGroup,
-    BitlapConf.getNODE_RPC_TIMEOUT.getKey)).getOrElse("3").toLong * 1000
-  private val raftTimeout: Int = Option(defaultConf.get(BitlapConf.getNODE_RAFT_TIMEOUT.getGroup,
-    BitlapConf.getNODE_RAFT_TIMEOUT.getKey)).getOrElse("3").toInt * 1000
+  private val groupId: String = Option(defaultConf.get(BitlapConf.NODE_GROUP_ID)).getOrElse("bitlap-cluster")
+  private val timeout: Long = Option(defaultConf.get(BitlapConf.NODE_RPC_TIMEOUT)).getOrElse("3").toLong * 1000
+  private val raftTimeout: Int = Option(defaultConf.get(BitlapConf.NODE_RAFT_TIMEOUT)).getOrElse("3").toInt * 1000
 
   // kotlin 兼容
   def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle = {

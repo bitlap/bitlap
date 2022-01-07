@@ -1,6 +1,7 @@
 package org.bitlap.cli
 
-import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
+import org.bitlap.tools.apply
+import picocli.CommandLine.{Command, HelpCommand, Option, Parameters}
 
 /**
  *
@@ -13,7 +14,8 @@ import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
   description = Array("A bitlap subcommand for server."),
   subcommands = Array(classOf[HelpCommand])
 )
-class BitlapServerCli extends Runnable {
+@apply
+class BitlapServerCli extends Cli with Runnable {
 
   @Option(names = Array("-c", "--conf"),
     paramLabel = "CONF",
@@ -31,4 +33,10 @@ class BitlapServerCli extends Runnable {
     println(s"args:$args, conf:$config")
   }
 
+}
+
+object BitlapServerCli {
+  def main(args: Array[String]): Unit = {
+    System.exit(BitlapServerCli() > args)
+  }
 }

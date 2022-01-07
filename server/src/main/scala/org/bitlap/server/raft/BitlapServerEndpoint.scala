@@ -32,7 +32,7 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
         return
       }
       super.start()
-      val serverIdStr = conf.get(BitlapConf.getNODE_BIND_HOST.getGroup, BitlapConf.getNODE_BIND_HOST.getKey)
+      val serverIdStr = conf.get(BitlapConf.NODE_BIND_HOST)
       val nodeOptions = extractOptions()
       val serverId = new PeerId()
       serverId.parse(serverIdStr)
@@ -44,7 +44,7 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
       })
       val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
       registerProcessor(rpcServer)
-      val raftGroupService = new RaftGroupService(conf.get(BitlapConf.getNODE_GROUP_ID.getGroup, BitlapConf.getNODE_GROUP_ID.getKey), serverId, nodeOptions, rpcServer)
+      val raftGroupService = new RaftGroupService(conf.get(BitlapConf.NODE_GROUP_ID), serverId, nodeOptions, rpcServer)
       this.node = raftGroupService.start()
       println("Started counter server at port:" + node.getNodeId.getPeerId.getPort)
     }
@@ -59,9 +59,9 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleWrappe
   }
 
   def extractOptions(): NodeOptions = {
-    val dataPath = conf.get(BitlapConf.getDEFAULT_ROOT_DIR_LOCAL.getGroup, BitlapConf.getDEFAULT_ROOT_DIR_LOCAL.getKey)
-    val initConfStr = conf.get(BitlapConf.getNODE_BIND_PEERS.getGroup, BitlapConf.getNODE_BIND_PEERS.getKey)
-    val timeout = conf.get(BitlapConf.getNODE_RAFT_TIMEOUT.getGroup, BitlapConf.getNODE_RAFT_TIMEOUT.getKey)
+    val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)
+    val initConfStr = conf.get(BitlapConf.NODE_BIND_PEERS)
+    val timeout = conf.get(BitlapConf.NODE_RAFT_TIMEOUT)
     val raftTimeout = if (timeout != null) timeout.toInt * 1000 else 1000
     FileUtils.forceMkdir(new File(dataPath))
     val logUri = "raft" + File.separator + "log"

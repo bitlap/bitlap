@@ -12,7 +12,10 @@ import org.bitlap.common.utils.PreConditions
  * Created by IceMimosa
  * Date: 2021/5/28
  */
-class BitlapConfKey<T>(val key: String, val defaultValue: T? = null) {
+inline fun <reified T> BitlapConfKey(key: String, defaultValue: T? = null): BitlapConfKey<T> {
+    return BitlapConfKey(key, defaultValue, T::class.java)
+}
+class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, private val type: Class<T>) {
 
     /**
      * Property group
@@ -85,34 +88,35 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null) {
         it.validator = v
     }
 
-    inline fun <reified R : T> getValue(conf: BitlapConf): R? {
+    @Suppress("UNCHECKED_CAST")
+    fun getValue(conf: BitlapConf): T? {
         var value = conf.get(this.group, this.key)
         if (value == null) {
             value = SystemUtil.get(this.getSysKey(), SystemUtil.get(this.getEnvKey()))
         }
 
         val result = if (value == null) {
-            this.defaultBy(conf) as R?
+            this.defaultBy(conf)
         } else {
             value = value.trim()
-            when (R::class) {
-                String::class -> value
-                Byte::class -> Convert.toByte(value)
-                Short::class -> Convert.toShort(value)
-                Int::class -> Convert.toInt(value)
-                Long::class -> Convert.toLong(value)
-                Float::class -> Convert.toFloat(value)
-                Double::class -> Convert.toDouble(value)
-                Char::class -> Convert.toChar(value)
-                Boolean::class -> {
+            when (this.type) {
+                String::class.java -> value
+                Byte::class.java -> Convert.toByte(value)
+                Short::class.java -> Convert.toShort(value)
+                Int::class.java -> Convert.toInt(value)
+                Long::class.java -> Convert.toLong(value)
+                Float::class.java -> Convert.toFloat(value)
+                Double::class.java -> Convert.toDouble(value)
+                Char::class.java -> Convert.toChar(value)
+                Boolean::class.java -> {
                     if (value.isBlank()) {
                         false
                     } else {
                         Convert.toBool(value)
                     }
                 }
-                else -> throw IllegalArgumentException("Illegal value type: ${R::class}")
-            } as R?
+                else -> throw IllegalArgumentException("Illegal value type: ${this.type}")
+            } as T?
         }
 
         if (this.validator != null) {

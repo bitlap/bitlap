@@ -7,9 +7,13 @@ import scala.language.implicitConversions
 
 package object cli {
 
-  implicit def cmd(cli: BitlapCli): CommandLine = new CommandLine(cli)
+  trait Cli extends Runnable {
+    override def run(): Unit = {}
+  }
 
-  implicit class CommandLineWrapper(val cli: BitlapCli) {
+  implicit def cmd(cli: Cli): CommandLine = new CommandLine(cli)
+
+  implicit class CommandLineWrapper(val cli: Cli) {
 
     // execute cmd with input args
     def >(str: String): Int = {

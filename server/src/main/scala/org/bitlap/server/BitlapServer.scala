@@ -34,8 +34,8 @@ object BitlapServer extends App {
 
   val server = new BitlapServer()
   server.start()
-  val groupId = server.conf.get(BitlapConf.getNODE_GROUP_ID.getGroup, BitlapConf.getNODE_GROUP_ID.getKey)
-  val timeout = server.conf.get(BitlapConf.getNODE_RAFT_TIMEOUT.getGroup, BitlapConf.getNODE_RAFT_TIMEOUT.getKey)
+  val groupId = server.conf.get(BitlapConf.NODE_GROUP_ID)
+  val timeout = server.conf.get(BitlapConf.NODE_RAFT_TIMEOUT)
   val raftTimeout = if (timeout != null) timeout.toInt * 1000 else 1000
 
   val conf = new Configuration()

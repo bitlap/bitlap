@@ -15,10 +15,10 @@ import picocli.CommandLine.Command
   subcommands = Array(classOf[BitlapServerCli], classOf[BitlapSqlCli]),
 )
 @apply
-class BitlapCli
+class BitlapCli extends Cli
 
 object BitlapCli {
   def main(args: Array[String]): Unit = {
-    System.exit(new BitlapCli() > args)
+    System.exit(BitlapCli() > args)
   }
 }

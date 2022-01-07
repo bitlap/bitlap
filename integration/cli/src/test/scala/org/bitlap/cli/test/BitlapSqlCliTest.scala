@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.language.postfixOps
 
-class BitlapCliTest extends AnyFlatSpec with Matchers {
+class BitlapSqlCliTest extends AnyFlatSpec with Matchers {
 
   private val helpText =
     s"""Usage: bitlap [-hV] [COMMAND]
@@ -18,15 +18,16 @@ class BitlapCliTest extends AnyFlatSpec with Matchers {
        |  sql     A bitlap subcommand for sql.
        |""".stripMargin
 
-  "test bitlap cli" should "ok" in {
-    val cli = BitlapCli()
+  "test bitlap sql cli" should "ok" in {
+    val cli = BitlapSqlCli()
     // empty
-    cli >> "" shouldBe s"Missing required subcommand\n$helpText"
+    cli >> "" shouldBe s""
     // -V, --version
-    cli >> "-V" should include("v")
-    cli >> "--version" should include("v")
+//    cli >> "-V" should include("v")
+//    cli >> "--version" should include("v")
     // -h, --help
-    cli >> "-h" shouldBe helpText
+    cli >> "-h 'select 123 from T'" shouldBe helpText
     cli >> "--help" shouldBe helpText
   }
+
 }

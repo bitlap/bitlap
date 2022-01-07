@@ -1,59 +1,103 @@
 package org.bitlap.cli
 
-import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
+import org.bitlap.cli.extension.BitlapSqlApplication
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.utils.StringEx
+import org.bitlap.tools.apply
+import picocli.CommandLine.{Command, Option, Parameters}
+import sqlline.{SqlLine, SqlLineOpts}
+
+import java.io.File
+import java.lang.{Boolean => JBoolean}
 
 /**
- *
- * @author 梦境迷离
- * @since 2021/12/31
- * @version 1.0
+ * sql command line
  */
 @Command(
   name = "sql",
   description = Array("A bitlap subcommand for sql."),
-  subcommands = Array(classOf[HelpCommand])
+  mixinStandardHelpOptions = true,
+  usageHelpAutoWidth = true,
 )
-class BitlapSqlCli extends Runnable {
+@apply
+class BitlapSqlCli extends Cli {
 
-  @Option(names = Array("-h", "--host"),
-    paramLabel = "HOST",
-    description = Array("Server host"),
-    required = true,
-    hideParamSyntax = true,
-    defaultValue = "localhost"
+  @Option(
+    names = Array("-s", "--server"),
+    paramLabel = "SERVER",
+    description = Array("Server Address."),
+    defaultValue = "localhost:23333",
   )
-  var host: String = "localhost"
+  var server: String = _
 
-  @Option(names = Array("-P", "--port"),
-    paramLabel = "PORT",
-    description = Array("Server port"),
-    required = true,
-    hideParamSyntax = true,
-    defaultValue = "23333"
-  )
-  var port: Int = 23333
-
-  @Option(names = Array("-u", "--user"),
+  @Option(
+    names = Array("-u", "--user"),
     paramLabel = "USERNAME",
-    description = Array("User name"),
-    required = false,
-    hideParamSyntax = true
+    description = Array("User name."),
+    defaultValue = ""
   )
   var user: String = _
 
-  @Option(names = Array("-p", "--password"),
+  @Option(
+    names = Array("-p", "--password"),
     paramLabel = "PASSWORD",
-    description = Array("User password"),
-    required = false,
-    hideParamSyntax = true
+    description = Array("User password."),
+    defaultValue = "",
+    interactive = true,
   )
   var password: String = _
 
-  @Parameters(paramLabel = "SQL", description = Array("SQL to execute"), defaultValue = "")
-  var args: String = _
+  @Parameters(
+    paramLabel = "SQL",
+    description = Array("SQL to execute."),
+    defaultValue = "",
+  )
+  var args: Array[String] = _
+  lazy val sql: String = StringEx.trimMargin(this.args.mkString(" "), '"', '\'')
+}
 
-  override def run(): Unit = {
-    println(s"host:$host, port:$port, user:$user, password:$password")
+object BitlapSqlCli {
+
+  def main(args: Array[String]): Unit = {
+    val cli = BitlapSqlCli()
+    cli.parseArgs(args: _*)
+    val cmd = cli.getCommand[BitlapSqlCli]
+    cmd.sql match {
+      // sql line REPL
+      case "" =>
+        val conf = new BitlapConf()
+        val projectName = conf.get(BitlapConf.PROJECT_NAME)
+
+        System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
+        BitlapSqlApplication.conf.set(conf)
+        val line = new SqlLine()
+        val status = line.begin(
+          Array(
+            "-d", "org.h2.Driver",
+            "-u", "jdbc:h2:mem:",
+            "-n", "sa",
+            "-p", "",
+            "-ac", classOf[BitlapSqlApplication].getCanonicalName)
+          , null, false
+        )
+        if (!JBoolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
+          System.exit(status.ordinal)
+        }
+
+      // execute sql directly
+      case sql =>
+
+    }
   }
 
+  private def getHistoryPath(projectName: String): String = {
+    val home = System.getProperty("user.home")
+    val os = System.getProperty("os.name").toLowerCase
+    val child = if (os.contains("windows")) {
+      projectName
+    } else {
+      s".$projectName"
+    }
+    new File(home, child).getAbsolutePath
+  }
 }

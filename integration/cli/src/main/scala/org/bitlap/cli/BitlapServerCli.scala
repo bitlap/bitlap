@@ -1,5 +1,6 @@
 package org.bitlap.cli
 
+import org.bitlap.tools.apply
 import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
 
 /**
@@ -13,6 +14,7 @@ import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
   description = Array("A bitlap subcommand for server."),
   subcommands = Array(classOf[HelpCommand])
 )
+@apply
 class BitlapServerCli extends Runnable {
 
   @Option(names = Array("-c", "--conf"),
@@ -27,8 +29,12 @@ class BitlapServerCli extends Runnable {
   @Parameters(paramLabel = "OPERATE", description = Array("start or stop"))
   var args: String = _
 
-  override def run(): Unit = {
-    println(s"args:$args, conf:$config")
-  }
+  override def run(): Unit = ()
 
+}
+
+object BitlapServerCli {
+  def main(args: Array[String]): Unit = {
+    System.exit(BitlapServerExecutor.<<?(args))
+  }
 }

@@ -8,7 +8,9 @@ import scala.reflect.{ classTag, ClassTag }
 
 package object cli {
 
-  val CliExecutor = new CommandLine(new BitlapCli()) with CliExecutor
+  val BitlapExecutor = new CommandLine(BitlapCli()) with CliExecutor
+  val BitlapServerExecutor = new CommandLine(BitlapServerCli()) with CliExecutor
+  val BitlapSqlExecutor = new CommandLine(BitlapSqlCli()) with CliExecutor
 
   sealed trait CliExecutor {
     self: CommandLine =>

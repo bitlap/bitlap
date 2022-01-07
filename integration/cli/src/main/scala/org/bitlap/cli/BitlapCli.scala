@@ -19,6 +19,6 @@ class BitlapCli
 
 object BitlapCli {
   def main(args: Array[String]): Unit = {
-    System.exit(new BitlapCli() > args)
+    System.exit(CliExecutor.<<?(args))
   }
 }

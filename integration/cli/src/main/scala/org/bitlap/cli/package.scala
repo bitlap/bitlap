@@ -2,35 +2,43 @@ package org.bitlap
 
 import picocli.CommandLine
 
-import java.io.{PrintWriter, StringWriter}
+import java.io.{ PrintWriter, StringWriter }
 import scala.language.implicitConversions
+import scala.reflect.{ classTag, ClassTag }
 
 package object cli {
 
-  implicit def cmd(cli: BitlapCli): CommandLine = new CommandLine(cli)
+  val CliExecutor = new CommandLine(new BitlapCli()) with CliExecutor
 
-  implicit class CommandLineWrapper(val cli: BitlapCli) {
+  sealed trait CliExecutor {
+    self: CommandLine =>
 
-    // execute cmd with input args
-    def >(str: String): Int = {
-      val args = str.split(" ").map(_.trim).filter(_.nonEmpty)
-      this.cli > args
+    /**
+     * 参数执行返回值code
+     *
+     * @param args
+     * @tparam T
+     * @return
+     */
+    def <<?[T: ClassTag](args: T): Int = {
+      val clazz = classTag[T].runtimeClass
+      if (clazz.isArray) {
+        self.execute(args.asInstanceOf[Array[Object]].map(_.toString.trim).filter(_.nonEmpty): _*)
+      } else {
+        self.execute(args.asInstanceOf[String].split(" ").map(_.trim).filter(_.nonEmpty): _*)
+      }
     }
 
-    def >(args: Array[String]): Int = {
-      this.cli.execute(args: _*)
-    }
-
-    // execute cmd with input args, return execute output
-    def >>(str: String): String = {
-      val args = str.split(" ").map(_.trim).filter(_.nonEmpty)
-      this.cli >> args
-    }
-
-    def >>(args: Array[String]): String = {
+    def <<<?[I: ClassTag](args: I): String = {
+      val input = classTag[I].runtimeClass
       val sw = new StringWriter()
       val pw = new PrintWriter(sw)
-      this.cli.setOut(pw).setErr(pw).execute(args: _*)
+      self.setOut(pw).setErr(pw)
+      if (input.isArray) {
+        self.setOut(pw).setErr(pw).execute(args.asInstanceOf[Array[Object]].map(_.toString.trim).filter(_.nonEmpty): _*)
+      } else {
+        self.setOut(pw).setErr(pw).execute(args.asInstanceOf[String].split(" ").map(_.trim).filter(_.nonEmpty): _*)
+      }
       sw.toString
     }
   }

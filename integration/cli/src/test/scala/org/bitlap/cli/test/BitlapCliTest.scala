@@ -1,6 +1,6 @@
 package org.bitlap.cli.test
 
-import org.bitlap.cli.{BitlapCli, _}
+import org.bitlap.cli.{ BitlapCli, _ }
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,15 +9,15 @@ import scala.language.postfixOps
 class BitlapCliTest extends AnyFlatSpec with Matchers {
 
   "test bitlap cli" should "ok" in {
-    val cli = BitlapCli()
     // empty
-    cli >> "" shouldBe s"Missing required subcommand\n$helpText"
+    CliExecutor <<<? (Array("")) shouldBe s"Missing required subcommand\n$helpText"
+    CliExecutor <<<? ("") shouldBe s"Missing required subcommand\n$helpText"
     // -V, --version
-    cli >> "-V" should include("v")
-    cli >> "--version" should include("v")
+    CliExecutor <<<? ("-V") should include("v")
+    CliExecutor <<<? ("--version") should include("v")
     // -h, --help
-    cli >> "-h" shouldBe helpText
-    cli >> "--help" shouldBe helpText
+    CliExecutor <<<? ("-h") shouldBe helpText
+    CliExecutor <<<? ("--help") shouldBe helpText
   }
 
   private val helpText =

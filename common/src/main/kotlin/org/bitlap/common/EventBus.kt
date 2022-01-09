@@ -15,8 +15,6 @@ typealias BitlapSubscriber<E> = (e: E) -> Unit
 open class EventBus(
     val executor: ExecutorService = Executors.newWorkStealingPool()
 ) : LifeCycleWrapper() {
-
-    private val log = logger { }
     val subscribers = ConcurrentHashMap<Class<out BitlapEvent>, MutableList<BitlapSubscriber<*>>>()
 
     inline fun <reified E : BitlapEvent> subscribe(noinline subscriber: BitlapSubscriber<E>): EventBus {

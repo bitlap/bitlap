@@ -13,16 +13,22 @@ class BitlapSqlCliTest extends AnyFlatSpec with Matchers {
                            |      [SQL...]          SQL to execute.
                            |  -h, --help            Show this help message and exit.
                            |  -p, --password        User password.
-                           |  -s, --server=SERVER   Server Address.
+                           |  -s, --server=SERVER   Server Addresses, separated by comma.
                            |  -u, --user=USERNAME   User name.
                            |  -V, --version         Print version information and exit.
                            |""".stripMargin
 
   "test bitlap sql cli" should "ok" in {
+    var cli = BitlapSqlExecutor.getCommand[BitlapSqlCli]
     // empty
     BitlapSqlExecutor <<<? "" shouldBe s""
-    BitlapSqlExecutor <<<? "-h 'select 123 from T'" shouldBe helpText
+    // help
+    BitlapSqlExecutor <<<? "-h" shouldBe helpText
     BitlapSqlExecutor <<<? "--help" shouldBe helpText
+    // with sql arguments
+    BitlapSqlExecutor <<<? "-h 'select 123 from t'" shouldBe helpText
+    cli.sql shouldBe "select 123 from t"
+    BitlapSqlExecutor <<<? "select 1"
+    cli.sql shouldBe "select 1"
   }
-
 }

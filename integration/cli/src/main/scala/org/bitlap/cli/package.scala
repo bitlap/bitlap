@@ -16,13 +16,10 @@ package object cli {
     self: CommandLine =>
 
     /**
-     * 参数执行返回值code
-     *
-     * @param args
-     * @tparam T
-     * @return
+     * execute with args and return status code
      */
     def <<?[T: ClassTag](args: T): Int = {
+      self.parseArgs()
       val clazz = classTag[T].runtimeClass
       if (clazz.isArray) {
         self.execute(args.asInstanceOf[Array[Object]].map(_.toString.trim).filter(_.nonEmpty): _*)
@@ -31,6 +28,9 @@ package object cli {
       }
     }
 
+    /**
+     * execute with args and return execute console output
+     */
     def <<<?[I: ClassTag](args: I): String = {
       val input = classTag[I].runtimeClass
       val sw = new StringWriter()

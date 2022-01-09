@@ -3,12 +3,14 @@ package org.bitlap.cli
 import org.bitlap.cli.extension.BitlapSqlApplication
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
+import org.bitlap.jdbc.BitlapDriver
 import org.bitlap.tools.apply
-import picocli.CommandLine.{ Command, Option, Parameters }
-import sqlline.{ SqlLine, SqlLineOpts }
+import picocli.CommandLine.{Command, Option, Parameters}
+import sqlline.{SqlLine, SqlLineOpts}
 
 import java.io.File
-import java.lang.{ Boolean => JBoolean }
+import java.lang.{Boolean => JBoolean}
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * sql command line
@@ -25,7 +27,7 @@ class BitlapSqlCli extends Runnable {
   @Option(
     names = Array("-s", "--server"),
     paramLabel = "SERVER",
-    description = Array("Server Address."),
+    description = Array("Server Addresses, separated by comma."),
     defaultValue = "localhost:23333",
   )
   var server: String = _
@@ -53,7 +55,7 @@ class BitlapSqlCli extends Runnable {
     defaultValue = "",
   )
   var args: Array[String] = _
-  lazy val sql: String = StringEx.trimMargin(this.args.mkString(" "), '"', '\'')
+  def sql: String = StringEx.trimMargin(this.args.mkString(" "), '"', '\'')
 
   override def run(): Unit = ()
 }
@@ -61,32 +63,28 @@ class BitlapSqlCli extends Runnable {
 object BitlapSqlCli {
 
   def main(args: Array[String]): Unit = {
+    val conf = new BitlapConf()
+    val projectName = conf.get(BitlapConf.PROJECT_NAME)
     BitlapSqlExecutor.parseArgs(args: _*)
     val cmd = BitlapSqlExecutor.getCommand[BitlapSqlCli]
-    cmd.sql match {
-      // sql line REPL
-      case "" =>
-        val conf = new BitlapConf()
-        val projectName = conf.get(BitlapConf.PROJECT_NAME)
-        System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
-        BitlapSqlApplication.conf.set(conf)
-        val line = new SqlLine()
-        val status = line.begin(
-          Array(
-            "-d", "org.h2.Driver",
-            "-u", "jdbc:h2:mem:",
-            "-n", "sa",
-            "-p", "",
-            "-ac", classOf[BitlapSqlApplication].getCanonicalName)
-          , null, false
-        )
-        if (!JBoolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
-          System.exit(status.ordinal)
-        }
 
-      // execute sql directly
-      case sql =>
-
+    val sqlArgs = ArrayBuffer(
+      "-d", classOf[BitlapDriver].getCanonicalName,
+      "-u", s"jdbc:bitlap://${cmd.server}/default",
+      "-n", cmd.user,
+      "-p", cmd.password,
+      "-ac", classOf[BitlapSqlApplication].getCanonicalName
+    )
+    if (!StringEx.nullOrBlank(cmd.sql)) {
+      sqlArgs ++= Array("-e", cmd.sql)
+    }
+    // sql line REPL or execute sql directly
+    System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
+    BitlapSqlApplication.conf.set(conf)
+    val line = new SqlLine()
+    val status = line.begin(sqlArgs.toArray, null, false)
+    if (!JBoolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
+      System.exit(status.ordinal)
     }
   }
 
@@ -96,7 +94,7 @@ object BitlapSqlCli {
     val child = if (os.contains("windows")) {
       projectName
     } else {
-      s".$projectName"
+      s".$projectName" // default is: ~/.bitlap
     }
     new File(home, child).getAbsolutePath
   }

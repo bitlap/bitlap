@@ -2,6 +2,7 @@ package org.bitlap.common
 
 import cn.hutool.setting.Setting
 import org.bitlap.common.conf.BitlapConfKey
+import org.bitlap.common.conf.Validator
 import org.bitlap.common.conf.Validators
 import org.bitlap.common.utils.StringEx.withPaths
 import org.slf4j.LoggerFactory
@@ -124,14 +125,18 @@ open class BitlapConf() : Serializable {
          * Sofa RPC timeout, Unit: Second.
          */
         @JvmField
-        val NODE_RPC_TIMEOUT = BitlapConfKey<String>("node.rpc.timeout")
-            .validator(Validators.NOT_BLANK)
+        val NODE_RPC_TIMEOUT = BitlapConfKey("node.rpc.timeout", 1000L)
+            .validator {
+                it != null && it >= 1000L
+            }
 
         /**
          * Sofa RAFT timeout, Unit: Second.
          */
         @JvmField
-        val NODE_RAFT_TIMEOUT = BitlapConfKey<String>("node.raft.timeout")
-            .validator(Validators.NOT_BLANK)
+        val NODE_RAFT_TIMEOUT = BitlapConfKey("node.raft.timeout", 1000L)
+            .validator {
+                it != null && it >= 1000L
+            }
     }
 }

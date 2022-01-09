@@ -8,8 +8,9 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.proto.driver.{ BCloseSession, BExecuteStatement, BFetchResults, BGetColumns, BGetResultSetMetadata, BGetSchemas, BGetTables, BOpenSession, BOperationHandle, BSessionHandle, BStatus, BStatusCode, BTableSchema }
+import org.bitlap.network.proto.driver.{BCloseSession, BExecuteStatement, BFetchResults, BGetColumns, BGetResultSetMetadata, BGetSchemas, BGetTables, BOpenSession, BOperationHandle, BSessionHandle, BStatus, BStatusCode, BTableSchema}
 
+import java.lang.{Long => JLong}
 import java.sql.SQLException
 import java.util.Properties
 
@@ -24,8 +25,8 @@ object BitlapClient extends NetworkHelper {
 
   private val defaultConf: BitlapConf = new BitlapConf() // TODO 怎么拿不到 /conf/bitlap.setting?
   private val groupId: String = Option(defaultConf.get(BitlapConf.NODE_GROUP_ID)).getOrElse("bitlap-cluster")
-  private val timeout: Long = Option(defaultConf.get(BitlapConf.NODE_RPC_TIMEOUT)).getOrElse("3").toLong * 1000
-  private val raftTimeout: Int = Option(defaultConf.get(BitlapConf.NODE_RAFT_TIMEOUT)).getOrElse("3").toInt * 1000
+  private val timeout: JLong = Option(defaultConf.get[JLong](BitlapConf.NODE_RPC_TIMEOUT)).getOrElse(3000L)
+  private val raftTimeout: JLong = Option(defaultConf.get[JLong](BitlapConf.NODE_RAFT_TIMEOUT)).getOrElse(3000L)
 
   // kotlin 兼容
   def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle = {
@@ -89,13 +90,13 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used to close the session when the JDBC connection is closed.
      */
-    def closeSession(sessionHandle: BSessionHandle) {
+    def closeSession(sessionHandle: BSessionHandle): Unit = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       cc.getRpcClient.invokeAsync(
         leader.getEndpoint,
         BCloseSession.BCloseSessionReq.newBuilder().setSessionHandle(sessionHandle).build(),
         new InvokeCallback() {
-          override def complete(o: Any, throwable: Throwable) = {
+          override def complete(o: Any, throwable: Throwable): Unit = {
             ()
           }
         }, timeout)
@@ -190,14 +191,14 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used to initialize available nodes.
      */
-    private def init(conf: Configuration) {
+    private def init(conf: Configuration): Unit = {
       RouteTable.getInstance().updateConfiguration(groupId, conf)
       val cliOptions = new CliOptions
       cliOptions.setMaxRetry(3)
       cc.init(cliOptions)
       while (true) { //首次连不上，，为什么？
         try {
-          val ret = RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout).isOk
+          val ret = RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout.toInt).isOk
           if (ret) return
         } catch {
           case e: Exception => println(e.getLocalizedMessage)
@@ -208,7 +209,7 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used to verify whether the RPC result is correct.
      */
-    private def verifySuccess(status: BStatus) {
+    private def verifySuccess(status: BStatus): Unit = {
       if (status.getStatusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
         throw new SQLException(
           status.getErrorMessage,
@@ -218,7 +219,7 @@ object BitlapClient extends NetworkHelper {
     }
   }
 
-  def beforeInit() {
+  def beforeInit(): Unit = {
     registerMessageInstances(NetworkHelper.requestInstances(), (i1, i2) => {
       RpcFactoryHelper.rpcFactory().registerProtobufSerializer(i1, i2)
     }

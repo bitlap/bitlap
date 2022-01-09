@@ -7,49 +7,47 @@ export BITLAP_HOME="$bin"/..
 
 . $BITLAP_HOME/bin/bitlap-env.sh
 
-function print_usage(){
-  echo "Usage: bitlap [-hV] [COMMAND]"
-  echo "bitlap cli command."
-  echo "  -h, --help      Show this help message and exit."
-  echo "  -V, --version   Print version information and exit."
-  echo "Commands:"
-  echo "  server  A bitlap subcommand for server."
-  echo "  sql     A bitlap subcommand for sql."
-  echo "Most commands print help when invoked w/o parameters."
-}
-
-if [ $# = 0 ]; then
-  print_usage
-  exit
-fi
-
 COMMAND=$1
 case $COMMAND in
-  # usage flags
-  --help|-help|-h)
-    print_usage
-    exit
+  # server command
+  server)
+    shift
+    ARGS=$@
+    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+      ARGS="--help"
+    fi
+    OPTS="$BITLAP_SERVER_OPTS"
+    CLASS="org.bitlap.cli.BitlapServerCli"
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    echo $CMD
     ;;
 
-  # core comamnds
-  *)
-    ## server
-    if [ "$COMMAND" = "server" ] ; then
-      CLASS="org.bitlap.cli.BitlapServerCli"
-      OPTS="$BITLAP_SERVER_OPTS"
-      shift
-    ## sql
-    elif [ "$COMMAND" = "sql" ] ; then
-      CLASS="org.bitlap.cli.BitlapSqlCli"
-      OPTS="$BITLAP_CLIENT_OPTS"
-      shift
-    ## others
-    else
-      CLASS="org.bitlap.cli.BitlapCli"
-      OPTS="$BITLAP_CLIENT_OPTS"
+  # sql command
+  sql)
+    shift
+    ARGS=$@
+    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+      ARGS="--help"
     fi
+    OPTS="$BITLAP_CLIENT_OPTS"
+    CLASS="org.bitlap.cli.BitlapSqlCli"
 
-    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $@"
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    echo $CMD
+    ;;
+
+  # other comamnds
+  *)
+    ARGS=$@
+    if [ $# = 0 ] || [ "$COMMAND" = "-help" ] ; then
+      ARGS="--help"
+    fi
+    CLASS="org.bitlap.cli.BitlapCli"
+    OPTS="$BITLAP_CLIENT_OPTS"
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
     echo $CMD
     # exec $CMD
 

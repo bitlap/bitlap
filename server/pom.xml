@@ -24,11 +24,6 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>scala-macro-tools_2.13</artifactId>
-            <version>${scala-macro.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -38,11 +33,6 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <configuration>
-                    <args>
-                        <arg>-Ymacro-annotations</arg>
-                    </args>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

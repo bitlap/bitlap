@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+bin=`which $0`
+bin=`dirname ${bin}`
+bin=`cd "$bin"; pwd`
+export BITLAP_HOME="$bin"/..
+
+. $BITLAP_HOME/bin/bitlap-env.sh
+
+COMMAND=$1
+case $COMMAND in
+  # server command
+  server)
+    shift
+    ARGS=$@
+    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+      ARGS="--help"
+    fi
+    OPTS="$BITLAP_SERVER_OPTS"
+    CLASS="org.bitlap.cli.BitlapServerCli"
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    echo $CMD
+    ;;
+
+  # sql command
+  sql)
+    shift
+    ARGS=$@
+    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+      ARGS="--help"
+    fi
+    OPTS="$BITLAP_CLIENT_OPTS"
+    CLASS="org.bitlap.cli.BitlapSqlCli"
+
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    echo $CMD
+    ;;
+
+  # other comamnds
+  *)
+    ARGS=$@
+    if [ $# = 0 ] || [ "$COMMAND" = "-help" ] ; then
+      ARGS="--help"
+    fi
+    CLASS="org.bitlap.cli.BitlapCli"
+    OPTS="$BITLAP_CLIENT_OPTS"
+
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    echo $CMD
+    # exec $CMD
+
+    ;;
+
+esac

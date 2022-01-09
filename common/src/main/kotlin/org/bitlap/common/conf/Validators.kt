@@ -7,9 +7,5 @@ package org.bitlap.common.conf
  */
 object Validators {
 
-    val NOT_BLANK = object : Validator<String> {
-        override fun validate(t: String?): Boolean {
-            return !t.isNullOrBlank()
-        }
-    }
+    val NOT_BLANK = Validator<String> { t -> !t.isNullOrBlank() }
 }

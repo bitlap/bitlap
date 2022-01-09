@@ -2,6 +2,7 @@ package org.bitlap.common
 
 import cn.hutool.setting.Setting
 import org.bitlap.common.conf.BitlapConfKey
+import org.bitlap.common.conf.Validator
 import org.bitlap.common.conf.Validators
 import org.bitlap.common.utils.StringEx.withPaths
 import org.slf4j.LoggerFactory
@@ -53,7 +54,7 @@ open class BitlapConf() : Serializable {
         }
     }
 
-    inline fun <reified T> get(key: BitlapConfKey<T>): T? {
+    fun <T> get(key: BitlapConfKey<T>): T? {
         // TODO: Add cache
         return key.getValue(this)
     }
@@ -84,7 +85,7 @@ open class BitlapConf() : Serializable {
         /**
          * Project name, default is bitlap
          */
-        @JvmStatic
+        @JvmField
         val PROJECT_NAME = BitlapConfKey("project.name", "bitlap")
             .sys("bitlap.project.name")
             .env("BITLAP_PROJECT_NAME")
@@ -92,13 +93,13 @@ open class BitlapConf() : Serializable {
         /**
          * Data dir and local dir
          */
-        @JvmStatic
+        @JvmField
         val DEFAULT_ROOT_DIR_DATA = BitlapConfKey<String>("root.dir.data")
             .validator(Validators.NOT_BLANK)
-        @JvmStatic
+        @JvmField
         val DEFAULT_ROOT_DIR_LOCAL = BitlapConfKey<String>("root.dir.local")
             .validator(Validators.NOT_BLANK)
-        @JvmStatic
+        @JvmField
         val DEFAULT_ROOT_DIR_LOCAL_META = BitlapConfKey<String>("root.dir.local.meta")
             .defaultBy {
                 it.get(DEFAULT_ROOT_DIR_LOCAL)?.withPaths("meta")
@@ -107,31 +108,35 @@ open class BitlapConf() : Serializable {
         /**
          * Node address
          */
-        @JvmStatic
+        @JvmField
         val NODE_BIND_HOST = BitlapConfKey<String>("node.bind.host")
             .validator(Validators.NOT_BLANK)
-        @JvmStatic
+        @JvmField
         val NODE_BIND_PEERS = BitlapConfKey<String>("node.bind.peers")
             .validator(Validators.NOT_BLANK)
         /**
          * Sofa RPC cluster name.
          */
-        @JvmStatic
+        @JvmField
         val NODE_GROUP_ID = BitlapConfKey<String>("node.group.id")
             .validator(Validators.NOT_BLANK)
 
         /**
          * Sofa RPC timeout, Unit: Second.
          */
-        @JvmStatic
-        val NODE_RPC_TIMEOUT = BitlapConfKey<String>("node.rpc.timeout")
-            .validator(Validators.NOT_BLANK)
+        @JvmField
+        val NODE_RPC_TIMEOUT = BitlapConfKey("node.rpc.timeout", 1000L)
+            .validator {
+                it != null && it >= 1000L
+            }
 
         /**
          * Sofa RAFT timeout, Unit: Second.
          */
-        @JvmStatic
-        val NODE_RAFT_TIMEOUT = BitlapConfKey<String>("node.raft.timeout")
-            .validator(Validators.NOT_BLANK)
+        @JvmField
+        val NODE_RAFT_TIMEOUT = BitlapConfKey("node.raft.timeout", 1000L)
+            .validator {
+                it != null && it >= 1000L
+            }
     }
 }

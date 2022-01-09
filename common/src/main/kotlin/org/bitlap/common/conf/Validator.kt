@@ -7,7 +7,7 @@ package org.bitlap.common.conf
  * Created by IceMimosa
  * Date: 2021/5/30
  */
-interface Validator<T> {
+fun interface Validator<T> {
 
     /**
      * check [t] if is valid.

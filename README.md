@@ -8,10 +8,6 @@ OLAP
 
 🚧 施工中......
 
-# Environment
-
-* [IDEA Plugin Scala-Macro-Tools](https://github.com/bitlap/scala-macro-tools)
-
 # Architecture
 
 ![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
@@ -19,3 +15,23 @@ OLAP
 # Quick Start
 
 * [Test Data File Example](https://docs.google.com/spreadsheets/d/13KNvNTGYRjdPSsp9PSrIMU_2uKqKkJa-BgL4Q236Ky0/edit?usp=sharing)
+
+# How to contribute
+
+## Environment
+
+* [IDEA Plugin Scala-Macro-Tools](https://github.com/bitlap/scala-macro-tools)
+
+## Build
+
+```sh
+./mvnw clean package -DskipTests
+```
+
+* make tarball
+
+```sh
+./dev/make-tarball.sh
+```
+
+# LICENSE

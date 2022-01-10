@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<assembly>
+    <id>bin</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>../${project.basedir}/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>../${project.basedir}/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <fileMode>0644</fileMode>
+            <includes>
+                <include>*.xml</include>
+                <include>*.setting</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>logs</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>tmp</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>../${project.basedir}</directory>
+            <includes>
+                <include>NOTICE</include>
+                <include>LICENSE</include>
+                <include>*.md</include>
+                <include>*.png</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <excludes/>
+            <outputDirectory>lib</outputDirectory>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>

@@ -2,7 +2,6 @@ package org.bitlap.common
 
 import cn.hutool.setting.Setting
 import org.bitlap.common.conf.BitlapConfKey
-import org.bitlap.common.conf.Validator
 import org.bitlap.common.conf.Validators
 import org.bitlap.common.utils.StringEx.withPaths
 import org.slf4j.LoggerFactory

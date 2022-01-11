@@ -6,7 +6,7 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
@@ -33,8 +33,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "forbidden queries" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             shouldThrow<BitlapException> {
                 sql("select *, a, b from $db.$table") // star is forbidden
@@ -55,8 +54,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 
         "only metrics query with one dimension time" {
             // System.setProperty("calcite.debug", "true")
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
@@ -108,8 +106,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "only metrics query with one complex dimension time" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
@@ -125,8 +122,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "only metrics query with one dimension that is not time" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
@@ -136,7 +132,8 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
     }
 
     private fun prepareTestData(database: String, tableName: String, time: Long) {
-        val writer = BitlapWriter(Table(database, tableName), conf, hadoopConf)
+        val table = BitlapContext.catalog.getTable(tableName, database)
+        val writer = BitlapWriter(table, hadoopConf)
         writer.use {
             it.write(
                 listOf(

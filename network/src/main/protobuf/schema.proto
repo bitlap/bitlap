@@ -9,4 +9,5 @@ message TablePB {
     string name = 2;
     int64 createTime = 3;
     int64 updateTime = 4;
+    map<string, string> props = 5;
 }

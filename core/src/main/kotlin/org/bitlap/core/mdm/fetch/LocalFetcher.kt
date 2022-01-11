@@ -20,7 +20,7 @@ import org.bitlap.core.mdm.model.RowIterator
 import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.TimeFilterFun
-import org.bitlap.core.storage.store.MetricStore
+import org.bitlap.core.storage.StoreType
 
 /**
  * Fetch results from local jvm.
@@ -33,7 +33,8 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         metrics: List<String>,
         metricType: Class<out DataType>,
     ): RowIterator {
-        val metricStore = MetricStore(table, BitlapContext.hadoopConf, context.queryContext.runtimeConf!!)
+        val storeProvider = StoreType.valueOf(table.getTableFormat()).getProvider(table, BitlapContext.hadoopConf)
+        val metricStore = storeProvider.getMetricStore()
         // TODO: eager consume? remote should be eager
         val rows = when (metricType) {
             DataTypeRowValueMeta::class.java -> {

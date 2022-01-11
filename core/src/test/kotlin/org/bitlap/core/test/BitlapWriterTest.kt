@@ -6,7 +6,6 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.mdm.BitlapReader
 import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.mdm.model.Query
@@ -25,10 +24,10 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
     init {
 
         "test SimpleBitlapWriter" {
-            val database = randomString()
-            val table = randomString()
-            BitlapContext.catalog.createTable(table, database, true)
-            val writer = BitlapWriter(Table(database, table), conf, hadoopConf)
+            val (dbName, tableName) = randomDBTable()
+            BitlapContext.catalog.createTable(tableName, dbName, true)
+            val table = BitlapContext.catalog.getTable(tableName, dbName)
+            val writer = BitlapWriter(table, hadoopConf)
 
             val testTime = DateTime.parse("2021-01-01").millis
             val testTime2 = DateTime.parse("2021-01-02").millis
@@ -53,7 +52,7 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
 
             val reader = BitlapReader()
             val rows = reader.use {
-                it.read(Query(database, table, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
+                it.read(Query(dbName, tableName, QueryTime(testTime2), "user", listOf(QueryMetric("pv"), QueryMetric("vv"))))
             }
             rows.size shouldBe 1
             val pv = rows.first().getBM("pv")
@@ -62,35 +61,35 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "test csv writer" {
-            val db = randomString()
-            val table = randomString()
-            sql("create table $db.$table")
-            val writer = BitlapWriter(Table(db, table), conf, hadoopConf)
+            val (dbName, tableName) = randomDBTable()
+            sql("create table $dbName.$tableName")
+            val table = BitlapContext.catalog.getTable(tableName, dbName)
+            val writer = BitlapWriter(table, hadoopConf)
             val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.csv")!!
             writer.writeCsv(input)
             checkRows(
-                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time >= 100 group by _time",
                 listOf(listOf(100, 4, 12, 3), listOf(200, 4, 12, 3))
             )
             checkRows(
-                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time >= 100",
                 listOf(listOf(8, 24, 3))
             )
         }
 
         "test excel writer" {
-            val db = randomString()
-            val table = randomString()
-            sql("create table $db.$table")
-            val writer = BitlapWriter(Table(db, table), conf, hadoopConf)
+            val (dbName, tableName) = randomDBTable()
+            sql("create table $dbName.$tableName")
+            val table = BitlapContext.catalog.getTable(tableName, dbName)
+            val writer = BitlapWriter(table, hadoopConf)
             val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.xlsx")!!
             writer.writeExcel(input)
             checkRows(
-                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100 group by _time",
+                "select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time >= 100 group by _time",
                 listOf(listOf(100, 4, 12, 3), listOf(200, 4, 12, 3))
             )
             checkRows(
-                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time >= 100",
                 listOf(listOf(8, 24, 3))
             )
         }

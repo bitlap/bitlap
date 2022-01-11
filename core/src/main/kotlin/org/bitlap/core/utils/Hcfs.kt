@@ -29,7 +29,7 @@ object Hcfs {
             val len = it.readInt()
             val buf = ByteArray(len)
             it.readFully(buf, 0, len)
-            Table.from(buf)
+            Table.from(buf, tableDir.toString())
         }
     }
 }

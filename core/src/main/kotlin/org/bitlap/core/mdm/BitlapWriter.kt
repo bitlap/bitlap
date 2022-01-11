@@ -2,7 +2,6 @@ package org.bitlap.core.mdm
 
 import cn.hutool.core.convert.Convert
 import org.apache.hadoop.conf.Configuration
-import org.bitlap.common.BitlapConf
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.data.Dimension
@@ -15,9 +14,9 @@ import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.storage.StoreType
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.storage.store.MetricStore
 import org.bitlap.core.utils.Excel.readCsv
 import org.bitlap.core.utils.Excel.readExcel
 import java.io.Closeable
@@ -28,16 +27,14 @@ import kotlin.system.measureTimeMillis
 /**
  * bitmap mdm [Event] writer
  */
-class BitlapWriter(
-    val table: Table,
-    private val conf: BitlapConf,
-    private val hadoopConf: Configuration,
-) : Serializable, Closeable {
+class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, Closeable {
 
     @Volatile
     private var closed = false
     private val log = logger { }
-    private val metricStore = MetricStore(this.table, this.hadoopConf, this.conf)
+    private val metricStore = StoreType.valueOf(table.props[Table.TABLE_FORMAT_KEY]!!)
+        .getProvider(table, hadoopConf)
+        .getMetricStore()
 
     /**
      * write mdm events
@@ -125,7 +122,7 @@ class BitlapWriter(
                     )
                     r
                 }
-            metricStore.store(time to metricRows)
+            metricStore.store(time, metricRows)
 
             // store metric with one dimension
             // TODO

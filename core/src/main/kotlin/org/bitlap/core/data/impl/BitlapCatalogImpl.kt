@@ -16,7 +16,7 @@ import org.bitlap.core.event.DatabaseCreateEvent
 import org.bitlap.core.event.DatabaseDeleteEvent
 import org.bitlap.core.event.TableCreateEvent
 import org.bitlap.core.event.TableDeleteEvent
-import org.bitlap.core.storage.store.MetricStore
+import org.bitlap.core.storage.StoreType
 import org.bitlap.core.utils.Hcfs.readTable
 import org.bitlap.core.utils.Hcfs.writeTable
 import kotlin.streams.toList
@@ -24,7 +24,8 @@ import kotlin.streams.toList
 /**
  * Impl for Catalog, using dfs to manage catalog metadata.
  */
-open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog, LifeCycleWrapper() {
+open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
+    LifeCycleWrapper() {
 
     private val fs: FileSystem by lazy {
         rootPath.getFileSystem(hadoopConf).also {
@@ -159,8 +160,14 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     override fun createTable(name: String, database: String, ifNotExists: Boolean): Boolean {
         val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().lowercase()
         val cleanName = PreConditions.checkNotBlank(name, "table").trim().lowercase()
-        val table = Table(cleanDBName, cleanName)
+        val tm = System.currentTimeMillis()
         val tableDir = Path(dataPath, "$cleanDBName/$cleanName")
+        val table = Table(
+            cleanDBName, cleanName, tm, tm,
+            mutableMapOf(Table.TABLE_FORMAT_KEY to StoreType.CARBON.name), // TODO: default use carbon
+            tableDir.toString(),
+        )
+
         val exists = fs.exists(tableDir)
         if (exists && ifNotExists) {
             return false
@@ -224,9 +231,5 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
             .filter { it.isDirectory }
             .map { fs.readTable(it.path) }
             .toList()
-    }
-
-    override fun getMetricStore(table: String, database: String): MetricStore {
-        return MetricStore(getTable(table, database), hadoopConf, conf)
     }
 }

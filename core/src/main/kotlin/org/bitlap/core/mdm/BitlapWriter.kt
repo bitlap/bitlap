@@ -14,7 +14,6 @@ import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.data.metadata.Table
-import org.bitlap.core.storage.StoreType
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
 import org.bitlap.core.utils.Excel.readCsv
@@ -32,7 +31,7 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
     @Volatile
     private var closed = false
     private val log = logger { }
-    private val metricStore = StoreType.valueOf(table.props[Table.TABLE_FORMAT_KEY]!!)
+    private val metricStore = table.getTableFormat()
         .getProvider(table, hadoopConf)
         .getMetricStore()
 

@@ -1,11 +1,9 @@
 package org.bitlap.core.mdm
 
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.mdm.model.AggType
 import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.RawRow
-import org.bitlap.core.storage.StoreType
 import java.io.Closeable
 import java.io.Serializable
 
@@ -20,7 +18,7 @@ class BitlapReader : Serializable, Closeable {
 
     fun read(query: Query): List<RawRow> {
         val table = BitlapContext.catalog.getTable(query.table, query.database)
-        val metricStore = StoreType.valueOf(table.props[Table.TABLE_FORMAT_KEY]!!)
+        val metricStore = table.getTableFormat()
             .getProvider(table, BitlapContext.hadoopConf)
             .getMetricStore()
 

@@ -1,5 +1,6 @@
 package org.bitlap.core.data.metadata
 
+import org.bitlap.core.storage.StoreType
 import org.bitlap.network.proto.metadata.TablePB
 
 /**
@@ -32,7 +33,7 @@ data class Table(
         return "$database.$name"
     }
 
-    fun getTableFormat(): String = this.props[TABLE_FORMAT_KEY]!!
+    fun getTableFormat(): StoreType = StoreType.valueOf(this.props[TABLE_FORMAT_KEY]!!)
 
     companion object {
 

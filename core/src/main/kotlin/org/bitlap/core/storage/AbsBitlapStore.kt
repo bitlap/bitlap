@@ -1,10 +1,9 @@
-package org.bitlap.core.storage.store
+package org.bitlap.core.storage
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.storage.BitlapStore
 
 /**
  * Abstract store

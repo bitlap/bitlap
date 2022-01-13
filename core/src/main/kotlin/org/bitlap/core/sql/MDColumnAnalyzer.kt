@@ -110,10 +110,17 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun getFilterColNames() = this.mdColumns.filter { it.filter }.map { it.name }.distinct()
 
     /**
-     * no time dimension in query
+     * no other dimension in query without time
      */
-    fun hasNoTimeInQuery() = this.mdColumns
+    fun hasNoOtherDimInQuery() = this.mdColumns
         .none { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
+
+    /**
+     * one other dimension in query without time
+     */
+    fun hasOneOtherDimInQuery() = this.mdColumns
+        .filter { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
+        .size == 1
 
     /**
      * check if one metric should materialize

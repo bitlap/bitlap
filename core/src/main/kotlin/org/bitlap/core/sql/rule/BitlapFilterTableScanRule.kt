@@ -48,7 +48,7 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                     val timeFilter = this.pruneTimeFilter(oFilter, scan.rowType, rexBuilder)
                     BitlapTableFilterScan(
                         scan.cluster, scan.traitSet, scan.hints, scan.table,
-                        timeFilter, oFilter, rel.parent
+                        timeFilter, RexUtil.toDnf(rexBuilder, oFilter), rel.parent
                     )
                 }
             }

@@ -14,6 +14,8 @@ import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.storage.load.MetricDimRow
+import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
 import org.bitlap.core.utils.Excel.readCsv
@@ -31,9 +33,9 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
     @Volatile
     private var closed = false
     private val log = logger { }
-    private val metricStore = table.getTableFormat()
-        .getProvider(table, hadoopConf)
-        .getMetricStore()
+    private val storeProvider = table.getTableFormat().getProvider(table, hadoopConf)
+    private val metricStore = storeProvider.getMetricStore()
+    private val metricDimStore = storeProvider.getMetricDimStore()
 
     /**
      * write mdm events
@@ -124,7 +126,29 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
             metricStore.store(time, metricRows)
 
             // store metric with one dimension
-            // TODO
+            val metricDimRows = cleanRows
+                .flatMap { r ->
+                    r.dimension.dimensions.map { (key, value) ->
+                        r.copy(dimension = Dimension(key to value))
+                    }
+                }
+                .groupingBy { "${it.entity.key}${it.metric.key}${it.dimension.firstPair()}" }
+                .fold({ _, r ->
+                    val (dk, d) = r.dimension.firstPair()
+                    MetricDimRow(time, r.metric.key, dk, d, CBM(), BBM(), MetricDimRowMeta(time, r.metric.key, dk, d))
+                }) { _, a, b ->
+                    a.entity.add(b.dimId, b.entity.id)
+                    a.metric.add(b.dimId, b.entity.id, b.metric.value.toLong()) // TODO double support
+                    a
+                }
+                .map { (_, r) ->
+                    r.metadata = MetricDimRowMeta(
+                        r.tm, r.metricKey, r.dimensionKey, r.dimension,
+                        r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount()
+                    )
+                    r
+                }
+            metricDimStore.store(time, metricDimRows)
 
             // store metric with high cardinality dimensions
             // TODO

@@ -16,4 +16,12 @@ interface Fetcher {
         metrics: List<String>,
         metricType: Class<out DataType>,
     ): RowIterator
+
+    fun fetchMetrics(
+        table: Table,
+        timeFilter: TimeFilterFun,
+        metrics: List<String>,
+        dimension: Pair<String, List<String>>,
+        metricType: Class<out DataType>,
+    ): RowIterator
 }

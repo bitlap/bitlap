@@ -23,10 +23,10 @@ import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.Range.BoundType
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.sql.TimeFilterFun
+import org.bitlap.core.storage.MetricStore
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowIterator
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.storage.store.MetricStore
 import org.joda.time.DateTime
 
 /**
@@ -61,7 +61,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
     private fun readerB() = CarbonReader.builder()
         .withHadoopConf(hadoopConf)
         .withRowRecordReader() // disable vector read
-        .withBatch(1000) // default is 100
+        .withBatch(100) // default is 100
 
     /**
      * Store [rows] with time [tm] as carbon data file format.

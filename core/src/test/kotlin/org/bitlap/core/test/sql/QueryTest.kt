@@ -127,7 +127,10 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
 //            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'").show()
+            sql(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " +
+                    "from $db.$table where _time = 100 and (os = 'Mac' or os ='Mac2')"
+            ).show()
         }
     }
 

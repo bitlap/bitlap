@@ -1,4 +1,4 @@
-package org.bitlap.core.storage.store
+package org.bitlap.core.storage
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path

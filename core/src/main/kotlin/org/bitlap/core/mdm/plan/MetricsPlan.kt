@@ -24,6 +24,7 @@ class MetricsPlan(
             msg = "MetricsPlan's metrics $metrics must have only one metric type ${metricType.name}"
         )
         return withFetcher(context) { fetcher ->
+//            val x = fetcher.fetchMetrics(context.table, timeFilter, metrics.map { it.name }, "os" to listOf("Mac"), metricType)
             fetcher.fetchMetrics(context.table, timeFilter, metrics.map { it.name }, metricType)
         }
     }

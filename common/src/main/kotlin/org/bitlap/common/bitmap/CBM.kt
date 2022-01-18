@@ -130,7 +130,7 @@ class CBM : AbsBM, ComparableBM {
                 container.clear()
             } else {
                 DataInputStream(ByteArrayInputStream(bytes)).use { dis ->
-                    assert(dis.readInt() == Versions.CBM_VERSION_V1)
+                    PreConditions.checkExpression(dis.readInt() == Versions.CBM_VERSION_V1, msg = "Broken CBM bytes.")
                     weight = dis.readDouble()
                     while (dis.available() > 0) {
                         val bit = dis.readInt()

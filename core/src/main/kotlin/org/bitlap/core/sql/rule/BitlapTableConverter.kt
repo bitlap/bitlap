@@ -27,7 +27,7 @@ class BitlapTableConverter : AbsRelRule(BitlapTableScan::class.java, "BitlapTabl
                 BitlapSqlQueryEmptyTable(oTable.table)
             }
             analyzer.hasNoOrOneOtherDim() ->
-                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.pruneFilters)
+                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.pruneFilter)
             else ->
                 // TODO: with dimensions
                 TODO()

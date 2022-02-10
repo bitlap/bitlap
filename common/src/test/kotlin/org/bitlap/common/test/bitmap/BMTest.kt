@@ -6,6 +6,7 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.bitmap.RBM
 import org.bitlap.common.test.utils.BMTestUtils
+import java.nio.ByteBuffer
 
 /**
  * Desc: [BM] Test
@@ -15,6 +16,18 @@ import org.bitlap.common.test.utils.BMTestUtils
  * Date: 2020/12/4
  */
 class BMTest : StringSpec({
+
+    "RBM serde" {
+        val rbm = RBM((-100 until 100).toList().toIntArray())
+        rbm.getCount() shouldBe 200
+        val b1 = rbm.getBytes()
+        RBM(b1).getCount() shouldBe 200
+        // native bitmap compatible
+        val buf = ByteBuffer.allocate(rbm.getNativeRBM().serializedSizeInBytes())
+        rbm.getNativeRBM().serialize(buf)
+        val b2 = buf.array()
+        RBM(b2).getCount() shouldBe 200
+    }
 
     "RBM with 1000 ids" {
         val num = 1000

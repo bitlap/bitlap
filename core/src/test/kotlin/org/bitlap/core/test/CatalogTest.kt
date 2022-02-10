@@ -16,7 +16,7 @@ class CatalogTest : BaseLocalFsTest() {
     init {
 
         "test database" {
-            val testDatabase = randomString()
+            val testDatabase = randomDatabase()
             val catalog = BitlapContext.catalog
             catalog.createDatabase(testDatabase)
             catalog.dropDatabase(testDatabase)
@@ -29,7 +29,7 @@ class CatalogTest : BaseLocalFsTest() {
         }
 
         "test table create" {
-            val testName = randomString()
+            val testName = randomTable()
             val catalog = BitlapContext.catalog
             catalog.createTable(testName)
             catalog.createTable(testName, ifNotExists = true)

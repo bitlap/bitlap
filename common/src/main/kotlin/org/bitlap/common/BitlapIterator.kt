@@ -21,7 +21,7 @@ abstract class BitlapIterator<E> : Iterator<E>, Closeable {
 
     companion object {
         fun <R> empty() = object : BitlapIterator<R>() {
-            override fun next(): R = throw NotImplementedError()
+            override fun next(): R = null!! // should never be here
             override fun hasNext(): Boolean = false
         }
 

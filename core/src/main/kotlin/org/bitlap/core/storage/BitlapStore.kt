@@ -14,7 +14,7 @@ interface BitlapStore<T> : Closeable {
     fun open()
 
     /**
-     * Store [t] to persistent filesystem or other stores
+     * Store [rows] with time [tm] to persistent filesystem or other stores
      */
-    fun store(t: T): T
+    fun store(tm: Long, rows: List<T>)
 }

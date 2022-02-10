@@ -3,7 +3,6 @@ package org.bitlap.core.data
 import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.data.metadata.Database
 import org.bitlap.core.data.metadata.Table
-import org.bitlap.core.storage.store.MetricStore
 
 /**
  * Desc: Catalog for schema, datasource, and etc.
@@ -68,7 +67,4 @@ interface BitlapCatalog {
      * List all [Table] in the [database].
      */
     fun listTables(database: String = DEFAULT_DATABASE): List<Table>
-
-    // TODO: will be remove
-    fun getMetricStore(table: String, database: String = DEFAULT_DATABASE): MetricStore
 }

@@ -8,6 +8,7 @@ import org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
 import org.bitlap.core.BitlapContext
+import org.joda.time.DateTime
 
 /**
  * Mail: chk19940609@gmail.com
@@ -45,7 +46,13 @@ abstract class BaseLocalFsTest : StringSpec() {
         }
     }
 
-    protected fun randomString(): String {
-        return "${this::class.java.simpleName.lowercase()}_${RandomUtil.randomString(10)}"
+    protected fun randomDBTable(): Pair<String, String> = randomDatabase() to randomTable()
+    protected fun randomDatabase(): String {
+        val tm = DateTime.now().toString("yyyyMMddHHmmss")
+        return "database_${tm}_${RandomUtil.randomString(5)}"
+    }
+    protected fun randomTable(): String {
+        val tm = DateTime.now().toString("yyyyMMddHHmmss")
+        return "table_${tm}_${RandomUtil.randomString(5)}"
     }
 }

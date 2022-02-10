@@ -1,6 +1,5 @@
 package org.bitlap.core.mdm
 
-import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.model.AggType
 import org.bitlap.core.mdm.model.Query
@@ -18,10 +17,10 @@ import java.io.Serializable
 class BitlapReader : Serializable, Closeable {
 
     fun read(query: Query): List<RawRow> {
-        val metricStore = BitlapContext.catalog.getMetricStore(
-            PreConditions.checkNotBlank(query.table),
-            PreConditions.checkNotBlank(query.database)
-        )
+        val table = BitlapContext.catalog.getTable(query.table, query.database)
+        val metricStore = table.getTableFormat()
+            .getProvider(table, BitlapContext.hadoopConf)
+            .getMetricStore()
 
         if (query.hasDimensions()) {
             // TODO: with dimensions

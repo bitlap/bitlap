@@ -28,6 +28,10 @@ data class Dimension(private val pairs: Map<String, String> = emptyMap()) {
         this.dimensions[key] = value
     }
 
+    fun firstPair(): Pair<String, String> {
+        return this.dimensions.entries.first().toPair()
+    }
+
     override fun toString(): String = dimensions.toString()
 
     override fun equals(other: Any?): Boolean {

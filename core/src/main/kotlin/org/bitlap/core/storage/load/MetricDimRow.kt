@@ -4,19 +4,23 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 
 /**
- * Desc: One row for metric data model.
+ * Desc: One row for metric data model with one dimension.
  */
-data class MetricRow(
+data class MetricDimRow(
     val tm: Long,
     override val metricKey: String,
+    val dimensionKey: String,
+    val dimension: String,
     val metric: CBM,
     val entity: BBM,
-    var metadata: MetricRowMeta = MetricRowMeta(tm, metricKey),
+    var metadata: MetricDimRowMeta = MetricDimRowMeta(tm, metricKey, dimensionKey, dimension),
 ) : HasMetricKey
 
-data class MetricRowMeta(
+data class MetricDimRowMeta(
     val tm: Long,
     override val metricKey: String,
+    val dimensionKey: String,
+    val dimension: String,
     val entityUniqueCount: Long = 0,
     val entityCount: Long = 0,
     val metricCount: Double = 0.0

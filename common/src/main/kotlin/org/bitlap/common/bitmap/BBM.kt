@@ -2,6 +2,7 @@ package org.bitlap.common.bitmap
 
 import org.bitlap.common.doIf
 import org.bitlap.common.utils.BMUtils
+import org.bitlap.common.utils.PreConditions
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -144,7 +145,7 @@ class BBM : AbsBM {
                 container.clear()
             } else {
                 DataInputStream(ByteArrayInputStream(bytes)).use { dis ->
-                    assert(dis.readInt() == Versions.BBM_VERSION_V1)
+                    PreConditions.checkExpression(dis.readInt() == Versions.BBM_VERSION_V1, msg = "Broken BBM bytes.")
                     while (dis.available() > 0) {
                         val bit = dis.readInt()
                         val rBytes = ByteArray(dis.readInt())

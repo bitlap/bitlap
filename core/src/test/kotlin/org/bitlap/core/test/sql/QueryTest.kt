@@ -6,7 +6,7 @@ import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
@@ -33,8 +33,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "forbidden queries" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             shouldThrow<BitlapException> {
                 sql("select *, a, b from $db.$table") // star is forbidden
@@ -55,8 +54,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
 
         "only metrics query with one dimension time" {
             // System.setProperty("calcite.debug", "true")
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
@@ -108,8 +106,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "only metrics query with one complex dimension time" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
@@ -125,18 +122,63 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "only metrics query with one dimension that is not time" {
-            val db = randomString()
-            val table = randomString()
+            val (db, table) = randomDBTable()
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
-//            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'").show()
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv from $db.$table where _time = 100 and os = 'Mac'",
+                listOf(listOf(3, 9))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'",
+                listOf(listOf(3, 9, 3))
+            )
+            checkRows(
+                """
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac' and lower(os) = 'mac'
+                """.trimIndent(),
+                listOf(listOf(3, 9, 3))
+            )
+            checkRows(
+                """
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac' and lower(os) = 'xxx'
+                """.trimIndent(),
+                listOf(listOf(0, 0, 0))
+            )
+            checkRows(
+                """
+                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac'
+                    group by os
+                """.trimIndent(),
+                listOf(listOf("Mac", 3, 9, 3))
+            )
+            checkRows(
+                """
+                    select lower(os) os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac'
+                    group by lower(os)
+                """.trimIndent(),
+                listOf(listOf("mac", 3, 9, 3))
+            )
+//            sql(
+//                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " +
+//                    // "from $db.$table where _time = 100 and (os = 'Mac' or os ='Mac2')"
+//                    "from $db.$table where _time = 100 and os = 'Mac' and lower(os) = 'mac'"
+//            ).show()
         }
     }
 
     private fun prepareTestData(database: String, tableName: String, time: Long) {
-        val writer = BitlapWriter(Table(database, tableName), conf, hadoopConf)
+        val table = BitlapContext.catalog.getTable(tableName, database)
+        val writer = BitlapWriter(table, hadoopConf)
         writer.use {
             it.write(
                 listOf(

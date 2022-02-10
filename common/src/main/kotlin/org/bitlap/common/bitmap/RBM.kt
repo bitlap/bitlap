@@ -5,6 +5,7 @@ import org.bitlap.common.bitmap.rbm.IntConsumer
 import org.bitlap.common.bitmap.rbm.RoaringArray
 import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
+import org.bitlap.common.utils.PreConditions
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
@@ -121,8 +122,18 @@ open class RBM : AbsBM {
                 _rbm.clear()
             } else {
                 DataInputStream(ByteArrayInputStream(bytes)).use { dis ->
-                    assert(dis.readInt() == Versions.RBM_VERSION_V1)
-                    _rbm.deserialize(dis)
+                    val msg = "Broken rbm bytes."
+                    runCatching {
+                        PreConditions.checkExpression(dis.readInt() == Versions.RBM_VERSION_V1, msg = msg)
+                        _rbm.deserialize(dis)
+                    }.onFailure {
+                        if (it.message == msg) {
+                            dis.reset()
+                            _rbm.deserialize(dis)
+                        } else {
+                            throw it
+                        }
+                    }
                 }
             }
         }

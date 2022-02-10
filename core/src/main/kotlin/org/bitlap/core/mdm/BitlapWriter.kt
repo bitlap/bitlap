@@ -2,7 +2,6 @@ package org.bitlap.core.mdm
 
 import cn.hutool.core.convert.Convert
 import org.apache.hadoop.conf.Configuration
-import org.bitlap.common.BitlapConf
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.data.Dimension
@@ -15,9 +14,10 @@ import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.storage.load.MetricDimRow
+import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.storage.store.MetricStore
 import org.bitlap.core.utils.Excel.readCsv
 import org.bitlap.core.utils.Excel.readExcel
 import java.io.Closeable
@@ -28,16 +28,14 @@ import kotlin.system.measureTimeMillis
 /**
  * bitmap mdm [Event] writer
  */
-class BitlapWriter(
-    val table: Table,
-    private val conf: BitlapConf,
-    private val hadoopConf: Configuration,
-) : Serializable, Closeable {
+class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, Closeable {
 
     @Volatile
     private var closed = false
     private val log = logger { }
-    private val metricStore = MetricStore(this.table, this.hadoopConf, this.conf)
+    private val storeProvider = table.getTableFormat().getProvider(table, hadoopConf)
+    private val metricStore = storeProvider.getMetricStore()
+    private val metricDimStore = storeProvider.getMetricDimStore()
 
     /**
      * write mdm events
@@ -125,10 +123,32 @@ class BitlapWriter(
                     )
                     r
                 }
-            metricStore.store(time to metricRows)
+            metricStore.store(time, metricRows)
 
             // store metric with one dimension
-            // TODO
+            val metricDimRows = cleanRows
+                .flatMap { r ->
+                    r.dimension.dimensions.map { (key, value) ->
+                        r.copy(dimension = Dimension(key to value))
+                    }
+                }
+                .groupingBy { "${it.entity.key}${it.metric.key}${it.dimension.firstPair()}" }
+                .fold({ _, r ->
+                    val (dk, d) = r.dimension.firstPair()
+                    MetricDimRow(time, r.metric.key, dk, d, CBM(), BBM(), MetricDimRowMeta(time, r.metric.key, dk, d))
+                }) { _, a, b ->
+                    a.entity.add(b.dimId, b.entity.id)
+                    a.metric.add(b.dimId, b.entity.id, b.metric.value.toLong()) // TODO double support
+                    a
+                }
+                .map { (_, r) ->
+                    r.metadata = MetricDimRowMeta(
+                        r.tm, r.metricKey, r.dimensionKey, r.dimension,
+                        r.entity.getCountUnique(), r.entity.getLongCount(), r.metric.getCount()
+                    )
+                    r
+                }
+            metricDimStore.store(time, metricDimRows)
 
             // store metric with high cardinality dimensions
             // TODO

@@ -3,6 +3,7 @@ package org.bitlap.common.bitmap
 import org.bitlap.common.bitmap.rbm.longlong.LongConsumer
 import org.bitlap.common.bitmap.rbm.longlong.Roaring64Bitmap
 import org.bitlap.common.doIf
+import org.bitlap.common.utils.PreConditions
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
@@ -111,7 +112,7 @@ open class RBM64 : AbsBM {
                 _rbm.clear()
             } else {
                 DataInputStream(ByteArrayInputStream(bytes)).use { dis ->
-                    assert(dis.readInt() == Versions.RBM64_VERSION_V1)
+                    PreConditions.checkExpression(dis.readInt() == Versions.RBM64_VERSION_V1, msg = "Broken RBM64 bytes.")
                     _rbm.deserialize(dis)
                 }
             }

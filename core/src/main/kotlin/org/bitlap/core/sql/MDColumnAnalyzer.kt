@@ -6,6 +6,7 @@ import org.apache.calcite.sql.SqlBasicCall
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlNode
+import org.apache.calcite.sql.SqlNodeList
 import org.apache.calcite.sql.SqlSelect
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.mdm.format.DataType
@@ -100,6 +101,9 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
                     }
                 }
             }
+            is SqlNodeList -> {
+                node.list.filterNotNull().flatMap(::getColumnName)
+            }
             is SqlLiteral -> emptyList()
             else -> throw IllegalArgumentException("Illegal node: $node")
         }
@@ -108,12 +112,14 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun getMetricColNames() = this.mdColumns.filter { it.type is MetricCol }.map { it.name }.distinct()
     fun getDimensionColNames() = this.mdColumns.filter { it.type is DimensionCol }.map { it.name }.distinct()
     fun getFilterColNames() = this.mdColumns.filter { it.filter }.map { it.name }.distinct()
+    fun getDimensionColNamesWithoutTime() = this.getDimensionColNames().filter { it != Keyword.TIME }
 
     /**
-     * no time dimension in query
+     * none or one other dimension
      */
-    fun hasNoTimeInQuery() = this.mdColumns
-        .none { it.project && it.type is DimensionCol && it.name != Keyword.TIME }
+    fun hasNoOrOneOtherDim() = this.mdColumns
+        .filter { it.type is DimensionCol && it.name != Keyword.TIME }
+        .size <= 1
 
     /**
      * check if one metric should materialize
@@ -151,9 +157,8 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
      * check whether the metric is Cartesian Product
      */
     fun shouldCartesian(): Boolean {
-        val dimensions = this.getDimensionColNames()
         // there are more than or equal to 2 dimensions except time
-        val noTimeDims = dimensions.filter { it != Keyword.TIME }
+        val noTimeDims = this.getDimensionColNamesWithoutTime()
         if (noTimeDims.size >= 2) {
             return true
         }

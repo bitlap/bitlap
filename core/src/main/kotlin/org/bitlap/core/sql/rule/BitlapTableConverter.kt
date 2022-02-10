@@ -23,14 +23,14 @@ class BitlapTableConverter : AbsRelRule(BitlapTableScan::class.java, "BitlapTabl
 
         // convert to physical table scan
         val target = when {
-            rel.timeFilter.isAlwaysFalse -> {
+            rel.isAlwaysFalse -> {
                 BitlapSqlQueryEmptyTable(oTable.table)
             }
-            analyzer.hasNoOtherDimInQuery() || analyzer.hasOneOtherDimInQuery() ->
-                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.filters)
+            analyzer.hasNoOrOneOtherDim() ->
+                BitlapSqlQueryMetricTable(oTable.table, oTable.analyzer, rel.timeFilter, rel.pruneFilters)
             else ->
                 // TODO: with dimensions
-                throw NotImplementedError()
+                TODO()
         }
         return rel.withTable(
             RelOptTableImpl.create(

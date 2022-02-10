@@ -2,13 +2,6 @@ package org.bitlap.core.storage.carbon
 
 import org.apache.carbondata.core.metadata.datatype.DataTypes
 import org.apache.carbondata.core.metadata.datatype.Field
-import org.apache.carbondata.core.scan.expression.ColumnExpression
-import org.apache.carbondata.core.scan.expression.Expression
-import org.apache.carbondata.core.scan.expression.LiteralExpression
-import org.apache.carbondata.core.scan.expression.conditional.GreaterThanEqualToExpression
-import org.apache.carbondata.core.scan.expression.conditional.GreaterThanExpression
-import org.apache.carbondata.core.scan.expression.conditional.LessThanEqualToExpression
-import org.apache.carbondata.core.scan.expression.conditional.LessThanExpression
 import org.apache.carbondata.core.scan.filter.FilterUtil
 import org.apache.carbondata.sdk.file.CarbonReader
 import org.apache.carbondata.sdk.file.CarbonWriter
@@ -20,8 +13,9 @@ import org.bitlap.common.TimeRange
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
-import org.bitlap.common.utils.Range.BoundType
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.Keyword
+import org.bitlap.core.sql.PruneTimeFilter
 import org.bitlap.core.sql.TimeFilterFun
 import org.bitlap.core.storage.MetricStore
 import org.bitlap.core.storage.load.MetricRow
@@ -88,24 +82,27 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
     }
 
     override fun query(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRow> {
-        val timeFilter = { tm: Long ->
+        val timeFunc = { tm: Long ->
             time.contains(DateTime(tm))
         }
+        val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
         return this.queryCBM(timeFilter, metrics)
     }
 
     override fun queryMeta(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRowMeta> {
-        val timeFilter = { tm: Long ->
+        val timeFunc = { tm: Long ->
             time.contains(DateTime(tm))
         }
+        val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
         return this.queryMeta(timeFilter, metrics)
     }
 
-    override fun queryMeta(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRowMeta> {
-        return this.query(timeFilter, metrics, arrayOf("meta")) { row ->
+    override fun queryMeta(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRowMeta> {
+        val timeFunc = timeFilter.mergeCondition()
+        return this.query(timeFunc, metrics, arrayOf("meta")) { row ->
             val (meta) = row
             val metaObj = JSONUtils.fromJson(meta.toString(), MetricRowMeta::class.java)
-            if (timeFilter(metaObj.tm)) {
+            if (timeFunc(metaObj.tm)) {
                 metaObj
             } else {
                 null
@@ -113,10 +110,11 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         }
     }
 
-    override fun queryBBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow> {
-        return this.query(timeFilter, metrics, arrayOf("mk", "t", "e")) { row ->
+    override fun queryBBM(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRow> {
+        val timeFunc = timeFilter.mergeCondition()
+        return this.query(timeFunc, metrics, arrayOf("mk", "t", "e")) { row ->
             val (mk, t, e) = row
-            if (timeFilter(t as Long)) {
+            if (timeFunc(t as Long)) {
                 MetricRow(t, mk.toString(), CBM(), BBM(e as? ByteArray))
             } else {
                 null
@@ -124,10 +122,11 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         }
     }
 
-    override fun queryCBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow> {
-        return this.query(timeFilter, metrics, arrayOf("mk", "t", "m")) { row ->
+    override fun queryCBM(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRow> {
+        val timeFunc = timeFilter.mergeCondition()
+        return this.query(timeFunc, metrics, arrayOf("mk", "t", "m")) { row ->
             val (mk, t, m) = row
-            if (timeFilter(t as Long)) {
+            if (timeFunc(t as Long)) {
                 MetricRow(t, mk.toString(), CBM(m as? ByteArray), BBM())
             } else {
                 null
@@ -136,7 +135,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
     }
 
     private fun <R> query(
-        timeFilter: TimeFilterFun,
+        timeFunc: TimeFilterFun,
         metrics: List<String>,
         projections: Array<String>,
         rowHandler: (Array<*>) -> R?
@@ -144,7 +143,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         // 1. get files
         val files = fs.listStatus(dataPath)
             .map { it.path }
-            .flatMap { subPath -> fs.listStatus(subPath) { timeFilter(it.name.toLong()) }.map { it.path } }
+            .flatMap { subPath -> fs.listStatus(subPath) { timeFunc(it.name.toLong()) }.map { it.path } }
             .flatMap { filePath -> fs.listStatus(filePath).map { it.path } }
 
         if (files.isEmpty()) {
@@ -158,33 +157,6 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
             )
             .build<Any>()
         return MetricRowIterator(reader, rowHandler)
-    }
-
-    // for pushed down timeFilter
-    private fun buildTimeExpression(time: TimeRange): Pair<Expression, Expression> {
-        val (startTime, endTime) = time
-        val columnExpr = ColumnExpression("t", DataTypes.LONG)
-        val startExpr = LiteralExpression(startTime.millis, DataTypes.LONG)
-        val endExpr = LiteralExpression(endTime.millis, DataTypes.LONG)
-        return when (time.lower.boundType to time.upper.boundType) {
-            BoundType.OPEN to BoundType.OPEN -> GreaterThanExpression(columnExpr, startExpr) to LessThanExpression(
-                columnExpr,
-                endExpr
-            )
-            BoundType.OPEN to BoundType.CLOSE -> GreaterThanExpression(
-                columnExpr,
-                startExpr
-            ) to LessThanEqualToExpression(columnExpr, endExpr)
-            BoundType.CLOSE to BoundType.OPEN -> GreaterThanEqualToExpression(
-                columnExpr,
-                startExpr
-            ) to LessThanExpression(columnExpr, endExpr)
-            BoundType.CLOSE to BoundType.CLOSE -> GreaterThanEqualToExpression(
-                columnExpr,
-                startExpr
-            ) to LessThanEqualToExpression(columnExpr, endExpr)
-            else -> throw IllegalArgumentException("Illegal arguments time: $time")
-        }
     }
 
     override fun close() {

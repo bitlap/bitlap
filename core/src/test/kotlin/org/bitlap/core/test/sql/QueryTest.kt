@@ -126,11 +126,53 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             sql("create table $db.$table")
             prepareTestData(db, table, 100L)
             prepareTestData(db, table, 200L)
-//            sql("select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $table where _time=100 and (c='123' or c='1234')").show()
-            sql(
-                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " +
-                    "from $db.$table where _time = 100 and (os = 'Mac' or os ='Mac2')"
-            ).show()
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv from $db.$table where _time = 100 and os = 'Mac'",
+                listOf(listOf(3, 9))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'",
+                listOf(listOf(3, 9, 3))
+            )
+            checkRows(
+                """
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac' and lower(os) = 'mac'
+                """.trimIndent(),
+                listOf(listOf(3, 9, 3))
+            )
+            checkRows(
+                """
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac' and lower(os) = 'xxx'
+                """.trimIndent(),
+                listOf(listOf(0, 0, 0))
+            )
+            checkRows(
+                """
+                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac'
+                    group by os
+                """.trimIndent(),
+                listOf(listOf("Mac", 3, 9, 3))
+            )
+            checkRows(
+                """
+                    select lower(os) os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time = 100 and os = 'Mac'
+                    group by lower(os)
+                """.trimIndent(),
+                listOf(listOf("mac", 3, 9, 3))
+            )
+//            sql(
+//                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " +
+//                    // "from $db.$table where _time = 100 and (os = 'Mac' or os ='Mac2')"
+//                    "from $db.$table where _time = 100 and os = 'Mac' and lower(os) = 'mac'"
+//            ).show()
         }
     }
 

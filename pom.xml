@@ -64,7 +64,7 @@
         <kotest.version>5.1.0</kotest.version>
         <kotlin.logging.version>2.1.21</kotlin.logging.version>
         <arrow.version>1.0.1</arrow.version>
-        <slf4j.version>1.7.33</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.14.1</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
         <hutool.version>5.7.20</hutool.version>
@@ -81,7 +81,7 @@
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
         <scala-macro.version>0.3.4</scala-macro.version>
-        <picocli.version>4.6.2</picocli.version>
+        <picocli.version>4.6.3</picocli.version>
         <maven.compiler.version>3.9.0</maven.compiler.version>
     </properties>
 

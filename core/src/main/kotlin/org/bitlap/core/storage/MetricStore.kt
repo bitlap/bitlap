@@ -5,7 +5,7 @@ import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapIterator
 import org.bitlap.common.TimeRange
 import org.bitlap.core.data.metadata.Table
-import org.bitlap.core.sql.TimeFilterFun
+import org.bitlap.core.sql.PruneTimeFilter
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
 
@@ -19,9 +19,9 @@ abstract class MetricStore(table: Table, hadoopConf: Configuration) :
 
     abstract fun queryMeta(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRowMeta>
 
-    abstract fun queryMeta(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRowMeta>
+    abstract fun queryMeta(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRowMeta>
 
-    abstract fun queryBBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow>
+    abstract fun queryBBM(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRow>
 
-    abstract fun queryCBM(timeFilter: TimeFilterFun, metrics: List<String>): BitlapIterator<MetricRow>
+    abstract fun queryCBM(timeFilter: PruneTimeFilter, metrics: List<String>): BitlapIterator<MetricRow>
 }

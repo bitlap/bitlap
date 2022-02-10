@@ -20,7 +20,9 @@ import org.bitlap.core.mdm.format.DataTypes
 import org.bitlap.core.mdm.model.RowIterator
 import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.Keyword
-import org.bitlap.core.sql.TimeFilterFun
+import org.bitlap.core.sql.PrunePushedFilter
+import org.bitlap.core.sql.PruneTimeFilter
+import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
@@ -32,7 +34,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
 
     override fun fetchMetrics(
         table: Table,
-        timeFilter: TimeFilterFun,
+        timeFilter: PruneTimeFilter,
         metrics: List<String>,
         metricType: Class<out DataType>,
     ): RowIterator {
@@ -103,10 +105,11 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
 
     override fun fetchMetrics(
         table: Table,
-        timeFilter: TimeFilterFun,
+        timeFilter: PruneTimeFilter,
         metrics: List<String>,
-        dimension: Pair<String, List<String>>,
-        metricType: Class<out DataType>
+        metricType: Class<out DataType>,
+        dimension: String,
+        dimensionFilter: PrunePushedFilter,
     ): RowIterator {
         val storeProvider = table.getTableFormat().getProvider(table, BitlapContext.hadoopConf)
         val metricDimStore = storeProvider.getMetricDimStore()
@@ -114,13 +117,49 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         val container = when (metricType) {
             DataTypeRowValueMeta::class.java -> {
                 MDContainer<MetricDimRowMeta, RowValueMeta>(2).also { container ->
-                    metricDimStore.queryMeta(timeFilter, metrics, dimension)
+                    metricDimStore.queryMeta(timeFilter, metrics, dimension, dimensionFilter)
                         .asSequence()
                         .forEach { row ->
                             container.put(
                                 listOf(row.tm, row.dimension), row,
                                 { RowValueMeta.of(it.entityUniqueCount, it.entityCount, it.metricCount) },
                                 { a, b -> a.add(b.entityUniqueCount, b.entityCount, b.metricCount) }
+                            )
+                        }
+                }
+            }
+            DataTypeRBM::class.java -> {
+                MDContainer<MetricDimRow, RBM>(2).also { container ->
+                    metricDimStore.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                        .forEach { row ->
+                            container.put(
+                                listOf(row.tm, row.dimension), row,
+                                { it.entity.getRBM() },
+                                { a, b -> a.or(b.entity.getRBM()) }
+                            )
+                        }
+                }
+            }
+            DataTypeBBM::class.java -> {
+                MDContainer<MetricDimRow, BBM>(2).also { container ->
+                    metricDimStore.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                        .forEach { row ->
+                            container.put(
+                                listOf(row.tm, row.dimension), row,
+                                { it.entity },
+                                { a, b -> a.or(b.entity) }
+                            )
+                        }
+                }
+            }
+            DataTypeCBM::class.java -> {
+                MDContainer<MetricDimRow, CBM>(2).also { container ->
+                    metricDimStore.queryCBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                        .forEach { row ->
+                            container.put(
+                                listOf(row.tm, row.dimension), row,
+                                { it.metric },
+                                { a, b -> a.or(b.metric) }
                             )
                         }
                 }
@@ -133,7 +172,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             BitlapIterator.of(flatRows),
             listOf(
                 DataTypeLong(Keyword.TIME, 0),
-                DataTypeString(dimension.first, 1),
+                DataTypeString(dimension, 1),
             ),
             metrics.mapIndexed { i, m -> DataTypes.from(metricType, m, i + 2) }
         )

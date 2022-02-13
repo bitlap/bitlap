@@ -3,7 +3,15 @@ package org.bitlap.core.storage.carbon
 import arrow.core.tail
 import org.apache.carbondata.core.metadata.datatype.DataTypes
 import org.apache.carbondata.core.metadata.datatype.Field
+import org.apache.carbondata.core.scan.expression.ColumnExpression
 import org.apache.carbondata.core.scan.expression.Expression
+import org.apache.carbondata.core.scan.expression.LiteralExpression
+import org.apache.carbondata.core.scan.expression.conditional.GreaterThanEqualToExpression
+import org.apache.carbondata.core.scan.expression.conditional.GreaterThanExpression
+import org.apache.carbondata.core.scan.expression.conditional.LessThanEqualToExpression
+import org.apache.carbondata.core.scan.expression.conditional.LessThanExpression
+import org.apache.carbondata.core.scan.expression.conditional.NotEqualsExpression
+import org.apache.carbondata.core.scan.expression.conditional.NotInExpression
 import org.apache.carbondata.core.scan.expression.logical.AndExpression
 import org.apache.carbondata.core.scan.expression.logical.TrueExpression
 import org.apache.carbondata.core.scan.filter.FilterUtil
@@ -17,6 +25,7 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.FilterOp
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PrunePushedFilterExpr
 import org.bitlap.core.sql.PruneTimeFilter
@@ -190,12 +199,51 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
     }
 
     private fun convertToExpression(expr: PrunePushedFilterExpr): Expression {
+        val columnExpr = ColumnExpression("d", DataTypes.STRING)
         return when (expr.op) {
-            "=", "!=", "<>", "<", "<=", ">", ">=" ->
-                FilterUtil.prepareEqualToExpression("d", "string", expr.values.first())
-            "in" ->
-                FilterUtil.prepareEqualToExpressionSet("d", "string", expr.values)
-            else -> throw IllegalArgumentException("Unable to convert ${expr.op} to carbon expression.")
+            FilterOp.EQUALS ->
+                if (expr.values.size == 1) {
+                    // EqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+                    FilterUtil.prepareEqualToExpression("d", "string", expr.values.first())
+                } else {
+                    // TODO: InExpression(columnExpr, LiteralExpression(expr.values, DataTypes.STRING)) // not working, maybe bug
+                    FilterUtil.prepareEqualToExpressionSet("d", "string", expr.values)
+                }
+            FilterOp.NOT_EQUALS ->
+                if (expr.values.size == 1) {
+                    NotEqualsExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+                } else {
+                    NotInExpression(columnExpr, LiteralExpression(expr.values, DataTypes.STRING))
+                }
+            FilterOp.GREATER_THAN ->
+                GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+            FilterOp.GREATER_EQUALS_THAN ->
+                GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+            FilterOp.LESS_THAN ->
+                LessThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+            FilterOp.LESS_EQUALS_THAN ->
+                LessThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+            FilterOp.OPEN ->
+                AndExpression(
+                    GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
+                    LessThanExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
+                )
+            FilterOp.CLOSED ->
+                AndExpression(
+                    GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
+                    LessThanEqualToExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
+                )
+
+            FilterOp.CLOSED_OPEN ->
+                AndExpression(
+                    GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
+                    LessThanExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
+                )
+            FilterOp.OPEN_CLOSED ->
+                AndExpression(
+                    GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
+                    LessThanEqualToExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
+                )
         }
     }
 

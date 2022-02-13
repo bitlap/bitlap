@@ -9,21 +9,18 @@ typealias PushedFilterFun = (String) -> Boolean
 
 data class PrunePushedFilterExpr(
     val name: String,
-    val op: String,
+    val op: FilterOp,
     val values: List<String>,
     val func: PushedFilterFun,
     val expr: String,
-) {
-    constructor(name: String, op: String, value: String, func: PushedFilterFun, expr: String) :
-        this(name, op, listOf(value), func, expr)
-}
+)
 
 open class PrunePushedFilter : Serializable {
 
     private val conditions = mutableListOf<PrunePushedFilterExpr>()
 
-    fun add(name: String, op: String, value: String, func: PushedFilterFun, expr: String): PrunePushedFilter {
-        return this.also { it.conditions.add(PrunePushedFilterExpr(name, op, value, func, expr)) }
+    fun add(name: String, op: FilterOp, values: List<String>, func: PushedFilterFun, expr: String): PrunePushedFilter {
+        return this.also { it.conditions.add(PrunePushedFilterExpr(name, op, values, func, expr)) }
     }
 
     fun filter(name: String?): PrunePushedFilter {

@@ -16,7 +16,11 @@ import org.apache.calcite.rex.RexShuttle
 import org.apache.calcite.rex.RexSimplify
 import org.apache.calcite.rex.RexUtil
 import org.apache.calcite.sql.SqlKind
+import org.apache.calcite.util.NlsString
+import org.apache.calcite.util.RangeSets
+import org.apache.calcite.util.Sarg
 import org.apache.calcite.util.mapping.Mappings
+import org.bitlap.core.sql.FilterOp
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PruneTimeFilter
@@ -99,7 +103,9 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                         }
                     }
                     // x (=, <>, >, >=, <, <=) xxx
-                    in SqlKind.COMPARISON -> {
+                    // x in (xx, xxx, ...)
+                    // x between xx and xxx
+                    in SqlKind.COMPARISON, SqlKind.SEARCH -> {
                         val (left, right) = call.operands
                         when {
                             left is RexInputRef && right is RexLiteral -> {
@@ -111,9 +117,10 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                                         call.toString().replace("$${inputField.index}", inputField.name)
                                     )
                                 } else {
+                                    val (values, op) = getLiteralValue(right, call.kind.sql.lowercase())
                                     pruneFilter.add(
-                                        inputField.name, call.kind.sql.lowercase(),
-                                        right.getValueAs(String::class.java)!!,
+                                        inputField.name, op,
+                                        values,
                                         resolveFilter(call, inputField, rowType, rexBuilder),
                                         call.toString().replace("$${inputField.index}", inputField.name)
                                     )
@@ -139,10 +146,6 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                                 }
                             }
                         }
-                    }
-                    // x in (xx, xxx, ...)
-                    SqlKind.SEARCH -> {
-                        TODO()
                     }
                     // x is [not] null
                     SqlKind.IS_NULL, SqlKind.IS_NOT_NULL -> TODO()
@@ -178,6 +181,73 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
             // why inputRecord? see DataContextInputGetter
             val input = DataContexts.of(mapOf("inputRecord" to arrayOf(it)))
             (executor.apply(input) as Array<*>).first() as Boolean
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST", "UnstableApiUsage")
+    private fun getLiteralValue(literal: RexLiteral, op: String): Pair<List<String>, FilterOp> {
+        return when (literal.value) {
+            is Sarg<*> -> {
+                val values = mutableListOf<NlsString>()
+                var filterOp = FilterOp.EQUALS
+                RangeSets.forEach(
+                    (literal.value as Sarg<NlsString>).rangeSet,
+                    object : RangeSets.Consumer<NlsString> {
+                        override fun all() = throw IllegalStateException("Illegal compare all.")
+                        override fun atLeast(lower: NlsString) {
+                            values.add(lower)
+                            filterOp = FilterOp.GREATER_EQUALS_THAN
+                        }
+
+                        override fun atMost(upper: NlsString) {
+                            values.add(upper)
+                            filterOp = FilterOp.LESS_EQUALS_THAN
+                        }
+
+                        override fun greaterThan(lower: NlsString) {
+                            values.add(lower)
+                            filterOp = FilterOp.GREATER_THAN
+                        }
+
+                        override fun lessThan(upper: NlsString) {
+                            values.add(upper)
+                            filterOp = FilterOp.LESS_THAN
+                        }
+
+                        override fun singleton(value: NlsString) {
+                            values.add(value)
+                            filterOp = FilterOp.EQUALS
+                        }
+
+                        override fun closed(lower: NlsString, upper: NlsString) {
+                            values.add(lower)
+                            values.add(upper)
+                            filterOp = FilterOp.CLOSED
+                        }
+
+                        override fun closedOpen(lower: NlsString, upper: NlsString) {
+                            values.add(lower)
+                            values.add(upper)
+                            filterOp = FilterOp.CLOSED_OPEN
+                        }
+
+                        override fun openClosed(lower: NlsString, upper: NlsString) {
+                            values.add(lower)
+                            values.add(upper)
+                            filterOp = FilterOp.OPEN_CLOSED
+                        }
+
+                        override fun open(lower: NlsString, upper: NlsString) {
+                            values.add(lower)
+                            values.add(upper)
+                            filterOp = FilterOp.OPEN
+                        }
+                    }
+                )
+                values.map { it.value } to filterOp
+            }
+            else ->
+                listOf(literal.getValueAs(String::class.java)!!) to FilterOp.from(op)
         }
     }
 }

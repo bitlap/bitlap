@@ -49,6 +49,7 @@ import org.bitlap.core.sql.udf.FunctionRegistry
 class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
 
     fun parse(statement: String): RelNode {
+        System.setProperty("calcite.default.charset", "utf8")
         // 1. init
         val schema = this.buildSchemas()
         val listSqlOperatorTable = ListSqlOperatorTable().apply {

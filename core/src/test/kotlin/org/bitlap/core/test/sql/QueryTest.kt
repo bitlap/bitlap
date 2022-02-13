@@ -131,29 +131,33 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 listOf(listOf(3, 9))
             )
             checkRows(
+                "select sum(vv) as vv, sum(pv) as pv from $db.$table where _time = 100 and os = 'Mac000'",
+                listOf(listOf(0, 0))
+            )
+            checkRows(
                 "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time = 100 and os = 'Mac'",
                 listOf(listOf(3, 9, 3))
             )
             checkRows(
                 """
-                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
                     where _time = 100 and os = 'Mac' and lower(os) = 'mac'
                 """.trimIndent(),
                 listOf(listOf(3, 9, 3))
             )
             checkRows(
                 """
-                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
+                    select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
                     where _time = 100 and os = 'Mac' and lower(os) = 'xxx'
                 """.trimIndent(),
                 listOf(listOf(0, 0, 0))
             )
             checkRows(
                 """
-                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
+                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
                     where _time = 100 and os = 'Mac'
                     group by os
                 """.trimIndent(),
@@ -161,18 +165,31 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             )
             checkRows(
                 """
-                    select lower(os) os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
+                    select lower(os) os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
                     where _time = 100 and os = 'Mac'
                     group by lower(os)
                 """.trimIndent(),
                 listOf(listOf("mac", 3, 9, 3))
             )
-//            sql(
-//                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " +
-//                    // "from $db.$table where _time = 100 and (os = 'Mac' or os ='Mac2')"
-//                    "from $db.$table where _time = 100 and os = 'Mac' and lower(os) = 'mac'"
-//            ).show()
+            checkRows(
+                """
+                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
+                    where _time = 100 and (os = 'Mac' or os = 'Mac2' or os = '中文')
+                    group by os
+                """.trimIndent(),
+                listOf(listOf("Mac", 3, 9, 3))
+            )
+            checkRows(
+                """
+                    select os, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
+                    where _time = 100 and os in ('Mac', 'Mac2', '中文')
+                    group by os
+                """.trimIndent(),
+                listOf(listOf("Mac", 3, 9, 3))
+            )
         }
     }
 

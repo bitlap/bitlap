@@ -177,7 +177,7 @@ class CBM : AbsBM, ComparableBM {
     /**
      * operators
      */
-    fun add(dat: Int, count: Long): CBM = this.add(0, dat, count)
+    fun add(dat: Int, count: Long): CBM = this.add(BBM.MAGIC_BUCKET, dat, count)
     fun add(bucket: Int, dat: Int, count: Long): CBM = resetModify {
         PreConditions.checkExpression(count > 0, "CBM count should be greater than 0")
 

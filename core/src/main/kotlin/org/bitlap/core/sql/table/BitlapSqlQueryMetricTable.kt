@@ -27,7 +27,7 @@ class BitlapSqlQueryMetricTable(
         if (projects == null) {
             return Linq4j.emptyEnumerable()
         }
-        // TODO: Fix bug org.apache.calcite.interpreter.TableScanNode.createProjectableFilterable
+        // TODO: Fix https://github.com/apache/calcite/pull/2729
         val bits = RelOptUtil.InputFinder.bits(filters, null)
         val coverAll = bits.all { projects.contains(it) }
         if (!coverAll) {

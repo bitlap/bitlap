@@ -48,10 +48,14 @@ import org.bitlap.core.sql.udf.FunctionRegistry
  */
 class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
 
-    fun parse(statement: String): RelNode {
+    /**
+     * Parse a [statement] to a [RelNode]
+     */
+    fun parse(statement: String): BitlapSqlPlan {
         System.setProperty("calcite.default.charset", "utf8")
-        // 1. init
+        // get schemas from catalog
         val schema = this.buildSchemas()
+        // register user-defined functions
         val listSqlOperatorTable = ListSqlOperatorTable().apply {
             FunctionRegistry.sqlFunctions().forEach { add(it) }
         }
@@ -68,32 +72,39 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
             .traitDefs(ConventionTraitDef.INSTANCE, RelDistributionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE)
             .operatorTable(SqlOperatorTables.chain(listSqlOperatorTable, SqlStdOperatorTable.instance()))
             .build()
-        val queryContext = QueryContext.get()
-        val parser = SqlParser.create(statement, config.parserConfig)
-        val sqlNode = queryContext.let { ctx ->
+
+        // parser sql to sql node
+        val sqlNode = QueryContext.get().let { ctx ->
+            val parser = SqlParser.create(statement, config.parserConfig)
             parser.parseQuery().also {
                 ctx.originalPlan = it
             }
         }
         return when (sqlNode) {
             is BitlapSqlDdlRel -> {
-                sqlNode.rel(RelBuilder.create(config))
+                val rel = sqlNode.rel(RelBuilder.create(config))
+                BitlapSqlPlan(statement, rel, rel)
             }
             else -> {
+                // 1. validate sql plan
                 val validator = this.buildValidator(config)
-                val planner = VolcanoPlanner(config.costFactory, config.context)
-                RelOptUtil.registerDefaultRules(
-                    planner,
-                    validator.connConfig.materializationsEnabled(),
-                    Hook.ENABLE_BINDABLE.get(false)
-                )
-                planner.executor = config.executor
-                planner.clearRelTraitDefs()
-                config.traitDefs?.forEach { planner.addRelTraitDef(it) }
-                planner.addRelTraitDef(ConventionTraitDef.INSTANCE)
-                ENUMERABLE_RULES.forEach { planner.addRule(it) }
+                val sqlNodeV = validator.validate(sqlNode)
 
+                // 2. parse sql node to logical plan
+                val planner = VolcanoPlanner(config.costFactory, config.context).also { p ->
+                    RelOptUtil.registerDefaultRules(
+                        p,
+                        validator.connConfig.materializationsEnabled(),
+                        Hook.ENABLE_BINDABLE.get(false)
+                    )
+                    p.executor = config.executor
+                    p.clearRelTraitDefs()
+                    config.traitDefs?.forEach { p.addRelTraitDef(it) }
+                    p.addRelTraitDef(ConventionTraitDef.INSTANCE)
+                    ENUMERABLE_RULES.forEach { p.addRule(it) }
+                }
                 val cluster = RelOptCluster.create(planner, RexBuilder(validator.typeFactory))
+
                 val sqlToRelConverterConfig = config.sqlToRelConverterConfig.withTrimUnusedFields(false)
                 val sqlToRelConverter = SqlToRelConverter(
                     null,
@@ -103,18 +114,12 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
                     config.convertletTable,
                     sqlToRelConverterConfig
                 )
-                val sqlNodeV = validator.validate(sqlNode)
                 var root = sqlToRelConverter.convertQuery(sqlNodeV, false, true)
                 root = root.withRel(sqlToRelConverter.flattenTypes(root.rel, true))
                 val relBuilder = sqlToRelConverterConfig.relBuilderFactory.create(cluster, null)
                 root = root.withRel(RelDecorrelator.decorrelateQuery(root.rel, relBuilder))
-//                val relNode = planner.rel(sqlNode)
-                var relNode = root.rel
-//                val desiredTraits = cluster.traitSetOf(EnumerableConvention.INSTANCE)
-//                if (!relNode.getTraitSet().equals(desiredTraits)) {
-//                    relNode = cluster.getPlanner().changeTraits(relNode, desiredTraits)
-//                }
 
+                var relNode = root.rel
                 relNode = RULES.fold(relNode) { rel, rules ->
                     val builder = HepProgramBuilder()
                     builder.addRuleCollection(rules)
@@ -122,8 +127,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
                     hepPlanner.root = rel
                     hepPlanner.findBestExp()
                 }
-                println(relNode.explain())
-                relNode
+                BitlapSqlPlan(statement, root.rel, relNode)
             }
         }
     }
@@ -143,6 +147,14 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
             root.add(dbName, schema)
         }
         return root
+    }
+
+
+    /**
+     * explain [statement]
+     */
+    fun explain(statement: String): String {
+        return this.parse(statement).explain()
     }
 
     private fun buildValidator(config: FrameworkConfig): BitlapSqlValidator {

@@ -23,7 +23,7 @@ class QueryExecution(private val statement: String) {
             return QueryContext.use {
                 it.runtimeConf = runtimeConf
                 it.statement = statement
-                val plan = planner.parse(statement)
+                val plan = planner.parse(statement).relOpt
                 RelRunners.run(plan).executeQuery()
             }
         } catch (e: Throwable) {

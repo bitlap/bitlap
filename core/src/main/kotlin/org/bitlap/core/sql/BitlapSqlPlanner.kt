@@ -149,14 +149,6 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
         return root
     }
 
-
-    /**
-     * explain [statement]
-     */
-    fun explain(statement: String): String {
-        return this.parse(statement).explain()
-    }
-
     private fun buildValidator(config: FrameworkConfig): BitlapSqlValidator {
         val parserConfig = config.parserConfig
         val sqlValidatorConfig = config.sqlValidatorConfig

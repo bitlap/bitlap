@@ -20,9 +20,9 @@ class QueryExecution(private val statement: String) {
 
     fun execute(): ResultSet {
         try {
-            return QueryContext.use {
-                it.runtimeConf = runtimeConf
-                it.statement = statement
+            return QueryContext.use { ctx ->
+                ctx.runtimeConf = runtimeConf
+                ctx.statement = statement
                 val plan = planner.parse(statement).relOpt
                 RelRunners.run(plan).executeQuery()
             }

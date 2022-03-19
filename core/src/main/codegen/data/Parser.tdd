@@ -27,7 +27,6 @@
   # List of additional classes and packages to import.
   # Example: "org.apache.calcite.sql.*", "java.util.List".
   imports: [
-    "org.bitlap.core.sql.parser.cmd.SqlRunExample"
     "org.apache.calcite.sql.ddl.SqlDdlNodes"
     "org.apache.calcite.sql.SqlCreate"
     "org.apache.calcite.sql.SqlDrop"
@@ -37,6 +36,8 @@
     "org.bitlap.core.sql.parser.ddl.SqlDropTable"
     "org.bitlap.core.sql.parser.ddl.SqlShowDatabases"
     "org.bitlap.core.sql.parser.ddl.SqlShowTables"
+    "org.bitlap.core.sql.parser.cmd.SqlRunExample"
+    "org.bitlap.core.sql.parser.cmd.SqlExplainX"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -414,6 +415,7 @@
     "SqlRunExample()"
     "SqlShowDatabases()"
     "SqlShowTables()"
+    "SqlExplainX()"
   ]
 
   # List of methods for parsing custom literals.

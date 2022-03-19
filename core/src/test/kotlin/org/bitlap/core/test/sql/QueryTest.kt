@@ -63,6 +63,10 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 listOf(listOf(4, 4))
             )
             checkRows(
+                "select count(vv) cvv, count(pv) cpv from $db.$table where 100 = _time",
+                listOf(listOf(4, 4))
+            )
+            checkRows(
                 "select count(a) as a, count(distinct a) as a_dis, sum(b) as b from $db.$table where _time = 123",
                 listOf(listOf(0, 0, 0))
             )
@@ -101,6 +105,10 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             )
             checkRows(
                 "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time >= 100",
+                listOf(listOf(8, 24, 3))
+            )
+            checkRows(
+                "select sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv from $db.$table where _time between 100 and 200",
                 listOf(listOf(8, 24, 3))
             )
         }

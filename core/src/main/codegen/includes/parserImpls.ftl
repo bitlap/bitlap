@@ -200,3 +200,15 @@ SqlShowTables SqlShowTables() :
         return new SqlShowTables(getPos(), dbName);
     }
 }
+
+SqlNode SqlExplainX() :
+{
+  SqlNode stmt;
+}
+{
+  <EXPLAIN>
+  stmt = SqlQueryOrDml()
+  {
+    return new SqlExplainX(getPos(), stmt);
+  }
+}

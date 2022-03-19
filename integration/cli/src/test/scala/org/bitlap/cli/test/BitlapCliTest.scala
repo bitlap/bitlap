@@ -1,6 +1,6 @@
 package org.bitlap.cli.test
 
-import org.bitlap.cli.{ BitlapCli, _ }
+import org.bitlap.cli._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

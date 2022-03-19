@@ -8,8 +8,10 @@ import org.apache.carbondata.core.scan.expression.Expression
 import org.apache.carbondata.core.scan.expression.LiteralExpression
 import org.apache.carbondata.core.scan.expression.conditional.GreaterThanEqualToExpression
 import org.apache.carbondata.core.scan.expression.conditional.GreaterThanExpression
+import org.apache.carbondata.core.scan.expression.conditional.InExpression
 import org.apache.carbondata.core.scan.expression.conditional.LessThanEqualToExpression
 import org.apache.carbondata.core.scan.expression.conditional.LessThanExpression
+import org.apache.carbondata.core.scan.expression.conditional.ListExpression
 import org.apache.carbondata.core.scan.expression.conditional.NotEqualsExpression
 import org.apache.carbondata.core.scan.expression.conditional.NotInExpression
 import org.apache.carbondata.core.scan.expression.logical.AndExpression
@@ -206,14 +208,20 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
                     // EqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
                     FilterUtil.prepareEqualToExpression("d", "string", expr.values.first())
                 } else {
-                    // TODO: InExpression(columnExpr, LiteralExpression(expr.values, DataTypes.STRING)) // not working, maybe bug
-                    FilterUtil.prepareEqualToExpressionSet("d", "string", expr.values)
+                    // FilterUtil.prepareEqualToExpressionSet("d", "string", expr.values)
+                    InExpression(
+                        columnExpr,
+                        ListExpression(expr.values.map { LiteralExpression(it, DataTypes.STRING) })
+                    )
                 }
             FilterOp.NOT_EQUALS ->
                 if (expr.values.size == 1) {
                     NotEqualsExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
                 } else {
-                    NotInExpression(columnExpr, LiteralExpression(expr.values, DataTypes.STRING))
+                    NotInExpression(
+                        columnExpr,
+                        ListExpression(expr.values.map { LiteralExpression(it, DataTypes.STRING) })
+                    )
                 }
             FilterOp.GREATER_THAN ->
                 GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))

@@ -67,10 +67,10 @@
         <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.14.1</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <hutool.version>5.7.20</hutool.version>
+        <hutool.version>5.7.22</hutool.version>
         <joda.version>2.10.13</joda.version>
-        <gson.version>2.8.9</gson.version>
-        <sofa.jraft.version>1.3.9</sofa.jraft.version>
+        <gson.version>2.9.0</gson.version>
+        <sofa.jraft.version>1.3.10</sofa.jraft.version>
         <calcite.version>1.29.0</calcite.version>
         <kotlin.cli.version>0.3.4</kotlin.cli.version>
         <sqlline.version>1.11.0</sqlline.version>
@@ -82,7 +82,7 @@
         <sqlline.version>1.12.0</sqlline.version>
         <scala-macro.version>0.3.4</scala-macro.version>
         <picocli.version>4.6.3</picocli.version>
-        <maven.compiler.version>3.9.0</maven.compiler.version>
+        <maven.compiler.version>3.10.1</maven.compiler.version>
     </properties>
 
     <dependencies>
@@ -321,7 +321,7 @@
                 <plugin>
                     <groupId>com.github.gantsign.maven</groupId>
                     <artifactId>ktlint-maven-plugin</artifactId>
-                    <version>1.11.2</version>
+                    <version>1.12.1</version>
                     <executions>
                         <execution>
                             <id>format-and-check</id>
@@ -489,7 +489,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.12</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>central</serverId>

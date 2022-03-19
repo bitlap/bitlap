@@ -108,8 +108,12 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                     in SqlKind.COMPARISON, SqlKind.SEARCH -> {
                         val (left, right) = call.operands
                         when {
-                            left is RexInputRef && right is RexLiteral -> {
-                                val inputField = fieldIndexMap[left.index]!!
+                            left is RexInputRef && right is RexLiteral || left is RexLiteral && right is RexInputRef -> {
+                                val (ref, refValue) = if (left is RexInputRef) left to right else right to left
+                                ref as RexInputRef
+                                refValue as RexLiteral
+
+                                val inputField = fieldIndexMap[ref.index]!!
                                 if (timeField == inputField) {
                                     timeFilter.add(
                                         inputField.name,
@@ -117,7 +121,7 @@ class BitlapFilterTableScanRule : AbsRelRule(BitlapFilter::class.java, "BitlapFi
                                         call.toString().replace("$${inputField.index}", inputField.name)
                                     )
                                 } else {
-                                    val (values, op) = getLiteralValue(right, call.kind.sql.lowercase())
+                                    val (values, op) = getLiteralValue(refValue, call.kind.sql.lowercase())
                                     pruneFilter.add(
                                         inputField.name, op,
                                         values,

@@ -61,7 +61,7 @@
         <dokka.version>1.6.0</dokka.version>
         <kotlin.version>1.6.10</kotlin.version>
         <kotlinx.coroutines.version>1.5.2-native-mt</kotlinx.coroutines.version>
-        <kotest.version>5.1.0</kotest.version>
+        <kotest.version>5.2.2</kotest.version>
         <kotlin.logging.version>2.1.21</kotlin.logging.version>
         <arrow.version>1.0.1</arrow.version>
         <slf4j.version>1.7.36</slf4j.version>

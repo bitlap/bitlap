@@ -1,20 +1,21 @@
 package org.bitlap.net.processor
 
-import com.alipay.sofa.jraft.rpc.{ RpcContext, RpcRequestClosure, RpcRequestProcessor }
+import com.alipay.sofa.jraft.rpc.{RpcContext, RpcRequestClosure, RpcRequestProcessor}
 import org.bitlap.net.NetworkServiceImpl
-import org.bitlap.network.proto.driver.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
-import org.bitlap.tools.{ apply, ProcessorCreator }
+import org.bitlap.network.proto.driver.BOpenSession.{BOpenSessionReq, BOpenSessionResp}
+import org.bitlap.tools.apply
 import org.bitlap.net.handles
 
 import java.util.concurrent.Executor
 import scala.jdk.CollectionConverters.MapHasAsScala
-import org.bitlap.network.proto.driver.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
-import org.bitlap.network.proto.driver.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
-import org.bitlap.network.proto.driver.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
-import org.bitlap.network.proto.driver.BGetColumns.{ BGetColumnsReq, BGetColumnsResp }
-import org.bitlap.network.proto.driver.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
-import org.bitlap.network.proto.driver.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
-import org.bitlap.network.proto.driver.BGetTables.{ BGetTablesReq, BGetTablesResp }
+import org.bitlap.network.proto.driver.BCloseSession.{BCloseSessionReq, BCloseSessionResp}
+import org.bitlap.network.proto.driver.BExecuteStatement.{BExecuteStatementReq, BExecuteStatementResp}
+import org.bitlap.network.proto.driver.BFetchResults.{BFetchResultsReq, BFetchResultsResp}
+import org.bitlap.network.proto.driver.BGetColumns.{BGetColumnsReq, BGetColumnsResp}
+import org.bitlap.network.proto.driver.BGetResultSetMetadata.{BGetResultSetMetadataReq, BGetResultSetMetadataResp}
+import org.bitlap.network.proto.driver.BGetSchemas.{BGetSchemasReq, BGetSchemasResp}
+import org.bitlap.network.proto.driver.BGetTables.{BGetTablesReq, BGetTablesResp}
+import org.bitlap.tools.method.ProcessorCreator
 
 /**
  *

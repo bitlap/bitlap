@@ -4,7 +4,6 @@ import arrow.core.toOption
 import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.Enumerable
 import org.apache.calcite.linq4j.Linq4j
-import org.apache.calcite.plan.RelOptUtil
 import org.apache.calcite.rex.RexNode
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.mdm.fetch
@@ -25,12 +24,6 @@ class BitlapSqlQueryMetricTable(
     // filters is empty here, pushed by BitlapFilterTableScanRule
     override fun scan(root: DataContext, filters: MutableList<RexNode>, projects: IntArray?): Enumerable<Array<Any?>> {
         if (projects == null) {
-            return Linq4j.emptyEnumerable()
-        }
-        // TODO: Fix https://github.com/apache/calcite/pull/2729
-        val bits = RelOptUtil.InputFinder.bits(filters, null)
-        val coverAll = bits.all { projects.contains(it) }
-        if (!coverAll) {
             return Linq4j.emptyEnumerable()
         }
         return this.scan(root, projects)

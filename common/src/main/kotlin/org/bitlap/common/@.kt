@@ -21,6 +21,10 @@ fun logger(func: () -> Unit): KLogger {
     return KotlinLogging.logger(func)
 }
 
+fun logger(clazz: Class<*>): KLogger {
+    return logger(clazz.name)
+}
+
 fun logger(name: String): KLogger {
     return KotlinLogging.logger(name)
 }

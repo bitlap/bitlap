@@ -53,7 +53,7 @@ class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleThread
   }
 
   def extractOptions(): NodeOptions = {
-    val dataPath = conf.get(BitlapConf.DEFAULT_ROOT_DIR_LOCAL)
+    val dataPath = conf.get(BitlapConf.ROOT_DIR_LOCAL)
     val initConfStr = conf.get(BitlapConf.NODE_BIND_PEERS)
     val raftTimeout = conf.get(BitlapConf.NODE_RAFT_TIMEOUT)
     FileUtils.forceMkdir(new File(dataPath))

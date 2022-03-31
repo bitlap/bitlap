@@ -23,7 +23,7 @@ class BitlapSession extends Session {
   override var password: String = _
   override var username: String = _
   override val creationTime: Long = System.currentTimeMillis()
-  override var sessionConf: BitlapConf = new BitlapConf
+  override var sessionConf: BitlapConf = _
   override var sessionManager: SessionManager = _
   override var lastAccessTime: Long = System.currentTimeMillis()
   override var operationManager: OperationManager = _
@@ -41,7 +41,7 @@ class BitlapSession extends Session {
     this.username = username
     this.sessionHandle = sessionHandle
     this.password = password
-    this.sessionConf.setSessionConfig(sessionConf.asJava)
+    this.sessionConf = new BitlapConf(sessionConf.asJava)
     this.sessionState.compareAndSet(false, true)
     this.sessionManager = sessionManager
   }

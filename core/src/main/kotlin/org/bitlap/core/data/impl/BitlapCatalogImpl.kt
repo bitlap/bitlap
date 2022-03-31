@@ -35,7 +35,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     private val rootPath by lazy {
-        Path(conf.get(BitlapConf.DEFAULT_ROOT_DIR_DATA))
+        Path(conf.get(BitlapConf.ROOT_DIR_DATA))
     }
 
     private val dataPath by lazy {

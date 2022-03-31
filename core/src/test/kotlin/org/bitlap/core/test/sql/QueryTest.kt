@@ -52,6 +52,15 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             }
         }
 
+        "query whatever you want" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            checkRows(
+                "select sum(pv) pv, count(distinct pv) uv, sum(xx) xx from $db.$table where _time = 100",
+                listOf(listOf(0, 0, 0))
+            )
+        }
+
         "only metrics query with one dimension time" {
             // System.setProperty("calcite.debug", "true")
             val (db, table) = randomDBTable()

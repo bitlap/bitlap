@@ -57,6 +57,13 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         .withRowRecordReader() // disable vector read
         .withBatch(100) // default is 100
 
+    override fun open() {
+        super.open()
+        if (!fs.exists(dataPath)) {
+            fs.mkdirs(dataPath)
+        }
+    }
+
     /**
      * Store [rows] with time [tm] as carbon data file format.
      */

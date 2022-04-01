@@ -1,8 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.core
 
-import org.bitlap.network.operation.{ operations, OperationFactory }
-import org.bitlap.network.operation.OperationType.OperationType
+import org.bitlap.network.operation.{ operations, OperationFactory, OperationType }
 import org.bitlap.network.session.Session
 
 /**
@@ -13,7 +12,7 @@ class BitlapOperationFactory extends OperationFactory {
 
   override def create(
     parentSession: Session,
-    opType: OperationType,
+    opType: OperationType.OperationType,
     hasResultSet: Boolean
   ): operations.Operation =
     BitlapOperation(parentSession, opType, hasResultSet)

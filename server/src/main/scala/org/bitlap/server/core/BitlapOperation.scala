@@ -1,18 +1,15 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.core
 
-import org.bitlap.network.operation.OperationType.OperationType
-import org.bitlap.network.operation.operations
-import org.bitlap.network.session.Session
-import org.bitlap.network.models
-
-import java.sql.Types
 import com.google.protobuf.ByteString
-
-import java.sql.ResultSet
-import scala.collection.mutable.ListBuffer
 import org.bitlap.core.sql.QueryExecution
+import org.bitlap.network.models
+import org.bitlap.network.operation.{ operations, OperationType }
+import org.bitlap.network.session.Session
 import org.bitlap.tools.apply
+
+import java.sql.{ ResultSet, Types }
+import scala.collection.mutable.ListBuffer
 
 /**
  * @author 梦境迷离
@@ -21,7 +18,7 @@ import org.bitlap.tools.apply
 @apply
 class BitlapOperation(
   parentSession: Session,
-  opType: OperationType,
+  opType: OperationType.OperationType,
   hasResultSet: Boolean = false
 ) extends operations.Operation(parentSession, opType, hasResultSet) {
 

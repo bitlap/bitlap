@@ -1,4 +1,5 @@
-package org.bitlap.net
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.network
 
 import com.alipay.sofa.jraft.RouteTable
 import com.alipay.sofa.jraft.conf.Configuration
@@ -8,9 +9,23 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.proto.driver.{BCloseSession, BExecuteStatement, BFetchResults, BGetColumns, BGetResultSetMetadata, BGetSchemas, BGetTables, BOpenSession, BOperationHandle, BSessionHandle, BStatus, BStatusCode, BTableSchema}
+import org.bitlap.network.proto.driver.{
+  BCloseSession,
+  BExecuteStatement,
+  BFetchResults,
+  BGetColumns,
+  BGetResultSetMetadata,
+  BGetSchemas,
+  BGetTables,
+  BOpenSession,
+  BOperationHandle,
+  BSessionHandle,
+  BStatus,
+  BStatusCode,
+  BTableSchema
+}
 
-import java.lang.{Long => JLong}
+import java.lang.{ Long => JLong }
 import java.sql.SQLException
 import java.util.Properties
 
@@ -29,44 +44,45 @@ object BitlapClient extends NetworkHelper {
   private val raftTimeout: JLong = defaultConf.get(BitlapConf.NODE_RAFT_TIMEOUT)
 
   // kotlin 兼容
-  def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle = {
+  def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle =
     cc.openSession(conf, info)
-  }
 
-  def closeSession(sessionHandle: BSessionHandle)(implicit cc: CliClientServiceImpl): Unit = {
+  def closeSession(sessionHandle: BSessionHandle)(implicit cc: CliClientServiceImpl): Unit =
     cc.closeSession(sessionHandle)
-  }
 
-  def executeStatement(sessionHandle: BSessionHandle, statement: String)(implicit cc: CliClientServiceImpl): BOperationHandle = {
+  def executeStatement(sessionHandle: BSessionHandle, statement: String)(implicit
+    cc: CliClientServiceImpl
+  ): BOperationHandle =
     cc.executeStatement(sessionHandle, statement)
-  }
 
-  def fetchResults(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BFetchResults.BFetchResultsResp = {
+  def fetchResults(operationHandle: BOperationHandle)(implicit
+    cc: CliClientServiceImpl
+  ): BFetchResults.BFetchResultsResp =
     cc.fetchResults(operationHandle)
-  }
 
-  def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
-                (implicit cc: CliClientServiceImpl): BOperationHandle = {
+  def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)(implicit
+    cc: CliClientServiceImpl
+  ): BOperationHandle =
     cc.getSchemas(sessionHandle, catalogName, schemaName)
-  }
 
-  def getTables(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)
-               (implicit cc: CliClientServiceImpl): BOperationHandle = {
+  def getTables(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)(implicit
+    cc: CliClientServiceImpl
+  ): BOperationHandle =
     cc.getTables(sessionHandle, catalogName, schemaName)
-  }
 
-  def getColumns(sessionHandle: BSessionHandle, tableName: String = null, schemaName: String = null, columnName: String = null)
-                (implicit cc: CliClientServiceImpl): BOperationHandle = {
+  def getColumns(
+    sessionHandle: BSessionHandle,
+    tableName: String = null,
+    schemaName: String = null,
+    columnName: String = null
+  )(implicit cc: CliClientServiceImpl): BOperationHandle =
     cc.getColumns(sessionHandle, tableName, schemaName, columnName)
-  }
 
   /**
    * Used for JDBC to get Schema of the specified operation.
    */
-  def getResultSetMetadata(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BTableSchema = {
+  def getResultSetMetadata(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BTableSchema =
     cc.getResultSetMetadata(operationHandle)
-  }
-
 
   implicit class CliClientServiceImplWrapper(val cc: CliClientServiceImpl) {
 
@@ -78,8 +94,11 @@ object BitlapClient extends NetworkHelper {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BOpenSession.BOpenSessionReq.newBuilder().setUsername(info.getProperty("user"))
-          .setPassword(info.getProperty("password")).build(),
+        BOpenSession.BOpenSessionReq
+          .newBuilder()
+          .setUsername(info.getProperty("user"))
+          .setPassword(info.getProperty("password"))
+          .build(),
         timeout
       )
       val re = result.asInstanceOf[BOpenSession.BOpenSessionResp]
@@ -96,10 +115,11 @@ object BitlapClient extends NetworkHelper {
         leader.getEndpoint,
         BCloseSession.BCloseSessionReq.newBuilder().setSessionHandle(sessionHandle).build(),
         new InvokeCallback() {
-          override def complete(o: Any, throwable: Throwable): Unit = {
+          override def complete(o: Any, throwable: Throwable): Unit =
             ()
-          }
-        }, timeout)
+        },
+        timeout
+      )
     }
 
     /**
@@ -109,7 +129,10 @@ object BitlapClient extends NetworkHelper {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BExecuteStatement.BExecuteStatementReq.newBuilder().setSessionHandle(sessionHandle).setStatement(statement)
+        BExecuteStatement.BExecuteStatementReq
+          .newBuilder()
+          .setSessionHandle(sessionHandle)
+          .setStatement(statement)
           .build(),
         timeout
       )
@@ -133,12 +156,20 @@ object BitlapClient extends NetworkHelper {
       re
     }
 
-    def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null): BOperationHandle = {
+    def getSchemas(
+      sessionHandle: BSessionHandle,
+      catalogName: String = null,
+      schemaName: String = null
+    ): BOperationHandle = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BGetSchemas.BGetSchemasReq.newBuilder().setSessionHandle(sessionHandle).setCatalogName(catalogName)
-          .setSchemaName(schemaName).build(),
+        BGetSchemas.BGetSchemasReq
+          .newBuilder()
+          .setSessionHandle(sessionHandle)
+          .setCatalogName(catalogName)
+          .setSchemaName(schemaName)
+          .build(),
         timeout
       )
       val re = result.asInstanceOf[BGetSchemas.BGetSchemasResp]
@@ -146,12 +177,20 @@ object BitlapClient extends NetworkHelper {
       re.getOperationHandle
     }
 
-    def getTables(sessionHandle: BSessionHandle, tableName: String = null, schemaName: String = null): BOperationHandle = {
+    def getTables(
+      sessionHandle: BSessionHandle,
+      tableName: String = null,
+      schemaName: String = null
+    ): BOperationHandle = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BGetTables.BGetTablesReq.newBuilder().setSessionHandle(sessionHandle).setTableName(tableName)
-          .setSchemaName(schemaName).build(),
+        BGetTables.BGetTablesReq
+          .newBuilder()
+          .setSessionHandle(sessionHandle)
+          .setTableName(tableName)
+          .setSchemaName(schemaName)
+          .build(),
         timeout
       )
       val re = result.asInstanceOf[BGetTables.BGetTablesResp]
@@ -159,13 +198,22 @@ object BitlapClient extends NetworkHelper {
       re.getOperationHandle
     }
 
-    def getColumns(sessionHandle: BSessionHandle, tableName: String = null, schemaName: String = null, columnName: String = null): BOperationHandle = {
+    def getColumns(
+      sessionHandle: BSessionHandle,
+      tableName: String = null,
+      schemaName: String = null,
+      columnName: String = null
+    ): BOperationHandle = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BGetColumns.BGetColumnsReq.newBuilder().setSessionHandle(sessionHandle).setTableName(tableName)
+        BGetColumns.BGetColumnsReq
+          .newBuilder()
+          .setSessionHandle(sessionHandle)
+          .setTableName(tableName)
           .setColumnName(columnName)
-          .setSchemaName(schemaName).build(),
+          .setSchemaName(schemaName)
+          .build(),
         timeout
       )
       val re = result.asInstanceOf[BGetColumns.BGetColumnsResp]
@@ -196,37 +244,36 @@ object BitlapClient extends NetworkHelper {
       val cliOptions = new CliOptions
       cliOptions.setMaxRetry(3)
       cc.init(cliOptions)
-      while (true) { //首次连不上，，为什么？
+      while (true) //首次连不上，，为什么？
         try {
           val ret = RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout.toInt).isOk
           if (ret) return
         } catch {
           case e: Exception => println(e.getLocalizedMessage)
         }
-      }
     }
 
     /**
      * Used to verify whether the RPC result is correct.
      */
-    private def verifySuccess(status: BStatus): Unit = {
+    private def verifySuccess(status: BStatus): Unit =
       if (status.getStatusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
         throw new SQLException(
           status.getErrorMessage,
-          status.getSqlState, status.getErrorCode
+          status.getSqlState,
+          status.getErrorCode
         )
       }
-    }
   }
 
   def beforeInit(): Unit = {
-    registerMessageInstances(NetworkHelper.requestInstances(), (i1, i2) => {
-      RpcFactoryHelper.rpcFactory().registerProtobufSerializer(i1, i2)
-    }
+    registerMessageInstances(
+      NetworkHelper.requestInstances(),
+      (i1, i2) => RpcFactoryHelper.rpcFactory().registerProtobufSerializer(i1, i2)
     )
-    registerMessageInstances(NetworkHelper.responseInstances(), (i1, i2) => {
-      MarshallerHelper.registerRespInstance(i1, i2)
-    }
+    registerMessageInstances(
+      NetworkHelper.responseInstances(),
+      (i1, i2) => MarshallerHelper.registerRespInstance(i1, i2)
     )
   }
 

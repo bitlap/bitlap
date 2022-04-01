@@ -1,13 +1,13 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.test
 
-import org.bitlap.net.handles
-import org.bitlap.net.handles.{ HandleIdentifier, SessionHandle }
-import org.bitlap.net.operation.OperationType
+import org.bitlap.network.handles
+import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
+import org.bitlap.network.operation.OperationType
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/11/21
  * @version 1.0

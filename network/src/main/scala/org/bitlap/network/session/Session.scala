@@ -1,9 +1,10 @@
-package org.bitlap.net.session
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.network.session
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.net.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.net.models.{ RowSet, TableSchema }
-import org.bitlap.net.operation.OperationManager
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.operation.OperationManager
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,7 +43,11 @@ trait Session {
    * @param confOverlay
    * @return OperationHandle The Operate handle
    */
-  def executeStatement(sessionHandle: SessionHandle, statement: String, confOverlay: Map[String, String]): OperationHandle
+  def executeStatement(
+    sessionHandle: SessionHandle,
+    statement: String,
+    confOverlay: Map[String, String]
+  ): OperationHandle
 
   /**
    * execute statement
@@ -52,7 +57,12 @@ trait Session {
    * @param queryTimeout
    * @return OperationHandle The Operate handle
    */
-  def executeStatement(sessionHandle: SessionHandle, statement: String, confOverlay: Map[String, String] = Map.empty, queryTimeout: Long): OperationHandle
+  def executeStatement(
+    sessionHandle: SessionHandle,
+    statement: String,
+    confOverlay: Map[String, String] = Map.empty,
+    queryTimeout: Long
+  ): OperationHandle
 
   def fetchResults(operationHandle: OperationHandle): RowSet
 

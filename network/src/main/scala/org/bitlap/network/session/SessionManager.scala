@@ -1,15 +1,15 @@
-package org.bitlap.net.session
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.network.session
 
 import cn.hutool.core.util.ServiceLoaderUtil
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.net.handles.SessionHandle
-import org.bitlap.net.operation.OperationManager
+import org.bitlap.network.handles.SessionHandle
+import org.bitlap.network.operation.OperationManager
 
 import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/11/20
  * @version 1.0
@@ -19,7 +19,8 @@ class SessionManager extends LazyLogging {
   val operationManager: OperationManager = new OperationManager()
   private val sessionFactory: SessionFactory = ServiceLoaderUtil.loadFirst(classOf[SessionFactory])
 
-  private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] = new ConcurrentHashMap[SessionHandle, Session]()
+  private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] =
+    new ConcurrentHashMap[SessionHandle, Session]()
 
   private lazy val sessionThread: Thread = new Thread { // register center
     while (true) {
@@ -52,7 +53,7 @@ class SessionManager extends LazyLogging {
     }
   }
 
-  def startListener():Unit = {
+  def startListener(): Unit = {
     sessionThread.setDaemon(true)
     sessionThread.start()
   }
@@ -96,9 +97,8 @@ class SessionManager extends LazyLogging {
     }
   }
 
-  private def getOpenSessionCount(): Int = {
+  private def getOpenSessionCount(): Int =
     handleToSession.size
-  }
 
   def getSession(sessionHandle: SessionHandle): Session = {
     val session: Session = SessionManager.sessionAddLock.synchronized {
@@ -111,7 +111,7 @@ class SessionManager extends LazyLogging {
     session
   }
 
-  def refreshSession(sessionHandle: SessionHandle, session: Session): Session = {
+  def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
     SessionManager.sessionAddLock.synchronized {
       session.lastAccessTime = System.currentTimeMillis()
       if (handleToSession.containsKey(sessionHandle)) {
@@ -120,7 +120,6 @@ class SessionManager extends LazyLogging {
         throw new BitlapException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
-  }
 
 }
 object SessionManager {

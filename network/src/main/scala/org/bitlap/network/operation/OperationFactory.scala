@@ -1,10 +1,10 @@
-package org.bitlap.net.operation
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.network.operation
 
-import org.bitlap.net.operation.operations.Operation
-import org.bitlap.net.session.Session
+import org.bitlap.network.operation.operations.Operation
+import org.bitlap.network.session.Session
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/11/20
  * @version 1.0

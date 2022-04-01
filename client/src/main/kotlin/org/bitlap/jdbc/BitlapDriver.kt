@@ -1,6 +1,6 @@
 package org.bitlap.jdbc
 
-import org.bitlap.net.BSQLException
+import org.bitlap.network.BSQLException
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo

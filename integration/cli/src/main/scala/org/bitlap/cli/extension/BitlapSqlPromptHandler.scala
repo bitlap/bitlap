@@ -1,8 +1,9 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli.extension
 
 import org.bitlap.common.utils.StringEx
 import org.bitlap.tools.apply
-import sqlline.{PromptHandler, SqlLine}
+import sqlline.{ PromptHandler, SqlLine }
 
 @apply
 class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends PromptHandler(line) {

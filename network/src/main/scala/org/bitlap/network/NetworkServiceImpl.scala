@@ -1,18 +1,22 @@
-package org.bitlap.net
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.network
 
-import org.bitlap.net.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.net.models.{ RowSet, TableSchema }
-import org.bitlap.net.session.SessionManager
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.session.SessionManager
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/11/20
  * @version 1.0
  */
 class NetworkServiceImpl(private val sessionManager: SessionManager) extends NetworkService {
 
-  override def openSession(username: String, password: String, configuration: Map[String, String] = Map.empty): SessionHandle = {
+  override def openSession(
+    username: String,
+    password: String,
+    configuration: Map[String, String] = Map.empty
+  ): SessionHandle = {
     val session = sessionManager.openSession(username, password, configuration)
     session.sessionHandle
   }
@@ -21,13 +25,22 @@ class NetworkServiceImpl(private val sessionManager: SessionManager) extends Net
     sessionManager.closeSession(sessionHandle)
   }
 
-  override def executeStatement(sessionHandle: SessionHandle, statement: String, confOverlay: Map[String, String]): OperationHandle = {
+  override def executeStatement(
+    sessionHandle: SessionHandle,
+    statement: String,
+    confOverlay: Map[String, String]
+  ): OperationHandle = {
     val session = sessionManager.getSession(sessionHandle)
     sessionManager.refreshSession(sessionHandle, session)
     session.executeStatement(sessionHandle, statement, confOverlay)
   }
 
-  override def executeStatement(sessionHandle: SessionHandle, statement: String, queryTimeout: Long, confOverlay: Map[String, String] = Map.empty): OperationHandle = {
+  override def executeStatement(
+    sessionHandle: SessionHandle,
+    statement: String,
+    queryTimeout: Long,
+    confOverlay: Map[String, String] = Map.empty
+  ): OperationHandle = {
     val session = sessionManager.getSession(sessionHandle)
     sessionManager.refreshSession(sessionHandle, session)
     session.executeStatement(sessionHandle, statement, confOverlay, queryTimeout)
@@ -87,18 +100,27 @@ class NetworkServiceImpl(private val sessionManager: SessionManager) extends Net
     //        )
   }
 
-  override def getColumns(sessionHandle: SessionHandle, tableName: String = null, schemaName: String = null, columnName: String = null): OperationHandle = {
-    import org.bitlap.net.operation.OperationType
+  override def getColumns(
+    sessionHandle: SessionHandle,
+    tableName: String = null,
+    schemaName: String = null,
+    columnName: String = null
+  ): OperationHandle = {
+    import org.bitlap.network.operation.OperationType
     new OperationHandle(OperationType.GET_COLUMNS)
   }
 
-  override def getTables(sessionHandle: SessionHandle, tableName: String = null, schemaName: String = null): OperationHandle = {
-    import org.bitlap.net.operation.OperationType
+  override def getTables(
+    sessionHandle: SessionHandle,
+    tableName: String = null,
+    schemaName: String = null
+  ): OperationHandle = {
+    import org.bitlap.network.operation.OperationType
     new OperationHandle(OperationType.GET_TABLES)
   }
 
   override def getSchemas(sessionHandle: SessionHandle): OperationHandle = {
-    import org.bitlap.net.operation.OperationType
+    import org.bitlap.network.operation.OperationType
     new OperationHandle(OperationType.GET_SCHEMAS)
   }
 }

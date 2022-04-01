@@ -77,10 +77,10 @@
         <scala.version>2.13.5</scala.version>
         <scala.log.version>2.14.1</scala.log.version>
         <!--  日志最新依赖Scala2.13.5  -->
-        <scala.logging.version>3.9.4</scala.logging.version> 
+        <scala.logging.version>3.9.4</scala.logging.version>
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <scala-macro.version>0.4.2</scala-macro.version>
+        <smt.version>0.4.2</smt.version>
         <picocli.version>4.6.3</picocli.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
     </properties>
@@ -121,16 +121,16 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-slf4j-impl</artifactId>-->
-<!--            <version>${log4j.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-core</artifactId>-->
-<!--            <version>${log4j.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.logging.log4j</groupId>-->
+        <!--            <artifactId>log4j-slf4j-impl</artifactId>-->
+        <!--            <version>${log4j.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.logging.log4j</groupId>-->
+        <!--            <artifactId>log4j-core</artifactId>-->
+        <!--            <version>${log4j.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -146,11 +146,11 @@
             <artifactId>hutool-setting</artifactId>
             <version>${hutool.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>cn.hutool</groupId>-->
-<!--            <artifactId>hutool-json</artifactId>-->
-<!--            <version>${hutool.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>cn.hutool</groupId>-->
+        <!--            <artifactId>hutool-json</artifactId>-->
+        <!--            <version>${hutool.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>
@@ -212,7 +212,7 @@
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>smt-tools_2.13</artifactId>
-            <version>${scala-macro.version}</version>
+            <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -222,11 +222,11 @@
         </dependency>
 
         <!--        <dependency>-->
-<!--            <groupId>io.kotest</groupId>-->
-<!--            <artifactId>kotest-property-jvm</artifactId>-->
-<!--            <version>${kotest.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--            <groupId>io.kotest</groupId>-->
+        <!--            <artifactId>kotest-property-jvm</artifactId>-->
+        <!--            <version>${kotest.version}</version>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -323,21 +323,6 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>com.github.gantsign.maven</groupId>
-                    <artifactId>ktlint-maven-plugin</artifactId>
-                    <version>1.13.0</version>
-                    <executions>
-                        <execution>
-                            <id>format-and-check</id>
-                            <goals>
-                                <goal>format</goal>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
                 <!-- scala -->
                 <plugin>
                     <groupId>org.scala-tools</groupId>
@@ -391,9 +376,52 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>2.22.0</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <configuration>
+                    <scala>
+                        <!-- These are the defaults, you can override if you want -->
+                        <includes>
+                            <include>src/main/scala/**/*.scala</include>
+                            <include>src/test/scala/**/*.scala</include>
+                            <include>src/main/scala/**/*.sc</include>
+                            <include>src/test/scala/**/*.sc</include>
+                        </includes>
+
+                        <scalafmt>
+                            <version>2.7.5</version>
+                            <file>.scalafmt.conf</file>
+                        </scalafmt>
+                        <licenseHeader>
+                            <content>/* Copyright (c) 2022 bitlap.org */</content>
+                            <delimiter>package</delimiter>
+                        </licenseHeader>
+                    </scala>
+
+                    <googleJavaFormat>
+                        <version>1.8</version>
+                        <style>GOOGLE</style>                       <!-- or AOSP (optional) -->
+                        <reflowLongStrings>true</reflowLongStrings>
+                        <groupArtifact>com.google.googlejavaformat:google-java-format</groupArtifact>
+                    </googleJavaFormat>
+
+                    <ktlint>
+                        <version>0.43.2</version> <!-- optional -->
+                    </ktlint>
+
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>

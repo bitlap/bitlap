@@ -1,18 +1,18 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.core
 
-import org.bitlap.net.session.Session
+import org.bitlap.network.session.Session
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.net.{ handles, models }
-import org.bitlap.net.operation.OperationManager
-import org.bitlap.net.session.SessionManager
+import org.bitlap.network.{ handles, models }
+import org.bitlap.network.operation.OperationManager
+import org.bitlap.network.session.SessionManager
 
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
- *
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
@@ -48,15 +48,23 @@ class BitlapSession extends Session {
 
   override def open(sessionConfMap: Map[String, String]): handles.SessionHandle = ???
 
-  override def executeStatement(sessionHandle: handles.SessionHandle, statement: String, confOverlay: Map[String, String]): handles.OperationHandle = {
+  override def executeStatement(
+    sessionHandle: handles.SessionHandle,
+    statement: String,
+    confOverlay: Map[String, String]
+  ): handles.OperationHandle = {
     val operation = operationManager.newExecuteStatementOperation(this, statement, confOverlay)
     opHandleSet.append(operation.opHandle)
     operation.opHandle
   }
 
-  override def executeStatement(sessionHandle: handles.SessionHandle, statement: String, confOverlay: Map[String, String], queryTimeout: Long): handles.OperationHandle = {
+  override def executeStatement(
+    sessionHandle: handles.SessionHandle,
+    statement: String,
+    confOverlay: Map[String, String],
+    queryTimeout: Long
+  ): handles.OperationHandle =
     executeStatement(sessionHandle, statement, confOverlay)
-  }
 
   override def fetchResults(operationHandle: handles.OperationHandle): models.RowSet = {
     val op = operationManager.getOperation(operationHandle)
@@ -65,9 +73,8 @@ class BitlapSession extends Session {
     rows
   }
 
-  override def getResultSetMetadata(operationHandle: handles.OperationHandle): models.TableSchema = {
+  override def getResultSetMetadata(operationHandle: handles.OperationHandle): models.TableSchema =
     operationManager.getOperation(operationHandle).getResultSetSchema()
-  }
 
   override def close(): Unit = ???
 }

@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.parser
 
 import org.apache.calcite.sql.SqlDrop

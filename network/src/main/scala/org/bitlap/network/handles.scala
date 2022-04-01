@@ -22,7 +22,9 @@ object handles {
    *
    * @param handleId
    */
-  abstract class Handle(val handleId: HandleIdentifier = new HandleIdentifier()) {
+  abstract class Handle(
+    val handleId: HandleIdentifier = new HandleIdentifier()
+  ) {
 
     // super不能直接引用handleId属性
     def getHandleId(): HandleIdentifier = handleId
@@ -65,7 +67,10 @@ object handles {
    * @param secretId
    */
   @toString(includeFieldNames = true)
-  class HandleIdentifier(var publicId: UUID = UUID.randomUUID(), var secretId: UUID = UUID.randomUUID()) {
+  class HandleIdentifier(
+    var publicId: UUID = UUID.randomUUID(),
+    var secretId: UUID = UUID.randomUUID()
+  ) {
 
     def this(bHandleId: BHandleIdentifier) = {
       this()
@@ -129,10 +134,14 @@ object handles {
   @toString(includeFieldNames = true)
   class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId) {
 
-    def this(bSessionHandle: BSessionHandle) = this(new HandleIdentifier(bSessionHandle.getSessionId))
+    def this(bSessionHandle: BSessionHandle) =
+      this(new HandleIdentifier(bSessionHandle.getSessionId))
 
     def toBSessionHandle(): BSessionHandle =
-      BSessionHandle.newBuilder().setSessionId(super.getHandleId().toBHandleIdentifier()).build()
+      BSessionHandle
+        .newBuilder()
+        .setSessionId(super.getHandleId().toBHandleIdentifier())
+        .build()
 
     override def equals(other: Any): Boolean = {
       if (this.eq(other.asInstanceOf[AnyRef])) return true

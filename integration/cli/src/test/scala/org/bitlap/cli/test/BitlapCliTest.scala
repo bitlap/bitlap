@@ -21,7 +21,9 @@ class BitlapCliTest extends AnyFlatSpec with Matchers {
 
   "test bitlap cli" should "ok" in {
     // empty
-    BitlapExecutor <<<? (Array("")) shouldBe s"Missing required subcommand\n$helpText"
+    BitlapExecutor <<<? (Array(
+      ""
+    )) shouldBe s"Missing required subcommand\n$helpText"
     BitlapExecutor <<<? ("") shouldBe s"Missing required subcommand\n$helpText"
     // -V, --version
     BitlapExecutor <<<? ("-V") should include("v")

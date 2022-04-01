@@ -43,7 +43,12 @@ class NetworkServiceImpl(private val sessionManager: SessionManager) extends Net
   ): OperationHandle = {
     val session = sessionManager.getSession(sessionHandle)
     sessionManager.refreshSession(sessionHandle, session)
-    session.executeStatement(sessionHandle, statement, confOverlay, queryTimeout)
+    session.executeStatement(
+      sessionHandle,
+      statement,
+      confOverlay,
+      queryTimeout
+    )
   }
 
   override def fetchResults(opHandle: OperationHandle): RowSet = {

@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.mdm
 
 import org.bitlap.core.BitlapContext

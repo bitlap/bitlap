@@ -16,7 +16,8 @@ import scala.collection.mutable
  */
 class OperationManager {
 
-  private val operationFactory: OperationFactory = ServiceLoaderUtil.loadFirst(classOf[OperationFactory])
+  private val operationFactory: OperationFactory =
+    ServiceLoaderUtil.loadFirst(classOf[OperationFactory])
   private val handleToOperation: mutable.HashMap[OperationHandle, Operation] =
     mutable.HashMap[OperationHandle, Operation]()
 
@@ -28,7 +29,11 @@ class OperationManager {
     statement: String,
     confOverlay: Map[String, String] = Map.empty
   ): Operation = {
-    val operation = operationFactory.create(parentSession, OperationType.EXECUTE_STATEMENT, hasResultSet = true)
+    val operation = operationFactory.create(
+      parentSession,
+      OperationType.EXECUTE_STATEMENT,
+      hasResultSet = true
+    )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
     operation.setStatement(statement)
     operation.run()

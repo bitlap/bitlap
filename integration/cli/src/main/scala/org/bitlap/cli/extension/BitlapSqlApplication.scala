@@ -11,7 +11,9 @@ import java.util
 @apply
 class BitlapSqlApplication extends Application {
 
-  override def getCommandHandlers(sqlLine: SqlLine): util.Collection[CommandHandler] =
+  override def getCommandHandlers(
+    sqlLine: SqlLine
+  ): util.Collection[CommandHandler] =
     super.getCommandHandlers(sqlLine)
 
   override def getPromptHandler(sqlLine: SqlLine): PromptHandler = {

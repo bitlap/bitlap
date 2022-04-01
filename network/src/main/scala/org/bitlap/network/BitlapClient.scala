@@ -38,16 +38,21 @@ import java.util.Properties
  */
 object BitlapClient extends NetworkHelper {
 
-  private val defaultConf: BitlapConf = new BitlapConf() // TODO 怎么拿不到 /conf/bitlap.setting?
+  private val defaultConf: BitlapConf =
+    new BitlapConf() // TODO 怎么拿不到 /conf/bitlap.setting?
   private val groupId: String = defaultConf.get(BitlapConf.NODE_GROUP_ID)
   private val timeout: JLong = defaultConf.get(BitlapConf.NODE_RPC_TIMEOUT)
   private val raftTimeout: JLong = defaultConf.get(BitlapConf.NODE_RAFT_TIMEOUT)
 
   // kotlin 兼容
-  def openSession(conf: Configuration, info: Properties)(implicit cc: CliClientServiceImpl): BSessionHandle =
+  def openSession(conf: Configuration, info: Properties)(implicit
+    cc: CliClientServiceImpl
+  ): BSessionHandle =
     cc.openSession(conf, info)
 
-  def closeSession(sessionHandle: BSessionHandle)(implicit cc: CliClientServiceImpl): Unit =
+  def closeSession(sessionHandle: BSessionHandle)(implicit
+    cc: CliClientServiceImpl
+  ): Unit =
     cc.closeSession(sessionHandle)
 
   def executeStatement(sessionHandle: BSessionHandle, statement: String)(implicit
@@ -60,12 +65,20 @@ object BitlapClient extends NetworkHelper {
   ): BFetchResults.BFetchResultsResp =
     cc.fetchResults(operationHandle)
 
-  def getSchemas(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)(implicit
+  def getSchemas(
+    sessionHandle: BSessionHandle,
+    catalogName: String = null,
+    schemaName: String = null
+  )(implicit
     cc: CliClientServiceImpl
   ): BOperationHandle =
     cc.getSchemas(sessionHandle, catalogName, schemaName)
 
-  def getTables(sessionHandle: BSessionHandle, catalogName: String = null, schemaName: String = null)(implicit
+  def getTables(
+    sessionHandle: BSessionHandle,
+    catalogName: String = null,
+    schemaName: String = null
+  )(implicit
     cc: CliClientServiceImpl
   ): BOperationHandle =
     cc.getTables(sessionHandle, catalogName, schemaName)
@@ -81,7 +94,9 @@ object BitlapClient extends NetworkHelper {
   /**
    * Used for JDBC to get Schema of the specified operation.
    */
-  def getResultSetMetadata(operationHandle: BOperationHandle)(implicit cc: CliClientServiceImpl): BTableSchema =
+  def getResultSetMetadata(operationHandle: BOperationHandle)(implicit
+    cc: CliClientServiceImpl
+  ): BTableSchema =
     cc.getResultSetMetadata(operationHandle)
 
   implicit class CliClientServiceImplWrapper(val cc: CliClientServiceImpl) {
@@ -113,7 +128,10 @@ object BitlapClient extends NetworkHelper {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       cc.getRpcClient.invokeAsync(
         leader.getEndpoint,
-        BCloseSession.BCloseSessionReq.newBuilder().setSessionHandle(sessionHandle).build(),
+        BCloseSession.BCloseSessionReq
+          .newBuilder()
+          .setSessionHandle(sessionHandle)
+          .build(),
         new InvokeCallback() {
           override def complete(o: Any, throwable: Throwable): Unit =
             ()
@@ -125,7 +143,10 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used to execute normal SQL by JDBC. Does not contain `?` placeholders.
      */
-    def executeStatement(sessionHandle: BSessionHandle, statement: String): BOperationHandle = {
+    def executeStatement(
+      sessionHandle: BSessionHandle,
+      statement: String
+    ): BOperationHandle = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
@@ -144,11 +165,16 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used for JDBC to get result set of the specified operation.
      */
-    def fetchResults(operationHandle: BOperationHandle): BFetchResults.BFetchResultsResp = {
+    def fetchResults(
+      operationHandle: BOperationHandle
+    ): BFetchResults.BFetchResultsResp = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BFetchResults.BFetchResultsReq.newBuilder().setOperationHandle(operationHandle).build(),
+        BFetchResults.BFetchResultsReq
+          .newBuilder()
+          .setOperationHandle(operationHandle)
+          .build(),
         timeout
       )
       val re = result.asInstanceOf[BFetchResults.BFetchResultsResp]
@@ -224,14 +250,20 @@ object BitlapClient extends NetworkHelper {
     /**
      * Used for JDBC to get Schema of the specified operation.
      */
-    def getResultSetMetadata(operationHandle: BOperationHandle): BTableSchema = {
+    def getResultSetMetadata(
+      operationHandle: BOperationHandle
+    ): BTableSchema = {
       val leader = RouteTable.getInstance().selectLeader(groupId)
       val result = cc.getRpcClient.invokeSync(
         leader.getEndpoint,
-        BGetResultSetMetadata.BGetResultSetMetadataReq.newBuilder().setOperationHandle(operationHandle).build(),
+        BGetResultSetMetadata.BGetResultSetMetadataReq
+          .newBuilder()
+          .setOperationHandle(operationHandle)
+          .build(),
         timeout
       )
-      val re = result.asInstanceOf[BGetResultSetMetadata.BGetResultSetMetadataResp]
+      val re =
+        result.asInstanceOf[BGetResultSetMetadata.BGetResultSetMetadataResp]
       verifySuccess(re.getStatus)
       re.getSchema
     }
@@ -246,7 +278,10 @@ object BitlapClient extends NetworkHelper {
       cc.init(cliOptions)
       while (true) //首次连不上，，为什么？
         try {
-          val ret = RouteTable.getInstance().refreshLeader(cc, groupId, raftTimeout.toInt).isOk
+          val ret = RouteTable
+            .getInstance()
+            .refreshLeader(cc, groupId, raftTimeout.toInt)
+            .isOk
           if (ret) return
         } catch {
           case e: Exception => println(e.getLocalizedMessage)

@@ -1,3 +1,5 @@
+/* Copyright (c) 2022 bitlap.org */
+package org.bitlap.jdbc.test
 
 import junit.framework.TestCase
 import org.junit.Test

@@ -22,15 +22,27 @@ trait NetworkHelper {
 object NetworkHelper {
   def responseInstances(): List[(String, GeneratedMessageV3)] =
     List(
-      classOf[BOpenSession.BOpenSessionReq].getName -> BOpenSession.BOpenSessionResp.getDefaultInstance,
-      classOf[BCloseSession.BCloseSessionReq].getName -> BCloseSession.BCloseSessionResp.getDefaultInstance,
+      classOf[
+        BOpenSession.BOpenSessionReq
+      ].getName -> BOpenSession.BOpenSessionResp.getDefaultInstance,
+      classOf[
+        BCloseSession.BCloseSessionReq
+      ].getName -> BCloseSession.BCloseSessionResp.getDefaultInstance,
       classOf[
         BExecuteStatement.BExecuteStatementReq
       ].getName -> BExecuteStatement.BExecuteStatementResp.getDefaultInstance,
-      classOf[BFetchResults.BFetchResultsReq].getName -> BFetchResults.BFetchResultsResp.getDefaultInstance,
-      classOf[BGetColumns.BGetColumnsReq].getName -> BGetColumns.BGetColumnsResp.getDefaultInstance,
-      classOf[BGetSchemas.BGetSchemasReq].getName -> BGetSchemas.BGetSchemasResp.getDefaultInstance,
-      classOf[BGetTables.BGetTablesReq].getName -> BGetTables.BGetTablesResp.getDefaultInstance,
+      classOf[
+        BFetchResults.BFetchResultsReq
+      ].getName -> BFetchResults.BFetchResultsResp.getDefaultInstance,
+      classOf[
+        BGetColumns.BGetColumnsReq
+      ].getName -> BGetColumns.BGetColumnsResp.getDefaultInstance,
+      classOf[
+        BGetSchemas.BGetSchemasReq
+      ].getName -> BGetSchemas.BGetSchemasResp.getDefaultInstance,
+      classOf[
+        BGetTables.BGetTablesReq
+      ].getName -> BGetTables.BGetTablesResp.getDefaultInstance,
       classOf[
         BGetResultSetMetadata.BGetResultSetMetadataReq
       ].getName -> BGetResultSetMetadata.BGetResultSetMetadataResp.getDefaultInstance
@@ -38,15 +50,27 @@ object NetworkHelper {
 
   def requestInstances(): List[(String, GeneratedMessageV3)] =
     List(
-      classOf[BOpenSession.BOpenSessionReq].getName -> BOpenSession.BOpenSessionReq.getDefaultInstance,
-      classOf[BCloseSession.BCloseSessionReq].getName -> BCloseSession.BCloseSessionReq.getDefaultInstance,
+      classOf[
+        BOpenSession.BOpenSessionReq
+      ].getName -> BOpenSession.BOpenSessionReq.getDefaultInstance,
+      classOf[
+        BCloseSession.BCloseSessionReq
+      ].getName -> BCloseSession.BCloseSessionReq.getDefaultInstance,
       classOf[
         BExecuteStatement.BExecuteStatementReq
       ].getName -> BExecuteStatement.BExecuteStatementReq.getDefaultInstance,
-      classOf[BFetchResults.BFetchResultsReq].getName -> BFetchResults.BFetchResultsReq.getDefaultInstance,
-      classOf[BGetColumns.BGetColumnsReq].getName -> BGetColumns.BGetColumnsReq.getDefaultInstance,
-      classOf[BGetSchemas.BGetSchemasReq].getName -> BGetSchemas.BGetSchemasReq.getDefaultInstance,
-      classOf[BGetTables.BGetTablesReq].getName -> BGetTables.BGetTablesReq.getDefaultInstance,
+      classOf[
+        BFetchResults.BFetchResultsReq
+      ].getName -> BFetchResults.BFetchResultsReq.getDefaultInstance,
+      classOf[
+        BGetColumns.BGetColumnsReq
+      ].getName -> BGetColumns.BGetColumnsReq.getDefaultInstance,
+      classOf[
+        BGetSchemas.BGetSchemasReq
+      ].getName -> BGetSchemas.BGetSchemasReq.getDefaultInstance,
+      classOf[
+        BGetTables.BGetTablesReq
+      ].getName -> BGetTables.BGetTablesReq.getDefaultInstance,
       classOf[
         BGetResultSetMetadata.BGetResultSetMetadataReq
       ].getName -> BGetResultSetMetadata.BGetResultSetMetadataReq.getDefaultInstance

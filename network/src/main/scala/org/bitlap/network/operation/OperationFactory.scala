@@ -11,6 +11,10 @@ import org.bitlap.network.session.Session
  */
 trait OperationFactory {
 
-  def create(parentSession: Session, opType: OperationType.OperationType, hasResultSet: Boolean = false): Operation
+  def create(
+    parentSession: Session,
+    opType: OperationType.OperationType,
+    hasResultSet: Boolean = false
+  ): Operation
 
 }

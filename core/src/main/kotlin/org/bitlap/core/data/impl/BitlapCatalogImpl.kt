@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.data.impl
 
 import org.apache.hadoop.conf.Configuration

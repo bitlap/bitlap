@@ -17,7 +17,11 @@ object models {
   case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) {
     def toBRowSet(): BRowSet = {
       import scala.jdk.CollectionConverters._
-      BRowSet.newBuilder().setStartRowOffset(startOffset).addAllRows(rows.map(_.toBRow()).asJava).build()
+      BRowSet
+        .newBuilder()
+        .setStartRowOffset(startOffset)
+        .addAllRows(rows.map(_.toBRow()).asJava)
+        .build()
     }
   }
 
@@ -35,17 +39,27 @@ object models {
 
     def toBTableSchema(): BTableSchema = {
       import scala.jdk.CollectionConverters._
-      BTableSchema.newBuilder().addAllColumns(columns.map(_.toBColumnDesc()).asJava).build()
+      BTableSchema
+        .newBuilder()
+        .addAllColumns(columns.map(_.toBColumnDesc()).asJava)
+        .build()
     }
   }
 
   /**
    * The wrapper class of the Proto buffer `BColumnDesc`.
    */
-  case class ColumnDesc(private val columnName: String, private val typeDesc: TypeId) {
+  case class ColumnDesc(
+    private val columnName: String,
+    private val typeDesc: TypeId
+  ) {
 
     def toBColumnDesc(): BColumnDesc =
-      BColumnDesc.newBuilder().setTypeDesc(TypeId.toBOperationType(typeDesc)).setColumnName(columnName).build()
+      BColumnDesc
+        .newBuilder()
+        .setTypeDesc(TypeId.toBOperationType(typeDesc))
+        .setColumnName(columnName)
+        .build()
   }
 
   /**
@@ -55,21 +69,45 @@ object models {
 
     type TypeId = Value
     val B_TYPE_ID_UNSPECIFIED: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_UNSPECIFIED.getNumber, BTypeId.B_TYPE_ID_UNSPECIFIED.name())
+      Value(
+        BTypeId.B_TYPE_ID_UNSPECIFIED.getNumber,
+        BTypeId.B_TYPE_ID_UNSPECIFIED.name()
+      )
     val B_TYPE_ID_STRING_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_STRING_TYPE.getNumber, BTypeId.B_TYPE_ID_STRING_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_STRING_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_STRING_TYPE.name()
+      )
     val B_TYPE_ID_INT_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_INT_TYPE.getNumber, BTypeId.B_TYPE_ID_INT_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_INT_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_INT_TYPE.name()
+      )
     val B_TYPE_ID_DOUBLE_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_DOUBLE_TYPE.getNumber, BTypeId.B_TYPE_ID_DOUBLE_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_DOUBLE_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_DOUBLE_TYPE.name()
+      )
     val B_TYPE_ID_LONG_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_LONG_TYPE.getNumber, BTypeId.B_TYPE_ID_LONG_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_LONG_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_LONG_TYPE.name()
+      )
     val B_TYPE_ID_BOOLEAN_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_BOOLEAN_TYPE.getNumber, BTypeId.B_TYPE_ID_BOOLEAN_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.name()
+      )
     val B_TYPE_ID_TIMESTAMP_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.getNumber, BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.name()
+      )
     val B_TYPE_ID_SHORT_TYPE: TypeId.Value =
-      Value(BTypeId.B_TYPE_ID_SHORT_TYPE.getNumber, BTypeId.B_TYPE_ID_SHORT_TYPE.name())
+      Value(
+        BTypeId.B_TYPE_ID_SHORT_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_SHORT_TYPE.name()
+      )
 
     def toBOperationType(typeId: TypeId): BTypeId =
       BTypeId.forNumber(typeId.id)

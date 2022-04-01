@@ -8,4 +8,7 @@ import java.sql.SQLException
  * @since 2021/11/20
  * @version 1.0
  */
-case class BSQLException(msg: String = "Bitlap SQL Exception", cause: Throwable = null) extends SQLException(msg, cause)
+case class BSQLException(
+  msg: String = "Bitlap SQL Exception",
+  cause: Throwable = null
+) extends SQLException(msg, cause)

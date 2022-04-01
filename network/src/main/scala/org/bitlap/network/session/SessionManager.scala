@@ -17,7 +17,8 @@ import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 class SessionManager extends LazyLogging {
 
   val operationManager: OperationManager = new OperationManager()
-  private val sessionFactory: SessionFactory = ServiceLoaderUtil.loadFirst(classOf[SessionFactory])
+  private val sessionFactory: SessionFactory =
+    ServiceLoaderUtil.loadFirst(classOf[SessionFactory])
 
   private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
@@ -33,13 +34,17 @@ class SessionManager extends LazyLogging {
           val sessionHandle = element._1
           if (!element._2.sessionState.get()) {
             iterator.remove()
-            logger.info(s"Session state is false, remove session: $sessionHandle")
+            logger.info(
+              s"Session state is false, remove session: $sessionHandle"
+            )
           }
 
           val now = System.currentTimeMillis()
           if (element._2.lastAccessTime + 20 * 60 * 1000 < now) {
             iterator.remove()
-            logger.info(s"Session has not been visited for 20 minutes, remove session: $sessionHandle")
+            logger.info(
+              s"Session has not been visited for 20 minutes, remove session: $sessionHandle"
+            )
           } else {
             logger.info(s"SessionId: ${sessionHandle.handleId}")
           }
@@ -48,7 +53,10 @@ class SessionManager extends LazyLogging {
         TimeUnit.SECONDS.sleep(3)
       } catch {
         case e: Exception =>
-          logger.error(s"Failed to listen for session, error: $e.localizedMessage", e)
+          logger.error(
+            s"Failed to listen for session, error: $e.localizedMessage",
+            e
+          )
       }
     }
   }
@@ -61,8 +69,14 @@ class SessionManager extends LazyLogging {
   // service, provider, conf, discover
   // session life cycle manage
 
-  def openSession(username: String, password: String, sessionConf: Map[String, String]): Session = {
-    logger.info(s"Server get properties [username:$username, password:$password, sessionConf:$sessionConf]")
+  def openSession(
+    username: String,
+    password: String,
+    sessionConf: Map[String, String]
+  ): Session = {
+    logger.info(
+      s"Server get properties [username:$username, password:$password, sessionConf:$sessionConf]"
+    )
     SessionManager.sessionAddLock.synchronized {
       val session = this.sessionFactory.create(
         username,
@@ -86,7 +100,9 @@ class SessionManager extends LazyLogging {
         v
       }
     }
-    logger.info("Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount())
+    logger.info(
+      "Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount()
+    )
     if (getOpenSessionCount() == 0) {
       //        log.warn(
       //          "This instance of Bitlap has been removed from the list of server " +

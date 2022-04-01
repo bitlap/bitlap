@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.storage.carbon
 
 import org.apache.carbondata.core.metadata.datatype.DataTypes

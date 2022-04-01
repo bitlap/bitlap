@@ -11,7 +11,11 @@ import org.bitlap.network.models.{ RowSet, TableSchema }
  */
 trait NetworkService {
 
-  def openSession(username: String, password: String, configuration: Map[String, String] = Map.empty): SessionHandle
+  def openSession(
+    username: String,
+    password: String,
+    configuration: Map[String, String] = Map.empty
+  ): SessionHandle
 
   def closeSession(sessionHandle: SessionHandle)
 
@@ -39,7 +43,11 @@ trait NetworkService {
     columnName: String = null
   ): OperationHandle
 
-  def getTables(sessionHandle: SessionHandle, tableName: String = null, schemaName: String = null): OperationHandle
+  def getTables(
+    sessionHandle: SessionHandle,
+    tableName: String = null,
+    schemaName: String = null
+  ): OperationHandle
 
   def getSchemas(sessionHandle: SessionHandle): OperationHandle
 }

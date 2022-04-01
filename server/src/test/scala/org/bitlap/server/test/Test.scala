@@ -37,11 +37,17 @@ object Test {
     RouteTable.getInstance().updateConfiguration(groupId, config)
     val cli = new CliClientServiceImpl()
     cli.init(new CliOptions())
-    assert(RouteTable.getInstance().refreshLeader(cli, groupId, raftTimeout).isOk, "Refresh leader failed")
+    assert(
+      RouteTable.getInstance().refreshLeader(cli, groupId, raftTimeout).isOk,
+      "Refresh leader failed"
+    )
     val leader = RouteTable.getInstance().selectLeader(groupId)
     println(s"Leader is $leader")
 
-    val req = PingRequest.newBuilder().setSendTimestamp(System.currentTimeMillis()).build()
+    val req = PingRequest
+      .newBuilder()
+      .setSendTimestamp(System.currentTimeMillis())
+      .build()
     val resp = cli.getRpcClient.invokeSync(leader.getEndpoint, req, 3000)
     println(s">>>>> ${resp.toString}")
 

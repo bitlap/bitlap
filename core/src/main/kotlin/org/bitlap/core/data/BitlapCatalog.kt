@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.data
 
 import org.bitlap.core.Constants.DEFAULT_DATABASE

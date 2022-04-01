@@ -19,8 +19,11 @@ import org.bitlap.tools.apply
  * @version 1.0,2021/12/3
  */
 @apply
-class BitlapOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
-    extends operations.Operation(parentSession, opType, hasResultSet) {
+class BitlapOperation(
+  parentSession: Session,
+  opType: OperationType,
+  hasResultSet: Boolean = false
+) extends operations.Operation(parentSession, opType, hasResultSet) {
 
   def wrapper(rs: ResultSet): models.QueryResult = {
     // get schema
@@ -48,10 +51,16 @@ class BitlapOperation(parentSession: Session, opType: OperationType, hasResultSe
       }
       rows.append(models.Row(cl.toList))
     }
-    models.QueryResult(models.TableSchema(columns.toList), models.RowSet(rows.toList))
+    models.QueryResult(
+      models.TableSchema(columns.toList),
+      models.RowSet(rows.toList)
+    )
   }
 
   override def run(): Unit =
-    cache.put(super.getOpHandle, wrapper(new QueryExecution(super.getStatement).execute()))
+    cache.put(
+      super.getOpHandle,
+      wrapper(new QueryExecution(super.getStatement).execute())
+    )
 
 }

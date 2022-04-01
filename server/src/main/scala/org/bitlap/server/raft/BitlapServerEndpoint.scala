@@ -42,11 +42,19 @@ class BitlapServerEndpoint(private val conf: BitlapConf)
       NetworkHelper.responseInstances(),
       (t1, t2) => MarshallerHelper.registerRespInstance(t1, t2)
     )
-    val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
+    val rpcServer =
+      RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
     registerProcessor(rpcServer)
-    val raftGroupService = new RaftGroupService(conf.get(BitlapConf.NODE_GROUP_ID), serverId, nodeOptions, rpcServer)
+    val raftGroupService = new RaftGroupService(
+      conf.get(BitlapConf.NODE_GROUP_ID),
+      serverId,
+      nodeOptions,
+      rpcServer
+    )
     this.node = raftGroupService.start()
-    println("Started counter server at port:" + node.getNodeId.getPeerId.getPort)
+    println(
+      "Started counter server at port:" + node.getNodeId.getPeerId.getPort
+    )
   }
 
   override def close(): Unit =

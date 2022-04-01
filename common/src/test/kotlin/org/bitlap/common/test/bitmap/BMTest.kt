@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common.test.bitmap
 
 import io.kotest.core.spec.style.StringSpec

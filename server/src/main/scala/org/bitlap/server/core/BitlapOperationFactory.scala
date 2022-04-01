@@ -11,6 +11,10 @@ import org.bitlap.network.session.Session
  */
 class BitlapOperationFactory extends OperationFactory {
 
-  override def create(parentSession: Session, opType: OperationType, hasResultSet: Boolean): operations.Operation =
+  override def create(
+    parentSession: Session,
+    opType: OperationType,
+    hasResultSet: Boolean
+  ): operations.Operation =
     BitlapOperation(parentSession, opType, hasResultSet)
 }

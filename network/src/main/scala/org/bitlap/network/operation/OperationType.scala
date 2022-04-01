@@ -17,12 +17,22 @@ object OperationType extends Enumeration {
     BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT.name()
   )
   val GET_COLUMNS: OperationType.Value =
-    Value(BOperationType.B_OPERATION_TYPE_GET_COLUMNS.getNumber, BOperationType.B_OPERATION_TYPE_GET_COLUMNS.name())
+    Value(
+      BOperationType.B_OPERATION_TYPE_GET_COLUMNS.getNumber,
+      BOperationType.B_OPERATION_TYPE_GET_COLUMNS.name()
+    )
   val GET_SCHEMAS: OperationType.Value =
-    Value(BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.getNumber, BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.name())
+    Value(
+      BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.getNumber,
+      BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.name()
+    )
   val GET_TABLES: OperationType.Value =
-    Value(BOperationType.B_OPERATION_TYPE_GET_TABLES.getNumber, BOperationType.B_OPERATION_TYPE_GET_TABLES.name())
-  val UNKNOWN_OPERATION: OperationType.Value = Value(0, BOperationType.UNRECOGNIZED.name())
+    Value(
+      BOperationType.B_OPERATION_TYPE_GET_TABLES.getNumber,
+      BOperationType.B_OPERATION_TYPE_GET_TABLES.name()
+    )
+  val UNKNOWN_OPERATION: OperationType.Value =
+    Value(0, BOperationType.UNRECOGNIZED.name())
 
   def getOperationType(bOperationType: BOperationType): OperationType =
     values.find(_.id == bOperationType.getNumber).getOrElse(UNKNOWN_OPERATION)

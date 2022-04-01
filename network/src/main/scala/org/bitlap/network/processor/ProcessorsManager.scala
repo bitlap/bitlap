@@ -23,7 +23,10 @@ import org.bitlap.tools.method.ProcessorCreator
  * @version 1.0,2021/12/11
  */
 @apply
-class ProcessorsManager(private val service: NetworkServiceImpl, val executor: Executor) {
+class ProcessorsManager(
+  private val service: NetworkServiceImpl,
+  val executor: Executor
+) {
 
   private implicit val s: NetworkServiceImpl = service
   private implicit val e: Executor = executor
@@ -42,8 +45,12 @@ class ProcessorsManager(private val service: NetworkServiceImpl, val executor: E
       val username = req.getUsername
       val password = req.getPassword
       val configurationMap = req.getConfigurationMap
-      val ret = service.openSession(username, password, configurationMap.asScala.toMap)
-      BOpenSessionResp.newBuilder().setSessionHandle(ret.toBSessionHandle()).build()
+      val ret =
+        service.openSession(username, password, configurationMap.asScala.toMap)
+      BOpenSessionResp
+        .newBuilder()
+        .setSessionHandle(ret.toBSessionHandle())
+        .build()
     },
     (_, _, exception) => BOpenSessionResp.newBuilder().setStatus(error(exception)).build()
   )
@@ -78,7 +85,8 @@ class ProcessorsManager(private val service: NetworkServiceImpl, val executor: E
     BFetchResultsResp.getDefaultInstance,
     (service, _, req) => {
       val operationHandle = req.getOperationHandle
-      val result = service.fetchResults(new handles.OperationHandle(operationHandle))
+      val result =
+        service.fetchResults(new handles.OperationHandle(operationHandle))
       BFetchResultsResp
         .newBuilder()
         .setHasMoreRows(false)
@@ -128,8 +136,14 @@ class ProcessorsManager(private val service: NetworkServiceImpl, val executor: E
     BGetResultSetMetadataResp.getDefaultInstance,
     (service, _, req) => {
       val operationHandle = req.getOperationHandle
-      val result = service.getResultSetMetadata(new handles.OperationHandle(operationHandle))
-      BGetResultSetMetadataResp.newBuilder().setStatus(success()).setSchema(result.toBTableSchema()).build()
+      val result = service.getResultSetMetadata(
+        new handles.OperationHandle(operationHandle)
+      )
+      BGetResultSetMetadataResp
+        .newBuilder()
+        .setStatus(success())
+        .setSchema(result.toBTableSchema())
+        .build()
     },
     (_, _, exception) => BGetResultSetMetadataResp.newBuilder().setStatus(error(exception)).build()
   )
@@ -196,7 +210,11 @@ class ProcessorsManager(private val service: NetworkServiceImpl, val executor: E
     BGetTablesResp.getDefaultInstance,
     (service, _, req) => {
       val result =
-        service.getTables(new handles.SessionHandle((req.getSessionHandle)), req.getTableName, req.getSchemaName)
+        service.getTables(
+          new handles.SessionHandle((req.getSessionHandle)),
+          req.getTableName,
+          req.getSchemaName
+        )
       BGetTablesResp
         .newBuilder()
         .setStatus(success())

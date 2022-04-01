@@ -46,14 +46,20 @@ class BitlapSession extends Session {
     this.sessionManager = sessionManager
   }
 
-  override def open(sessionConfMap: Map[String, String]): handles.SessionHandle = ???
+  override def open(
+    sessionConfMap: Map[String, String]
+  ): handles.SessionHandle = ???
 
   override def executeStatement(
     sessionHandle: handles.SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
   ): handles.OperationHandle = {
-    val operation = operationManager.newExecuteStatementOperation(this, statement, confOverlay)
+    val operation = operationManager.newExecuteStatementOperation(
+      this,
+      statement,
+      confOverlay
+    )
     opHandleSet.append(operation.opHandle)
     operation.opHandle
   }
@@ -66,14 +72,18 @@ class BitlapSession extends Session {
   ): handles.OperationHandle =
     executeStatement(sessionHandle, statement, confOverlay)
 
-  override def fetchResults(operationHandle: handles.OperationHandle): models.RowSet = {
+  override def fetchResults(
+    operationHandle: handles.OperationHandle
+  ): models.RowSet = {
     val op = operationManager.getOperation(operationHandle)
     val rows = op.getNextResultSet()
     op.remove(operationHandle) // TODO: work with fetch offset & size
     rows
   }
 
-  override def getResultSetMetadata(operationHandle: handles.OperationHandle): models.TableSchema =
+  override def getResultSetMetadata(
+    operationHandle: handles.OperationHandle
+  ): models.TableSchema =
     operationManager.getOperation(operationHandle).getResultSetSchema()
 
   override def close(): Unit = ???

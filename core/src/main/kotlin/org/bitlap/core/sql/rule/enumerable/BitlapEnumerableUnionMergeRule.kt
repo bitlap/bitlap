@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.rule.enumerable
 
 import org.apache.calcite.adapter.enumerable.EnumerableMergeUnionRule

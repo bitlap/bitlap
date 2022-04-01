@@ -18,7 +18,10 @@ import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
 @apply
 class BitlapServerCli extends Runnable {
 
-  @Parameters(paramLabel = "OPERATE", description = Array("start, stop, status."))
+  @Parameters(
+    paramLabel = "OPERATE",
+    description = Array("start, stop, status.")
+  )
   var args: String = _
 
   override def run(): Unit = ()

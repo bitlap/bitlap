@@ -11,7 +11,10 @@ import org.bitlap.network.proto.driver.{ BStatus, BStatusCode }
  */
 package object processor {
 
-  def success(): BStatus = BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS).build()
+  def success(): BStatus = BStatus
+    .newBuilder()
+    .setStatusCode(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS)
+    .build()
 
   def error(msg: String = ""): BStatus = BStatus
     .newBuilder()
@@ -22,12 +25,21 @@ package object processor {
   def error(exception: Exception): BStatus = BStatus
     .newBuilder()
     .setStatusCode(BStatusCode.B_STATUS_CODE_ERROR_STATUS)
-    .setErrorMessage(if (StringUtils.isBlank(exception.getMessage)) "" else exception.getMessage)
+    .setErrorMessage(
+      if (StringUtils.isBlank(exception.getMessage)) ""
+      else exception.getMessage
+    )
     .build()
 
   def executing(): BStatus =
-    BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS).build()
+    BStatus
+      .newBuilder()
+      .setStatusCode(BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS)
+      .build()
 
   def invalidHandle(): BStatus =
-    BStatus.newBuilder().setStatusCode(BStatusCode.B_STATUS_CODE_INVALID_HANDLE_STATUS).build()
+    BStatus
+      .newBuilder()
+      .setStatusCode(BStatusCode.B_STATUS_CODE_INVALID_HANDLE_STATUS)
+      .build()
 }

@@ -1,4 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.helper
 
-trait QueryScheduleHelper extends CommonHelper {}
+import org.bitlap.network.NetworkHelper
+
+trait QueryScheduleHelper extends NetworkHelper {}

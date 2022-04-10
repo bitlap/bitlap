@@ -1,13 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.helper
 
+import org.bitlap.network.NetworkHelper
 import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.types.models.{ RowSet, TableSchema }
 
 /**
  * network helper for jdbc
  */
-trait JdbcHelper extends CommonHelper {
+trait JdbcHelper extends NetworkHelper {
 
   def openSession(
     username: String,

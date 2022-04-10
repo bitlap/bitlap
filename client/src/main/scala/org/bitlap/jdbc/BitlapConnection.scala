@@ -2,7 +2,6 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
-import org.bitlap.network.NetworkHelper
 import org.bitlap.network.proto.driver.BSessionHandle
 
 import java.{ sql, util }
@@ -29,7 +28,7 @@ import scala.jdk.CollectionConverters._
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapConnection(uri: String, info: Properties = new Properties()) extends Connection with NetworkHelper {
+class BitlapConnection(uri: String, info: Properties = new Properties()) extends Connection {
 
   private var session: BSessionHandle = _
   private var closed = true

@@ -6,17 +6,20 @@ import io.kotest.matchers.shouldBe
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.bitmap.RBM
+import org.bitlap.common.elapsed
+import org.bitlap.common.logger
 import org.bitlap.common.test.utils.BMTestUtils
 import java.nio.ByteBuffer
 
 /**
- * Desc: [BM] Test
+ * Desc: [org.bitlap.common.bitmap.BM] Test
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2020/12/4
  */
 class BMTest : StringSpec({
+    val log = logger { }
 
     "RBM serde" {
         val rbm = RBM((-100 until 100).toList().toIntArray())
@@ -101,17 +104,25 @@ class BMTest : StringSpec({
     }
 
     "CBM with 2000000 ids" {
-        val num = 2000000
-        val cbm = BMTestUtils.randomCBM(100000, 10, num, num)
-        // serialize
-        val cbmSerD = CBM(cbm.getBytes())
-        cbm.getCount() shouldBe cbmSerD.getCount()
-        cbm.getCountUnique() shouldBe cbmSerD.getCountUnique()
-        // split
-        val cbmSplit = cbm.split(10, true).values.fold(CBM()) { r1, r2 ->
-            r1.or(r2)
+        val (cbm, genTime) = elapsed {
+            val num = 2000000
+            BMTestUtils.randomCBM(100000, 10, num, num)
         }
-        cbm.getCount() shouldBe cbmSplit.getCount()
-        cbm.getCountUnique() shouldBe cbmSplit.getCountUnique()
+        val bytes = cbm.getBytes()
+        log.info { "CBM generate time is ${genTime.seconds}s, size is ${bytes.size / 1024}kb" }
+
+        val (_, genTime2) = elapsed {
+            // serialize
+            val cbmSerD = CBM(bytes)
+            cbm.getCount() shouldBe cbmSerD.getCount()
+            cbm.getCountUnique() shouldBe cbmSerD.getCountUnique()
+            // split
+            val cbmSplit = cbm.split(10, true).values.fold(CBM()) { r1, r2 ->
+                r1.or(r2)
+            }
+            cbm.getCount() shouldBe cbmSplit.getCount()
+            cbm.getCountUnique() shouldBe cbmSplit.getCountUnique()
+        }
+        log.info { "Cost ${genTime2.toMillis()}ms" }
     }
 })

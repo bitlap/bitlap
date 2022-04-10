@@ -15,18 +15,6 @@
 // limitations under the License.
 -->
 
-SqlNode SqlRunExample() :
-{
-  SqlNode stringNode;
-}
-{
-  <RUN> <EXAMPLE>
-  stringNode = StringLiteral()
-  {
-    return new SqlRunExample(getPos(), token.image);
-  }
-}
-
 /**
  * Parses a "IF EXISTS" option, default is false.
  */
@@ -212,3 +200,32 @@ SqlNode SqlExplainX() :
     return new SqlExplainX(getPos(), stmt);
   }
 }
+
+
+/**
+ * ********************************* other commands *********************************
+ */
+ SqlNode SqlRunExample() :
+ {
+   SqlNode stringNode;
+ }
+ {
+   <RUN> <EXAMPLE>
+   stringNode = StringLiteral()
+   {
+     return new SqlRunExample(getPos(), token.image);
+   }
+ }
+
+ SqlNode SqlLoadData() :
+ {
+   SqlNode filePath;
+   SqlIdentifier tableName;
+ }
+ {
+   <LOAD> <DATA> filePath = StringLiteral()
+   <INTO> <TABLE> tableName = CompoundIdentifier()
+   {
+     return new SqlLoadData(getPos(), filePath, tableName);
+   }
+ }

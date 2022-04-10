@@ -146,18 +146,19 @@ open class BitlapConf(val conf: Map<String, String> = emptyMap()) : Serializable
             .defaultBy { it.get(NODE_BIND_HOST) }
 
         @JvmField
-        val NODE_GROUP_ID = BitlapConfKey<String>("bitlap.node.group.id").validator(Validators.NOT_BLANK)
+        val NODE_GROUP_ID = BitlapConfKey("bitlap.node.group.id", "bitlap")
+            .validator(Validators.NOT_BLANK)
 
         /**
          * timeout in milliseconds
          */
         @JvmField
-        val NODE_RPC_TIMEOUT = BitlapConfKey("bitlap.node.rpc.timeout", 10000L)
+        val NODE_RPC_TIMEOUT = BitlapConfKey("bitlap.node.rpc.timeout", 3000L)
             .overWritable(true)
             .validator { it != null && it >= 1000L }
 
         @JvmField
-        val NODE_RAFT_TIMEOUT = BitlapConfKey("bitlap.node.raft.timeout", 1000L)
-            .validator { it != null && it >= 100L }
+        val NODE_READ_TIMEOUT = BitlapConfKey("bitlap.node.read.timeout", 10000L)
+            .validator { it != null && it >= 1000L }
     }
 }

@@ -1,8 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common
 
+import cn.hutool.core.date.DateUtil
 import mu.KLogger
 import mu.KotlinLogging
+import java.time.Duration
 
 /**
  * Do [func] when [flag] is true,
@@ -13,6 +15,14 @@ fun <T> doIf(flag: Boolean, t: T, func: (T) -> T): T {
         return func.invoke(t)
     }
     return t
+}
+
+/**
+ * see [kotlin.system.measureTimeMillis] and [kotlin.time.measureTimedValue]
+ */
+fun <T> elapsed(block: () -> T): Pair<T, Duration> {
+    val timer = DateUtil.timer()
+    return block() to Duration.ofMillis(timer.interval())
 }
 
 /**

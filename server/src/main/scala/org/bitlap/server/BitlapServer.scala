@@ -2,7 +2,6 @@
 package org.bitlap.server
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.server.raft.BitlapServerEndpoint
 
 /**
  * @author 梦境迷离

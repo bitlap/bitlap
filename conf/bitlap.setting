@@ -4,8 +4,8 @@ bitlap.root.dir.data    = hdfs://127.0.0.1:9000/bitlap
 bitlap.root.dir.local   = /usr/local/var/bitlap
 
 # node information
-bitlap.node.group.id    = bitlap-cluster
+bitlap.node.group.id    = bitlap
 bitlap.node.bind.host   = 127.0.0.1:23333
-bitlap.node.bind.peers  = ${bitlap.node.bind.host}
-bitlap.node.rpc.timeout = 10000
-bitlap.node.raft.timeout = 1000
+bitlap.node.bind.peers  = 127.0.0.1:23333
+bitlap.node.rpc.timeout = 3000
+bitlap.node.read.timeout = 10000

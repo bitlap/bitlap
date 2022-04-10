@@ -24,8 +24,8 @@ class BitlapConfTest : StringSpec({
         System.setProperty(BitlapConf.NODE_BIND_HOST.getSysKey(), "127.0.0.1:23333")
         conf.get(BitlapConf.NODE_BIND_HOST) shouldBe "127.0.0.1:23333"
         conf.get(BitlapConf.NODE_BIND_PEERS) shouldBe "127.0.0.1:23333"
-        conf.get(BitlapConf.NODE_RPC_TIMEOUT) shouldBe 10000L
-        conf.get(BitlapConf.NODE_RAFT_TIMEOUT) shouldBe 1000L
+        conf.get(BitlapConf.NODE_RPC_TIMEOUT) shouldBe 3000L
+        conf.get(BitlapConf.NODE_READ_TIMEOUT) shouldBe 10000L
     }
 
     "test bitlap configuration with parameters" {

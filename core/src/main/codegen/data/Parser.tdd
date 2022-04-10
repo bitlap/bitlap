@@ -38,6 +38,7 @@
     "org.bitlap.core.sql.parser.ddl.SqlShowTables"
     "org.bitlap.core.sql.parser.cmd.SqlRunExample"
     "org.bitlap.core.sql.parser.cmd.SqlExplainX"
+    "org.bitlap.core.sql.parser.cmd.SqlLoadData"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -416,6 +417,7 @@
     "SqlShowDatabases()"
     "SqlShowTables()"
     "SqlExplainX()"
+    "SqlLoadData()"
   ]
 
   # List of methods for parsing custom literals.

@@ -4,6 +4,7 @@ package org.bitlap.network
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ RowSet, TableSchema }
 import org.bitlap.network.session.SessionManager
+import org.bitlap.network.operation.OperationType
 
 /**
  * @author 梦境迷离
@@ -110,22 +111,16 @@ class NetworkServiceImpl(private val sessionManager: SessionManager) extends Net
     tableName: String = null,
     schemaName: String = null,
     columnName: String = null
-  ): OperationHandle = {
-    import org.bitlap.network.operation.OperationType
+  ): OperationHandle =
     new OperationHandle(OperationType.GET_COLUMNS)
-  }
 
   override def getTables(
     sessionHandle: SessionHandle,
     tableName: String = null,
     schemaName: String = null
-  ): OperationHandle = {
-    import org.bitlap.network.operation.OperationType
+  ): OperationHandle =
     new OperationHandle(OperationType.GET_TABLES)
-  }
 
-  override def getSchemas(sessionHandle: SessionHandle): OperationHandle = {
-    import org.bitlap.network.operation.OperationType
+  override def getSchemas(sessionHandle: SessionHandle): OperationHandle =
     new OperationHandle(OperationType.GET_SCHEMAS)
-  }
 }

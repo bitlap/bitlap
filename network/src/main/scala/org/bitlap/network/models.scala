@@ -4,6 +4,7 @@ package org.bitlap.network
 import com.google.protobuf.ByteString
 import org.bitlap.network.models.TypeId.TypeId
 import org.bitlap.network.proto.driver.{ BColumnDesc, BRow, BRowSet, BTableSchema, BTypeId }
+import scala.jdk.CollectionConverters._
 
 /**
  * @author 梦境迷离
@@ -15,14 +16,12 @@ object models {
   case class QueryResult(tableSchema: TableSchema, rows: RowSet)
 
   case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) {
-    def toBRowSet(): BRowSet = {
-      import scala.jdk.CollectionConverters._
+    def toBRowSet(): BRowSet =
       BRowSet
         .newBuilder()
         .setStartRowOffset(startOffset)
         .addAllRows(rows.map(_.toBRow()).asJava)
         .build()
-    }
   }
 
   /**
@@ -37,13 +36,11 @@ object models {
 
   case class TableSchema(private val columns: List[ColumnDesc] = Nil) {
 
-    def toBTableSchema(): BTableSchema = {
-      import scala.jdk.CollectionConverters._
+    def toBTableSchema(): BTableSchema =
       BTableSchema
         .newBuilder()
         .addAllColumns(columns.map(_.toBColumnDesc()).asJava)
         .build()
-    }
   }
 
   /**

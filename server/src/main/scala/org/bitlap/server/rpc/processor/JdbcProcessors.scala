@@ -29,7 +29,18 @@ class JdbcProcessors {
   private implicit val s: JdbcProcessor = new JdbcProcessor()
   private implicit val e: Executor = null
 
-  val openSession = ProcessorCreator[
+  val processors = List(
+    closeSession,
+    openSession,
+    executeStatement,
+    fetchResults,
+    getResultSet,
+    getSchemas,
+    getColumns,
+    getTables
+  )
+
+  private val openSession = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -53,7 +64,7 @@ class JdbcProcessors {
     (_, _, exception) => BOpenSessionResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val closeSession = ProcessorCreator[
+  private val closeSession = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -71,7 +82,7 @@ class JdbcProcessors {
     (_, _, exception) => BCloseSessionResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val fetchResults = ProcessorCreator[
+  private val fetchResults = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -95,7 +106,7 @@ class JdbcProcessors {
     (_, _, exception) => BFetchResultsResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val getColumns = ProcessorCreator[
+  private val getColumns = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -122,7 +133,7 @@ class JdbcProcessors {
     (_, _, exception) => BGetColumnsResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val getResultSet = ProcessorCreator[
+  private val getResultSet = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -146,7 +157,7 @@ class JdbcProcessors {
     (_, _, exception) => BGetResultSetMetadataResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val executeStatement = ProcessorCreator[
+  private val executeStatement = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -174,7 +185,7 @@ class JdbcProcessors {
     (_, _, exception) => BExecuteStatementResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val getSchemas = ProcessorCreator[
+  private val getSchemas = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,
@@ -197,7 +208,7 @@ class JdbcProcessors {
     (_, _, exception) => BGetSchemasResp.newBuilder().setStatus(error(exception)).build()
   )
 
-  val getTables = ProcessorCreator[
+  private val getTables = ProcessorCreator[
     RpcRequestClosure,
     RpcRequestProcessor,
     RpcContext,

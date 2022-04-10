@@ -16,6 +16,7 @@ interface LifeCycle : Closeable {
 }
 
 abstract class LifeCycleWrapper : LifeCycle {
+    @JvmField
     protected val log = logger(this::class.java)
 
     @Volatile

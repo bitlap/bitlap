@@ -4,7 +4,7 @@ package org.bitlap.jdbc
 import com.alipay.sofa.jraft.rpc.InvokeCallback
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.proto.driver._
-import org.bitlap.network.{ NetworkHelper, RPC }
+import org.bitlap.network.RPC
 
 import java.lang.{ Long => JLong }
 import scala.jdk.CollectionConverters._
@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters._
  * @since 2021/11/21
  * @version 1.0
  */
-class BitlapClient(uri: String, props: Map[String, String]) extends NetworkHelper {
+class BitlapClient(uri: String, props: Map[String, String]) {
 
   private val conf: BitlapConf = new BitlapConf(props.asJava)
   private val rpcClient = RPC.newClient(uri, conf)

@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
+import com.alipay.sofa.jraft.rpc.RpcRequestProcessor
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
 import org.bitlap.common.BitlapConf
@@ -11,10 +12,11 @@ import org.bitlap.network.proto.driver._
  */
 object RPC {
 
-  def newClient(uri: String, conf: BitlapConf): RpcClient = new RpcClient(uri, conf)
+  def newClient(uri: String, conf: BitlapConf): RpcClient =
+    new RpcClient(uri, conf)
 
-  def newServer() =
-    ???
+  def newServer(conf: BitlapConf, processors: List[RpcRequestProcessor[_]]): RpcServer =
+    new RpcServer(conf, processors)
 
   // register request serializer
   val requestInstances = List(

@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.proto.driver.{BRow, BTableSchema, BTypeId}
+import org.bitlap.network.proto.driver.{ BRow, BTableSchema, BTypeId }
 
 import java.io.{InputStream, Reader}
 import java.math.BigDecimal

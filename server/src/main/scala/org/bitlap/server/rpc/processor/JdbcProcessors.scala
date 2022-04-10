@@ -1,17 +1,17 @@
 package org.bitlap.server.rpc.processor
 
-import com.alipay.sofa.jraft.rpc.{RpcContext, RpcRequestClosure, RpcRequestProcessor}
-import org.bitlap.network.proto.driver.BCloseSession.{BCloseSessionReq, BCloseSessionResp}
-import org.bitlap.network.proto.driver.BExecuteStatement.{BExecuteStatementReq, BExecuteStatementResp}
-import org.bitlap.network.proto.driver.BFetchResults.{BFetchResultsReq, BFetchResultsResp}
-import org.bitlap.network.proto.driver.BGetColumns.{BGetColumnsReq, BGetColumnsResp}
-import org.bitlap.network.proto.driver.BGetResultSetMetadata.{BGetResultSetMetadataReq, BGetResultSetMetadataResp}
-import org.bitlap.network.proto.driver.BGetSchemas.{BGetSchemasReq, BGetSchemasResp}
-import org.bitlap.network.proto.driver.BGetTables.{BGetTablesReq, BGetTablesResp}
-import org.bitlap.network.proto.driver.BOpenSession.{BOpenSessionReq, BOpenSessionResp}
-import org.bitlap.network.types.{OperationType, handles}
+import com.alipay.sofa.jraft.rpc.{ RpcContext, RpcRequestClosure, RpcRequestProcessor }
+import org.bitlap.network.proto.driver.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
+import org.bitlap.network.proto.driver.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
+import org.bitlap.network.proto.driver.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
+import org.bitlap.network.proto.driver.BGetColumns.{ BGetColumnsReq, BGetColumnsResp }
+import org.bitlap.network.proto.driver.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
+import org.bitlap.network.proto.driver.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
+import org.bitlap.network.proto.driver.BGetTables.{ BGetTablesReq, BGetTablesResp }
+import org.bitlap.network.proto.driver.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
+import org.bitlap.network.types.{ OperationType, handles }
 import org.bitlap.network.types.handles.OperationHandle
-import org.bitlap.network.types.status.{error, success}
+import org.bitlap.network.types.status.{ error, success }
 import org.bitlap.tools.apply
 import org.bitlap.tools.method.ProcessorCreator
 

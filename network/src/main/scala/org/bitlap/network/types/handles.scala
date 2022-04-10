@@ -2,7 +2,7 @@ package org.bitlap.network.types
 
 import com.google.protobuf.ByteString
 import OperationType.OperationType
-import org.bitlap.network.proto.driver.{BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle}
+import org.bitlap.network.proto.driver.{ BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle }
 import org.bitlap.tools.toString
 
 import java.nio.ByteBuffer

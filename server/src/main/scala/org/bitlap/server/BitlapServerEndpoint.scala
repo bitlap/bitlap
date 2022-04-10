@@ -5,12 +5,12 @@ import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.option.NodeOptions
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
-import com.alipay.sofa.jraft.rpc.{RaftRpcServerFactory, RpcServer}
+import com.alipay.sofa.jraft.rpc.{ RaftRpcServerFactory, RpcServer }
 import com.alipay.sofa.jraft.util.RpcFactoryHelper
-import com.alipay.sofa.jraft.{Node, RaftGroupService}
+import com.alipay.sofa.jraft.{ Node, RaftGroupService }
 import org.apache.commons.io.FileUtils
 import org.bitlap.common.utils.StringEx
-import org.bitlap.common.{BitlapConf, LifeCycleThread}
+import org.bitlap.common.{ BitlapConf, LifeCycleThread }
 import org.bitlap.network.NetworkHelper
 import org.bitlap.server.raft.MetaStateMachine
 import org.bitlap.server.rpc.processor.JdbcProcessors

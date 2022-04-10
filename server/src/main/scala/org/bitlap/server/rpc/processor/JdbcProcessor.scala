@@ -2,8 +2,8 @@
 package org.bitlap.server.rpc.processor
 
 import org.bitlap.network.helper.JdbcHelper
-import org.bitlap.network.types.handles.{OperationHandle, SessionHandle}
-import org.bitlap.network.types.models.{RowSet, TableSchema}
+import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.types.models.{ RowSet, TableSchema }
 import org.bitlap.server.rpc.SessionManager
 
 /**

@@ -1,8 +1,8 @@
 package org.bitlap.server.rpc
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.types.handles.{OperationHandle, SessionHandle}
-import org.bitlap.network.types.models.{RowSet, TableSchema}
+import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.types.models.{ RowSet, TableSchema }
 
 import java.util.concurrent.atomic.AtomicBoolean
 

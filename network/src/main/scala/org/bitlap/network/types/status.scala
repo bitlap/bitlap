@@ -1,7 +1,7 @@
 package org.bitlap.network.types
 
 import org.apache.commons.lang.StringUtils
-import org.bitlap.network.proto.driver.{BStatus, BStatusCode}
+import org.bitlap.network.proto.driver.{ BStatus, BStatusCode }
 
 /**
  * @author 梦境迷离

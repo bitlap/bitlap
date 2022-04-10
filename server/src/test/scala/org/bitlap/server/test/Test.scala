@@ -2,7 +2,7 @@
 package org.bitlap.server.test
 
 import com.alipay.sofa.jraft.RouteTable
-import com.alipay.sofa.jraft.rpc.RpcRequests.{ErrorResponse, PingRequest}
+import com.alipay.sofa.jraft.rpc.RpcRequests.{ ErrorResponse, PingRequest }
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.RPC
 import org.bitlap.server.BitlapServer

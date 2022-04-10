@@ -3,10 +3,10 @@ package org.bitlap.server.rpc
 
 import com.google.protobuf.ByteString
 import org.bitlap.core.sql.QueryExecution
-import org.bitlap.network.types.{OperationType, models}
+import org.bitlap.network.types.{ OperationType, models }
 import org.bitlap.tools.apply
 
-import java.sql.{ResultSet, Types}
+import java.sql.{ ResultSet, Types }
 import scala.collection.mutable.ListBuffer
 
 /**

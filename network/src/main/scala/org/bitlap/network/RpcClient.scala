@@ -1,6 +1,6 @@
 package org.bitlap.network
 
-import com.alipay.sofa.jraft.{RouteTable, Status}
+import com.alipay.sofa.jraft.{ RouteTable, Status }
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.InvokeCallback

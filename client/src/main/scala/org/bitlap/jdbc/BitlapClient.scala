@@ -4,7 +4,7 @@ package org.bitlap.jdbc
 import com.alipay.sofa.jraft.rpc.InvokeCallback
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.proto.driver._
-import org.bitlap.network.{NetworkHelper, RPC}
+import org.bitlap.network.{ NetworkHelper, RPC }
 
 import java.lang.{Long => JLong}
 import scala.jdk.CollectionConverters._

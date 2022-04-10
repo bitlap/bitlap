@@ -1,7 +1,7 @@
 package org.bitlap.network.helper
 
-import org.bitlap.network.types.handles.{OperationHandle, SessionHandle}
-import org.bitlap.network.types.models.{RowSet, TableSchema}
+import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.types.models.{ RowSet, TableSchema }
 
 
 /**

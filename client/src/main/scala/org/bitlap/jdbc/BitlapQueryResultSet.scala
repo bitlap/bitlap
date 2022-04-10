@@ -2,9 +2,9 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
-import org.bitlap.network.proto.driver.{BOperationHandle, BRow, BSessionHandle}
+import org.bitlap.network.proto.driver.{ BOperationHandle, BRow, BSessionHandle }
 
-import java.sql.{ResultSetMetaData, SQLException, SQLWarning}
+import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
 import scala.jdk.CollectionConverters._
 
 /**

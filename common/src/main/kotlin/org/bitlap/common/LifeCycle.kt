@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common
 
 import cn.hutool.core.thread.ThreadUtil
@@ -15,7 +16,8 @@ interface LifeCycle : Closeable {
 }
 
 abstract class LifeCycleWrapper : LifeCycle {
-    protected val log = logger { }
+    @JvmField
+    protected val log = logger(this::class.java)
 
     @Volatile
     @JvmField

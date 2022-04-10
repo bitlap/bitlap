@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap
 
 import picocli.CommandLine
@@ -22,9 +23,20 @@ package object cli {
       self.parseArgs()
       val clazz = classTag[T].runtimeClass
       if (clazz.isArray) {
-        self.execute(args.asInstanceOf[Array[Object]].map(_.toString.trim).filter(_.nonEmpty): _*)
+        self.execute(
+          args
+            .asInstanceOf[Array[Object]]
+            .map(_.toString.trim)
+            .filter(_.nonEmpty): _*
+        )
       } else {
-        self.execute(args.asInstanceOf[String].split(" ").map(_.trim).filter(_.nonEmpty): _*)
+        self.execute(
+          args
+            .asInstanceOf[String]
+            .split(" ")
+            .map(_.trim)
+            .filter(_.nonEmpty): _*
+        )
       }
     }
 
@@ -37,9 +49,26 @@ package object cli {
       val pw = new PrintWriter(sw)
       self.setOut(pw).setErr(pw)
       if (input.isArray) {
-        self.setOut(pw).setErr(pw).execute(args.asInstanceOf[Array[Object]].map(_.toString.trim).filter(_.nonEmpty): _*)
+        self
+          .setOut(pw)
+          .setErr(pw)
+          .execute(
+            args
+              .asInstanceOf[Array[Object]]
+              .map(_.toString.trim)
+              .filter(_.nonEmpty): _*
+          )
       } else {
-        self.setOut(pw).setErr(pw).execute(args.asInstanceOf[String].split(" ").map(_.trim).filter(_.nonEmpty): _*)
+        self
+          .setOut(pw)
+          .setErr(pw)
+          .execute(
+            args
+              .asInstanceOf[String]
+              .split(" ")
+              .map(_.trim)
+              .filter(_.nonEmpty): _*
+          )
       }
       sw.toString
     }

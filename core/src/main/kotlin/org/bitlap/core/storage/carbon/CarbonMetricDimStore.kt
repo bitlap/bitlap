@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.storage.carbon
 
 import arrow.core.tail
@@ -73,6 +74,13 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
         .withHadoopConf(hadoopConf)
         .withRowRecordReader() // disable vector read
         .withBatch(1000) // default is 100
+
+    override fun open() {
+        super.open()
+        if (!fs.exists(dataPath)) {
+            fs.mkdirs(dataPath)
+        }
+    }
 
     /**
      * Store [rows] with time [tm] as carbon data file format.

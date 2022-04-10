@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.utils
 
 import cn.hutool.core.io.FileUtil
@@ -17,7 +18,7 @@ object Excel {
     fun String.readCsv(): Pair<List<String>, List<List<Any?>>> {
         val file = FileUtil.file(this)
         if (!file.exists()) {
-            throw IllegalArgumentException("Excel file $this does not exist.")
+            throw IllegalArgumentException("Csv file $this does not exist.")
         }
         return file.inputStream().readCsv()
     }

@@ -1,10 +1,9 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.server.raft.BitlapServerEndpoint
 
 /**
- *
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */

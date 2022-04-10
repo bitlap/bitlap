@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common
 
 import org.bitlap.common.utils.Range

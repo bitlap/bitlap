@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.rel
 
 import com.google.common.collect.ImmutableSet

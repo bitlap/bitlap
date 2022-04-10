@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.rule.shuttle
 
 import org.apache.calcite.rex.RexInputRef

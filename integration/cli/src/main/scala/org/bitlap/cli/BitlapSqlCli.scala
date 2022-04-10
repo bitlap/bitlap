@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli
 
 import org.bitlap.cli.extension.BitlapSqlApplication
@@ -5,11 +6,11 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import org.bitlap.jdbc.BitlapDriver
 import org.bitlap.tools.apply
-import picocli.CommandLine.{Command, Option, Parameters}
-import sqlline.{SqlLine, SqlLineOpts}
+import picocli.CommandLine.{ Command, Option, Parameters }
+import sqlline.{ SqlLine, SqlLineOpts }
 
 import java.io.File
-import java.lang.{Boolean => JBoolean}
+import java.lang.{ Boolean => JBoolean }
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -19,7 +20,7 @@ import scala.collection.mutable.ArrayBuffer
   name = "sql",
   description = Array("A bitlap subcommand for sql."),
   mixinStandardHelpOptions = true,
-  usageHelpAutoWidth = true,
+  usageHelpAutoWidth = true
 )
 @apply
 class BitlapSqlCli extends Runnable {
@@ -28,7 +29,7 @@ class BitlapSqlCli extends Runnable {
     names = Array("-s", "--server"),
     paramLabel = "SERVER",
     description = Array("Server Addresses, separated by comma."),
-    defaultValue = "localhost:23333",
+    defaultValue = "localhost:23333"
   )
   var server: String = _
 
@@ -45,14 +46,14 @@ class BitlapSqlCli extends Runnable {
     paramLabel = "PASSWORD",
     description = Array("User password."),
     defaultValue = "",
-    interactive = true,
+    interactive = true
   )
   var password: String = _
 
   @Parameters(
     paramLabel = "SQL",
     description = Array("SQL to execute."),
-    defaultValue = "",
+    defaultValue = ""
   )
   var args: Array[String] = _
   def sql: String = StringEx.trimMargin(this.args.mkString(" "), '"', '\'')
@@ -69,11 +70,16 @@ object BitlapSqlCli {
     val cmd = BitlapSqlExecutor.getCommand[BitlapSqlCli]
 
     val sqlArgs = ArrayBuffer(
-      "-d", classOf[BitlapDriver].getCanonicalName,
-      "-u", s"jdbc:bitlap://${cmd.server}/default",
-      "-n", cmd.user,
-      "-p", cmd.password,
-      "-ac", classOf[BitlapSqlApplication].getCanonicalName
+      "-d",
+      classOf[BitlapDriver].getCanonicalName,
+      "-u",
+      s"jdbc:bitlap://${cmd.server}/default",
+      "-n",
+      cmd.user,
+      "-p",
+      cmd.password,
+      "-ac",
+      classOf[BitlapSqlApplication].getCanonicalName
     )
     if (!StringEx.nullOrBlank(cmd.sql)) {
       sqlArgs ++= Array("-e", cmd.sql)

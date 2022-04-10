@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.test.sql
 
 import io.kotest.assertions.throwables.shouldThrow
@@ -50,6 +51,15 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             shouldThrow<BitlapException> {
                 sql("select count(*) cnt from $db.$table where _time = 123") // one special aggregation metric is required
             }
+        }
+
+        "query whatever you want" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            checkRows(
+                "select sum(pv) pv, count(distinct pv) uv, sum(xx) xx from $db.$table where _time = 100",
+                listOf(listOf(0, 0, 0))
+            )
         }
 
         "only metrics query with one dimension time" {

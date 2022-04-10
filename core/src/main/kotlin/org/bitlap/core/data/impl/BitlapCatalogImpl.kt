@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.data.impl
 
 import org.apache.hadoop.conf.Configuration
@@ -35,7 +36,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     private val rootPath by lazy {
-        Path(conf.get(BitlapConf.DEFAULT_ROOT_DIR_DATA))
+        Path(conf.get(BitlapConf.ROOT_DIR_DATA))
     }
 
     private val dataPath by lazy {

@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.table
 
 import org.apache.calcite.DataContext

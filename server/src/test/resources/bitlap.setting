@@ -1,8 +1,8 @@
-[default]
-root.dir.data          = /tmp/bitlap_data
-root.dir.local         = /tmp/bitlap
-root.dir.local.log     = /tmp/bitlap
-root.dir.local.meta    = /tmp/bitlap
-node.bind.host         = 127.0.0.1:23333
-node.bind.peers        = 127.0.0.1:23333
-node.group.id          = bitlap-cluster
+bitlap.root.dir.data          = /tmp/bitlap_data
+bitlap.root.dir.local         = /tmp/bitlap
+
+bitlap.node.group.id          = bitlap
+bitlap.node.bind.host         = 127.0.0.1:23333
+bitlap.node.bind.peers        = 127.0.0.1:23333
+bitlap.node.rpc.timeout       = 3000
+bitlap.node.read.timeout      = 10000

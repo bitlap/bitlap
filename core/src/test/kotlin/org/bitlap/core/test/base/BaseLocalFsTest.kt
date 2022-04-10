@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.test.base
 
 import cn.hutool.core.util.RandomUtil
@@ -33,7 +34,7 @@ abstract class BaseLocalFsTest : StringSpec() {
             }
             // set bitlap properties
             conf = BitlapContext.bitlapConf
-            conf.set(BitlapConf.DEFAULT_ROOT_DIR_DATA, workPath.toString())
+            conf.set(BitlapConf.ROOT_DIR_DATA.key, workPath.toString(), true)
         }
 
         afterSpec {

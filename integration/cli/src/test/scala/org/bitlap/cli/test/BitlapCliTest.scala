@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli.test
 
 import org.bitlap.cli._
@@ -20,7 +21,9 @@ class BitlapCliTest extends AnyFlatSpec with Matchers {
 
   "test bitlap cli" should "ok" in {
     // empty
-    BitlapExecutor <<<? (Array("")) shouldBe s"Missing required subcommand\n$helpText"
+    BitlapExecutor <<<? (Array(
+      ""
+    )) shouldBe s"Missing required subcommand\n$helpText"
     BitlapExecutor <<<? ("") shouldBe s"Missing required subcommand\n$helpText"
     // -V, --version
     BitlapExecutor <<<? ("-V") should include("v")

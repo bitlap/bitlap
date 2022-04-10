@@ -1,9 +1,10 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.test.base
 
 import io.kotest.assertions.Actual
 import io.kotest.assertions.Expected
 import io.kotest.assertions.failure
-import io.kotest.matchers.collections.printed
+import io.kotest.assertions.print.print
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.utils.Sql.toTable
 import org.bitlap.common.utils.internal.DBTable
@@ -38,7 +39,7 @@ interface SqlChecker {
         } catch (e: Throwable) {
             when (e) {
                 is AssertionError ->
-                    throw failure(Expected(rows.printed()), Actual(result.printed()))
+                    throw failure(Expected(rows.print()), Actual(result.print()))
                 else ->
                     throw e
             }

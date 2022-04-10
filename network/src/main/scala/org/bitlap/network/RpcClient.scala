@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
 import com.alipay.sofa.jraft.{ RouteTable, Status }
@@ -41,7 +42,12 @@ class RpcClient(uri: String, conf: BitlapConf) {
     resp.asInstanceOf[T]
   }
 
-  def invokeAsync[T](request: AnyRef, callback: InvokeCallback, timeout: Long = timeout, leader: Boolean = true): Unit = {
+  def invokeAsync[T](
+    request: AnyRef,
+    callback: InvokeCallback,
+    timeout: Long = timeout,
+    leader: Boolean = true
+  ): Unit = {
     // TODO: support other nodes
     this.refreshLeader()
     val node = if (leader) route.selectLeader(groupId) else route.selectLeader(groupId)

@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.processor
 
 import com.alipay.sofa.jraft.rpc.{ RpcContext, RpcRequestClosure, RpcRequestProcessor }
@@ -9,7 +10,7 @@ import org.bitlap.network.proto.driver.BGetResultSetMetadata.{ BGetResultSetMeta
 import org.bitlap.network.proto.driver.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
 import org.bitlap.network.proto.driver.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.proto.driver.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
-import org.bitlap.network.types.{ OperationType, handles }
+import org.bitlap.network.types.{ handles, OperationType }
 import org.bitlap.network.types.handles.OperationHandle
 import org.bitlap.network.types.status.{ error, success }
 import org.bitlap.tools.apply

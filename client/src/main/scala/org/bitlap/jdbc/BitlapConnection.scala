@@ -5,7 +5,7 @@ import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
 import org.bitlap.network.NetworkHelper
 import org.bitlap.network.proto.driver.BSessionHandle
 
-import java.{sql, util}
+import java.{ sql, util }
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob
@@ -31,155 +31,158 @@ import scala.jdk.CollectionConverters._
  */
 class BitlapConnection(uri: String, info: Properties = new Properties()) extends Connection with NetworkHelper {
 
-    private var session: BSessionHandle = _
-    private var closed = true
-    private var warningChain: SQLWarning = _
-    private var client: BitlapClient = _
+  private var session: BSessionHandle = _
+  private var closed = true
+  private var warningChain: SQLWarning = _
+  private var client: BitlapClient = _
 
-    {
-        if (!uri.startsWith(URI_PREFIX)) {
-            throw new Exception("Invalid URL: $uri")
-        }
-        // remove prefix
-        val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
-        val hosts = uriWithoutPrefix.split(",")
-        // parse uri
-        val parts = hosts.map { it => it.split("/") }
-        try {
-            client = new BitlapClient(parts.map(_(0)).mkString(","), info.asScala.toMap)
-            session = client.openSession()
-            closed = false
-        } catch  {
-            case e: Exception => e.printStackTrace()
-        }
+  {
+    if (!uri.startsWith(URI_PREFIX)) {
+      throw new Exception("Invalid URL: $uri")
+    }
+    // remove prefix
+    val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
+    val hosts = uriWithoutPrefix.split(",")
+    // parse uri
+    val parts = hosts.map(it => it.split("/"))
+    try {
+      client = new BitlapClient(parts.map(_(0)).mkString(","), info.asScala.toMap)
+      session = client.openSession()
+      closed = false
+    } catch {
+      case e: Exception => e.printStackTrace()
+    }
+  }
+
+  override def unwrap[T](iface: Class[T]): T = ???
+
+  override def isWrapperFor(iface: Class[_]): Boolean = ???
+
+  override def close(): Unit =
+    try if (session != null) {
+      client.closeSession(session)
+    } finally closed = true
+
+  override def createStatement(): Statement =
+    if (session != null) {
+      return new BitlapStatement(session, client)
+    } else {
+      throw BSQLException("Statement is closed")
     }
 
-    override def unwrap[T](iface: Class[T]): T = ???
+  override def isClosed(): Boolean =
+    return closed
 
-    override def isWrapperFor(iface: Class[_]): Boolean = ???
+  override def clearWarnings() =
+    warningChain = null
 
-    override def close(): Unit = {
-        try {
-            if (session != null) {
-                client.closeSession(session)
-            }
-        } finally {
-            closed = true
-        }
-    }
+  override def prepareStatement(sql: String): PreparedStatement = ???
 
-    override def createStatement(): Statement = {
-        if (session != null) {
-            return new BitlapStatement(session, client)
-        } else {
-            throw BSQLException("Statement is closed")
-        }
-    }
+  override def prepareCall(sql: String): CallableStatement = ???
 
-    override def isClosed(): Boolean = {
-        return closed
-    }
+  override def nativeSQL(sql: String): String = ???
 
-    override def clearWarnings() = {
-        warningChain = null
-    }
+  override def setAutoCommit(autoCommit: Boolean): Unit = ???
 
-    override def prepareStatement(sql: String): PreparedStatement = ???
+  override def getAutoCommit: Boolean = ???
 
-    override def prepareCall(sql: String): CallableStatement = ???
+  override def commit(): Unit = ???
 
-    override def nativeSQL(sql: String): String = ???
+  override def rollback(): Unit = ???
 
-    override def setAutoCommit(autoCommit: Boolean): Unit = ???
+  override def getMetaData: DatabaseMetaData = ???
 
-    override def getAutoCommit: Boolean = ???
+  override def setReadOnly(readOnly: Boolean): Unit = ???
 
-    override def commit(): Unit = ???
+  override def isReadOnly: Boolean = ???
 
-    override def rollback(): Unit = ???
+  override def setCatalog(catalog: String): Unit = ???
 
-    override def getMetaData: DatabaseMetaData = ???
+  override def getCatalog: String = ???
 
-    override def setReadOnly(readOnly: Boolean): Unit = ???
+  override def setTransactionIsolation(level: Int): Unit = ???
 
-    override def isReadOnly: Boolean = ???
+  override def getTransactionIsolation: Int = ???
 
-    override def setCatalog(catalog: String): Unit = ???
+  override def getWarnings: SQLWarning = ???
 
-    override def getCatalog: String = ???
+  override def createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement = ???
 
-    override def setTransactionIsolation(level: Int): Unit = ???
+  override def prepareStatement(sql: String, resultSetType: Int, resultSetConcurrency: Int): PreparedStatement = ???
 
-    override def getTransactionIsolation: Int = ???
+  override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int): CallableStatement = ???
 
-    override def getWarnings: SQLWarning = ???
+  override def getTypeMap: util.Map[String, Class[_]] = ???
 
-    override def createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement = ???
+  override def setTypeMap(map: util.Map[String, Class[_]]): Unit = ???
 
-    override def prepareStatement(sql: String, resultSetType: Int, resultSetConcurrency: Int): PreparedStatement = ???
+  override def setHoldability(holdability: Int): Unit = ???
 
-    override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int): CallableStatement = ???
+  override def getHoldability: Int = ???
 
-    override def getTypeMap: util.Map[String, Class[_]] = ???
+  override def setSavepoint(): Savepoint = ???
 
-    override def setTypeMap(map: util.Map[String, Class[_]]): Unit = ???
+  override def setSavepoint(name: String): Savepoint = ???
 
-    override def setHoldability(holdability: Int): Unit = ???
+  override def rollback(savepoint: Savepoint): Unit = ???
 
-    override def getHoldability: Int = ???
+  override def releaseSavepoint(savepoint: Savepoint): Unit = ???
 
-    override def setSavepoint(): Savepoint = ???
+  override def createStatement(resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): Statement =
+    ???
 
-    override def setSavepoint(name: String): Savepoint = ???
+  override def prepareStatement(
+    sql: String,
+    resultSetType: Int,
+    resultSetConcurrency: Int,
+    resultSetHoldability: Int
+  ): PreparedStatement = ???
 
-    override def rollback(savepoint: Savepoint): Unit = ???
+  override def prepareCall(
+    sql: String,
+    resultSetType: Int,
+    resultSetConcurrency: Int,
+    resultSetHoldability: Int
+  ): CallableStatement = ???
 
-    override def releaseSavepoint(savepoint: Savepoint): Unit = ???
+  override def prepareStatement(sql: String, autoGeneratedKeys: Int): PreparedStatement = ???
 
-    override def createStatement(resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): Statement = ???
+  override def prepareStatement(sql: String, columnIndexes: Array[Int]): PreparedStatement = ???
 
-    override def prepareStatement(sql: String, resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): PreparedStatement = ???
+  override def prepareStatement(sql: String, columnNames: Array[String]): PreparedStatement = ???
 
-    override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): CallableStatement = ???
+  override def createClob(): Clob = ???
 
-    override def prepareStatement(sql: String, autoGeneratedKeys: Int): PreparedStatement = ???
+  override def createBlob(): Blob = ???
 
-    override def prepareStatement(sql: String, columnIndexes: Array[Int]): PreparedStatement = ???
+  override def createNClob(): NClob = ???
 
-    override def prepareStatement(sql: String, columnNames: Array[String]): PreparedStatement = ???
+  override def createSQLXML(): SQLXML = ???
 
-    override def createClob(): Clob = ???
+  override def isValid(timeout: Int): Boolean = ???
 
-    override def createBlob(): Blob = ???
+  override def setClientInfo(name: String, value: String): Unit = ???
 
-    override def createNClob(): NClob = ???
+  override def setClientInfo(properties: Properties): Unit = ???
 
-    override def createSQLXML(): SQLXML = ???
+  override def getClientInfo(name: String): String = ???
 
-    override def isValid(timeout: Int): Boolean = ???
+  override def getClientInfo: Properties = ???
 
-    override def setClientInfo(name: String, value: String): Unit = ???
+  override def createArrayOf(typeName: String, elements: Array[AnyRef]): sql.Array = ???
 
-    override def setClientInfo(properties: Properties): Unit = ???
+  override def createStruct(typeName: String, attributes: Array[AnyRef]): Struct = ???
 
-    override def getClientInfo(name: String): String = ???
+  override def setSchema(schema: String): Unit = ???
 
-    override def getClientInfo: Properties = ???
+  override def getSchema: String = ???
 
-    override def createArrayOf(typeName: String, elements: Array[AnyRef]): sql.Array = ???
+  override def abort(executor: Executor): Unit = ???
 
-    override def createStruct(typeName: String, attributes: Array[AnyRef]): Struct = ???
+  override def setNetworkTimeout(executor: Executor, milliseconds: Int): Unit = ???
 
-    override def setSchema(schema: String): Unit = ???
-
-    override def getSchema: String = ???
-
-    override def abort(executor: Executor): Unit = ???
-
-    override def setNetworkTimeout(executor: Executor, milliseconds: Int): Unit = ???
-
-    override def getNetworkTimeout: Int = ???
+  override def getNetworkTimeout: Int = ???
 }
 object BitlapConnection {
-    private val URI_PREFIX = "jdbc:bitlap://"
+  private val URI_PREFIX = "jdbc:bitlap://"
 }

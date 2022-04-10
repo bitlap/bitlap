@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging

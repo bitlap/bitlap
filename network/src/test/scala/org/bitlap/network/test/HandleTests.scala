@@ -2,7 +2,7 @@
 package org.bitlap.network.test
 
 import org.bitlap.network.types.handles.{ HandleIdentifier, SessionHandle }
-import org.bitlap.network.types.{ OperationType, handles }
+import org.bitlap.network.types.{ handles, OperationType }
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

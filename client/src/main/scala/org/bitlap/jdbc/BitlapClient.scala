@@ -6,7 +6,7 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.network.proto.driver._
 import org.bitlap.network.{ NetworkHelper, RPC }
 
-import java.lang.{Long => JLong}
+import java.lang.{ Long => JLong }
 import scala.jdk.CollectionConverters._
 
 /**
@@ -42,7 +42,7 @@ class BitlapClient(uri: String, props: Map[String, String]) extends NetworkHelpe
   /**
    * Used to close the session when the JDBC connection is closed.
    */
-  def closeSession(sessionHandle: BSessionHandle): Unit = {
+  def closeSession(sessionHandle: BSessionHandle): Unit =
     this.rpcClient.invokeAsync(
       BCloseSession.BCloseSessionReq
         .newBuilder()
@@ -52,7 +52,6 @@ class BitlapClient(uri: String, props: Map[String, String]) extends NetworkHelpe
         override def complete(o: Any, throwable: Throwable): Unit = ()
       }
     )
-  }
 
   /**
    * Used to execute normal SQL by JDBC. Does not contain `?` placeholders.
@@ -60,10 +59,10 @@ class BitlapClient(uri: String, props: Map[String, String]) extends NetworkHelpe
   def executeStatement(sessionHandle: BSessionHandle, statement: String): BOperationHandle = {
     val resp = this.rpcClient.invokeSync[BExecuteStatement.BExecuteStatementResp](
       BExecuteStatement.BExecuteStatementReq
-      .newBuilder()
-      .setSessionHandle(sessionHandle)
-      .setStatement(statement)
-      .build(),
+        .newBuilder()
+        .setSessionHandle(sessionHandle)
+        .setStatement(statement)
+        .build(),
       readTimeout
     )
     verifySuccess(resp.getStatus)

@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
 import com.alipay.sofa.jraft.rpc.impl.MarshallerHelper
@@ -10,13 +11,10 @@ import org.bitlap.network.proto.driver._
  */
 object RPC {
 
-  def newClient(uri: String, conf: BitlapConf): RpcClient = {
-    new RpcClient(uri, conf)
-  }
+  def newClient(uri: String, conf: BitlapConf): RpcClient = new RpcClient(uri, conf)
 
-  def newServer() = {
+  def newServer() =
     ???
-  }
 
   // register request serializer
   val requestInstances = List(
@@ -27,7 +25,9 @@ object RPC {
     classOf[BGetColumns.BGetColumnsReq] -> BGetColumns.BGetColumnsReq.getDefaultInstance,
     classOf[BGetSchemas.BGetSchemasReq] -> BGetSchemas.BGetSchemasReq.getDefaultInstance,
     classOf[BGetTables.BGetTablesReq] -> BGetTables.BGetTablesReq.getDefaultInstance,
-    classOf[BGetResultSetMetadata.BGetResultSetMetadataReq] -> BGetResultSetMetadata.BGetResultSetMetadataReq.getDefaultInstance
+    classOf[
+      BGetResultSetMetadata.BGetResultSetMetadataReq
+    ] -> BGetResultSetMetadata.BGetResultSetMetadataReq.getDefaultInstance
   )
   requestInstances.foreach { case (i1, i2) => RpcFactoryHelper.rpcFactory().registerProtobufSerializer(i1.getName, i2) }
 
@@ -40,7 +40,9 @@ object RPC {
     classOf[BGetColumns.BGetColumnsReq] -> BGetColumns.BGetColumnsResp.getDefaultInstance,
     classOf[BGetSchemas.BGetSchemasReq] -> BGetSchemas.BGetSchemasResp.getDefaultInstance,
     classOf[BGetTables.BGetTablesReq] -> BGetTables.BGetTablesResp.getDefaultInstance,
-    classOf[BGetResultSetMetadata.BGetResultSetMetadataReq] -> BGetResultSetMetadata.BGetResultSetMetadataResp.getDefaultInstance
+    classOf[
+      BGetResultSetMetadata.BGetResultSetMetadataReq
+    ] -> BGetResultSetMetadata.BGetResultSetMetadataResp.getDefaultInstance
   )
   responseInstances.foreach { case (i1, i2) => MarshallerHelper.registerRespInstance(i1.getName, i2) }
 }

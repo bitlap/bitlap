@@ -2,7 +2,6 @@
 package org.bitlap.jdbc
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/8/23
  * @version 1.0
@@ -10,10 +9,8 @@ package org.bitlap.jdbc
 abstract class BitlapMetaDataResultSet[M](
   override val columnNames: List[String] = List(),
   override val columnTypes: List[String] = List(),
-  protected var data: List[M] = List(),
+  protected var data: List[M] = List()
 ) extends BitlapBaseResultSet {
 
-  override def close(): Unit = {
-
-  }
+  override def close(): Unit = {}
 }

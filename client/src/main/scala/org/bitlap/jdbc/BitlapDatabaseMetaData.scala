@@ -9,14 +9,13 @@ import java.sql.ResultSet
 import java.sql.RowIdLifetime
 
 /**
- *
  * @author 梦境迷离
  * @since 2021/6/12
  * @version 1.0
  */
 class BitlapDatabaseMetaData(
-    private val session: BSessionHandle,
-    private val client: CliClientServiceImpl
+  private val session: BSessionHandle,
+  private val client: CliClientServiceImpl
 ) extends DatabaseMetaData {
   override def allProceduresAreCallable(): Boolean = ???
 
@@ -256,9 +255,19 @@ class BitlapDatabaseMetaData(
 
   override def getProcedures(catalog: String, schemaPattern: String, procedureNamePattern: String): ResultSet = ???
 
-  override def getProcedureColumns(catalog: String, schemaPattern: String, procedureNamePattern: String, columnNamePattern: String): ResultSet = ???
+  override def getProcedureColumns(
+    catalog: String,
+    schemaPattern: String,
+    procedureNamePattern: String,
+    columnNamePattern: String
+  ): ResultSet = ???
 
-  override def getTables(catalog: String, schemaPattern: String, tableNamePattern: String, types: Array[String]): ResultSet = ???
+  override def getTables(
+    catalog: String,
+    schemaPattern: String,
+    tableNamePattern: String,
+    types: Array[String]
+  ): ResultSet = ???
 
   override def getSchemas: ResultSet = ???
 
@@ -266,13 +275,29 @@ class BitlapDatabaseMetaData(
 
   override def getTableTypes: ResultSet = ???
 
-  override def getColumns(catalog: String, schemaPattern: String, tableNamePattern: String, columnNamePattern: String): ResultSet = ???
+  override def getColumns(
+    catalog: String,
+    schemaPattern: String,
+    tableNamePattern: String,
+    columnNamePattern: String
+  ): ResultSet = ???
 
-  override def getColumnPrivileges(catalog: String, schema: String, table: String, columnNamePattern: String): ResultSet = ???
+  override def getColumnPrivileges(
+    catalog: String,
+    schema: String,
+    table: String,
+    columnNamePattern: String
+  ): ResultSet = ???
 
   override def getTablePrivileges(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet = ???
 
-  override def getBestRowIdentifier(catalog: String, schema: String, table: String, scope: Int, nullable: Boolean): ResultSet = ???
+  override def getBestRowIdentifier(
+    catalog: String,
+    schema: String,
+    table: String,
+    scope: Int,
+    nullable: Boolean
+  ): ResultSet = ???
 
   override def getVersionColumns(catalog: String, schema: String, table: String): ResultSet = ???
 
@@ -282,11 +307,24 @@ class BitlapDatabaseMetaData(
 
   override def getExportedKeys(catalog: String, schema: String, table: String): ResultSet = ???
 
-  override def getCrossReference(parentCatalog: String, parentSchema: String, parentTable: String, foreignCatalog: String, foreignSchema: String, foreignTable: String): ResultSet = ???
+  override def getCrossReference(
+    parentCatalog: String,
+    parentSchema: String,
+    parentTable: String,
+    foreignCatalog: String,
+    foreignSchema: String,
+    foreignTable: String
+  ): ResultSet = ???
 
   override def getTypeInfo: ResultSet = ???
 
-  override def getIndexInfo(catalog: String, schema: String, table: String, unique: Boolean, approximate: Boolean): ResultSet = ???
+  override def getIndexInfo(
+    catalog: String,
+    schema: String,
+    table: String,
+    unique: Boolean,
+    approximate: Boolean
+  ): ResultSet = ???
 
   override def supportsResultSetType(`type`: Int): Boolean = ???
 
@@ -312,7 +350,8 @@ class BitlapDatabaseMetaData(
 
   override def supportsBatchUpdates(): Boolean = ???
 
-  override def getUDTs(catalog: String, schemaPattern: String, typeNamePattern: String, types: Array[Int]): ResultSet = ???
+  override def getUDTs(catalog: String, schemaPattern: String, typeNamePattern: String, types: Array[Int]): ResultSet =
+    ???
 
   override def getConnection: Connection = ???
 
@@ -328,7 +367,12 @@ class BitlapDatabaseMetaData(
 
   override def getSuperTables(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet = ???
 
-  override def getAttributes(catalog: String, schemaPattern: String, typeNamePattern: String, attributeNamePattern: String): ResultSet = ???
+  override def getAttributes(
+    catalog: String,
+    schemaPattern: String,
+    typeNamePattern: String,
+    attributeNamePattern: String
+  ): ResultSet = ???
 
   override def supportsResultSetHoldability(holdability: Int): Boolean = ???
 
@@ -360,9 +404,19 @@ class BitlapDatabaseMetaData(
 
   override def getFunctions(catalog: String, schemaPattern: String, functionNamePattern: String): ResultSet = ???
 
-  override def getFunctionColumns(catalog: String, schemaPattern: String, functionNamePattern: String, columnNamePattern: String): ResultSet = ???
+  override def getFunctionColumns(
+    catalog: String,
+    schemaPattern: String,
+    functionNamePattern: String,
+    columnNamePattern: String
+  ): ResultSet = ???
 
-  override def getPseudoColumns(catalog: String, schemaPattern: String, tableNamePattern: String, columnNamePattern: String): ResultSet = ???
+  override def getPseudoColumns(
+    catalog: String,
+    schemaPattern: String,
+    tableNamePattern: String,
+    columnNamePattern: String
+  ): ResultSet = ???
 
   override def generatedKeyAlwaysReturned(): Boolean = ???
 

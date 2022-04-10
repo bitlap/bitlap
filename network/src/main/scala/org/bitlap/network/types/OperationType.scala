@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.types
 
 import org.bitlap.network.proto.driver.BOperationType

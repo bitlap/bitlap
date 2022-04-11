@@ -80,7 +80,7 @@
         <scala.logging.version>3.9.4</scala.logging.version>
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <smt.version>0.4.2</smt.version>
+        <smt.version>0.4.3</smt.version>
         <picocli.version>4.6.3</picocli.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
     </properties>

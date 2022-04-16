@@ -12,7 +12,7 @@ import java.util.Properties
  */
 class TestDriverUtils(name: String) extends TestCase(name) {
 
-  private val driverName = "org.bitlap.jdbc.BitlapDriver"
+  private val driverName = "org.bitlap.Driver"
 
   def test(): Unit = {
     Class.forName(driverName)

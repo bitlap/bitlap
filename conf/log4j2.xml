@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration status="WARN" name="bitlap">
+<Configuration name="bitlap" status="WARN" monitorInterval="300">
 
     <Properties>
-        <Property name="bitlap.log.dir">logs</Property>
-        <Property name="bitlap.log.file">bitlap.log</Property>
-        <Property name="bitlap.log.level">info</Property>
+        <property name="logDir">logs</property>
+        <property name="logFileName">bitlap</property>
+        <property name="logLevel">info</property>
+        <property name="logPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
+
+        <!-- common log configuration  -->
+        <property name="rollFile">${logDir}/${logFileName}.log</property>
+        <property name="rollPattern">${logDir}/${logFileName}-%d{yyyy-MM-dd-HH}-%i.log.gz</property>
+        <property name="rollFileSize">20MB</property>
+        <property name="rollTimeInterval">4</property>
+        <property name="rollFileNum">10</property>
     </Properties>
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="${logPattern}" />
         </Console>
+
+        <RollingFile name="RollingFile" fileName="${rollFile}" filePattern="${rollPattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${rollTimeInterval}" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${rollFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${rollFileNum}" />
+        </RollingFile>
     </Appenders>
 
     <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Console" />
+        <Root level="${logLevel}">
+            <AppenderRef ref="RollingFile" />
         </Root>
     </Loggers>
 </Configuration>

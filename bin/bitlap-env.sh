@@ -15,13 +15,13 @@ export BITLAP_SERVER_OPTS="-Xmx1024m $BITLAP_SERVER_OPTS $BITLAP_OPTS"
 export BITLAP_CLIENT_OPTS="-Xmx512m $BITLAP_CLIENT_OPTS $BITLAP_OPTS"
 
 # Where log files are stored.  $BITLAP_HOME/logs by default.
-#export BITLAP_LOG_DIR=${BITLAP_LOG_DIR}/$USER
+export BITLAP_LOG_DIR=${BITLAP_LOG_DIR:-"$BITLAP_HOME/logs"}
 
-# The directory where pid files are stored. /tmp by default.
+# The directory where pid files are stored. $BITLAP_HOME/tmp by default.
 # NOTE: this should be set to a directory that can only be written to by
 #       the user that will run the bitlap servers.  Otherwise there is the
 #       potential for a symlink attack.
-export BITLAP_PID_DIR=${BITLAP_PID_DIR}
+export BITLAP_TMP_DIR=${BITLAP_TMP_DIR:-"$BITLAP_HOME/tmp"}
 
 # Attempt to set JAVA_HOME if it is not set
 if [[ -z $JAVA_HOME ]]; then

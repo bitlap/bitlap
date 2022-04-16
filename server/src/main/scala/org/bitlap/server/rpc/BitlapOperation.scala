@@ -26,9 +26,13 @@ class BitlapOperation(
     val columns = (1 to metaData.getColumnCount).map { it =>
       val colName = metaData.getColumnName(it)
       val colType = metaData.getColumnType(it) match {
-        case Types.VARCHAR => models.TypeId.B_TYPE_ID_STRING_TYPE
-        case Types.INTEGER => models.TypeId.B_TYPE_ID_INT_TYPE
-        case Types.DOUBLE  => models.TypeId.B_TYPE_ID_DOUBLE_TYPE
+        case Types.VARCHAR   => models.TypeId.B_TYPE_ID_STRING_TYPE
+        case Types.SMALLINT  => models.TypeId.B_TYPE_ID_SHORT_TYPE
+        case Types.INTEGER   => models.TypeId.B_TYPE_ID_INT_TYPE
+        case Types.BIGINT    => models.TypeId.B_TYPE_ID_LONG_TYPE
+        case Types.DOUBLE    => models.TypeId.B_TYPE_ID_DOUBLE_TYPE
+        case Types.BOOLEAN   => models.TypeId.B_TYPE_ID_BOOLEAN_TYPE
+        case Types.TIMESTAMP => models.TypeId.B_TYPE_ID_TIMESTAMP_TYPE
         // TODO more
         case _ => models.TypeId.B_TYPE_ID_UNSPECIFIED
       }
@@ -39,7 +43,13 @@ class BitlapOperation(
     while (rs.next()) {
       val cl = (1 to metaData.getColumnCount).map { it =>
         metaData.getColumnType(it) match {
-          case Types.VARCHAR => ByteString.copyFromUtf8(rs.getString(it))
+          case Types.VARCHAR                => ByteString.copyFromUtf8(rs.getString(it))
+          case Types.SMALLINT               => ByteString.copyFromUtf8(rs.getShort(it).toString)
+          case Types.INTEGER                => ByteString.copyFromUtf8(rs.getInt(it).toString)
+          case Types.BIGINT | Types.NUMERIC => ByteString.copyFromUtf8(rs.getLong(it).toString)
+          case Types.DOUBLE                 => ByteString.copyFromUtf8(rs.getDouble(it).toString)
+          case Types.BOOLEAN                => ByteString.copyFromUtf8(rs.getBoolean(it).toString)
+          case Types.TIMESTAMP              => ByteString.copyFromUtf8(rs.getLong(it).toString)
           // TODO more
           case _ => ByteString.copyFrom(rs.getBytes(it))
         }
@@ -55,7 +65,7 @@ class BitlapOperation(
   override def run(): Unit =
     cache.put(
       super.getOpHandle,
-      wrapper(new QueryExecution(super.getStatement).execute())
+      wrapper(new QueryExecution(super.getStatement).execute()) // TODO: add error
     )
 
 }

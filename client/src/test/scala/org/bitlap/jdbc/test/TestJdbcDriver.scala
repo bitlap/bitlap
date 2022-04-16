@@ -5,8 +5,7 @@ import junit.framework.TestCase
 import junit.framework.TestCase.assertNotNull
 import org.junit.Test
 
-import java.sql.DriverManager
-import java.sql.Statement
+import java.sql.{ DriverManager, Statement }
 
 /**
  * @author 梦境迷离
@@ -15,7 +14,7 @@ import java.sql.Statement
  */
 class TestJdbcDriver(name: String) extends TestCase(name) {
 
-  private val driverName = "org.bitlap.jdbc.BitlapDriver"
+  private val driverName = "org.bitlap.Driver"
 
   def test(): Unit = {
     Class.forName(driverName)

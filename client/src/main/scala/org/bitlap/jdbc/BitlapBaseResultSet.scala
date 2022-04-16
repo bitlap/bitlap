@@ -47,20 +47,15 @@ abstract class BitlapBaseResultSet extends ResultSet {
     ???
   }
 
-  override def wasNull(): Boolean =
-    return _wasNull
+  override def wasNull(): Boolean = _wasNull
 
-  override def getString(columnIndex: Int): String =
-    return getColumnValue(columnIndex)
+  override def getString(columnIndex: Int): String = getColumnValue(columnIndex)
 
-  override def getString(columnLabel: String): String =
-    return getString(findColumn(columnLabel))
+  override def getString(columnLabel: String): String = getString(findColumn(columnLabel))
 
-  override def getBoolean(columnIndex: Int): Boolean =
-    return getColumnValue(columnIndex)
+  override def getBoolean(columnIndex: Int): Boolean = getColumnValue(columnIndex)
 
-  override def getBoolean(columnLabel: String): Boolean =
-    return getBoolean(findColumn(columnLabel))
+  override def getBoolean(columnLabel: String): Boolean = getBoolean(findColumn(columnLabel))
 
   override def getByte(columnIndex: Int): Byte =
     ???
@@ -68,23 +63,17 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getByte(columnLabel: String): Byte =
     ???
 
-  override def getShort(columnIndex: Int): Short =
-    return getColumnValue(columnIndex)
+  override def getShort(columnIndex: Int): Short = getColumnValue(columnIndex)
 
-  override def getShort(columnLabel: String): Short =
-    return getShort(findColumn(columnLabel))
+  override def getShort(columnLabel: String): Short = getShort(findColumn(columnLabel))
 
-  override def getInt(columnIndex: Int): Int =
-    return getColumnValue(columnIndex)
+  override def getInt(columnIndex: Int): Int = getColumnValue(columnIndex)
 
-  override def getInt(columnLabel: String): Int =
-    return getInt(findColumn(columnLabel))
+  override def getInt(columnLabel: String): Int = getInt(findColumn(columnLabel))
 
-  override def getLong(columnIndex: Int): Long =
-    return getColumnValue(columnIndex)
+  override def getLong(columnIndex: Int): Long = getColumnValue(columnIndex)
 
-  override def getLong(columnLabel: String): Long =
-    return getLong(findColumn(columnLabel))
+  override def getLong(columnLabel: String): Long = getLong(findColumn(columnLabel))
 
   override def getFloat(columnIndex: Int): Float =
     ???
@@ -92,11 +81,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getFloat(columnLabel: String): Float =
     ???
 
-  override def getDouble(columnIndex: Int): Double =
-    return getColumnValue(columnIndex)
+  override def getDouble(columnIndex: Int): Double = getColumnValue(columnIndex)
 
-  override def getDouble(columnLabel: String): Double =
-    return getDouble(findColumn(columnLabel))
+  override def getDouble(columnLabel: String): Double = getDouble(findColumn(columnLabel))
 
   override def getBigDecimal(columnIndex: Int, scale: Int): BigDecimal =
     ???
@@ -139,11 +126,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getTime(columnLabel: String, cal: Calendar): Time =
     ???
 
-  override def getTimestamp(columnIndex: Int): Timestamp =
-    return getColumnValue(columnIndex)
+  override def getTimestamp(columnIndex: Int): Timestamp = getColumnValue(columnIndex)
 
-  override def getTimestamp(columnLabel: String): Timestamp =
-    return getTimestamp(findColumn(columnLabel))
+  override def getTimestamp(columnLabel: String): Timestamp = getTimestamp(findColumn(columnLabel))
 
   override def getTimestamp(columnIndex: Int, cal: Calendar): Timestamp =
     ???
@@ -169,23 +154,18 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getBinaryStream(columnLabel: String): InputStream =
     ???
 
-  override def getWarnings(): SQLWarning =
-    return warningChain
+  override def getWarnings(): SQLWarning = warningChain
 
-  override def clearWarnings() =
-    warningChain = null
+  override def clearWarnings() = warningChain = null
 
   override def getCursorName(): String =
     ???
 
-  override def getMetaData(): ResultSetMetaData =
-    return new BitlapResultSetMetaData(columnNames.toList, columnTypes.toList)
+  override def getMetaData(): ResultSetMetaData = new BitlapResultSetMetaData(columnNames, columnTypes)
 
-  override def getObject(columnIndex: Int): Any =
-    ???
+  override def getObject(columnIndex: Int): Any = getColumnValue(columnIndex)
 
-  override def getObject(columnLabel: String): Any =
-    ???
+  override def getObject(columnLabel: String): Any = getObject(findColumn(columnLabel))
 
   override def getObject(columnIndex: Int, map: util.Map[String, Class[_]]): AnyRef = ???
 
@@ -652,9 +632,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
     }
   }
 
-  def setSchema(schema: BTableSchema) =
-    this.schema = schema
+  def setSchema(schema: BTableSchema) = this.schema = schema
 
-  def getSchema(): BTableSchema =
-    return this.schema
+  def getSchema(): BTableSchema = this.schema
 }

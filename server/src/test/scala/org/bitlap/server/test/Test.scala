@@ -29,7 +29,7 @@ object Test {
     val groupId = conf.get(BitlapConf.NODE_GROUP_ID)
     val timeout = conf.get(BitlapConf.NODE_RPC_TIMEOUT).toInt
 
-    val client = RPC.newClient(peers, conf)
+    val client = RPC.newClient(conf, peers)
     assert(client.refreshLeader().isOk, "Refresh leader failed")
     val leader = RouteTable.getInstance().selectLeader(groupId)
     println(s"Leader is $leader")

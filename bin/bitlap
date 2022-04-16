@@ -5,40 +5,83 @@ bin=`dirname ${bin}`
 bin=`cd "$bin"; pwd`
 export BITLAP_HOME="$bin"/..
 
-. $BITLAP_HOME/bin/bitlap-env.sh
+. "$BITLAP_HOME"/bin/bitlap-env.sh
+
+BITLAP_PID_FILE=${BITLAP_PID_FILE:-"$BITLAP_TMP_DIR/bitlap.pid"}
+
+start() {
+  if [[ -f ${BITLAP_PID_FILE} ]] && [[ ! -z "$(ps -ef | grep $(cat ${BITLAP_PID_FILE}) | grep bitlap-server.*.jar | grep -v grep)" ]]; then
+    echo "process $(cat ${BITLAP_PID_FILE}) is still alive, maybe there is already a bitlap server running."
+    exit 1
+  fi
+  CLASS="org.bitlap.server.BitlapServer"
+  CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS"
+  echo "$CMD"
+  exec $CMD > "${BITLAP_LOG_DIR}"/bitlap.out 2>&1 &
+  echo $! > "${BITLAP_PID_FILE}"
+}
+
+stop() {
+  echo "Stopping bitlap server ..."
+  if [[ -f ${BITLAP_PID_FILE} ]]; then
+      kill -KILL $(cat ${BITLAP_PID_FILE})
+      echo "bitlap server stopped."
+      rm -f "${BITLAP_PID_FILE}"
+    else
+      echo "Fail to stop bitlap server, pid is stored in ${BITLAP_PID_FILE}."
+    fi
+}
 
 COMMAND=$1
 case $COMMAND in
   # server command
   server)
     shift
-    ARGS=$@
-    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
-      ARGS="--help"
-    fi
-    OPTS="$BITLAP_SERVER_OPTS"
-    CLASS="org.bitlap.cli.BitlapServerCli"
 
-    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-    echo $CMD
+    case $1 in
+      start)
+        start
+        ;;
+
+      stop)
+        stop
+        ;;
+
+      restart)
+        stop
+        start
+        ;;
+
+      *)
+        ARGS=$@
+        if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+          ARGS="--help"
+        fi
+        CLASS="org.bitlap.cli.BitlapServerCli"
+        CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+        echo "$CMD"
+        exec $CMD
+        ;;
+    esac
+
     ;;
 
   # sql command
   sql)
     shift
     ARGS=$@
-    if [ $# = 0 ] || [ "$1" = "-help" ] ; then
+    if [ "$1" = "-help" ] ; then
       ARGS="--help"
     fi
     OPTS="$BITLAP_CLIENT_OPTS"
     CLASS="org.bitlap.cli.BitlapSqlCli"
 
-
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-    echo $CMD
+    echo "$CMD"
+    exec $CMD
     ;;
 
-  # other comamnds
+  # other commands
   *)
     ARGS=$@
     if [ $# = 0 ] || [ "$COMMAND" = "-help" ] ; then
@@ -48,8 +91,8 @@ case $COMMAND in
     OPTS="$BITLAP_CLIENT_OPTS"
 
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-    echo $CMD
-    # exec $CMD
+    echo "$CMD"
+    exec $CMD
 
     ;;
 

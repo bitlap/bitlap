@@ -2,7 +2,7 @@
 package org.bitlap.cli
 
 import org.bitlap.tools.apply
-import picocli.CommandLine.{ Command, HelpCommand, Option, Parameters }
+import picocli.CommandLine.{ Command, Parameters }
 
 /**
  * @author 梦境迷离
@@ -20,9 +20,9 @@ class BitlapServerCli extends Runnable {
 
   @Parameters(
     paramLabel = "OPERATE",
-    description = Array("start, stop, status.")
+    description = Array("start, stop, restart, status.")
   )
-  var args: String = _
+  var operate: String = _
 
   override def run(): Unit = ()
 }

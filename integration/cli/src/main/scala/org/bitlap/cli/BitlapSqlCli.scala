@@ -4,7 +4,6 @@ package org.bitlap.cli
 import org.bitlap.cli.extension.BitlapSqlApplication
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
-import org.bitlap.jdbc.BitlapDriver
 import org.bitlap.tools.apply
 import picocli.CommandLine.{ Command, Option, Parameters }
 import sqlline.{ SqlLine, SqlLineOpts }
@@ -29,7 +28,7 @@ class BitlapSqlCli extends Runnable {
     names = Array("-s", "--server"),
     paramLabel = "SERVER",
     description = Array("Server Addresses, separated by comma."),
-    defaultValue = "localhost:23333"
+    defaultValue = "127.0.0.1:23333"
   )
   var server: String = _
 
@@ -64,14 +63,17 @@ class BitlapSqlCli extends Runnable {
 object BitlapSqlCli {
 
   def main(args: Array[String]): Unit = {
+    BitlapSqlExecutor.parseArgs(args: _*)
+    if (BitlapSqlExecutor.isUsageHelpRequested || BitlapSqlExecutor.isVersionHelpRequested) {
+      System.exit(BitlapSqlExecutor.<<?(args))
+    }
+
     val conf = new BitlapConf()
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
-    BitlapSqlExecutor.parseArgs(args: _*)
     val cmd = BitlapSqlExecutor.getCommand[BitlapSqlCli]
-
     val sqlArgs = ArrayBuffer(
       "-d",
-      classOf[BitlapDriver].getCanonicalName,
+      classOf[org.bitlap.Driver].getCanonicalName,
       "-u",
       s"jdbc:bitlap://${cmd.server}/default",
       "-n",
@@ -81,8 +83,9 @@ object BitlapSqlCli {
       "-ac",
       classOf[BitlapSqlApplication].getCanonicalName
     )
-    if (!StringEx.nullOrBlank(cmd.sql)) {
-      sqlArgs ++= Array("-e", cmd.sql)
+    val defaultSql = cmd.sql
+    if (!StringEx.nullOrBlank(defaultSql)) {
+      sqlArgs ++= Array("-e", defaultSql)
     }
     // sql line REPL or execute sql directly
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))

@@ -19,7 +19,7 @@ import scala.jdk.CollectionConverters._
 class BitlapClient(uri: String, props: Map[String, String]) {
 
   private val conf: BitlapConf = new BitlapConf(props.asJava)
-  private val rpcClient = RPC.newClient(uri, conf)
+  private val rpcClient = RPC.newClient(conf, uri)
   private val readTimeout: JLong = conf.get(BitlapConf.NODE_READ_TIMEOUT)
 
   /**

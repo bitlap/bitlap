@@ -64,6 +64,7 @@ object models {
    */
   object TypeId extends Enumeration {
 
+    // TODO: define types <=> java.sql.Types
     type TypeId = Value
     val B_TYPE_ID_UNSPECIFIED: TypeId.Value =
       Value(

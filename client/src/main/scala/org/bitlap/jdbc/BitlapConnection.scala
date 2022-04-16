@@ -64,16 +64,14 @@ class BitlapConnection(uri: String, info: Properties = new Properties()) extends
 
   override def createStatement(): Statement =
     if (session != null) {
-      return new BitlapStatement(session, client)
+      new BitlapStatement(session, client)
     } else {
       throw BSQLException("Statement is closed")
     }
 
-  override def isClosed(): Boolean =
-    return closed
+  override def isClosed(): Boolean = closed
 
-  override def clearWarnings() =
-    warningChain = null
+  override def clearWarnings() = warningChain = null
 
   override def prepareStatement(sql: String): PreparedStatement = ???
 
@@ -103,7 +101,7 @@ class BitlapConnection(uri: String, info: Properties = new Properties()) extends
 
   override def getTransactionIsolation: Int = ???
 
-  override def getWarnings: SQLWarning = ???
+  override def getWarnings: SQLWarning = warningChain
 
   override def createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement = ???
 
@@ -174,7 +172,7 @@ class BitlapConnection(uri: String, info: Properties = new Properties()) extends
 
   override def setSchema(schema: String): Unit = ???
 
-  override def getSchema: String = ???
+  override def getSchema: String = "default" // TODO: fix me
 
   override def abort(executor: Executor): Unit = ???
 

@@ -43,13 +43,14 @@
                 <include>NOTICE</include>
                 <include>LICENSE</include>
                 <include>*.md</include>
-                <include>*.png</include>
             </includes>
         </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <excludes/>
+            <excludes>
+                <exclude>org.slf4j:slf4j-log4j12</exclude>
+            </excludes>
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>

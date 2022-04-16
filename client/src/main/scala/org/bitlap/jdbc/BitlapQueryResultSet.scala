@@ -78,7 +78,7 @@ class BitlapQueryResultSet(
         namesSb.append(columnName)
         typesSb.append(columnTypeName)
       }
-      println("retrieveSchema => names: $namesSb, types: $typesSb")
+      println(s"retrieveSchema => names: $namesSb, types: $typesSb")
     } catch {
       case e: SQLException => throw e
       case e: Exception    => throw new SQLException("Could not create ResultSet: " + e.getMessage, e)
@@ -112,7 +112,7 @@ class BitlapQueryResultSet(
       case e: Exception    => throw new SQLException("Error retrieving next row", e)
     }
 
-    return true
+    true
   }
 
   override def isClosed(): Boolean =

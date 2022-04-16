@@ -1,6 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
+import org.slf4j.LoggerFactory
+
 import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverPropertyInfo
@@ -15,7 +17,9 @@ import java.util.logging.Logger
  * Created by IceMimosa
  * Date: 2021/4/16
  */
-class BitlapDriver extends Driver {
+abstract class BitlapDriver extends Driver {
+
+  protected val log = LoggerFactory.getLogger("BitlapDriver")
 
   override def connect(url: String, info: Properties): Connection =
     try new BitlapConnection(url, info)
@@ -70,17 +74,19 @@ class BitlapDriver extends Driver {
     Array(hostProp, portProp, dbProp)
   }
 
-  override def getMajorVersion(): Int =
-    return Utils.MAJOR_VERSION
+  override def getMajorVersion(): Int = Utils.MAJOR_VERSION
 
-  override def getMinorVersion(): Int =
-    return Utils.MINOR_VERSION
+  override def getMinorVersion(): Int = Utils.MINOR_VERSION
 
-  override def jdbcCompliant(): Boolean =
-    return Utils.JDBC_COMPLIANT
+  override def jdbcCompliant(): Boolean = Utils.JDBC_COMPLIANT
 
-  override def getParentLogger(): Logger =
-    throw new SQLException("Method not supported")
+  override def getParentLogger(): Logger = Logger.getLogger("BitlapDriver")
+
+  def register(): Unit =
+    try java.sql.DriverManager.registerDriver(this)
+    catch {
+      case e: Exception => log.error("Error occurred while registering JDBC driver", e)
+    }
 
   /**
    * Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
@@ -119,8 +125,4 @@ class BitlapDriver extends Driver {
     }
     return urlProps
   }
-}
-
-object BitlapDriver {
-  java.sql.DriverManager.registerDriver(new BitlapDriver())
 }

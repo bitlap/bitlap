@@ -44,6 +44,12 @@
     <profiles>
         <profile>
             <id>assembly</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.bitlap</groupId>
+                    <artifactId>bitlap-cli</artifactId>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>

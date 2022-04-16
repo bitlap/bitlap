@@ -18,5 +18,8 @@ object BitlapServer extends App {
     }
   )
   this.server.start()
-  this.server.join()
+  try Thread.currentThread().join()
+  catch {
+    case _: Throwable => // ignore
+  }
 }

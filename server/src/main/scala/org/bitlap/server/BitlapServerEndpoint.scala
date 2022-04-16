@@ -17,7 +17,7 @@ import java.io.File
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
-class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleThread("BitlapServerEndpoint") {
+class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleThread("BitlapServerEndpoint", true) {
 
   private var node: Node = _
 

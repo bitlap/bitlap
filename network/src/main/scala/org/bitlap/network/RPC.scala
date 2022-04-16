@@ -12,7 +12,7 @@ import org.bitlap.network.proto.driver._
  */
 object RPC {
 
-  def newClient(uri: String, conf: BitlapConf): RpcClient =
+  def newClient(conf: BitlapConf, uri: String): RpcClient =
     new RpcClient(uri, conf)
 
   def newServer(conf: BitlapConf, processors: List[RpcRequestProcessor[_]]): RpcServer =

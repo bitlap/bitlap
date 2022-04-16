@@ -29,7 +29,7 @@ class JdbcProcessors {
   private implicit val s: JdbcProcessor = new JdbcProcessor()
   private implicit val e: Executor = null
 
-  val processors = List(
+  def processors = List(
     closeSession,
     openSession,
     executeStatement,

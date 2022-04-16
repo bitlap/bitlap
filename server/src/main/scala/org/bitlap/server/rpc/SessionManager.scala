@@ -20,41 +20,39 @@ class SessionManager extends LazyLogging {
     new ConcurrentHashMap[SessionHandle, Session]()
 
   private lazy val sessionThread: Thread = new Thread { // register center
-    while (true) {
-      import scala.collection.convert.ImplicitConversions.{ `iterator asJava`, `map AsScalaConcurrentMap` }
-      val iterator = handleToSession.iterator
-      logger.info(s"There are [${handleToSession.size}] surviving sessions")
-      try {
-        while (iterator.hasNext) {
-          val element = iterator.next()
-          val sessionHandle = element._1
-          if (!element._2.sessionState.get()) {
-            iterator.remove()
-            logger.info(
-              s"Session state is false, remove session: $sessionHandle"
-            )
+    override def run(): Unit =
+      while (!Thread.currentThread().isInterrupted) {
+        import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
+        logger.info(s"There are [${handleToSession.size}] surviving sessions")
+        try {
+          handleToSession.asScala.foreach { case (sessionHandle, session) =>
+            if (!session.sessionState.get()) {
+              handleToSession.remove(sessionHandle)
+              logger.info(
+                s"Session state is false, remove session: $sessionHandle"
+              )
+            }
+
+            val now = System.currentTimeMillis()
+            if (session.lastAccessTime + 20 * 60 * 1000 < now) {
+              handleToSession.remove(sessionHandle)
+              logger.info(
+                s"Session has not been visited for 20 minutes, remove session: $sessionHandle"
+              )
+            } else {
+              logger.info(s"SessionId: ${sessionHandle.handleId}")
+            }
           }
 
-          val now = System.currentTimeMillis()
-          if (element._2.lastAccessTime + 20 * 60 * 1000 < now) {
-            iterator.remove()
-            logger.info(
-              s"Session has not been visited for 20 minutes, remove session: $sessionHandle"
+          TimeUnit.SECONDS.sleep(3)
+        } catch {
+          case e: Exception =>
+            logger.error(
+              s"Failed to listen for session, error: $e.localizedMessage",
+              e
             )
-          } else {
-            logger.info(s"SessionId: ${sessionHandle.handleId}")
-          }
         }
-
-        TimeUnit.SECONDS.sleep(3)
-      } catch {
-        case e: Exception =>
-          logger.error(
-            s"Failed to listen for session, error: $e.localizedMessage",
-            e
-          )
       }
-    }
   }
 
   def startListener(): Unit = {

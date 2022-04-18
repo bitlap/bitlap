@@ -64,7 +64,7 @@ object models {
    */
   object TypeId extends Enumeration {
 
-    // TODO: define types <=> java.sql.Types
+    // define types <=> java.sql.Types in driver
     type TypeId = Value
     val B_TYPE_ID_UNSPECIFIED: TypeId.Value =
       Value(
@@ -105,6 +105,12 @@ object models {
       Value(
         BTypeId.B_TYPE_ID_SHORT_TYPE.getNumber,
         BTypeId.B_TYPE_ID_SHORT_TYPE.name()
+      )
+
+    val B_TYPE_ID_BYTE_TYPE: TypeId.Value =
+      Value(
+        BTypeId.B_TYPE_ID_BYTE_TYPE.getNumber,
+        BTypeId.B_TYPE_ID_BYTE_TYPE.name()
       )
 
     def toBOperationType(typeId: TypeId): BTypeId =

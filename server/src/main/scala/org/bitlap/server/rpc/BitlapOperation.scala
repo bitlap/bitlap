@@ -33,6 +33,7 @@ class BitlapOperation(
         case Types.DOUBLE    => models.TypeId.B_TYPE_ID_DOUBLE_TYPE
         case Types.BOOLEAN   => models.TypeId.B_TYPE_ID_BOOLEAN_TYPE
         case Types.TIMESTAMP => models.TypeId.B_TYPE_ID_TIMESTAMP_TYPE
+        case Types.TINYINT   => models.TypeId.B_TYPE_ID_BYTE_TYPE
         // TODO more
         case _ => models.TypeId.B_TYPE_ID_UNSPECIFIED
       }
@@ -45,6 +46,7 @@ class BitlapOperation(
         metaData.getColumnType(it) match {
           case Types.VARCHAR                => ByteString.copyFromUtf8(rs.getString(it))
           case Types.SMALLINT               => ByteString.copyFromUtf8(rs.getShort(it).toString)
+          case Types.TINYINT                => ByteString.copyFromUtf8(rs.getByte(it).toString)
           case Types.INTEGER                => ByteString.copyFromUtf8(rs.getInt(it).toString)
           case Types.BIGINT | Types.NUMERIC => ByteString.copyFromUtf8(rs.getLong(it).toString)
           case Types.DOUBLE                 => ByteString.copyFromUtf8(rs.getDouble(it).toString)

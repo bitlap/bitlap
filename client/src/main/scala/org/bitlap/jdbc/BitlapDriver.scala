@@ -1,12 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
+import org.slf4j
 import org.slf4j.LoggerFactory
 
-import java.sql.Connection
-import java.sql.Driver
-import java.sql.DriverPropertyInfo
-import java.sql.SQLException
+import java.sql.{ Connection, Driver, DriverPropertyInfo, SQLException }
 import java.util.Properties
 import java.util.logging.Logger
 
@@ -17,12 +15,12 @@ import java.util.logging.Logger
  * Created by IceMimosa
  * Date: 2021/4/16
  */
-abstract class BitlapDriver extends Driver {
+private[jdbc] abstract class BitlapDriver extends Driver {
 
-  protected val log = LoggerFactory.getLogger("BitlapDriver")
+  protected val log: slf4j.Logger = LoggerFactory.getLogger(classOf[BitlapDriver].getTypeName)
 
   override def connect(url: String, info: Properties): Connection =
-    try new BitlapConnection(url, info)
+    try BitlapConnection(url, info)
     catch {
       case ex: Exception => throw BSQLException(ex.toString)
     }
@@ -30,8 +28,7 @@ abstract class BitlapDriver extends Driver {
   /**
    * Checks whether a given url is in a valid format.
    *
-   * The current uri format is:
-   * jdbc:bitlap://[host[:port]]
+   * The current uri format is: `jdbc:bitlap://[host[:port]]`
    *
    * jdbc:bitlap://                 - run in embedded mode
    * jdbc:bitlap://localhost        - connect to localhost default port (10000)
@@ -40,10 +37,9 @@ abstract class BitlapDriver extends Driver {
    * TODO: - write a better regex.
    *       - decide on uri format
    */
-  override def acceptsURL(url: String): Boolean = {
-    if (url == null || url.isEmpty) return false
-    url.startsWith(Utils.URL_PREFIX)
-  }
+  override def acceptsURL(url: String): Boolean =
+    if (url == null || url.isEmpty) false
+    else url.startsWith(Utils.URL_PREFIX)
 
   override def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] = {
     var curInfo: Properties = new Properties(info)
@@ -71,6 +67,8 @@ abstract class BitlapDriver extends Driver {
     )
     dbProp.required = false
     dbProp.description = "Database name"
+
+    log.info(s"Driver connect to: host[${hostProp.value}],port[${portProp.value}],database:[${dbProp.value}]")
     Array(hostProp, portProp, dbProp)
   }
 
@@ -123,6 +121,6 @@ abstract class BitlapDriver extends Driver {
     if (hostPortAndDatabase.size > 1) {
       urlProps.setProperty(Utils.DBNAME_PROPERTY_KEY, hostPortAndDatabase(1))
     }
-    return urlProps
+    urlProps
   }
 }

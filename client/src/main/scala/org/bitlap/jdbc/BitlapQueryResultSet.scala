@@ -73,15 +73,14 @@ class BitlapQueryResultSet(
         }
         val columnName = columns.get(pos).getColumnName
         columnNames :+= columnName
-        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns.get(pos).getTypeDesc)
+        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns.get(pos).getTypeDesc).stringify
         columnTypes :+= columnTypeName
         namesSb.append(columnName)
         typesSb.append(columnTypeName)
       }
-      println(s"retrieveSchema => names: $namesSb, types: $typesSb")
     } catch {
-      case e: SQLException => throw e
-      case e: Exception    => throw new SQLException("Could not create ResultSet: " + e.getMessage, e)
+      case e: SQLException => throw BSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
+      case e: Exception    => throw e
     }
 
   override def next(): Boolean = {
@@ -108,8 +107,8 @@ class BitlapQueryResultSet(
 
       rowsFetched = rowsFetched + 1
     } catch {
-      case e: SQLException => throw e
-      case e: Exception    => throw new SQLException("Error retrieving next row", e)
+      case e: SQLException => throw BSQLException(msg = "Error retrieving next row", cause = e)
+      case e: Exception    => throw e
     }
 
     true
@@ -139,7 +138,7 @@ class BitlapQueryResultSet(
     this.fetchSize = rows
   }
 
-  override def close() {
+  override def close(): Unit = {
     this.client = null
     this.stmtHandle = null
     this.sessHandle = null
@@ -167,39 +166,39 @@ object BitlapQueryResultSet {
     var fetchSize = 50
     var emptyResultSet = false
 
-    def setClient(client: BitlapClient) = {
+    def setClient(client: BitlapClient): Builder = {
       this.client = client
       this
     }
 
-    def setStmtHandle(stmtHandle: BOperationHandle) = {
+    def setStmtHandle(stmtHandle: BOperationHandle): Builder = {
       this.stmtHandle = stmtHandle
       this
     }
 
-    def setSessionHandle(sessHandle: BSessionHandle) = {
+    def setSessionHandle(sessHandle: BSessionHandle): Builder = {
       this.sessHandle = sessHandle
       this
     }
 
-    def setMaxRows(maxRows: Int) = {
+    def setMaxRows(maxRows: Int): Builder = {
       this.maxRows = maxRows
       this
     }
 
-    def setSchema(colNames: List[String], colTypes: List[String]) = {
+    def setSchema(colNames: List[String], colTypes: List[String]): Builder = {
       this.colNames ++= colNames
       this.colTypes ++= colTypes
       retrieveSchema = false
       this
     }
 
-    def setFetchSize(fetchSize: Int) = {
+    def setFetchSize(fetchSize: Int): Builder = {
       this.fetchSize = fetchSize
       this
     }
 
-    def setEmptyResultSet(emptyResultSet: Boolean) = {
+    def setEmptyResultSet(emptyResultSet: Boolean): Builder = {
       this.emptyResultSet = emptyResultSet
       this
     }

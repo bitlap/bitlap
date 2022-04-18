@@ -2,9 +2,10 @@
 package org.bitlap.jdbc
 
 import org.apache.commons.lang.StringUtils
+
 import java.io.PrintWriter
 import java.sql.Connection
-import java.sql.SQLException
+import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
 
@@ -29,12 +30,11 @@ class BitlapDataSource extends DataSource {
 
   override def getParentLogger: Logger = ???
 
-  override def getConnection(): Connection =
-    return getConnection(StringUtils.EMPTY, StringUtils.EMPTY)
+  override def getConnection(): Connection = getConnection(StringUtils.EMPTY, StringUtils.EMPTY)
 
   override def getConnection(username: String, password: String): Connection =
-    try new BitlapConnection(StringUtils.EMPTY)
+    try BitlapConnection(StringUtils.EMPTY, new Properties())
     catch {
-      case ex: java.lang.Exception => throw new SQLException("Error in getting BitlapConnection", ex)
+      case ex: java.lang.Exception => throw BSQLException(msg = "Error in getting BitlapConnection", cause = ex)
     }
 }

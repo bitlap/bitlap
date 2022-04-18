@@ -10,6 +10,7 @@ import org.bitlap.common.{ BitlapConf, LifeCycleThread }
 import org.bitlap.network.RPC
 import org.bitlap.server.raft.MetaStateMachine
 import org.bitlap.server.rpc.processor.JdbcProcessors
+import org.bitlap.tools.apply
 
 import java.io.File
 
@@ -17,6 +18,7 @@ import java.io.File
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
+@apply
 class BitlapServerEndpoint(private val conf: BitlapConf) extends LifeCycleThread("BitlapServerEndpoint", true) {
 
   private var node: Node = _

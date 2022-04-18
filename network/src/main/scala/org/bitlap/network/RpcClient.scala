@@ -7,10 +7,12 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.InvokeCallback
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import org.bitlap.common.BitlapConf
+import org.bitlap.tools.apply
 
 /**
  * rpc client to wrapper sofa client
  */
+@apply
 class RpcClient(uri: String, conf: BitlapConf) {
 
   private var configuration: Configuration = _

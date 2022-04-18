@@ -1,9 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import java.sql.ResultSetMetaData
-import java.sql.SQLException
-import java.sql.Types
+import java.sql.{ ResultSetMetaData, Types }
 
 /**
  * @author 梦境迷离
@@ -29,6 +27,7 @@ class BitlapResultSetMetaData(
     getColumnType(column) match {
       case Types.VARCHAR | Types.BIGINT => 32
       case Types.TINYINT                => 2
+      case Types.TINYINT                => 1
       case Types.BOOLEAN                => 8
       case Types.DOUBLE | Types.INTEGER => 16
       case _                            => 32
@@ -51,24 +50,15 @@ class BitlapResultSetMetaData(
   override def getCatalogName(column: Int): String = ???
 
   override def getColumnType(column: Int): Int = {
-    if (columnTypes.isEmpty) throw new SQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw new SQLException("Invalid column value: $column")
+    if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
+    if (column < 1 || column > columnTypes.size) throw BSQLException("Invalid column value: $column")
     val typ = columnTypes(column - 1)
-    typ match {
-      case "STRING"    => Types.VARCHAR
-      case "BOOLEAN"   => Types.BOOLEAN
-      case "DOUBLE"    => Types.DOUBLE
-      case "BYTE"      => Types.TINYINT
-      case "TIMESTAMP" => Types.TIMESTAMP
-      case "INT"       => Types.INTEGER
-      case "LONG"      => Types.BIGINT
-      case _           => throw new SQLException(s"Unrecognized column type: $typ")
-    }
+    ColumnTyped(typ).toValue
   }
 
   override def getColumnTypeName(column: Int): String = {
-    if (columnTypes.isEmpty) throw new SQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw new SQLException("Invalid column value: $column")
+    if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
+    if (column < 1 || column > columnTypes.size) throw BSQLException("Invalid column value: $column")
     columnTypes(column - 1)
   }
 

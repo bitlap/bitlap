@@ -18,7 +18,6 @@ class MetaStateMachine extends StateMachineAdapter {
 
   override def onApply(iterator: jraft.Iterator): Unit =
     while (iterator.hasNext) {
-      println("On apply with term: ${iter.term} and index: ${iter.index}.")
       iterator.next()
     }
 

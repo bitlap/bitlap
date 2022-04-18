@@ -43,9 +43,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def isWrapperFor(iface: Class[_]): Boolean = ???
 
-  override def close() {
-    ???
-  }
+  override def close(): Unit = ()
 
   override def wasNull(): Boolean = _wasNull
 
@@ -57,11 +55,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def getBoolean(columnLabel: String): Boolean = getBoolean(findColumn(columnLabel))
 
-  override def getByte(columnIndex: Int): Byte =
-    ???
+  override def getByte(columnIndex: Int): Byte = ???
 
-  override def getByte(columnLabel: String): Byte =
-    ???
+  override def getByte(columnLabel: String): Byte = ???
 
   override def getShort(columnIndex: Int): Short = getColumnValue(columnIndex)
 
@@ -156,7 +152,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def getWarnings(): SQLWarning = warningChain
 
-  override def clearWarnings() = warningChain = null
+  override def clearWarnings(): Unit = warningChain = null
 
   override def getCursorName(): String =
     ???
@@ -176,13 +172,11 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getObject[T](columnLabel: String, `type`: Class[T]): T = ???
 
   override def findColumn(columnLabel: String): Int = {
-    var columnIndex = columnNames.indexOf(columnLabel)
+    val columnIndex = columnNames.indexOf(columnLabel)
     if (columnIndex == -1) {
       throw BSQLException("Bitlap SQL Exception")
-    } else {
-      columnIndex = columnIndex + 1
     }
-    columnIndex
+    columnIndex + 1
   }
 
   override def getCharacterStream(columnIndex: Int): Reader =
@@ -203,10 +197,10 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def isLast(): Boolean =
     ???
 
-  override def beforeFirst() =
+  override def beforeFirst(): Unit =
     ???
 
-  override def afterLast() =
+  override def afterLast(): Unit =
     ???
 
   override def first(): Boolean =
@@ -227,7 +221,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def previous(): Boolean =
     ???
 
-  override def setFetchDirection(direction: Int) =
+  override def setFetchDirection(direction: Int): Unit =
     ???
 
   override def getFetchDirection(): Int =
@@ -238,8 +232,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getFetchSize(): Int =
     ???
 
-  override def getType(): Int =
-    return ResultSet.TYPE_FORWARD_ONLY
+  override def getType(): Int = ResultSet.TYPE_FORWARD_ONLY
 
   override def getConcurrency(): Int =
     ???
@@ -253,174 +246,173 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def rowDeleted(): Boolean =
     ???
 
-  override def updateNull(columnIndex: Int) =
+  override def updateNull(columnIndex: Int): Unit =
     ???
 
-  override def updateNull(columnLabel: String) =
+  override def updateNull(columnLabel: String): Unit =
     ???
 
-  override def updateBoolean(columnIndex: Int, x: Boolean) =
+  override def updateBoolean(columnIndex: Int, x: Boolean): Unit =
     ???
 
-  override def updateBoolean(columnLabel: String, x: Boolean) =
+  override def updateBoolean(columnLabel: String, x: Boolean): Unit =
     ???
 
-  override def updateByte(columnIndex: Int, x: Byte) =
+  override def updateByte(columnIndex: Int, x: Byte): Unit =
     ???
 
-  override def updateByte(columnLabel: String, x: Byte) =
+  override def updateByte(columnLabel: String, x: Byte): Unit =
     ???
 
-  override def updateShort(columnIndex: Int, x: Short) =
+  override def updateShort(columnIndex: Int, x: Short): Unit =
     ???
 
-  override def updateShort(columnLabel: String, x: Short) =
+  override def updateShort(columnLabel: String, x: Short): Unit =
     ???
 
-  override def updateInt(columnIndex: Int, x: Int) =
+  override def updateInt(columnIndex: Int, x: Int): Unit =
     ???
 
-  override def updateInt(columnLabel: String, x: Int) =
+  override def updateInt(columnLabel: String, x: Int): Unit =
     ???
 
-  override def updateLong(columnIndex: Int, x: Long) =
+  override def updateLong(columnIndex: Int, x: Long): Unit =
     ???
 
-  override def updateLong(columnLabel: String, x: Long) =
+  override def updateLong(columnLabel: String, x: Long): Unit =
     ???
 
-  override def updateFloat(columnIndex: Int, x: Float) =
+  override def updateFloat(columnIndex: Int, x: Float): Unit =
     ???
 
-  override def updateFloat(columnLabel: String, x: Float) =
+  override def updateFloat(columnLabel: String, x: Float): Unit =
     ???
 
-  override def updateDouble(columnIndex: Int, x: Double) =
+  override def updateDouble(columnIndex: Int, x: Double): Unit =
     ???
 
-  override def updateDouble(columnLabel: String, x: Double) =
+  override def updateDouble(columnLabel: String, x: Double): Unit =
     ???
 
-  override def updateBigDecimal(columnIndex: Int, x: BigDecimal) =
+  override def updateBigDecimal(columnIndex: Int, x: BigDecimal): Unit =
     ???
 
-  override def updateBigDecimal(columnLabel: String, x: BigDecimal) =
+  override def updateBigDecimal(columnLabel: String, x: BigDecimal): Unit =
     ???
 
-  override def updateString(columnIndex: Int, x: String) =
+  override def updateString(columnIndex: Int, x: String): Unit =
     ???
 
-  override def updateString(columnLabel: String, x: String) =
+  override def updateString(columnLabel: String, x: String): Unit =
     ???
 
   override def updateBytes(columnIndex: Int, x: Array[Byte]): Unit = ???
 
   override def updateBytes(columnLabel: String, x: Array[Byte]): Unit = ???
 
-  override def updateDate(columnIndex: Int, x: Date) =
+  override def updateDate(columnIndex: Int, x: Date): Unit =
     ???
 
-  override def updateDate(columnLabel: String, x: Date) =
+  override def updateDate(columnLabel: String, x: Date): Unit =
     ???
 
-  override def updateTime(columnIndex: Int, x: Time) {
-    ???
-  }
-
-  override def updateTime(columnLabel: String, x: Time) =
+  override def updateTime(columnIndex: Int, x: Time): Unit =
     ???
 
-  override def updateTimestamp(columnIndex: Int, x: Timestamp) =
+  override def updateTime(columnLabel: String, x: Time): Unit =
     ???
 
-  override def updateTimestamp(columnLabel: String, x: Timestamp) =
+  override def updateTimestamp(columnIndex: Int, x: Timestamp): Unit =
     ???
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Int) =
+  override def updateTimestamp(columnLabel: String, x: Timestamp): Unit =
     ???
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Int) =
+  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Int): Unit =
     ???
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Long) =
+  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Int): Unit =
     ???
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Long) =
+  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Long): Unit =
     ???
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream) =
+  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Long): Unit =
     ???
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream) =
+  override def updateAsciiStream(columnIndex: Int, x: InputStream): Unit =
     ???
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Int) =
+  override def updateAsciiStream(columnLabel: String, x: InputStream): Unit =
     ???
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Int) =
+  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Int): Unit =
     ???
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Long) =
+  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Int): Unit =
     ???
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Long) =
+  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Long): Unit =
     ???
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream) =
+  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Long): Unit =
     ???
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream) =
+  override def updateBinaryStream(columnIndex: Int, x: InputStream): Unit =
     ???
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Int) =
+  override def updateBinaryStream(columnLabel: String, x: InputStream): Unit =
     ???
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Int) =
+  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Int): Unit =
     ???
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Long) =
+  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Int): Unit =
     ???
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Long) =
+  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit =
     ???
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader) =
+  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader) =
+  override def updateCharacterStream(columnIndex: Int, x: Reader): Unit =
     ???
 
-  override def updateObject(columnIndex: Int, x: Any, scaleOrLength: Int) =
+  override def updateCharacterStream(columnLabel: String, reader: Reader): Unit =
     ???
 
-  override def updateObject(columnIndex: Int, x: Any) =
+  override def updateObject(columnIndex: Int, x: Any, scaleOrLength: Int): Unit =
     ???
 
-  override def updateObject(columnLabel: String, x: Any, scaleOrLength: Int) =
+  override def updateObject(columnIndex: Int, x: Any): Unit =
     ???
 
-  override def updateObject(columnLabel: String, x: Any) =
+  override def updateObject(columnLabel: String, x: Any, scaleOrLength: Int): Unit =
     ???
 
-  override def insertRow() =
+  override def updateObject(columnLabel: String, x: Any): Unit =
     ???
 
-  override def updateRow() =
+  override def insertRow(): Unit =
     ???
 
-  override def deleteRow() =
+  override def updateRow(): Unit =
     ???
 
-  override def refreshRow() =
+  override def deleteRow(): Unit =
     ???
 
-  override def cancelRowUpdates() =
+  override def refreshRow(): Unit =
     ???
 
-  override def moveToInsertRow() =
+  override def cancelRowUpdates(): Unit =
     ???
 
-  override def moveToCurrentRow() =
+  override def moveToInsertRow(): Unit =
+    ???
+
+  override def moveToCurrentRow(): Unit =
     ???
 
   override def getStatement(): Statement =
@@ -456,52 +448,52 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getURL(columnLabel: String): URL =
     ???
 
-  override def updateRef(columnIndex: Int, x: Ref) =
+  override def updateRef(columnIndex: Int, x: Ref): Unit =
     ???
 
-  override def updateRef(columnLabel: String, x: Ref) =
+  override def updateRef(columnLabel: String, x: Ref): Unit =
     ???
 
-  override def updateBlob(columnIndex: Int, x: Blob) =
+  override def updateBlob(columnIndex: Int, x: Blob): Unit =
     ???
 
-  override def updateBlob(columnLabel: String, x: Blob) =
+  override def updateBlob(columnLabel: String, x: Blob): Unit =
     ???
 
-  override def updateBlob(columnIndex: Int, inputStream: InputStream, length: Long) =
+  override def updateBlob(columnIndex: Int, inputStream: InputStream, length: Long): Unit =
     ???
 
-  override def updateBlob(columnLabel: String, inputStream: InputStream, length: Long) =
+  override def updateBlob(columnLabel: String, inputStream: InputStream, length: Long): Unit =
     ???
 
-  override def updateBlob(columnIndex: Int, inputStream: InputStream) =
+  override def updateBlob(columnIndex: Int, inputStream: InputStream): Unit =
     ???
 
-  override def updateBlob(columnLabel: String, inputStream: InputStream) =
+  override def updateBlob(columnLabel: String, inputStream: InputStream): Unit =
     ???
 
-  override def updateClob(columnIndex: Int, x: Clob) =
+  override def updateClob(columnIndex: Int, x: Clob): Unit =
     ???
 
-  override def updateClob(columnLabel: String, x: Clob) =
+  override def updateClob(columnLabel: String, x: Clob): Unit =
     ???
 
-  override def updateClob(columnIndex: Int, reader: Reader, length: Long) =
+  override def updateClob(columnIndex: Int, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateClob(columnLabel: String, reader: Reader, length: Long) =
+  override def updateClob(columnLabel: String, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateClob(columnIndex: Int, reader: Reader) =
+  override def updateClob(columnIndex: Int, reader: Reader): Unit =
     ???
 
-  override def updateClob(columnLabel: String, reader: Reader) =
+  override def updateClob(columnLabel: String, reader: Reader): Unit =
     ???
 
-  override def updateArray(columnIndex: Int, x: java.sql.Array) =
+  override def updateArray(columnIndex: Int, x: java.sql.Array): Unit =
     ???
 
-  override def updateArray(columnLabel: String, x: java.sql.Array) =
+  override def updateArray(columnLabel: String, x: java.sql.Array): Unit =
     ???
 
   override def getRowId(columnIndex: Int): RowId =
@@ -510,10 +502,10 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getRowId(columnLabel: String): RowId =
     ???
 
-  override def updateRowId(columnIndex: Int, x: RowId) =
+  override def updateRowId(columnIndex: Int, x: RowId): Unit =
     ???
 
-  override def updateRowId(columnLabel: String, x: RowId) =
+  override def updateRowId(columnLabel: String, x: RowId): Unit =
     ???
 
   override def getHoldability(): Int =
@@ -522,28 +514,28 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def isClosed(): Boolean =
     ???
 
-  override def updateNString(columnIndex: Int, nString: String) =
+  override def updateNString(columnIndex: Int, nString: String): Unit =
     ???
 
-  override def updateNString(columnLabel: String, nString: String) =
+  override def updateNString(columnLabel: String, nString: String): Unit =
     ???
 
-  override def updateNClob(columnIndex: Int, nClob: NClob) =
+  override def updateNClob(columnIndex: Int, nClob: NClob): Unit =
     ???
 
-  override def updateNClob(columnLabel: String, nClob: NClob) =
+  override def updateNClob(columnLabel: String, nClob: NClob): Unit =
     ???
 
-  override def updateNClob(columnIndex: Int, reader: Reader, length: Long) =
+  override def updateNClob(columnIndex: Int, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateNClob(columnLabel: String, reader: Reader, length: Long) =
+  override def updateNClob(columnLabel: String, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateNClob(columnIndex: Int, reader: Reader) =
+  override def updateNClob(columnIndex: Int, reader: Reader): Unit =
     ???
 
-  override def updateNClob(columnLabel: String, reader: Reader) =
+  override def updateNClob(columnLabel: String, reader: Reader): Unit =
     ???
 
   override def getNClob(columnIndex: Int): NClob =
@@ -558,10 +550,10 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getSQLXML(columnLabel: String): SQLXML =
     ???
 
-  override def updateSQLXML(columnIndex: Int, xmlObject: SQLXML) =
+  override def updateSQLXML(columnIndex: Int, xmlObject: SQLXML): Unit =
     ???
 
-  override def updateSQLXML(columnLabel: String, xmlObject: SQLXML) =
+  override def updateSQLXML(columnLabel: String, xmlObject: SQLXML): Unit =
     ???
 
   override def getNString(columnIndex: Int): String =
@@ -576,16 +568,16 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getNCharacterStream(columnLabel: String): Reader =
     ???
 
-  override def updateNCharacterStream(columnIndex: Int, x: Reader, length: Long) =
+  override def updateNCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit =
     ???
 
-  override def updateNCharacterStream(columnLabel: String, reader: Reader, length: Long) =
+  override def updateNCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit =
     ???
 
-  override def updateNCharacterStream(columnIndex: Int, x: Reader) =
+  override def updateNCharacterStream(columnIndex: Int, x: Reader): Unit =
     ???
 
-  override def updateNCharacterStream(columnLabel: String, reader: Reader) = ???
+  override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit = ???
 
   @inline
   private def getColumnValue[T](columnIndex: Int): T = {
@@ -607,24 +599,24 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
       val valueStr = bColumnValue.toStringUtf8
       val columnType = getSchema().getColumns(columnIndex - 1).getTypeDesc
-      return (
+      (
         columnType match {
           case BTypeId.B_TYPE_ID_STRING_TYPE =>
             if (valueStr.isEmpty) "" else valueStr
           case BTypeId.B_TYPE_ID_INT_TYPE =>
-            if (valueStr.nonEmpty) Integer.parseInt(valueStr) else 0
+            if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
           case BTypeId.B_TYPE_ID_DOUBLE_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else 0.0
+            if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
           case BTypeId.B_TYPE_ID_SHORT_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else 0
+            if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
           case BTypeId.B_TYPE_ID_LONG_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else 0
+            if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
           case BTypeId.B_TYPE_ID_BOOLEAN_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else false
+            if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
           case BTypeId.B_TYPE_ID_TIMESTAMP_TYPE =>
             if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
-            else Timestamp.from(Instant.now())
-          case _ => throw BSQLException("Unrecognized column type:$columnType")
+            else null
+          case _ => throw BSQLException(s"Unrecognized column type:$columnType")
         }
       ).asInstanceOf[T]
     } catch {
@@ -632,7 +624,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
     }
   }
 
-  def setSchema(schema: BTableSchema) = this.schema = schema
+  def setSchema(schema: BTableSchema): Unit = this.schema = schema
 
   def getSchema(): BTableSchema = this.schema
 }

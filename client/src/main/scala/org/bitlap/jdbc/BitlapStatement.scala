@@ -131,11 +131,11 @@ class BitlapStatement(
 
   override def getMoreResults(current: Int): Boolean = ???
 
-  override def setFetchDirection(direction: Int) = ???
+  override def setFetchDirection(direction: Int): Unit = ???
 
   override def getFetchDirection(): Int = ???
 
-  override def setFetchSize(rows: Int) = ???
+  override def setFetchSize(rows: Int): Unit = ???
 
   override def getFetchSize(): Int = fetchSize
 
@@ -143,9 +143,9 @@ class BitlapStatement(
 
   override def getResultSetType(): Int = ???
 
-  override def addBatch(sql: String) = ???
+  override def addBatch(sql: String): Unit = ???
 
-  override def clearBatch() = ???
+  override def clearBatch(): Unit = ???
 
   override def executeBatch(): Array[Int] = ???
 
@@ -157,11 +157,11 @@ class BitlapStatement(
 
   override def isClosed(): Boolean = closed
 
-  override def setPoolable(poolable: Boolean) = ???
+  override def setPoolable(poolable: Boolean): Unit = ???
 
   override def isPoolable(): Boolean = ???
 
-  override def closeOnCompletion() = ???
+  override def closeOnCompletion(): Unit = ???
 
   override def isCloseOnCompletion(): Boolean = ???
 }

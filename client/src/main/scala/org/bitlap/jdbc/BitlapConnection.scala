@@ -3,6 +3,7 @@ package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
 import org.bitlap.network.proto.driver.BSessionHandle
+import org.bitlap.tools.apply
 
 import java.{ sql, util }
 import java.sql.Blob
@@ -28,7 +29,8 @@ import scala.jdk.CollectionConverters._
  * @since 2021/6/6
  * @version 1.0
  */
-class BitlapConnection(uri: String, info: Properties = new Properties()) extends Connection {
+@apply // not support default args
+class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   private var session: BSessionHandle = _
   private var closed = true
@@ -37,7 +39,7 @@ class BitlapConnection(uri: String, info: Properties = new Properties()) extends
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
-      throw new Exception("Invalid URL: $uri")
+      throw new Exception(s"Invalid URL: $uri")
     }
     // remove prefix
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
@@ -71,7 +73,7 @@ class BitlapConnection(uri: String, info: Properties = new Properties()) extends
 
   override def isClosed(): Boolean = closed
 
-  override def clearWarnings() = warningChain = null
+  override def clearWarnings(): Unit = warningChain = null
 
   override def prepareStatement(sql: String): PreparedStatement = ???
 

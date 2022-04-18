@@ -9,7 +9,7 @@ import org.bitlap.common.BitlapConf
  */
 object BitlapServer extends App {
   val conf = new BitlapConf()
-  val server = new BitlapServerEndpoint(conf)
+  val server = BitlapServerEndpoint(conf)
   Runtime.getRuntime.addShutdownHook(
     new Thread {
       if (server != null && !server.isShutdown) {

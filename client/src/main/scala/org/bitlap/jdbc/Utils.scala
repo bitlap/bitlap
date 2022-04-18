@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
+import org.bitlap.jdbc.ColumnType.{ BOOLEAN, BYTE, DOUBLE, INT, LONG, STRING, TIMESTAMP }
 import org.bitlap.network.proto.driver.BTypeId
 
 /**
@@ -52,12 +53,13 @@ object Utils {
 
   val SERVER_TYPE_NAMES =
     Map(
-      BTypeId.B_TYPE_ID_STRING_TYPE -> "STRING",
-      BTypeId.B_TYPE_ID_INT_TYPE -> "INT",
-      BTypeId.B_TYPE_ID_DOUBLE_TYPE -> "DOUBLE",
-      BTypeId.B_TYPE_ID_SHORT_TYPE -> "SHORT",
-      BTypeId.B_TYPE_ID_BOOLEAN_TYPE -> "BOOLEAN",
-      BTypeId.B_TYPE_ID_LONG_TYPE -> "LONG",
-      BTypeId.B_TYPE_ID_TIMESTAMP_TYPE -> "TIMESTAMP"
+      BTypeId.B_TYPE_ID_STRING_TYPE -> ColumnType.STRING,
+      BTypeId.B_TYPE_ID_INT_TYPE -> ColumnType.INT,
+      BTypeId.B_TYPE_ID_DOUBLE_TYPE -> ColumnType.DOUBLE,
+      BTypeId.B_TYPE_ID_SHORT_TYPE -> ColumnType.SHORT,
+      BTypeId.B_TYPE_ID_BOOLEAN_TYPE -> ColumnType.BOOLEAN,
+      BTypeId.B_TYPE_ID_LONG_TYPE -> ColumnType.LONG,
+      BTypeId.B_TYPE_ID_TIMESTAMP_TYPE -> ColumnType.TIMESTAMP,
+      BTypeId.B_TYPE_ID_BYTE_TYPE -> ColumnType.BYTE
     )
 }

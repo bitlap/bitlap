@@ -16,9 +16,9 @@ import scala.jdk.CollectionConverters._
  * @since 2021/11/21
  * @version 1.0
  */
-class BitlapClient(uri: String, props: Map[String, String]) {
+private[jdbc] class BitlapClient(uri: String, props: Map[String, String]) {
 
-  private val conf: BitlapConf = new BitlapConf(props.asJava)
+  private lazy val conf: BitlapConf = new BitlapConf(props.asJava)
   private val rpcClient = RPC.newClient(conf, uri)
   private val readTimeout: JLong = conf.get(BitlapConf.NODE_READ_TIMEOUT)
 
@@ -153,7 +153,7 @@ class BitlapClient(uri: String, props: Map[String, String]) {
   /**
    * Used to verify whether the RPC result is correct.
    */
-  private def verifySuccess(status: BStatus): Unit =
+  @inline private def verifySuccess(status: BStatus): Unit =
     if (status.getStatusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
       throw BSQLException(
         status.getErrorMessage,

@@ -7,10 +7,7 @@ package org.bitlap.jdbc
  * @version 1.0
  */
 abstract class BitlapMetaDataResultSet[M](
-  override val columnNames: List[String] = List(),
-  override val columnTypes: List[String] = List(),
-  protected var data: List[M] = List()
-) extends BitlapBaseResultSet {
-
-  override def close(): Unit = {}
-}
+  override val columnNames: List[String] = Nil,
+  override val columnTypes: List[String] = Nil,
+  protected var data: List[M] = Nil
+) extends BitlapBaseResultSet

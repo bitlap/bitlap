@@ -17,9 +17,8 @@ class MetaStateMachine extends StateMachineAdapter {
   private val leaderTerm = new AtomicLong(-1)
 
   override def onApply(iterator: jraft.Iterator): Unit =
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       iterator.next()
-    }
 
   override def onLeaderStart(term: Long) {
     super.onLeaderStart(term)

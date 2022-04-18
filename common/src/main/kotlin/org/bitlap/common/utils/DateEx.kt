@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common.utils
 
 import org.joda.time.DateTime
@@ -7,7 +8,6 @@ import org.joda.time.DateTimeZone
  * Date functions
  */
 object DateEx {
-
 
     /**
      * get time with local zone

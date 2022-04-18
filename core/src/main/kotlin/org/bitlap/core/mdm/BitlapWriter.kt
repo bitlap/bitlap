@@ -166,6 +166,7 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
         closed = true
         runCatching {
             this.metricStore.close()
+            this.metricDimStore.close()
         }.onFailure {
             log.error("Error when closing BitlapWriter, cause: ", it)
         }

@@ -13,6 +13,7 @@ import org.bitlap.common.BitlapIterator
 import org.bitlap.common.TimeRange
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.utils.DateEx.utc
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.sql.Keyword
@@ -22,7 +23,6 @@ import org.bitlap.core.storage.MetricStore
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowIterator
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.joda.time.DateTime
 
 /**
  * Metric implemented by apache carbondata
@@ -72,9 +72,12 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         if (rows.isEmpty()) {
             return
         }
-        val date = DateTime(tm)
-        val output = "${date.withTimeAtStartOfDay().millis}/${date.millis}"
-        val writer = writerB().outputPath(Path(dataPath, output).toString()).build()
+        val date = tm.utc()
+        val output = Path(dataPath, "${date.withTimeAtStartOfDay().millis}/${date.millis}")
+        if (fs.exists(output)) {
+            fs.delete(output, true)
+        }
+        val writer = writerB().outputPath(output.toString()).build()
         rows.forEach {
             writer.write(
                 arrayOf(
@@ -91,7 +94,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
 
     override fun query(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRow> {
         val timeFunc = { tm: Long ->
-            time.contains(DateTime(tm))
+            time.contains(tm.utc())
         }
         val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
         return this.queryCBM(timeFilter, metrics)
@@ -99,7 +102,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
 
     override fun queryMeta(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRowMeta> {
         val timeFunc = { tm: Long ->
-            time.contains(DateTime(tm))
+            time.contains(tm.utc())
         }
         val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
         return this.queryMeta(timeFilter, metrics)

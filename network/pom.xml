@@ -18,18 +18,13 @@
             <version>3.17.3</version>
         </dependency>
         <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>jraft-core</artifactId>
-            <version>${sofa.jraft.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>rpc-grpc-impl</artifactId>
-            <version>${sofa.jraft.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.thesamet.scalapb.zio-grpc</groupId>
+            <artifactId>zio-grpc-core_2.13</artifactId>
+            <version>${zio.grpc.version}</version>
         </dependency>
     </dependencies>
 
@@ -50,6 +45,21 @@
                 <groupId>com.github.os72</groupId>
                 <artifactId>protoc-jar-maven-plugin</artifactId>
                 <version>3.11.4</version>
+                <configuration>
+                    <includeMavenTypes>transitive</includeMavenTypes>
+                    <outputTargets>
+                        <outputTarget>
+                            <type>scalapb</type>
+                            <outputOptions>grpc</outputOptions> 
+                            <pluginArtifact>com.thesamet.scalapb.zio-grpc:protoc-gen-zio:0.5.1:sh:unix</pluginArtifact>
+                        </outputTarget>
+                        <outputTarget>
+                            <type>scalapb</type>
+                            <outputOptions>grpc</outputOptions>
+                            <pluginArtifact>com.thesamet.scalapb:protoc-gen-scala:0.9.6:sh:unix</pluginArtifact>
+                        </outputTarget>
+                    </outputTargets>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

@@ -1,60 +1,61 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-import com.alipay.sofa.jraft.{ RouteTable, Status }
-import com.alipay.sofa.jraft.conf.Configuration
-import com.alipay.sofa.jraft.option.CliOptions
-import com.alipay.sofa.jraft.rpc.InvokeCallback
-import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.common.BitlapConf
+import io.grpc.{ ManagedChannelBuilder, Status }
+import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
+import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
+import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
+import org.bitlap.network.driver.proto.{ BStatus, BStatusCode }
+import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.tools.apply
+import scalapb.zio_grpc.ZManagedChannel
+import zio.{ Layer, _ }
 
 /**
  * rpc client to wrapper sofa client
  */
 @apply
-class RpcClient(uri: String, conf: BitlapConf) {
+class RpcClient(uri: String, port: Int) {
 
-  private var configuration: Configuration = _
-  private var route: RouteTable = _
-  private var client: CliClientServiceImpl = _
+  private lazy val runtime = zio.Runtime.global
 
-  // bitlap configuration
-  private val groupId = conf.get(BitlapConf.NODE_GROUP_ID)
-  private val timeout = conf.get(BitlapConf.NODE_RPC_TIMEOUT)
+  val clientLayer: Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
+    ZManagedChannel.apply(ManagedChannelBuilder.forAddress(uri, port))
+  )
 
-  // init code
-  {
-    configuration = new Configuration
-    configuration.parse(uri)
-    route = RouteTable.getInstance()
-    route.updateConfiguration(groupId, configuration)
-    client = new CliClientServiceImpl
-    val opts = new CliOptions
-    opts.setMaxRetry(3)
-    client.init(opts)
-    this.refreshLeader()
+  def openSession(request: BOpenSessionReq): IO[Status, BOpenSessionResp] =
+    DriverServiceClient.openSession(request).provideLayer(clientLayer)
+
+  def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
+    DriverServiceClient.closeSession(request).provideLayer(clientLayer)
+
+  def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
+    DriverServiceClient.executeStatement(request).provideLayer(clientLayer)
+
+  def syncOpenSession(request: BOpenSessionReq): BOpenSessionResp = {
+    val ret = runtime.unsafeRun(openSession(request))
+    verifySuccess(ret.getStatus)
+    ret
   }
 
-  def invokeSync[T](request: AnyRef, timeout: Long = timeout, leader: Boolean = true): T = {
-    // TODO: support other nodes
-    this.refreshLeader()
-    val node = if (leader) route.selectLeader(groupId) else route.selectLeader(groupId)
-    val resp = this.client.getRpcClient.invokeSync(node.getEndpoint, request, timeout)
-    resp.asInstanceOf[T]
+  def syncCloseSession(request: BCloseSessionReq): BCloseSessionResp = {
+    val ret = runtime.unsafeRun(closeSession(request))
+    verifySuccess(ret.getStatus)
+    ret
   }
 
-  def invokeAsync[T](
-    request: AnyRef,
-    callback: InvokeCallback,
-    timeout: Long = timeout,
-    leader: Boolean = true
-  ): Unit = {
-    // TODO: support other nodes
-    this.refreshLeader()
-    val node = if (leader) route.selectLeader(groupId) else route.selectLeader(groupId)
-    this.client.getRpcClient.invokeAsync(node.getEndpoint, request, callback, timeout)
+  def syncExecuteStatement(request: BExecuteStatementReq): BExecuteStatementResp = {
+    val ret = runtime.unsafeRun(executeStatement(request))
+    verifySuccess(ret.getStatus)
+    ret
   }
 
-  def refreshLeader(): Status = route.refreshLeader(client, groupId, timeout.toInt)
+  /**
+   * Used to verify whether the RPC result is correct.
+   */
+  @inline private def verifySuccess(status: BStatus): Unit =
+    if (status.statusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
+      throw new Exception(status.errorMessage)
+    }
+
 }

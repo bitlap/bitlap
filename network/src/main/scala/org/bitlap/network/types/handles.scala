@@ -3,13 +3,14 @@ package org.bitlap.network.types
 
 import com.google.protobuf.ByteString
 import OperationType.OperationType
-import org.bitlap.network.proto.driver.{ BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle }
+import org.bitlap.network.driver.proto.{ BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle }
 import org.bitlap.tools.toString
 
 import java.nio.ByteBuffer
 import java.util.UUID
 
 /**
+ * TODO fix
  * @author 梦境迷离
  * @since 2021/11/20
  * @version 1.0
@@ -73,9 +74,9 @@ object handles {
 
     def this(bHandleId: BHandleIdentifier) = {
       this()
-      var bb = ByteBuffer.wrap(bHandleId.getGuid.toByteArray)
+      var bb = ByteBuffer.wrap(bHandleId.guid.toByteArray)
       this.publicId = new UUID(bb.getLong, bb.getLong)
-      bb = ByteBuffer.wrap(bHandleId.getSecret.toByteArray)
+      bb = ByteBuffer.wrap(bHandleId.secret.toByteArray)
       this.secretId = new UUID(bb.getLong, bb.getLong)
     }
 
@@ -88,11 +89,7 @@ object handles {
       guidBB.putLong(this.publicId.getLeastSignificantBits)
       secretBB.putLong(this.secretId.getMostSignificantBits)
       secretBB.putLong(this.secretId.getLeastSignificantBits)
-      BHandleIdentifier
-        .newBuilder()
-        .setGuid(ByteString.copyFrom(guid))
-        .setSecret(ByteString.copyFrom(secret))
-        .build()
+      BHandleIdentifier(guid = ByteString.copyFrom(guid), secret = ByteString.copyFrom(secret))
     }
 
     // 理论上hashCode和equals也可以用，@equalsAndHashCode
@@ -137,10 +134,7 @@ object handles {
       this(new HandleIdentifier(bSessionHandle.getSessionId))
 
     def toBSessionHandle(): BSessionHandle =
-      BSessionHandle
-        .newBuilder()
-        .setSessionId(super.getHandleId().toBHandleIdentifier())
-        .build()
+      BSessionHandle(Some(super.getHandleId().toBHandleIdentifier()))
 
     override def equals(other: Any): Boolean = {
       if (this.eq(other.asInstanceOf[AnyRef])) return true
@@ -167,19 +161,18 @@ object handles {
 
     def this(bOperationHandle: BOperationHandle) = {
       this(
-        OperationType.getOperationType(bOperationHandle.getOperationType),
-        bOperationHandle.getHasResultSet,
+        OperationType.getOperationType(bOperationHandle.operationType),
+        bOperationHandle.hasResultSet,
         new HandleIdentifier(bOperationHandle.getOperationId)
       )
     }
 
     def toBOperationHandle(): BOperationHandle =
-      BOperationHandle
-        .newBuilder()
-        .setHasResultSet(hasResultSet)
-        .setOperationId(handleId.toBHandleIdentifier())
-        .setOperationType(BOperationType.forNumber(opType.id))
-        .build()
+      BOperationHandle(
+        hasResultSet = hasResultSet,
+        operationId = Some(handleId.toBHandleIdentifier()),
+        operationType = BOperationType.fromValue(opType.id)
+      )
 
     override def hashCode(): Int = {
       val prime = 31

@@ -2,9 +2,8 @@
 package org.bitlap.network.types
 
 import com.google.protobuf.ByteString
+import org.bitlap.network.driver.proto._
 import org.bitlap.network.types.models.TypeId.TypeId
-import org.bitlap.network.proto.driver.{ BColumnDesc, BRow, BRowSet, BTableSchema, BTypeId }
-import scala.jdk.CollectionConverters._
 
 /**
  * @author 梦境迷离
@@ -16,31 +15,19 @@ object models {
   case class QueryResult(tableSchema: TableSchema, rows: RowSet)
 
   case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) {
-    def toBRowSet(): BRowSet =
-      BRowSet
-        .newBuilder()
-        .setStartRowOffset(startOffset)
-        .addAllRows(rows.map(_.toBRow()).asJava)
-        .build()
+    def toBRowSet(): BRowSet = BRowSet(startRowOffset = startOffset, rows = rows.map(_.toBRow()))
   }
 
   /**
    * The wrapper class of the Proto buffer `BRow`.
    */
   case class Row(private val values: List[ByteString] = Nil) {
-    def toBRow(): BRow = {
-      import scala.jdk.CollectionConverters._
-      BRow.newBuilder().addAllColVals(values.asJava).build()
-    }
+    def toBRow(): BRow = BRow(values)
   }
 
   case class TableSchema(private val columns: List[ColumnDesc] = Nil) {
 
-    def toBTableSchema(): BTableSchema =
-      BTableSchema
-        .newBuilder()
-        .addAllColumns(columns.map(_.toBColumnDesc()).asJava)
-        .build()
+    def toBTableSchema(): BTableSchema = BTableSchema(columns = columns.map(_.toBColumnDesc()))
   }
 
   /**
@@ -52,11 +39,7 @@ object models {
   ) {
 
     def toBColumnDesc(): BColumnDesc =
-      BColumnDesc
-        .newBuilder()
-        .setTypeDesc(TypeId.toBOperationType(typeDesc))
-        .setColumnName(columnName)
-        .build()
+      BColumnDesc(typeDesc = TypeId.toBOperationType(typeDesc), columnName = columnName)
   }
 
   /**
@@ -68,53 +51,53 @@ object models {
     type TypeId = Value
     val B_TYPE_ID_UNSPECIFIED: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_UNSPECIFIED.getNumber,
-        BTypeId.B_TYPE_ID_UNSPECIFIED.name()
+        BTypeId.B_TYPE_ID_UNSPECIFIED.index,
+        BTypeId.B_TYPE_ID_UNSPECIFIED.name
       )
     val B_TYPE_ID_STRING_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_STRING_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_STRING_TYPE.name()
+        BTypeId.B_TYPE_ID_STRING_TYPE.index,
+        BTypeId.B_TYPE_ID_STRING_TYPE.name
       )
     val B_TYPE_ID_INT_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_INT_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_INT_TYPE.name()
+        BTypeId.B_TYPE_ID_INT_TYPE.index,
+        BTypeId.B_TYPE_ID_INT_TYPE.name
       )
     val B_TYPE_ID_DOUBLE_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_DOUBLE_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_DOUBLE_TYPE.name()
+        BTypeId.B_TYPE_ID_DOUBLE_TYPE.index,
+        BTypeId.B_TYPE_ID_DOUBLE_TYPE.name
       )
     val B_TYPE_ID_LONG_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_LONG_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_LONG_TYPE.name()
+        BTypeId.B_TYPE_ID_LONG_TYPE.index,
+        BTypeId.B_TYPE_ID_LONG_TYPE.name
       )
     val B_TYPE_ID_BOOLEAN_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.name()
+        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.index,
+        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.name
       )
     val B_TYPE_ID_TIMESTAMP_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.name()
+        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.index,
+        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.name
       )
     val B_TYPE_ID_SHORT_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_SHORT_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_SHORT_TYPE.name()
+        BTypeId.B_TYPE_ID_SHORT_TYPE.index,
+        BTypeId.B_TYPE_ID_SHORT_TYPE.name
       )
 
     val B_TYPE_ID_BYTE_TYPE: TypeId.Value =
       Value(
-        BTypeId.B_TYPE_ID_BYTE_TYPE.getNumber,
-        BTypeId.B_TYPE_ID_BYTE_TYPE.name()
+        BTypeId.B_TYPE_ID_BYTE_TYPE.index,
+        BTypeId.B_TYPE_ID_BYTE_TYPE.name
       )
 
     def toBOperationType(typeId: TypeId): BTypeId =
-      BTypeId.forNumber(typeId.id)
+      BTypeId.fromValue(typeId.id)
   }
 
 }

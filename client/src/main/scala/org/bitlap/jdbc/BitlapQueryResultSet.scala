@@ -2,10 +2,9 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
-import org.bitlap.network.proto.driver.{ BOperationHandle, BRow, BSessionHandle }
+import org.bitlap.network.driver.proto.{BOperationHandle, BRow, BSessionHandle}
 
-import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
-import scala.jdk.CollectionConverters._
+import java.sql.{ResultSetMetaData, SQLException, SQLWarning}
 
 /**
  * @author 梦境迷离
@@ -60,20 +59,20 @@ class BitlapQueryResultSet(
       val typesSb = new StringBuilder()
 
       val schema = client.getResultSetMetadata(stmtHandle)
-      if (schema == null || schema.getColumnsList.isEmpty) {
+      if (schema == null || schema.columns.isEmpty) {
         return
       }
 
       this.setSchema(schema)
-      val columns = schema.getColumnsList
-      for (pos <- 0 until schema.getColumnsCount) {
+      val columns = schema.columns
+      for (pos <- schema.columns.indices) {
         if (pos != 0) {
           namesSb.append(",")
           typesSb.append(",")
         }
-        val columnName = columns.get(pos).getColumnName
+        val columnName = columns(pos).columnName
         columnNames :+= columnName
-        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns.get(pos).getTypeDesc).stringify
+        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns(pos).typeDesc).stringify
         columnTypes :+= columnTypeName
         namesSb.append(columnName)
         typesSb.append(columnTypeName)
@@ -95,7 +94,7 @@ class BitlapQueryResultSet(
       if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) {
         val result = client.fetchResults(stmtHandle)
         if (result != null) {
-          fetchedRows = result.getResults.getRowsList.asScala.toList
+          fetchedRows = result.getResults.rows.toList
           fetchedRowsItr = fetchedRows.iterator
         }
       }

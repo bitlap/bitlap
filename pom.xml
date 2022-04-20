@@ -70,7 +70,6 @@
         <hutool.version>5.7.22</hutool.version>
         <joda.version>2.10.14</joda.version>
         <gson.version>2.9.0</gson.version>
-        <sofa.jraft.version>1.3.10</sofa.jraft.version>
         <calcite.version>1.30.0</calcite.version>
         <kotlin.cli.version>0.3.4</kotlin.cli.version>
         <sqlline.version>1.11.0</sqlline.version>
@@ -83,9 +82,15 @@
         <smt.version>0.4.2</smt.version>
         <picocli.version>4.6.3</picocli.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
+        <zio.grpc.version>0.5.1</zio.grpc.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.thesamet.scalapb.zio-grpc</groupId>
+            <artifactId>zio-grpc-core_2.13</artifactId>
+            <version>${zio.grpc.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>

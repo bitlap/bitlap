@@ -1,24 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.proto.driver.{ BRow, BTableSchema, BTypeId }
+import org.bitlap.network.driver.proto.{BRow, BTableSchema, BTypeId}
 
-import java.io.{ InputStream, Reader }
+import java.io.{InputStream, Reader}
 import java.math.BigDecimal
 import java.net.URL
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.Date
-import java.sql.NClob
-import java.sql.Ref
-import java.sql.ResultSet
-import java.sql.ResultSetMetaData
-import java.sql.RowId
-import java.sql.SQLWarning
-import java.sql.SQLXML
-import java.sql.Statement
-import java.sql.Time
-import java.sql.Timestamp
+import java.sql._
 import java.time.Instant
 import java.util
 import java.util.Calendar
@@ -584,21 +572,21 @@ abstract class BitlapBaseResultSet extends ResultSet {
     if (row == null) {
       throw BSQLException("No row found.")
     }
-    val colVals = row.getColValsList
+    val colVals = row.colVals
     if (colVals == null) throw BSQLException("RowSet does not contain any columns!")
     if (columnIndex > colVals.size) {
       throw BSQLException("Invalid columnIndex: $columnIndex")
     }
 
     // In kotlin, We can not use e.g. Int?,Long?,Double? to override the java interface here.
-    val bColumnValue = colVals.get(columnIndex - 1)
+    val bColumnValue = colVals(columnIndex - 1)
     try {
       if (bColumnValue.isEmpty) {
         _wasNull = true
       }
 
       val valueStr = bColumnValue.toStringUtf8
-      val columnType = getSchema().getColumns(columnIndex - 1).getTypeDesc
+      val columnType = getSchema().columns(columnIndex - 1).typeDesc
       (
         columnType match {
           case BTypeId.B_TYPE_ID_STRING_TYPE =>

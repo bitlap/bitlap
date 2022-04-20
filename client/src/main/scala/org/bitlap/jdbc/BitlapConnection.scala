@@ -2,10 +2,11 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
+import org.bitlap.network.driver.proto.BSessionHandle
 import org.bitlap.network.proto.driver.BSessionHandle
 import org.bitlap.tools.apply
 
-import java.{ sql, util }
+import java.{sql, util}
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob
@@ -47,7 +48,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     // parse uri
     val parts = hosts.map(it => it.split("/"))
     try {
-      client = new BitlapClient(parts.map(_(0)).mkString(","), info.asScala.toMap)
+      //FIXME
+      client = new BitlapClient(parts.map(_(0)).mkString(","), 80, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {

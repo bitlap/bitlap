@@ -1,8 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.proto.driver.BOperationHandle
-import org.bitlap.network.proto.driver.BSessionHandle
+import org.bitlap.network.driver.proto.{BOperationHandle, BSessionHandle}
 
 import java.sql.Connection
 import java.sql.ResultSet
@@ -100,7 +99,7 @@ class BitlapStatement(
     try {
       resultSet = null
       stmtHandle = client.executeStatement(sessHandle, sql)
-      if (stmtHandle == null || !stmtHandle.getHasResultSet) {
+      if (stmtHandle == null || !stmtHandle.hasResultSet) {
         return false
       }
     } catch {

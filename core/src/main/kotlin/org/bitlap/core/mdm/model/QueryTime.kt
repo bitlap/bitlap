@@ -2,7 +2,7 @@
 package org.bitlap.core.mdm.model
 
 import org.bitlap.common.TimeRange
-import org.joda.time.DateTime
+import org.bitlap.common.utils.DateEx.utc
 
 /**
  * Desc: Time for query
@@ -13,5 +13,5 @@ import org.joda.time.DateTime
  */
 data class QueryTime(val timeRange: TimeRange) {
 
-    constructor(start: Long) : this(TimeRange(DateTime(start)))
+    constructor(start: Long) : this(TimeRange(start.utc()))
 }

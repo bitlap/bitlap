@@ -1,12 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli
 
-import org.bitlap.cli.extension.BitlapSqlApplication
+import org.bitlap.cli.extension.{ BitlapPrompt, BitlapSqlApplication }
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import org.bitlap.tools.apply
 import picocli.CommandLine.{ Command, Option, Parameters }
-import sqlline.{ SqlLine, SqlLineOpts }
+import sqlline.{ SqlLine, SqlLineOpts, SqlLineProperty }
 
 import java.io.File
 import java.lang.{ Boolean => JBoolean }
@@ -89,8 +89,9 @@ object BitlapSqlCli {
     }
     // sql line REPL or execute sql directly
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
-    BitlapSqlApplication.conf.set(conf)
     val line = new SqlLine()
+    line.getOpts.set(BitlapPrompt, projectName)
+
     val status = line.begin(sqlArgs.toArray, null, false)
     if (!JBoolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
       System.exit(status.ordinal)

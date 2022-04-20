@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapIterator
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.utils.DateEx.utc
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
 import org.bitlap.core.sql.FilterOp
@@ -37,7 +38,6 @@ import org.bitlap.core.storage.MetricDimStore
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRowIterator
-import org.joda.time.DateTime
 
 /**
  * Metric one dimension implemented by apache carbondata
@@ -89,9 +89,12 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
         if (rows.isEmpty()) {
             return
         }
-        val date = DateTime(tm)
-        val output = "${date.withTimeAtStartOfDay().millis}/${date.millis}"
-        val writer = writerB().outputPath(Path(dataPath, output).toString()).build()
+        val date = tm.utc()
+        val output = Path(dataPath, "${date.withTimeAtStartOfDay().millis}/${date.millis}")
+        if (fs.exists(output)) {
+            fs.delete(output, true)
+        }
+        val writer = writerB().outputPath(output.toString()).build()
         rows.forEach {
             writer.write(
                 arrayOf(

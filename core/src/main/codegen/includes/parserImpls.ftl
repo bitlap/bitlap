@@ -221,11 +221,13 @@ SqlNode SqlExplainX() :
  {
    SqlNode filePath;
    SqlIdentifier tableName;
+   boolean overwrite = false;
  }
  {
    <LOAD> <DATA> filePath = StringLiteral()
-   <INTO> <TABLE> tableName = CompoundIdentifier()
+   (<INTO> | <OVERWRITE> { overwrite = true; })
+   <TABLE> tableName = CompoundIdentifier()
    {
-     return new SqlLoadData(getPos(), filePath, tableName);
+     return new SqlLoadData(getPos(), filePath, tableName, overwrite);
    }
  }

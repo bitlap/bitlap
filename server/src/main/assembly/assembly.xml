@@ -21,6 +21,7 @@
             <includes>
                 <include>*.xml</include>
                 <include>*.setting</include>
+                <include>*.csv</include>
             </includes>
         </fileSet>
         <fileSet>

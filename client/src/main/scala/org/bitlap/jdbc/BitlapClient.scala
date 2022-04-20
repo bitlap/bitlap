@@ -5,7 +5,7 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.network.RPC
 import org.bitlap.network.driver.proto._
 
-import java.lang.{Long => JLong}
+import java.lang.{ Long => JLong }
 import scala.jdk.CollectionConverters._
 
 /**

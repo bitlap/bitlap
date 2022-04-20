@@ -6,7 +6,7 @@ import org.bitlap.network.driver.proto.BSessionHandle
 import org.bitlap.network.proto.driver.BSessionHandle
 import org.bitlap.tools.apply
 
-import java.{sql, util}
+import java.{ sql, util }
 import java.sql.Blob
 import java.sql.CallableStatement
 import java.sql.Clob

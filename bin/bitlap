@@ -14,11 +14,13 @@ start() {
     echo "process $(cat ${BITLAP_PID_FILE}) is still alive, maybe there is already a bitlap server running."
     exit 1
   fi
+  echo "Starting bitlap server ..."
   CLASS="org.bitlap.server.BitlapServer"
   CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS"
-  echo "$CMD"
+  # echo "$CMD"
   exec $CMD > "${BITLAP_LOG_DIR}"/bitlap.out 2>&1 &
   echo $! > "${BITLAP_PID_FILE}"
+  echo "bitlap server started."
 }
 
 stop() {
@@ -59,7 +61,7 @@ case $COMMAND in
         fi
         CLASS="org.bitlap.cli.BitlapServerCli"
         CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-        echo "$CMD"
+        # echo "$CMD"
         exec $CMD
         ;;
     esac
@@ -77,7 +79,7 @@ case $COMMAND in
     CLASS="org.bitlap.cli.BitlapSqlCli"
 
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-    echo "$CMD"
+    # echo "$CMD"
     exec $CMD
     ;;
 
@@ -91,7 +93,7 @@ case $COMMAND in
     OPTS="$BITLAP_CLIENT_OPTS"
 
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
-    echo "$CMD"
+    # echo "$CMD"
     exec $CMD
 
     ;;

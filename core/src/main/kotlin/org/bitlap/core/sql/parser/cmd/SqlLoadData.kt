@@ -20,6 +20,7 @@ class SqlLoadData(
     override val pos: SqlParserPos,
     private val filePath: SqlNode,
     private val tableName: SqlIdentifier,
+    private val overwrite: Boolean,
 ) : BitlapSqlDdlNode(pos, OPERATOR, listOf(filePath, tableName)) {
 
     companion object {
@@ -38,6 +39,7 @@ class SqlLoadData(
         } else {
             catalog.getTable(tableName.names[1], tableName.names[0])
         }
+        // only support overwrite = true
         BitlapWriter(table, BitlapContext.hadoopConf).use {
             if (path.startsWith("hdfs:", true)) {
                 val p = Path(path)

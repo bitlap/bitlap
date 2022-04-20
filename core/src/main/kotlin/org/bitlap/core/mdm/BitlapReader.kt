@@ -17,6 +17,9 @@ import java.io.Serializable
  */
 class BitlapReader : Serializable, Closeable {
 
+    /**
+     * TODO: To be removed, or support by [fetch]
+     */
     fun read(query: Query): List<RawRow> {
         val table = BitlapContext.catalog.getTable(query.table, query.database)
         val metricStore = table.getTableFormat()

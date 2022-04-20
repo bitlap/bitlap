@@ -1,8 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli.extension
 
-import org.bitlap.cli.extension.BitlapSqlApplication.conf
-import org.bitlap.common.BitlapConf
 import org.bitlap.tools.apply
 import sqlline.{ Application, CommandHandler, PromptHandler, SqlLine }
 
@@ -17,11 +15,7 @@ class BitlapSqlApplication extends Application {
     super.getCommandHandlers(sqlLine)
 
   override def getPromptHandler(sqlLine: SqlLine): PromptHandler = {
-    val prompt = conf.get().get(BitlapConf.PROJECT_NAME)
+    val prompt = sqlLine.getOpts.get(BitlapPrompt)
     BitlapSqlPromptHandler(sqlLine, prompt)
   }
-}
-
-object BitlapSqlApplication {
-  val conf = new ThreadLocal[BitlapConf]()
 }

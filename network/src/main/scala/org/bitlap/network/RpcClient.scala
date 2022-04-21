@@ -32,30 +32,38 @@ class RpcClient(uri: String, port: Int) {
   def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
     DriverServiceClient.executeStatement(request).provideLayer(clientLayer)
 
-  def syncOpenSession(request: BOpenSessionReq): BOpenSessionResp = {
-    val ret = runtime.unsafeRun(openSession(request))
-    verifySuccess(ret.getStatus)
-    ret
-  }
+  def syncOpenSession(request: BOpenSessionReq): BOpenSessionResp =
+    blocking {
+      openSession(request)
+    } { t =>
+      verifySuccess(t.getStatus, t)
+    }
 
-  def syncCloseSession(request: BCloseSessionReq): BCloseSessionResp = {
-    val ret = runtime.unsafeRun(closeSession(request))
-    verifySuccess(ret.getStatus)
-    ret
-  }
+  def syncCloseSession(request: BCloseSessionReq): BCloseSessionResp =
+    blocking {
+      closeSession(request)
+    } { t =>
+      verifySuccess(t.getStatus, t)
+    }
 
-  def syncExecuteStatement(request: BExecuteStatementReq): BExecuteStatementResp = {
-    val ret = runtime.unsafeRun(executeStatement(request))
-    verifySuccess(ret.getStatus)
-    ret
-  }
+  def syncExecuteStatement(request: BExecuteStatementReq): BExecuteStatementResp =
+    blocking {
+      executeStatement(request)
+    } { t =>
+      verifySuccess(t.getStatus, t)
+    }
 
   /**
    * Used to verify whether the RPC result is correct.
    */
-  @inline private def verifySuccess(status: BStatus): Unit =
-    if (status.statusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
+  @inline private def verifySuccess[T](status: BStatus, t: T): T =
+    if (t == null || status.statusCode != BStatusCode.B_STATUS_CODE_SUCCESS_STATUS) {
       throw new Exception(status.errorMessage)
+    } else {
+      t
     }
+
+  @inline private def blocking[T, Z <: zio.ZIO[Any, Status, T]](action: => Z)(t: T => T): T =
+    t.apply(runtime.unsafeRun(action))
 
 }

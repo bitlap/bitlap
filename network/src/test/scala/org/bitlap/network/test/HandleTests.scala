@@ -24,15 +24,17 @@ class HandleTests extends AnyFlatSpec with Matchers {
     (op.toBOperationHandle().getOperationId == handleId
       .toBHandleIdentifier()) shouldBe true
 
-    (op.toBOperationHandle().getOperationId.getGuid == handleId
+    (op.toBOperationHandle().getOperationId.guid == handleId
       .toBHandleIdentifier()
-      .getGuid) shouldBe true
+      .guid) shouldBe true
 
-    (op.toBOperationHandle().getOperationId.getSecret == handleId
+    (op.toBOperationHandle().getOperationId.secret == handleId
       .toBHandleIdentifier()
-      .getSecret) shouldBe true
+      .secret) shouldBe true
 
-    op.toBOperationHandle().getOperationTypeValue == OperationType.EXECUTE_STATEMENT.id shouldBe true
+    OperationType.getOperationType(
+      op.toBOperationHandle().operationType
+    ) == OperationType.EXECUTE_STATEMENT shouldBe true
 
     val h1 = new handles.OperationHandle(op.toBOperationHandle())
     h1 == op shouldBe true
@@ -45,13 +47,13 @@ class HandleTests extends AnyFlatSpec with Matchers {
     (op.toBSessionHandle().getSessionId == handleId
       .toBHandleIdentifier()) shouldBe true
 
-    (op.toBSessionHandle().getSessionId.getGuid == handleId
+    (op.toBSessionHandle().getSessionId.guid == handleId
       .toBHandleIdentifier()
-      .getGuid) shouldBe true
+      .guid) shouldBe true
 
-    (op.toBSessionHandle().getSessionId.getSecret == handleId
+    (op.toBSessionHandle().getSessionId.secret == handleId
       .toBHandleIdentifier()
-      .getSecret) shouldBe true
+      .secret) shouldBe true
 
     new SessionHandle(op.toBSessionHandle()) == op shouldBe true
   }

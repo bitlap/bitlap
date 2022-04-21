@@ -17,6 +17,8 @@ import java.util.UUID
  */
 object handles {
 
+  import org.bitlap.tools.apply
+
   /**
    * 抽象处理器
    *
@@ -128,6 +130,7 @@ object handles {
    * @param handleId
    */
   @toString(includeFieldNames = true)
+  @apply
   class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId) {
 
     def this(bSessionHandle: BSessionHandle) =

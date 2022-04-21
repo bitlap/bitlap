@@ -18,6 +18,11 @@
             <version>3.17.3</version>
         </dependency>
         <dependency>
+            <groupId>com.thesamet.scalapb</groupId>
+            <artifactId>scalapb-runtime-grpc_2.13</artifactId>
+            <version>0.11.10</version>
+        </dependency>
+        <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-common</artifactId>
         </dependency>
@@ -67,6 +72,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
+                            <protocArtifact>com.google.protobuf:protoc:3.11.4:exe:osx-x86_64</protocArtifact>
                             <protocVersion>3.11.4</protocVersion>
                             <inputDirectories>
                                 <include>src/main/protobuf</include>

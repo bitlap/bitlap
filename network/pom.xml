@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.17.3</version>
+            <version>3.18.2</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
@@ -67,7 +67,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <protocVersion>3.11.4</protocVersion>
+                            <protocVersion>3.18.2</protocVersion>
                             <inputDirectories>
                                 <include>src/main/protobuf</include>
                             </inputDirectories>

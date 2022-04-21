@@ -6,19 +6,19 @@ package org.bitlap.network
  * @since 2021/11/20
  * @version 1.0
  */
-trait NetworkHelper {
+trait NetworkHelper[F[_]] {
 
   /**
    * get databases or schemas from catalog
    *
    * @see `show databases`
    */
-  def getDatabases(pattern: String): List[String]
+  def getDatabases(pattern: String): F[List[String]]
 
   /**
    * get tables from catalog with database name
    *
    * @see `show tables in [db_name]`
    */
-  def getTables(database: String, pattern: String): List[String]
+  def getTables(database: String, pattern: String): F[List[String]]
 }

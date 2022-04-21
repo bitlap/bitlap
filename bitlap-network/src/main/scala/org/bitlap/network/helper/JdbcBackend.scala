@@ -8,37 +8,37 @@ import org.bitlap.network.types.models.{ RowSet, TableSchema }
 /**
  * network helper for jdbc
  */
-trait JdbcHelper extends NetworkHelper {
+trait JdbcBackend[F[_]] extends NetworkHelper[F] {
 
   def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): SessionHandle
+  ): F[SessionHandle]
 
-  def closeSession(sessionHandle: SessionHandle): Unit
+  def closeSession(sessionHandle: SessionHandle): F[Unit]
 
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
-  ): OperationHandle
+  ): F[OperationHandle]
 
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): OperationHandle
+  ): F[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): RowSet
+  def fetchResults(opHandle: OperationHandle): F[RowSet]
 
-  def getResultSetMetadata(opHandle: OperationHandle): TableSchema
+  def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
     tableName: String = null,
     schemaName: String = null,
     columnName: String = null
-  ): OperationHandle
+  ): F[OperationHandle]
 }

@@ -2,6 +2,7 @@
 package org.bitlap.network
 
 import io.grpc.Status
+import org.bitlap.network.client.{ ClientF, Identity }
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
@@ -18,7 +19,7 @@ import scala.concurrent.Future
  */
 object RPC {
 
-  def newClient(uri: String, port: Int): RpcClient = RpcClient(uri, port)
+  def newClient(uri: String, port: Int): ClientF.SyncClient = ClientF.newSyncClient(uri, port)
 
   case class FutureDriverServiceLive(jdbcHelper: JdbcBackend[Future]) extends ZDriverService[Any, Any] with sqlStatus {
     def openSession(request: BOpenSessionReq): IO[Status, BOpenSessionResp] =

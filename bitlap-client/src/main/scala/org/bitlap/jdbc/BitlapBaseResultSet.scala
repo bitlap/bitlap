@@ -81,9 +81,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getBigDecimal(columnLabel: String): BigDecimal =
     ???
 
-  override def getBytes(columnIndex: Int): Array[Byte] = ???
+  override def getBytes(columnIndex: Int): scala.Array[Byte] = ???
 
-  override def getBytes(columnLabel: String): Array[Byte] =
+  override def getBytes(columnLabel: String): scala.Array[Byte] =
     ???
 
   override def getDate(columnIndex: Int): Date =
@@ -294,9 +294,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def updateString(columnLabel: String, x: String): Unit =
     ???
 
-  override def updateBytes(columnIndex: Int, x: Array[Byte]): Unit = ???
+  override def updateBytes(columnIndex: Int, x: scala.Array[Byte]): Unit = ???
 
-  override def updateBytes(columnLabel: String, x: Array[Byte]): Unit = ???
+  override def updateBytes(columnLabel: String, x: scala.Array[Byte]): Unit = ???
 
   override def updateDate(columnIndex: Int, x: Date): Unit =
     ???

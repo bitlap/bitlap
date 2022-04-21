@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.Identity
+import org.bitlap.network.client.Identity
 import org.bitlap.network.helper.JdbcBackend
 import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.types.models.{ RowSet, TableSchema }

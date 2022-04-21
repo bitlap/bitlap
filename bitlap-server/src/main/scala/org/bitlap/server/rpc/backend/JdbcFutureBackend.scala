@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
 import org.bitlap.network.helper.JdbcBackend
@@ -14,22 +15,23 @@ import scala.concurrent.Future
 class JdbcFutureBackend extends JdbcBackend[Future] {
 
   // TODO
-  private lazy val jdbcBackend = new JdbcSyncBackend()
+  private lazy val delegateBackend = new JdbcSyncBackend()
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String]
-  ): Future[SessionHandle] = Future.successful(jdbcBackend.openSession(username, password, configuration))
+  ): Future[SessionHandle] = Future.successful(delegateBackend.openSession(username, password, configuration))
 
   override def closeSession(sessionHandle: SessionHandle): Future[Unit] =
-    Future.successful(jdbcBackend.closeSession(sessionHandle))
+    Future.successful(delegateBackend.closeSession(sessionHandle))
 
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
-  ): Future[OperationHandle] = Future.successful(jdbcBackend.executeStatement(sessionHandle, statement, confOverlay))
+  ): Future[OperationHandle] =
+    Future.successful(delegateBackend.executeStatement(sessionHandle, statement, confOverlay))
 
   override def executeStatement(
     sessionHandle: SessionHandle,
@@ -37,13 +39,13 @@ class JdbcFutureBackend extends JdbcBackend[Future] {
     queryTimeout: Long,
     confOverlay: Map[String, String]
   ): Future[OperationHandle] =
-    Future.successful(jdbcBackend.executeStatement(sessionHandle, statement, queryTimeout, confOverlay))
+    Future.successful(delegateBackend.executeStatement(sessionHandle, statement, queryTimeout, confOverlay))
 
   override def fetchResults(opHandle: OperationHandle): Future[RowSet] =
-    Future.successful(jdbcBackend.fetchResults(opHandle))
+    Future.successful(delegateBackend.fetchResults(opHandle))
 
   override def getResultSetMetadata(opHandle: OperationHandle): Future[models.TableSchema] =
-    Future.successful(jdbcBackend.getResultSetMetadata(opHandle))
+    Future.successful(delegateBackend.getResultSetMetadata(opHandle))
 
   override def getColumns(
     sessionHandle: SessionHandle,
@@ -51,11 +53,11 @@ class JdbcFutureBackend extends JdbcBackend[Future] {
     schemaName: String,
     columnName: String
   ): Future[OperationHandle] =
-    Future.successful(jdbcBackend.getColumns(sessionHandle, tableName, schemaName, columnName))
+    Future.successful(delegateBackend.getColumns(sessionHandle, tableName, schemaName, columnName))
 
   override def getDatabases(pattern: String): Future[List[String]] =
-    Future.successful(jdbcBackend.getDatabases(pattern))
+    Future.successful(delegateBackend.getDatabases(pattern))
 
   override def getTables(database: String, pattern: String): Future[List[String]] =
-    Future.successful(jdbcBackend.getTables(database, pattern))
+    Future.successful(delegateBackend.getTables(database, pattern))
 }

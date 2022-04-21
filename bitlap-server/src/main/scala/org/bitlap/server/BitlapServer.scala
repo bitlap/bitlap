@@ -2,9 +2,9 @@
 package org.bitlap.server
 
 import org.bitlap.server.rpc.backend.Backend
-import scalapb.zio_grpc.{ServerMain, ServiceList}
+import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio.console.Console
-import zio.{ExitCode, URIO}
+import zio.{ ExitCode, URIO }
 
 /**
  * @author 梦境迷离

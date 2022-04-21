@@ -26,7 +26,7 @@ private[jdbc] class BitlapClient(uri: String, port: Int, props: Map[String, Stri
    */
   def openSession(): BSessionHandle =
     rpcClient
-      .syncOpenSession(BOpenSession.BOpenSessionReq(username = "", password = "", configuration = Map.empty))
+      .openSession(BOpenSession.BOpenSessionReq(username = "", password = "", configuration = Map.empty))
       .getSessionHandle
   // TODO: Add heartbeat
 
@@ -34,14 +34,14 @@ private[jdbc] class BitlapClient(uri: String, port: Int, props: Map[String, Stri
    * Used to close the session when the JDBC connection is closed.
    */
   def closeSession(sessionHandle: BSessionHandle): Unit =
-    rpcClient.syncCloseSession(BCloseSession.BCloseSessionReq(Some(sessionHandle)))
+    rpcClient.closeSession(BCloseSession.BCloseSessionReq(Some(sessionHandle)))
 
   /**
    * Used to execute normal SQL by JDBC. Does not contain `?` placeholders.
    */
   def executeStatement(sessionHandle: BSessionHandle, statement: String): BOperationHandle =
     rpcClient
-      .syncExecuteStatement(
+      .executeStatement(
         BExecuteStatement.BExecuteStatementReq(statement, Some(sessionHandle), Map.empty, readTimeout)
       )
       .getOperationHandle

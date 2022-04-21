@@ -45,13 +45,13 @@
     </developers>
 
     <modules>
-        <module>common</module>
-        <module>core</module>
-        <module>network</module>
-        <module>server</module>
-        <module>client</module>
-        <module>integration/cli</module>
-        <module>integration/spark3</module>
+        <module>bitlap-common</module>
+        <module>bitlap-core</module>
+        <module>bitlap-network</module>
+        <module>bitlap-server</module>
+        <module>bitlap-client</module>
+        <module>integration/bitlap-cli</module>
+        <module>integration/bitlap-spark3</module>
     </modules>
 
     <properties>

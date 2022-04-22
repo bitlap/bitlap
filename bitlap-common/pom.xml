@@ -46,7 +46,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <protocVersion>3.11.4</protocVersion>
+                            <protocVersion>${protobuf.version}</protocVersion>
                             <inputDirectories>
                                 <include>src/main/protobuf</include>
                             </inputDirectories>

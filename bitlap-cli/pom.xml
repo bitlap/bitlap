@@ -6,16 +6,25 @@
         <artifactId>bitlap</artifactId>
         <groupId>org.bitlap</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitlap-spark3</artifactId>
+    <artifactId>bitlap-cli</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
+            <artifactId>bitlap-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>sqlline</groupId>
+            <artifactId>sqlline</artifactId>
+            <version>${sqlline.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
         </dependency>
     </dependencies>
 

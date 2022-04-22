@@ -1,14 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.network.helper
+package org.bitlap.network.rpc
 
-import org.bitlap.network.NetworkHelper
-import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.types.models.{ RowSet, TableSchema }
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ RowSet, TableSchema }
 
 /**
- * network helper for jdbc
+ * @author 梦境迷离
+ * @version 1.0,2022/4/21
  */
-trait JdbcBackend[F[_]] extends NetworkHelper[F] {
+trait RpcF[F[_]] {
 
   def openSession(
     username: String,
@@ -41,4 +41,18 @@ trait JdbcBackend[F[_]] extends NetworkHelper[F] {
     schemaName: String = null,
     columnName: String = null
   ): F[OperationHandle]
+
+  /**
+   * get databases or schemas from catalog
+   *
+   * @see `show databases`
+   */
+  def getDatabases(pattern: String): F[List[String]]
+
+  /**
+   * get tables from catalog with database name
+   *
+   * @see `show tables in [db_name]`
+   */
+  def getTables(database: String, pattern: String): F[List[String]]
 }

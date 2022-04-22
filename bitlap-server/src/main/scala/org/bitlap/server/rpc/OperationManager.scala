@@ -2,8 +2,8 @@
 package org.bitlap.server.rpc
 
 import org.bitlap.jdbc.BSQLException
-import org.bitlap.network.types.OperationType
-import org.bitlap.network.types.handles.OperationHandle
+import org.bitlap.network.OperationType
+import org.bitlap.network.handles.OperationHandle
 
 import scala.collection.mutable
 

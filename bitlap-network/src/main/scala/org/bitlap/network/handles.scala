@@ -1,17 +1,17 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.network.types
+package org.bitlap.network
 
 import com.google.protobuf.ByteString
-import OperationType.OperationType
+import org.bitlap.network.OperationType.OperationType
 import org.bitlap.network.driver.proto.{ BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle }
-import org.bitlap.tools.toString
+import org.bitlap.tools.{ apply, toString }
 
 import java.nio.ByteBuffer
 import java.util.UUID
-import org.bitlap.tools.apply
 
 /**
  * TODO fix
+ *
  * @author 梦境迷离
  * @since 2021/11/20
  * @version 1.0

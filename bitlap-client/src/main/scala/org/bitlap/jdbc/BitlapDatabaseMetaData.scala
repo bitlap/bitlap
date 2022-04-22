@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
+import org.bitlap.jdbc.client.BitlapClient
 import org.bitlap.network.driver.proto.BSessionHandle
 
 import java.sql.{ Connection, DatabaseMetaData, ResultSet, RowIdLifetime }

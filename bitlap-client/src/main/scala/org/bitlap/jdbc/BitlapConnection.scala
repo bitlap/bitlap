@@ -2,6 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
+import org.bitlap.jdbc.client.BitlapClient
 import org.bitlap.network.driver.proto.BSessionHandle
 import org.bitlap.tools.apply
 

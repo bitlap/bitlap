@@ -2,6 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
+import org.bitlap.jdbc.client.BitlapClient
 import org.bitlap.network.driver.proto.{ BOperationHandle, BRow, BSessionHandle }
 
 import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
@@ -94,7 +95,7 @@ class BitlapQueryResultSet(
       if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) {
         val result = client.fetchResults(stmtHandle)
         if (result != null) {
-          fetchedRows = result.getResults.rows.toList
+          fetchedRows = result.rows.toList
           fetchedRowsItr = fetchedRows.iterator
         }
       }

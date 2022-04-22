@@ -1,8 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.test
 
-import org.bitlap.network.types.handles.{ HandleIdentifier, SessionHandle }
-import org.bitlap.network.types.{ handles, OperationType }
+import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
+import org.bitlap.network.{ handles, OperationType }
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

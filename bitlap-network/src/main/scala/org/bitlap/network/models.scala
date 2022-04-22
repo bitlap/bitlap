@@ -1,9 +1,9 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.network.types
+package org.bitlap.network
 
 import com.google.protobuf.ByteString
 import org.bitlap.network.driver.proto._
-import org.bitlap.network.types.models.TypeId.TypeId
+import org.bitlap.network.models.TypeId.TypeId
 
 /**
  * @author 梦境迷离
@@ -12,33 +12,35 @@ import org.bitlap.network.types.models.TypeId.TypeId
  */
 object models {
 
-  case class QueryResult(tableSchema: TableSchema, rows: RowSet)
+  sealed trait Model
 
-  case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) {
-    def toBRowSet(): BRowSet = BRowSet(startRowOffset = startOffset, rows = rows.map(_.toBRow()))
+  final case class QueryResult(tableSchema: TableSchema, rows: RowSet) extends Model
+
+  final case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) extends Model {
+    def toBRowSet: BRowSet = BRowSet(startRowOffset = startOffset, rows = rows.map(_.toBRow))
   }
 
   /**
    * The wrapper class of the Proto buffer `BRow`.
    */
-  case class Row(private val values: List[ByteString] = Nil) {
-    def toBRow(): BRow = BRow(values)
+  final case class Row(private val values: List[ByteString] = Nil) extends Model {
+    def toBRow: BRow = BRow(values)
   }
 
-  case class TableSchema(private val columns: List[ColumnDesc] = Nil) {
+  final case class TableSchema(private val columns: List[ColumnDesc] = Nil) extends Model {
 
-    def toBTableSchema(): BTableSchema = BTableSchema(columns = columns.map(_.toBColumnDesc()))
+    def toBTableSchema: BTableSchema = BTableSchema(columns = columns.map(_.toBColumnDesc))
   }
 
   /**
    * The wrapper class of the Proto buffer `BColumnDesc`.
    */
-  case class ColumnDesc(
+  final case class ColumnDesc(
     private val columnName: String,
     private val typeDesc: TypeId
-  ) {
+  ) extends Model {
 
-    def toBColumnDesc(): BColumnDesc =
+    def toBColumnDesc: BColumnDesc =
       BColumnDesc(typeDesc = TypeId.toBOperationType(typeDesc), columnName = columnName)
   }
 

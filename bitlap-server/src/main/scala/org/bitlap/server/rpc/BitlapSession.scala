@@ -2,11 +2,11 @@
 package org.bitlap.server.rpc
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.types.{ handles, models }
+import org.bitlap.network.{ handles, models }
 
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters._
 
 /**
  * @author 梦境迷离

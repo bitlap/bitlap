@@ -1,39 +1,45 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.client.Identity
-import org.bitlap.network.helper.JdbcBackend
-import org.bitlap.network.types.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.types.models.{ RowSet, TableSchema }
+import org.bitlap.network.OperationType
+import org.bitlap.network.rpc.RpcN
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ RowSet, TableSchema }
 import org.bitlap.server.rpc.SessionManager
-import org.bitlap.network.types.OperationType
+import zio.ZIO
 
 /**
+ * Async implementation based ZIO for jdbc server.
+ *
  * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+ * @version 1.0,2022/4/21
  */
-class JdbcSyncBackend extends JdbcBackend[Identity] {
+class ZioRpcBackend extends RpcN[ZIO] {
 
   private val sessionManager = new SessionManager()
   sessionManager.startListener()
 
+  // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): Identity[SessionHandle] = {
-    val session = sessionManager.openSession(username, password, configuration)
-    session.sessionHandle
-  }
+  ): ZIO[Any, Throwable, SessionHandle] =
+    ZIO.effect {
+      val session = sessionManager.openSession(username, password, configuration)
+      session.sessionHandle
+    }
 
-  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = sessionManager.closeSession(sessionHandle)
+  override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] =
+    ZIO.effect {
+      sessionManager.closeSession(sessionHandle)
+    }
 
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
-  ): Identity[OperationHandle] = {
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
     val session = sessionManager.getSession(sessionHandle)
     sessionManager.refreshSession(sessionHandle, session)
     session.executeStatement(sessionHandle, statement, confOverlay)
@@ -44,7 +50,7 @@ class JdbcSyncBackend extends JdbcBackend[Identity] {
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): Identity[OperationHandle] = {
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
     val session = sessionManager.getSession(sessionHandle)
     sessionManager.refreshSession(sessionHandle, session)
     session.executeStatement(
@@ -55,14 +61,14 @@ class JdbcSyncBackend extends JdbcBackend[Identity] {
     )
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[RowSet] = {
+  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, RowSet] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
     val session = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
     session.fetchResults(opHandle)
   }
 
-  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = {
+  override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
     val session = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
@@ -74,19 +80,9 @@ class JdbcSyncBackend extends JdbcBackend[Identity] {
     tableName: String = null,
     schemaName: String = null,
     columnName: String = null
-  ): Identity[OperationHandle] = new OperationHandle(OperationType.GET_COLUMNS)
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GET_COLUMNS))
 
-  /**
-   * get databases or schemas from catalog
-   *
-   * @see `show databases`
-   */
-  override def getDatabases(pattern: String): Identity[List[String]] = ???
+  override def getDatabases(pattern: String): ZIO[Any, Throwable, List[String]] = ???
 
-  /**
-   * get tables from catalog with database name
-   *
-   * @see `show tables in [db_name]`
-   */
-  override def getTables(database: String, pattern: String): Identity[List[String]] = ???
+  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, List[String]] = ???
 }

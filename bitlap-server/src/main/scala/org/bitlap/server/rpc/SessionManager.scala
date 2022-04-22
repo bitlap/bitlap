@@ -3,9 +3,10 @@ package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.types.handles.SessionHandle
-import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
+import org.bitlap.network.handles.SessionHandle
 
+import java.util.concurrent.atomic.AtomicBoolean
+import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
 import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 
 /**
@@ -16,6 +17,7 @@ import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 class SessionManager extends LazyLogging {
 
   val operationManager: OperationManager = new OperationManager()
+  val start = new AtomicBoolean(false)
 
   private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
@@ -55,10 +57,11 @@ class SessionManager extends LazyLogging {
       }
   }
 
-  def startListener(): Unit = {
-    sessionThread.setDaemon(true)
-    sessionThread.start()
-  }
+  def startListener(): Unit =
+    if (start.compareAndSet(false, true)) {
+      sessionThread.setDaemon(true)
+      sessionThread.start()
+    }
 
   // service, provider, conf, discover
   // session life cycle manage

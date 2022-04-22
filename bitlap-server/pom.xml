@@ -10,7 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>bitlap-server</artifactId>
-
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
@@ -23,6 +22,16 @@
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio_2.13</artifactId>
+            <version>${zio.version}</version>
         </dependency>
     </dependencies>
 

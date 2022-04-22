@@ -31,6 +31,11 @@
             <artifactId>zio-grpc-core_2.13</artifactId>
             <version>${zio.grpc.version}</version>
         </dependency>
+        <dependency>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio_2.13</artifactId>
+            <version>${zio.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

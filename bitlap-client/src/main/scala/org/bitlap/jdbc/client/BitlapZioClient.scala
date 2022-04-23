@@ -6,15 +6,16 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
-import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
+import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.{ exception, RpcN }
-import org.bitlap.network.{ handles, RpcStatus }
+import org.bitlap.network.function.statusApplyFunc
+import org.bitlap.network.handles.{OperationHandle, SessionHandle}
+import org.bitlap.network.models.{FetchResults, TableSchema}
+import org.bitlap.network.rpc.RpcN
+import org.bitlap.network.{RpcStatus, handles}
 import scalapb.zio_grpc.ZManagedChannel
-import zio.{ Layer, ZIO }
+import zio.{Layer, ZIO}
 
 import scala.jdk.CollectionConverters._
 
@@ -47,14 +48,14 @@ private[jdbc] class BitlapZioClient(uri: String, port: Int, props: Map[String, S
     DriverServiceClient
       .openSession(BOpenSessionReq(username, password, configuration))
       .map(r => new SessionHandle(r.getSessionHandle)) // 因为server和client使用一套API。必须转换以下
-      .mapError(f => new Throwable(f.asException()))
+      .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
   override def closeSession(sessionHandle: handles.SessionHandle): ZIO[Any, Throwable, Unit] =
     DriverServiceClient
       .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
       .map(_ => ())
-      .mapError(st => new Throwable(exception(st)))
+      .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
   override def executeStatement(
@@ -68,7 +69,7 @@ private[jdbc] class BitlapZioClient(uri: String, port: Int, props: Map[String, S
         BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), confOverlay, queryTimeout)
       )
       .map(r => new OperationHandle(r.getOperationHandle))
-      .mapError(st => new Throwable(exception(st)))
+      .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
   override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] =
@@ -77,14 +78,14 @@ private[jdbc] class BitlapZioClient(uri: String, port: Int, props: Map[String, S
         BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)
       )
       .map(r => FetchResults.fromBFetchResultsResp(r))
-      .mapError(st => new Throwable(exception(st)))
+      .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
     DriverServiceClient
       .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
       .map(t => TableSchema.fromBTableSchema(t.getSchema))
-      .mapError(st => new Throwable(exception(st)))
+      .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
   override def getColumns(

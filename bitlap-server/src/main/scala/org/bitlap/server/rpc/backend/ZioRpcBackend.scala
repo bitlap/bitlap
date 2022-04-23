@@ -1,9 +1,9 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.{ models, OperationType }
+import org.bitlap.network.OperationType
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, StatusCode, TableSchema }
+import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.RpcN
 import org.bitlap.server.rpc.SessionManager
 import zio.ZIO

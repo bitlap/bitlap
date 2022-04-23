@@ -127,7 +127,7 @@ open class BitlapConf(val conf: Map<String, String> = emptyMap()) : Serializable
          * Data dir
          */
         @JvmField
-        val ROOT_DIR_DATA = BitlapConfKey<String>("bitlap.root.dir.data", "/tmp/data/bitlap_data").validator(Validators.NOT_BLANK)
+        val ROOT_DIR_DATA = BitlapConfKey<String>("bitlap.root.dir.data").validator(Validators.NOT_BLANK)
 
         /**
          * Local dir

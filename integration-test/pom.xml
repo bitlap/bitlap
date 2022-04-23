@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitlap-spark3</artifactId>
+    <artifactId>integration-test</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
+            <artifactId>bitlap-server</artifactId>
         </dependency>
     </dependencies>
 

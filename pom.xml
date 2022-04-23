@@ -59,11 +59,11 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <dokka.version>1.6.20</dokka.version>
-        <kotlin.version>1.6.20</kotlin.version>
+        <kotlin.version>1.6.21</kotlin.version>
         <kotlinx.coroutines.version>1.6.1-native-mt</kotlinx.coroutines.version>
         <kotest.version>5.2.3</kotest.version>
         <kotlin.logging.version>2.1.21</kotlin.logging.version>
-        <arrow.version>1.0.1</arrow.version>
+        <arrow.version>1.1.2</arrow.version>
         <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.17.2</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
@@ -90,16 +90,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio_2.13</artifactId>
-            <version>${zio.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>${grpc.netty.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
@@ -269,16 +259,6 @@
                 <groupId>org.bitlap</groupId>
                 <artifactId>bitlap-network</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.thesamet.scalapb</groupId>
-                <artifactId>scalapb-runtime-grpc_2.13</artifactId>
-                <version>${scalapb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.thesamet.scalapb.zio-grpc</groupId>
-                <artifactId>zio-grpc-core_2.13</artifactId>
-                <version>${zio.grpc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -535,7 +515,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.12</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>central</serverId>

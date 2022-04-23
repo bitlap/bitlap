@@ -11,8 +11,9 @@ import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.{ RpcN, exception }
-import org.bitlap.network.{ RpcStatus, handles }
+import org.bitlap.network.rpc.{ exception, RpcN }
+import org.bitlap.network.{ handles, RpcStatus }
+import scalapb.zio_grpc.ZManagedChannel
 import zio.{ Layer, ZIO }
 
 import scala.jdk.CollectionConverters._

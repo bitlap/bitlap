@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.jdbc.client
+package org.bitlap.client
 
 import org.bitlap.network.RpcStatus
 import org.bitlap.network.dsl.blocking
@@ -14,7 +14,7 @@ import org.bitlap.network.rpc.{ Identity, RpcF }
  * @since 2021/11/21
  * @version 1.0
  */
-private[jdbc] class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
+private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
     extends RpcF[Identity]
     with RpcStatus {
 

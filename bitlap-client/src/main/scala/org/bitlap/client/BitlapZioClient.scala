@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.jdbc.client
+package org.bitlap.client
 
 import io.grpc.ManagedChannelBuilder
 import org.bitlap.common.BitlapConf
@@ -26,7 +26,7 @@ import scala.jdk.CollectionConverters._
  * @since 2021/11/21
  * @version 1.0
  */
-private[jdbc] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
+private[bitlap] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
     extends RpcN[ZIO]
     with RpcStatus {
 

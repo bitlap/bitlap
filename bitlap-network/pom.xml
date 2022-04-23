@@ -37,10 +37,6 @@
                 </exclusion>
                 <exclusion>
                     <groupId>io.grpc</groupId>
-                    <artifactId>grpc-netty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
                     <artifactId>grpc-core</artifactId>
                 </exclusion>
             </exclusions>
@@ -49,6 +45,11 @@
             <groupId>dev.zio</groupId>
             <artifactId>zio_2.13</artifactId>
             <version>${zio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.netty.version}</version>
         </dependency>
     </dependencies>
 

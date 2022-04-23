@@ -1,24 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli
 
-import org.bitlap.tools.apply
-import picocli.CommandLine.Command
+import zio.{ ExitCode, URIO }
 
 /**
  * Bitlap cli command
  */
-@Command(
-  name = "bitlap",
-  version = Array("v1.0"),
-  description = Array("bitlap cli command."),
-  mixinStandardHelpOptions = true,
-  usageHelpAutoWidth = true,
-  subcommands = Array(classOf[BitlapServerCli], classOf[BitlapSqlCli])
-)
-@apply
-class BitlapCli
+object BitlapCli extends zio.App {
 
-object BitlapCli {
-  def main(args: Array[String]): Unit =
-    System.exit(BitlapExecutor.<<?(args))
+  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
+    Command.bitlapApp.run(args)
+
 }

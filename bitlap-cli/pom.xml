@@ -22,9 +22,10 @@
             <version>${sqlline.version}</version>
         </dependency>
         <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>${picocli.version}</version>
+            <!--  use zio1.x, not support 2.0         -->
+            <groupId>dev.zio</groupId>
+            <artifactId>zio-cli_2.13</artifactId>
+            <version>0.1.0</version> 
         </dependency>
     </dependencies>
 

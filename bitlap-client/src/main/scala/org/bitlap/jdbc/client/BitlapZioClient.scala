@@ -12,7 +12,7 @@ import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.{ exception, RpcN }
-import org.bitlap.network.{ handles, models, RpcStatus }
+import org.bitlap.network.{ handles, RpcStatus }
 import scalapb.zio_grpc.ZManagedChannel
 import zio.{ Layer, ZIO }
 

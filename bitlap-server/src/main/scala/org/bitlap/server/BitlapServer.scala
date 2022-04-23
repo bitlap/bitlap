@@ -14,7 +14,7 @@ class BitlapServer(val serverPort: Int) extends ServerMain {
 
   override def port: Int = serverPort
 
-  def services: ServiceList[zio.ZEnv] = ServiceList.addM(Live.futureLive) // 可以随意更换实现
+  def services: ServiceList[zio.ZEnv] = ServiceList.addM(Live.zioLive) // 可以随意更换实现
 
 }
 

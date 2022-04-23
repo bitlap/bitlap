@@ -13,6 +13,7 @@ package object rpc {
 
   lazy val runtime = zio.Runtime.global
 
-  @inline def exception(st: Status) = NetworkException(st.getCode.value(), st.getCode.toStatus.getDescription)
+  @inline def exception(st: Status) =
+    NetworkException(st.getCode.value(), st.getCode.toStatus.getDescription, st.asException())
 
 }

@@ -26,16 +26,16 @@ class BitlapOperation(
     val columns = (1 to metaData.getColumnCount).map { it =>
       val colName = metaData.getColumnName(it)
       val colType = metaData.getColumnType(it) match {
-        case Types.VARCHAR   => models.TypeId.B_TYPE_ID_STRING_TYPE
-        case Types.SMALLINT  => models.TypeId.B_TYPE_ID_SHORT_TYPE
-        case Types.INTEGER   => models.TypeId.B_TYPE_ID_INT_TYPE
-        case Types.BIGINT    => models.TypeId.B_TYPE_ID_LONG_TYPE
-        case Types.DOUBLE    => models.TypeId.B_TYPE_ID_DOUBLE_TYPE
-        case Types.BOOLEAN   => models.TypeId.B_TYPE_ID_BOOLEAN_TYPE
-        case Types.TIMESTAMP => models.TypeId.B_TYPE_ID_TIMESTAMP_TYPE
-        case Types.TINYINT   => models.TypeId.B_TYPE_ID_BYTE_TYPE
+        case Types.VARCHAR   => models.TypeId.TYPE_ID_STRING_TYPE
+        case Types.SMALLINT  => models.TypeId.TYPE_ID_SHORT_TYPE
+        case Types.INTEGER   => models.TypeId.TYPE_ID_INT_TYPE
+        case Types.BIGINT    => models.TypeId.TYPE_ID_LONG_TYPE
+        case Types.DOUBLE    => models.TypeId.TYPE_ID_DOUBLE_TYPE
+        case Types.BOOLEAN   => models.TypeId.TYPE_ID_BOOLEAN_TYPE
+        case Types.TIMESTAMP => models.TypeId.TYPE_ID_TIMESTAMP_TYPE
+        case Types.TINYINT   => models.TypeId.TYPE_ID_BYTE_TYPE
         // TODO more
-        case _ => models.TypeId.B_TYPE_ID_UNSPECIFIED
+        case _ => models.TypeId.TYPE_ID_UNSPECIFIED
       }
       models.ColumnDesc(colName, colType)
     }

@@ -157,7 +157,7 @@ object handles {
   @toString(includeFieldNames = true)
   class OperationHandle(
     private val opType: OperationType,
-    private val hasResultSet: Boolean = false,
+    val hasResultSet: Boolean = false,
     override val handleId: HandleIdentifier = new HandleIdentifier()
   ) extends Handle(handleId) {
 

@@ -3,7 +3,7 @@ package org.bitlap.server.rpc.backend
 
 import org.bitlap.network.dsl.blocking
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.{ Identity, RpcF }
 
 /**
@@ -32,14 +32,6 @@ class SyncRpcBackend extends RpcF[Identity] {
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
-    confOverlay: Map[String, String]
-  ): Identity[OperationHandle] = blocking {
-    delegateBackend.executeStatement(sessionHandle, statement, confOverlay)
-  }
-
-  override def executeStatement(
-    sessionHandle: SessionHandle,
-    statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): Identity[OperationHandle] = blocking {
@@ -51,7 +43,7 @@ class SyncRpcBackend extends RpcF[Identity] {
     )
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[RowSet] = blocking {
+  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = blocking {
     delegateBackend.fetchResults(opHandle)
   }
 
@@ -61,18 +53,26 @@ class SyncRpcBackend extends RpcF[Identity] {
 
   override def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null,
-    columnName: String = null
+    schemaName: String,
+    tableName: String,
+    columnName: String
   ): Identity[OperationHandle] = blocking {
-    delegateBackend.getColumns(sessionHandle, tableName, schemaName, columnName)
+    delegateBackend.getColumns(sessionHandle, schemaName, tableName, columnName)
   }
 
-  override def getDatabases(pattern: String): Identity[List[String]] = blocking {
+  override def getDatabases(pattern: String): Identity[OperationHandle] = blocking {
     delegateBackend.getDatabases(pattern)
   }
 
-  override def getTables(database: String, pattern: String): Identity[List[String]] = blocking {
+  override def getTables(database: String, pattern: String): Identity[OperationHandle] = blocking {
     delegateBackend.getTables(database, pattern)
+  }
+
+  override def getSchemas(
+    sessionHandle: SessionHandle,
+    catalogName: String,
+    schemaName: String
+  ): Identity[OperationHandle] = blocking {
+    delegateBackend.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

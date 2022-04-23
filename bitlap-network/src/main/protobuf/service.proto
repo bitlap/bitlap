@@ -14,4 +14,14 @@ service DriverService {
 
   rpc ExecuteStatement (BExecuteStatement.BExecuteStatementReq) returns (BExecuteStatement.BExecuteStatementResp) {}
 
+  rpc FetchResults (BFetchResults.BFetchResultsReq) returns (BFetchResults.BFetchResultsResp) {}
+
+  rpc GetSchemas (BGetSchemas.BGetSchemasReq) returns (BGetSchemas.BGetSchemasResp) {}
+
+  rpc GetTables (BGetTables.BGetTablesReq) returns (BGetTables.BGetTablesResp) {}
+
+  rpc GetColumns (BGetColumns.BGetColumnsReq) returns (BGetColumns.BGetColumnsResp) {}
+
+  rpc GetResultSetMetadata (BGetResultSetMetadata.BGetResultSetMetadataReq) returns (BGetResultSetMetadata.BGetResultSetMetadataResp) {}
+
 }

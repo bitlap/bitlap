@@ -2,10 +2,10 @@
 package org.bitlap.server.rpc.backend
 
 import org.bitlap.network.dsl.blocking
-import org.bitlap.network.rpc.RpcF
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.RowSet
 import org.bitlap.network.models
+import org.bitlap.network.models.FetchResults
+import org.bitlap.network.rpc.RpcF
 
 import scala.concurrent.Future
 
@@ -34,21 +34,13 @@ class FutureRpcBackend extends RpcF[Future] {
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
-    confOverlay: Map[String, String]
-  ): Future[OperationHandle] = blocking {
-    delegateBackend.executeStatement(sessionHandle, statement, confOverlay).toFuture
-  }
-
-  override def executeStatement(
-    sessionHandle: SessionHandle,
-    statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String]
   ): Future[OperationHandle] = blocking {
     delegateBackend.executeStatement(sessionHandle, statement, queryTimeout, confOverlay).toFuture
   }
 
-  override def fetchResults(opHandle: OperationHandle): Future[RowSet] = blocking {
+  override def fetchResults(opHandle: OperationHandle): Future[FetchResults] = blocking {
     delegateBackend.fetchResults(opHandle).toFuture
   }
 
@@ -58,18 +50,26 @@ class FutureRpcBackend extends RpcF[Future] {
 
   override def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String,
     schemaName: String,
+    tableName: String,
     columnName: String
   ): Future[OperationHandle] = blocking {
-    delegateBackend.getColumns(sessionHandle, tableName, schemaName, columnName).toFuture
+    delegateBackend.getColumns(sessionHandle, schemaName, tableName, columnName).toFuture
   }
 
-  override def getDatabases(pattern: String): Future[List[String]] = blocking {
+  override def getDatabases(pattern: String): Future[OperationHandle] = blocking {
     delegateBackend.getDatabases(pattern).toFuture
   }
 
-  override def getTables(database: String, pattern: String): Future[List[String]] = blocking {
+  override def getTables(database: String, pattern: String): Future[OperationHandle] = blocking {
     delegateBackend.getTables(database, pattern).toFuture
+  }
+
+  override def getSchemas(
+    sessionHandle: SessionHandle,
+    catalogName: String,
+    schemaName: String
+  ): Future[OperationHandle] = blocking {
+    delegateBackend.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

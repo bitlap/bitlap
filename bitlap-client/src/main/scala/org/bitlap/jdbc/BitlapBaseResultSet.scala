@@ -1,7 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.driver.proto.{ BRow, BTableSchema, BTypeId }
+import org.bitlap.network.driver.proto.{ BTableSchema, BTypeId }
+import org.bitlap.network.models._
 
 import java.io.{ InputStream, Reader }
 import java.math.BigDecimal
@@ -19,11 +20,11 @@ import java.util.Calendar
 abstract class BitlapBaseResultSet extends ResultSet {
 
   protected var warningChain: SQLWarning
-  protected var row: BRow
+  protected var row: Row
   protected var columnNames: List[String]
   protected var columnTypes: List[String]
 
-  private var schema: BTableSchema = _
+  private var schema: TableSchema = _
 
   private var _wasNull: Boolean = false
 
@@ -572,13 +573,12 @@ abstract class BitlapBaseResultSet extends ResultSet {
     if (row == null) {
       throw BSQLException("No row found.")
     }
-    val colVals = row.colVals
+    val colVals = row.values
     if (colVals == null) throw BSQLException("RowSet does not contain any columns!")
     if (columnIndex > colVals.size) {
       throw BSQLException("Invalid columnIndex: $columnIndex")
     }
 
-    // In kotlin, We can not use e.g. Int?,Long?,Double? to override the java interface here.
     val bColumnValue = colVals(columnIndex - 1)
     try {
       if (bColumnValue.isEmpty) {
@@ -586,22 +586,22 @@ abstract class BitlapBaseResultSet extends ResultSet {
       }
 
       val valueStr = bColumnValue.toStringUtf8
-      val columnType = getSchema().columns(columnIndex - 1).typeDesc
+      val columnType = getSchema.columns(columnIndex - 1).typeDesc
       (
         columnType match {
-          case BTypeId.B_TYPE_ID_STRING_TYPE =>
+          case TypeId.TYPE_ID_STRING_TYPE =>
             if (valueStr.isEmpty) "" else valueStr
-          case BTypeId.B_TYPE_ID_INT_TYPE =>
+          case TypeId.TYPE_ID_INT_TYPE =>
             if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
-          case BTypeId.B_TYPE_ID_DOUBLE_TYPE =>
+          case TypeId.TYPE_ID_DOUBLE_TYPE =>
             if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
-          case BTypeId.B_TYPE_ID_SHORT_TYPE =>
+          case TypeId.TYPE_ID_SHORT_TYPE =>
             if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
-          case BTypeId.B_TYPE_ID_LONG_TYPE =>
+          case TypeId.TYPE_ID_LONG_TYPE =>
             if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
-          case BTypeId.B_TYPE_ID_BOOLEAN_TYPE =>
+          case TypeId.TYPE_ID_BOOLEAN_TYPE =>
             if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
-          case BTypeId.B_TYPE_ID_TIMESTAMP_TYPE =>
+          case TypeId.TYPE_ID_TIMESTAMP_TYPE =>
             if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
             else null
           case _ => throw BSQLException(s"Unrecognized column type:$columnType")
@@ -612,7 +612,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
     }
   }
 
-  def setSchema(schema: BTableSchema): Unit = this.schema = schema
+  def setSchema(schema: TableSchema): Unit = this.schema = schema
 
-  def getSchema(): BTableSchema = this.schema
+  def getSchema: TableSchema = this.schema
 }

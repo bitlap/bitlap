@@ -2,7 +2,7 @@
 package org.bitlap.network.rpc
 
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.models.{ FetchResults, TableSchema }
 
 /**
  * @author 梦境迷离
@@ -13,7 +13,7 @@ trait RpcF[F[_]] {
   def openSession(
     username: String,
     password: String,
-    configuration: Map[String, String] = Map.empty
+    configuration: Map[String, String]
   ): F[SessionHandle]
 
   def closeSession(sessionHandle: SessionHandle): F[Unit]
@@ -21,24 +21,18 @@ trait RpcF[F[_]] {
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
+    queryTimeout: Long,
     confOverlay: Map[String, String]
   ): F[OperationHandle]
 
-  def executeStatement(
-    sessionHandle: SessionHandle,
-    statement: String,
-    queryTimeout: Long,
-    confOverlay: Map[String, String] = Map.empty
-  ): F[OperationHandle]
-
-  def fetchResults(opHandle: OperationHandle): F[RowSet]
+  def fetchResults(opHandle: OperationHandle): F[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
     schemaName: String = null,
+    tableName: String = null,
     columnName: String = null
   ): F[OperationHandle]
 
@@ -47,12 +41,19 @@ trait RpcF[F[_]] {
    *
    * @see `show databases`
    */
-  def getDatabases(pattern: String): F[List[String]]
+  def getDatabases(pattern: String): F[OperationHandle]
 
   /**
    * get tables from catalog with database name
    *
    * @see `show tables in [db_name]`
    */
-  def getTables(database: String, pattern: String): F[List[String]]
+  def getTables(database: String, pattern: String): F[OperationHandle]
+
+  /**
+   * get schemas from catalog
+   *
+   * @see `show tables in [db_name]`
+   */
+  def getSchemas(sessionHandle: SessionHandle, catalogName: String, schemaName: String): F[OperationHandle]
 }

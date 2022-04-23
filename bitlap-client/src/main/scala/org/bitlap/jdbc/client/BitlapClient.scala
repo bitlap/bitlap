@@ -1,8 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc.client
 
-import org.bitlap.network.driver.proto._
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ RowSet, TableSchema }
 
 /**
  * This class mainly wraps the RPC call procedure used inside JDBC.
@@ -15,44 +15,44 @@ private[jdbc] class BitlapClient(uri: String, port: Int, props: Map[String, Stri
 
   private val rpcClient = new BitlapSyncClient(uri, port, props)
 
-  def openSession(): BSessionHandle =
+  def openSession(): SessionHandle =
     rpcClient
-      .openSession(username = "", password = "", configuration = Map.empty)
-      .toBSessionHandle()
+      .openSession(username = "", password = "", configuration = props)
   // TODO: Add heartbeat
 
-  def closeSession(sessionHandle: BSessionHandle): Unit =
-    rpcClient.closeSession(new SessionHandle(sessionHandle))
+  def closeSession(sessionHandle: SessionHandle): Unit =
+    rpcClient.closeSession(sessionHandle)
 
-  def executeStatement(sessionHandle: BSessionHandle, statement: String): BOperationHandle =
+  def executeStatement(sessionHandle: SessionHandle, statement: String): OperationHandle =
     rpcClient
       .executeStatement(
         statement = statement,
-        sessionHandle = new SessionHandle(sessionHandle)
+        sessionHandle = sessionHandle
       )
-      .toBOperationHandle()
 
-  def fetchResults(operationHandle: BOperationHandle): BRowSet =
-    rpcClient.fetchResults(new OperationHandle(operationHandle)).toBRowSet
+  def fetchResults(operationHandle: OperationHandle): RowSet =
+    rpcClient.fetchResults(operationHandle).results
 
+  // make it return schema data, instead of `BOperationHandle` ?
   def getSchemas(
-    sessionHandle: BSessionHandle,
+    sessionHandle: SessionHandle,
     catalogName: String = null,
     schemaName: String = null
-  ): BOperationHandle = ???
+  ): OperationHandle = ???
 
   def getTables(
-    sessionHandle: BSessionHandle,
+    sessionHandle: SessionHandle,
     tableName: String = null,
     schemaName: String = null
-  ): BOperationHandle = ???
+  ): OperationHandle = ???
 
   def getColumns(
-    sessionHandle: BSessionHandle,
+    sessionHandle: SessionHandle,
     tableName: String = null,
     schemaName: String = null,
     columnName: String = null
-  ): BOperationHandle = ???
+  ): OperationHandle = ???
 
-  def getResultSetMetadata(operationHandle: BOperationHandle): BTableSchema = ???
+  def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
+    rpcClient.getResultSetMetadata(operationHandle)
 }

@@ -29,6 +29,16 @@
             <version>${grpc.netty.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-core</artifactId>
+            <version>${grpc.netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+            <version>${grpc.netty.version}</version>
+        </dependency>
+        <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio_2.13</artifactId>
             <version>${zio.version}</version>

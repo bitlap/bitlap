@@ -2,7 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.jdbc.client.BitlapClient
-import org.bitlap.network.driver.proto.BSessionHandle
+import org.bitlap.network.handles.SessionHandle
 
 import java.sql.{ Connection, DatabaseMetaData, ResultSet, RowIdLifetime }
 
@@ -12,7 +12,7 @@ import java.sql.{ Connection, DatabaseMetaData, ResultSet, RowIdLifetime }
  * @version 1.0
  */
 class BitlapDatabaseMetaData(
-  private val session: BSessionHandle,
+  private val session: SessionHandle,
   private val client: BitlapClient
 ) extends DatabaseMetaData {
   override def allProceduresAreCallable(): Boolean = ???

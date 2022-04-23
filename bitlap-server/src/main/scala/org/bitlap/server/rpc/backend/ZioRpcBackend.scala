@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.OperationType
-import org.bitlap.network.rpc.RpcN
+import org.bitlap.network.{ models, OperationType }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.models.{ FetchResults, StatusCode, TableSchema }
+import org.bitlap.network.rpc.RpcN
 import org.bitlap.server.rpc.SessionManager
 import zio.ZIO
 
@@ -38,16 +38,6 @@ class ZioRpcBackend extends RpcN[ZIO] {
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
-    confOverlay: Map[String, String]
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
-    val session = sessionManager.getSession(sessionHandle)
-    sessionManager.refreshSession(sessionHandle, session)
-    session.executeStatement(sessionHandle, statement, confOverlay)
-  }
-
-  override def executeStatement(
-    sessionHandle: SessionHandle,
-    statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
@@ -61,11 +51,11 @@ class ZioRpcBackend extends RpcN[ZIO] {
     )
   }
 
-  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, RowSet] = ZIO.effect {
+  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
     val session = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
-    session.fetchResults(opHandle)
+    FetchResults(false, session.fetchResults(opHandle))
   }
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
@@ -77,12 +67,18 @@ class ZioRpcBackend extends RpcN[ZIO] {
 
   override def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null,
-    columnName: String = null
+    schemaName: String,
+    tableName: String,
+    columnName: String
   ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GET_COLUMNS))
 
-  override def getDatabases(pattern: String): ZIO[Any, Throwable, List[String]] = ???
+  override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
 
-  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, List[String]] = ???
+  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
+
+  override def getSchemas(
+    sessionHandle: SessionHandle,
+    catalogName: String,
+    schemaName: String
+  ): ZIO[Any, Throwable, OperationHandle] = ???
 }

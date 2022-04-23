@@ -1,7 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.driver.proto.BTypeId
+import org.bitlap.network.models.TypeId
+import org.bitlap.network.models.TypeId.TypeId
 
 /**
  * @author 梦境迷离
@@ -50,15 +51,15 @@ object Utils {
    */
   val PORT_PROPERTY_KEY = "PORT"
 
-  val SERVER_TYPE_NAMES: Map[Int, ColumnType] =
+  val SERVER_TYPE_NAMES: Map[TypeId, ColumnType] =
     Map(
-      BTypeId.B_TYPE_ID_STRING_TYPE -> ColumnType.STRING,
-      BTypeId.B_TYPE_ID_INT_TYPE -> ColumnType.INT,
-      BTypeId.B_TYPE_ID_DOUBLE_TYPE -> ColumnType.DOUBLE,
-      BTypeId.B_TYPE_ID_SHORT_TYPE -> ColumnType.SHORT,
-      BTypeId.B_TYPE_ID_BOOLEAN_TYPE -> ColumnType.BOOLEAN,
-      BTypeId.B_TYPE_ID_LONG_TYPE -> ColumnType.LONG,
-      BTypeId.B_TYPE_ID_TIMESTAMP_TYPE -> ColumnType.TIMESTAMP,
-      BTypeId.B_TYPE_ID_BYTE_TYPE -> ColumnType.BYTE
-    ).map(kv => kv._1.value -> kv._2)
+      TypeId.TYPE_ID_STRING_TYPE -> ColumnType.STRING,
+      TypeId.TYPE_ID_INT_TYPE -> ColumnType.INT,
+      TypeId.TYPE_ID_DOUBLE_TYPE -> ColumnType.DOUBLE,
+      TypeId.TYPE_ID_SHORT_TYPE -> ColumnType.SHORT,
+      TypeId.TYPE_ID_BOOLEAN_TYPE -> ColumnType.BOOLEAN,
+      TypeId.TYPE_ID_LONG_TYPE -> ColumnType.LONG,
+      TypeId.TYPE_ID_TIMESTAMP_TYPE -> ColumnType.TIMESTAMP,
+      TypeId.TYPE_ID_BYTE_TYPE -> ColumnType.BYTE
+    )
 }

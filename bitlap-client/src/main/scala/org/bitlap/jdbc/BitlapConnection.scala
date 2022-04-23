@@ -3,7 +3,7 @@ package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
 import org.bitlap.jdbc.client.BitlapClient
-import org.bitlap.network.driver.proto.BSessionHandle
+import org.bitlap.network.handles._
 import org.bitlap.tools.apply
 
 import java.sql._
@@ -22,7 +22,7 @@ import scala.jdk.CollectionConverters._
 @apply // not support default args
 class BitlapConnection(uri: String, info: Properties) extends Connection {
 
-  private var session: BSessionHandle = _
+  private var session: SessionHandle = _
   private var closed = true
   private var warningChain: SQLWarning = _
   private var client: BitlapClient = _
@@ -38,7 +38,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val parts = hosts.map(it => it.split("/"))
     try {
       //FIXME
-      client = new BitlapClient(parts.map(_(0)).mkString(","), 80, info.asScala.toMap)
+      val hostAndPort = parts.map(_(0)).mkString(",").split(":")
+      client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {

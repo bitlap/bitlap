@@ -3,7 +3,8 @@ package org.bitlap.jdbc
 
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.jdbc.client.BitlapClient
-import org.bitlap.network.driver.proto.{ BOperationHandle, BRow, BSessionHandle }
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models._
 
 import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
 
@@ -15,7 +16,7 @@ import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
 class BitlapQueryResultSet(
   private var client: BitlapClient,
   private var maxRows: Int,
-  override var row: BRow = null
+  override var row: Row = null
 ) extends BitlapBaseResultSet() {
   override protected var warningChain: SQLWarning = _
   override protected var columnNames: List[String] = List.empty
@@ -26,10 +27,10 @@ class BitlapQueryResultSet(
   protected var closed: Boolean = false
   protected var fetchSize = 0
 
-  private var fetchedRows: List[BRow] = List.empty
-  private var fetchedRowsItr: Iterator[BRow] = fetchedRows.iterator
-  private var sessHandle: BSessionHandle = _
-  private var stmtHandle: BOperationHandle = _
+  private var fetchedRows: List[Row] = List.empty
+  private var fetchedRowsItr: Iterator[Row] = fetchedRows.iterator
+  private var sessHandle: SessionHandle = _
+  private var stmtHandle: OperationHandle = _
 
   def this(builder: Builder) = {
     this(builder.client, builder.maxRows)
@@ -73,7 +74,7 @@ class BitlapQueryResultSet(
         }
         val columnName = columns(pos).columnName
         columnNames :+= columnName
-        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns(pos).typeDesc.value).stringify
+        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns(pos).typeDesc).stringify
         columnTypes :+= columnTypeName
         namesSb.append(columnName)
         typesSb.append(columnTypeName)
@@ -151,8 +152,8 @@ object BitlapQueryResultSet {
 
   class Builder {
     var client: BitlapClient = _
-    var stmtHandle: BOperationHandle = _
-    var sessHandle: BSessionHandle = _
+    var stmtHandle: OperationHandle = _
+    var sessHandle: SessionHandle = _
 
     /**
      * Sets the limit for the maximum number of rows that any ResultSet object produced by this
@@ -171,12 +172,12 @@ object BitlapQueryResultSet {
       this
     }
 
-    def setStmtHandle(stmtHandle: BOperationHandle): Builder = {
+    def setStmtHandle(stmtHandle: OperationHandle): Builder = {
       this.stmtHandle = stmtHandle
       this
     }
 
-    def setSessionHandle(sessHandle: BSessionHandle): Builder = {
+    def setSessionHandle(sessHandle: SessionHandle): Builder = {
       this.sessHandle = sessHandle
       this
     }

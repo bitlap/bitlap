@@ -10,12 +10,12 @@ import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetada
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.function.statusApplyFunc
-import org.bitlap.network.handles.{OperationHandle, SessionHandle}
-import org.bitlap.network.models.{FetchResults, TableSchema}
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.RpcN
-import org.bitlap.network.{RpcStatus, handles}
+import org.bitlap.network.{ handles, RpcStatus }
 import scalapb.zio_grpc.ZManagedChannel
-import zio.{Layer, ZIO}
+import zio.{ Layer, ZIO }
 
 import scala.jdk.CollectionConverters._
 

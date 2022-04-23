@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
 import io.grpc.Status
@@ -22,6 +23,5 @@ package object function {
   val statusApplyFunc: Status => Throwable = (st: Status) => {
     NetworkException(st.getCode.value(), st.getCode.toStatus.getDescription, st.asException())
   }
-  
-  
+
 }

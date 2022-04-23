@@ -3,17 +3,17 @@ package org.bitlap.server.rpc.live
 
 import io.grpc.Status
 import org.bitlap.network.RpcStatus
-import org.bitlap.network.driver.proto.BCloseSession.{BCloseSessionReq, BCloseSessionResp}
-import org.bitlap.network.driver.proto.BExecuteStatement.{BExecuteStatementReq, BExecuteStatementResp}
-import org.bitlap.network.driver.proto.BFetchResults.{BFetchResultsReq, BFetchResultsResp}
-import org.bitlap.network.driver.proto.BGetColumns.{BGetColumnsReq, BGetColumnsResp}
-import org.bitlap.network.driver.proto.BGetResultSetMetadata.{BGetResultSetMetadataReq, BGetResultSetMetadataResp}
-import org.bitlap.network.driver.proto.BGetSchemas.{BGetSchemasReq, BGetSchemasResp}
-import org.bitlap.network.driver.proto.BGetTables.{BGetTablesReq, BGetTablesResp}
-import org.bitlap.network.driver.proto.BOpenSession.{BOpenSessionReq, BOpenSessionResp}
+import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
+import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
+import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
+import org.bitlap.network.driver.proto.BGetColumns.{ BGetColumnsReq, BGetColumnsResp }
+import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
+import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
+import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
+import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
 import org.bitlap.network.function.errorApplyFunc
-import org.bitlap.network.handles.{OperationHandle, SessionHandle}
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.rpc.RpcN
 import org.bitlap.server.rpc.backend.ZioRpcBackend
 import zio.ZIO

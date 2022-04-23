@@ -80,7 +80,7 @@ object Command {
     command = bitlap
   ) {
     case sql: Command.Sql =>
-      ZIO.succeed(handleSqlCli(sql))
+      putStr(s"Executing `bitlap sql` with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
     case Command.Server(operate) =>
       putStr(s"Executing `bitlap server` with args: $operate")
   }

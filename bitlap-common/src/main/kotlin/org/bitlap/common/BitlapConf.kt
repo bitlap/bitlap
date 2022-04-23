@@ -124,10 +124,10 @@ open class BitlapConf(val conf: Map<String, String> = emptyMap()) : Serializable
             .env("BITLAP_PROJECT_NAME")
 
         /**
-         * Data dir
+         * Data dir FIXME 不加默认有问题
          */
         @JvmField
-        val ROOT_DIR_DATA = BitlapConfKey<String>("bitlap.root.dir.data").validator(Validators.NOT_BLANK)
+        val ROOT_DIR_DATA = BitlapConfKey<String>("bitlap.root.dir.data", "/tmp/bitlap_data").validator(Validators.NOT_BLANK)
 
         /**
          * Local dir

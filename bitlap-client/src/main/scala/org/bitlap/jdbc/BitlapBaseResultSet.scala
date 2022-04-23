@@ -11,6 +11,8 @@ import java.sql._
 import java.time.Instant
 import java.util
 import java.util.Calendar
+import scala.annotation.implicitNotFound
+import scala.reflect.{ classTag, ClassTag }
 
 /**
  * @author 梦境迷离
@@ -36,11 +38,11 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def wasNull(): Boolean = _wasNull
 
-  override def getString(columnIndex: Int): String = getColumnValue(columnIndex)
+  override def getString(columnIndex: Int): String = getColumnValue[String](columnIndex)
 
   override def getString(columnLabel: String): String = getString(findColumn(columnLabel))
 
-  override def getBoolean(columnIndex: Int): Boolean = getColumnValue(columnIndex)
+  override def getBoolean(columnIndex: Int): Boolean = getColumnValue[Boolean](columnIndex)
 
   override def getBoolean(columnLabel: String): Boolean = getBoolean(findColumn(columnLabel))
 
@@ -48,15 +50,15 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def getByte(columnLabel: String): Byte = ???
 
-  override def getShort(columnIndex: Int): Short = getColumnValue(columnIndex)
+  override def getShort(columnIndex: Int): Short = getColumnValue[Short](columnIndex)
 
   override def getShort(columnLabel: String): Short = getShort(findColumn(columnLabel))
 
-  override def getInt(columnIndex: Int): Int = getColumnValue(columnIndex)
+  override def getInt(columnIndex: Int): Int = getColumnValue[Int](columnIndex)
 
   override def getInt(columnLabel: String): Int = getInt(findColumn(columnLabel))
 
-  override def getLong(columnIndex: Int): Long = getColumnValue(columnIndex)
+  override def getLong(columnIndex: Int): Long = getColumnValue[Long](columnIndex)
 
   override def getLong(columnLabel: String): Long = getLong(findColumn(columnLabel))
 
@@ -66,7 +68,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getFloat(columnLabel: String): Float =
     ???
 
-  override def getDouble(columnIndex: Int): Double = getColumnValue(columnIndex)
+  override def getDouble(columnIndex: Int): Double = getColumnValue[Double](columnIndex)
 
   override def getDouble(columnLabel: String): Double = getDouble(findColumn(columnLabel))
 
@@ -111,7 +113,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def getTime(columnLabel: String, cal: Calendar): Time =
     ???
 
-  override def getTimestamp(columnIndex: Int): Timestamp = getColumnValue(columnIndex)
+  override def getTimestamp(columnIndex: Int): Timestamp = getColumnValue[Timestamp](columnIndex)
 
   override def getTimestamp(columnLabel: String): Timestamp = getTimestamp(findColumn(columnLabel))
 
@@ -148,7 +150,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def getMetaData(): ResultSetMetaData = new BitlapResultSetMetaData(columnNames, columnTypes)
 
-  override def getObject(columnIndex: Int): Any = getColumnValue(columnIndex)
+  override def getObject(columnIndex: Int): Any = getColumnValue[Any](columnIndex)
 
   override def getObject(columnLabel: String): Any = getObject(findColumn(columnLabel))
 
@@ -569,14 +571,15 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit = ???
 
   @inline
-  private def getColumnValue[T](columnIndex: Int): T = {
+  @implicitNotFound("ClassTag must exists")
+  private def getColumnValue[T: ClassTag](columnIndex: Int): T = {
     if (row == null) {
       throw BSQLException("No row found.")
     }
     val colVals = row.values
     if (colVals == null) throw BSQLException("RowSet does not contain any columns!")
     if (columnIndex > colVals.size) {
-      throw BSQLException("Invalid columnIndex: $columnIndex")
+      throw BSQLException(s"Invalid columnIndex: $columnIndex")
     }
 
     val bColumnValue = colVals(columnIndex - 1)
@@ -585,28 +588,26 @@ abstract class BitlapBaseResultSet extends ResultSet {
         _wasNull = true
       }
 
+      val typeName = classTag[T].runtimeClass.getTypeName
       val valueStr = bColumnValue.toStringUtf8
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
-      (
-        columnType match {
-          case TypeId.TYPE_ID_STRING_TYPE =>
-            if (valueStr.isEmpty) "" else valueStr
-          case TypeId.TYPE_ID_INT_TYPE =>
-            if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
-          case TypeId.TYPE_ID_DOUBLE_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
-          case TypeId.TYPE_ID_SHORT_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
-          case TypeId.TYPE_ID_LONG_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
-          case TypeId.TYPE_ID_BOOLEAN_TYPE =>
-            if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
-          case TypeId.TYPE_ID_TIMESTAMP_TYPE =>
-            if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
-            else null
-          case _ => throw BSQLException(s"Unrecognized column type:$columnType")
-        }
-      ).asInstanceOf[T]
+      (columnType match {
+        case TypeId.TYPE_ID_STRING_TYPE => valueStr
+        case TypeId.TYPE_ID_INT_TYPE =>
+          if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
+        case TypeId.TYPE_ID_DOUBLE_TYPE =>
+          if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
+        case TypeId.TYPE_ID_SHORT_TYPE =>
+          if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
+        case TypeId.TYPE_ID_LONG_TYPE =>
+          if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
+        case TypeId.TYPE_ID_BOOLEAN_TYPE =>
+          if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
+        case TypeId.TYPE_ID_TIMESTAMP_TYPE =>
+          if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
+          else null
+        case _ => throw BSQLException(s"Unrecognized column columnType:$columnType, scalaTypeName:$typeName")
+      }).asInstanceOf[T]
     } catch {
       case e: Exception => throw e
     }

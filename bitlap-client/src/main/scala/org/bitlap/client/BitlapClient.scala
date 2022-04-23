@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.jdbc.client
+package org.bitlap.client
 
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ RowSet, TableSchema }
@@ -11,7 +11,7 @@ import org.bitlap.network.models.{ RowSet, TableSchema }
  * @since 2021/11/21
  * @version 1.0
  */
-private[jdbc] class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
+private[bitlap] class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
 
   private val rpcClient = new BitlapSyncClient(uri, port, props)
 

@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.jdbc.client.BitlapClient
+import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles._
 
 import java.sql._

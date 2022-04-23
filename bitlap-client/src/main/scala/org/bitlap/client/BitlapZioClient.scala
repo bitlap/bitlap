@@ -1,19 +1,18 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.jdbc.client
+package org.bitlap.client
 
 import io.grpc.ManagedChannelBuilder
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
-import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
+import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.{ exception, RpcN }
-import org.bitlap.network.{ handles, RpcStatus }
-import scalapb.zio_grpc.ZManagedChannel
+import org.bitlap.network.rpc.{ RpcN, exception }
+import org.bitlap.network.{ RpcStatus, handles }
 import zio.{ Layer, ZIO }
 
 import scala.jdk.CollectionConverters._
@@ -25,7 +24,7 @@ import scala.jdk.CollectionConverters._
  * @since 2021/11/21
  * @version 1.0
  */
-private[jdbc] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
+private[bitlap] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
     extends RpcN[ZIO]
     with RpcStatus {
 

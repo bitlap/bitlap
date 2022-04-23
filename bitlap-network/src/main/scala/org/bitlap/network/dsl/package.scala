@@ -2,6 +2,7 @@
 package org.bitlap.network
 
 import io.grpc.Status
+import org.bitlap.network.function.errorApplyFunc
 import org.bitlap.network.rpc.runtime
 import zio.{ IO, ZIO }
 
@@ -21,5 +22,5 @@ package object dsl {
   def zioFromFuture[T, R, F[_] <: Future[_]](action: => F[T])(t: T => R): ZIO[Any, Status, R] =
     IO.fromFuture[T](make => action.asInstanceOf[Future[T]])
       .map(hd => t(hd))
-      .mapError { f => f.printStackTrace(); Status.INTERNAL }
+      .mapError(errorApplyFunc)
 }

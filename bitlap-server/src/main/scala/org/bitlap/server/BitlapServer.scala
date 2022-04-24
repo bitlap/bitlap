@@ -10,7 +10,7 @@ import zio.{ ExitCode, URIO }
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
-class BitlapServer(val serverPort: Int) extends ServerMain {
+class Server(val serverPort: Int) extends ServerMain {
 
   override def port: Int = serverPort
 
@@ -18,7 +18,7 @@ class BitlapServer(val serverPort: Int) extends ServerMain {
 
 }
 
-object Server extends BitlapServer(23333) {
+object BitlapServer extends Server(23333) {
 
   override def run(args: List[String]): URIO[zio.ZEnv with Console, ExitCode] = super.run(args)
 

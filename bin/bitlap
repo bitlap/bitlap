@@ -59,7 +59,7 @@ case $COMMAND in
         if [ $# = 0 ] || [ "$1" = "-help" ] ; then
           ARGS="--help"
         fi
-        CLASS="org.bitlap.cli.BitlapServerCli"
+        CLASS="org.bitlap.cli.BitlapCli"
         CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
         # echo "$CMD"
         exec $CMD
@@ -76,7 +76,7 @@ case $COMMAND in
       ARGS="--help"
     fi
     OPTS="$BITLAP_CLIENT_OPTS"
-    CLASS="org.bitlap.cli.BitlapSqlCli"
+    CLASS="org.bitlap.cli.BitlapCli"
 
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
     # echo "$CMD"
@@ -89,8 +89,8 @@ case $COMMAND in
     if [ $# = 0 ] || [ "$COMMAND" = "-help" ] ; then
       ARGS="--help"
     fi
-    CLASS="org.bitlap.cli.BitlapCli"
     OPTS="$BITLAP_CLIENT_OPTS"
+    CLASS="org.bitlap.cli.BitlapCli"
 
     CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
     # echo "$CMD"

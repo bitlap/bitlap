@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.cli.extension
+package org.bitlap.cli.interactive
 
 import org.bitlap.common.utils.StringEx
 import org.bitlap.tools.apply

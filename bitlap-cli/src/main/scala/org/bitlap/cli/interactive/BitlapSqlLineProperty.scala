@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.cli.extension
+package org.bitlap.cli.interactive
 
 import sqlline.SqlLineProperty
 import sqlline.SqlLineProperty.Type
@@ -29,4 +29,4 @@ class BitlapSqlLineProperty(
   override def getAvailableValues: util.Set[String] = availableValues.asJava
 }
 
-case object BitlapPrompt extends BitlapSqlLineProperty("bitlapPromp", Type.STRING, "bitlap")
+case object BitlapSqlLineProperty extends BitlapSqlLineProperty("bitlapPromp", Type.STRING, "bitlap")

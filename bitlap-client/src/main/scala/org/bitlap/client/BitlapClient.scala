@@ -5,7 +5,7 @@ import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ RowSet, TableSchema }
 
 /**
- * This class mainly wraps the RPC call procedure used inside JDBC.
+ * This class mainly wraps synchronous calls.
  *
  * @author 梦境迷离
  * @since 2021/11/21

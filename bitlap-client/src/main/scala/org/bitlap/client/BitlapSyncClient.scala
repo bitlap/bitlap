@@ -8,7 +8,7 @@ import org.bitlap.network.models._
 import org.bitlap.network.rpc.{ Identity, RpcF }
 
 /**
- * This class mainly wraps the RPC call procedure used inside JDBC.
+ * This class mainly wraps zio asynchronous calls.
  *
  * @author 梦境迷离
  * @since 2021/11/21

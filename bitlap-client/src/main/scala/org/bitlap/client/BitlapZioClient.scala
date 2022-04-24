@@ -20,7 +20,7 @@ import zio.{ Layer, ZIO }
 import scala.jdk.CollectionConverters._
 
 /**
- * This class mainly wraps the RPC call procedure used inside JDBC.
+ * This class mainly wraps zio rpc calling procedures.
  *
  * @author 梦境迷离
  * @since 2021/11/21

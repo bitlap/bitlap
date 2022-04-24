@@ -22,7 +22,8 @@ import scala.collection.mutable.ArrayBuffer
  */
 trait BitlapInterpreter {
 
-  def sqlBuild: List[String] => String = (args: List[String]) => args.map(_.trim).mkString("'", " ", "'")
+  def sqlBuild: List[String] => String = (args: List[String]) =>
+    StringEx.trimMargin(args.map(_.trim).mkString(" "), '"', '\'')
 
   import BitlapInterpreter.bitlap
 
@@ -38,9 +39,8 @@ trait BitlapInterpreter {
       putStrLn(s"Executing `bitlap server` with args: $operate")
   }
 
-  private def handleSqlCli(sql: Sql): Unit = {
+  private def handleSqlCli(sql: Sql): Int = {
     val conf = new BitlapConf()
-    println(s"Conf: ${conf.getConf}, sql: ${sqlBuild(sql.args)}")
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(
       "-d",
@@ -62,10 +62,12 @@ trait BitlapInterpreter {
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
     val line = new SqlLine()
     line.getOpts.set(BitlapPrompt, projectName)
-    println(s"SqlLine args: $sqlArgs")
     val status = line.begin(sqlArgs.toArray, null, false)
     if (!java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
-      System.exit(status.ordinal)
+      // System.exit(status.ordinal)
+      status.ordinal()
+    } else {
+      -1
     }
   }
 
@@ -81,6 +83,7 @@ trait BitlapInterpreter {
   }
 
 }
+
 object BitlapInterpreter {
 
   import org.bitlap.cli.BitlapInterpreter.CliOptions._
@@ -91,7 +94,7 @@ object BitlapInterpreter {
 
   object CliCommands {
 
-    // sql -h localhost -u 123 -p 123 show tables
+    // sql -s localhost -u 123 -p 123 show tables
     val sql: ZioCliCommand[Sql] =
       ZioCliCommand("sql", serverOpt ++ userOpt ++ passwordOpt, Args.text.*)
         .withHelp(sqlHelp)

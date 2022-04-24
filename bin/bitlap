@@ -60,7 +60,7 @@ case $COMMAND in
           ARGS="--help"
         fi
         CLASS="org.bitlap.cli.BitlapCli"
-        CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+        CMD="$JAVA $BITLAP_SERVER_OPTS -cp $BITLAP_CLASSPATH $CLASS server $ARGS"
         # echo "$CMD"
         exec $CMD
         ;;
@@ -78,7 +78,7 @@ case $COMMAND in
     OPTS="$BITLAP_CLIENT_OPTS"
     CLASS="org.bitlap.cli.BitlapCli"
 
-    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS $ARGS"
+    CMD="$JAVA $OPTS -cp $BITLAP_CLASSPATH $CLASS sql $ARGS"
     # echo "$CMD"
     exec $CMD
     ;;

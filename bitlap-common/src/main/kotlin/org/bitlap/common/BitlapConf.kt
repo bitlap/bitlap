@@ -25,7 +25,7 @@ import java.io.Serializable
  * Created by IceMimosa
  * Date: 2021/5/28
  */
-open class BitlapConf(val conf: Map<String, String> = emptyMap()) : Serializable {
+open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Serializable {
 
     private val log = logger { }
 

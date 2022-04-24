@@ -9,6 +9,6 @@ import zio.{ ExitCode, URIO }
 object BitlapCli extends zio.App with BitlapInterpreter {
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    bitlapApp.run(args)
+    bitlapApp.run(args).exitCode
 
 }

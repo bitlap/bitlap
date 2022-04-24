@@ -3,14 +3,15 @@ package org.bitlap.cli
 
 import org.bitlap.cli.BitlapInterpreter.CliCommands.{ server, sql }
 import org.bitlap.cli.Command.{ Server, Sql }
-import org.bitlap.cli.interactive.{ BitlapSqlApplication, BitlapSqlLineDefaultProperty }
+import org.bitlap.cli.interactive.BitlapSqlApplication
+import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import sqlline.{ SqlLine, SqlLineOpts }
 import zio.ZIO
 import zio.cli.HelpDoc.Span.text
 import zio.cli.{ Args, CliApp, HelpDoc, Options, Command => ZioCliCommand }
-import zio.console.{ putStr, putStrLn, Console }
+import zio.console.{ putStrLn, Console }
 
 import java.io.{ File, IOException }
 import scala.collection.mutable.ArrayBuffer
@@ -60,7 +61,7 @@ trait BitlapInterpreter {
     // sql line REPL or execute sql directly
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
     val line = new SqlLine()
-    line.getOpts.set(BitlapSqlLineDefaultProperty, projectName)
+    line.getOpts.set(BitlapPrompt, projectName)
     println(s"SqlLine args: $sqlArgs")
     val status = line.begin(sqlArgs.toArray, null, false)
     if (!java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {

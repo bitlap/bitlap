@@ -39,7 +39,7 @@ trait BitlapInterpreter {
 
   private def handleSqlCli(sql: Sql): Unit = {
     val conf = new BitlapConf()
-    println(s"conf: ${conf.getConf}, sql: ${sqlBuild(sql.args)}")
+    println(s"Conf: ${conf.getConf}, sql: ${sqlBuild(sql.args)}")
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(
       "-d",
@@ -61,7 +61,7 @@ trait BitlapInterpreter {
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
     val line = new SqlLine()
     line.getOpts.set(BitlapSqlLineDefaultProperty, projectName)
-
+    println(s"SqlLine args: $sqlArgs")
     val status = line.begin(sqlArgs.toArray, null, false)
     if (!java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
       System.exit(status.ordinal)
@@ -90,8 +90,9 @@ object BitlapInterpreter {
 
   object CliCommands {
 
+    // sql -h localhost -u 123 -p 123 show tables
     val sql: ZioCliCommand[Sql] =
-      ZioCliCommand("sql", serverOpt ++ userOpt ++ passwordOpt, Args.text("sql").repeat)
+      ZioCliCommand("sql", serverOpt ++ userOpt ++ passwordOpt, Args.text.*)
         .withHelp(sqlHelp)
         .map { input =>
           Command.Sql(input._1._1, input._1._2, input._1._3, input._2)

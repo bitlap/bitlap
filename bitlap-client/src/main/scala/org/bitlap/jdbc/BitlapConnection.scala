@@ -38,7 +38,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val parts = hosts.map(it => it.split("/"))
     try {
       //FIXME
-      val hostAndPort = parts.map(_(0)).mkString(",").split(":")
+      val hostAndPort =
+        try parts.map(_(0)).mkString(",").split(":")
+        catch { case e: Exception => e.printStackTrace(); scala.Array("localhost", "23333") }
       client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, info.asScala.toMap)
       session = client.openSession()
       closed = false

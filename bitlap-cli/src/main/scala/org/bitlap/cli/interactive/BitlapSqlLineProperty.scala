@@ -29,4 +29,4 @@ class BitlapSqlLineProperty(
   override def getAvailableValues: util.Set[String] = availableValues.asJava
 }
 
-case object BitlapSqlLineProperty extends BitlapSqlLineProperty("bitlapPromp", Type.STRING, "bitlap")
+case object BitlapSqlLineDefaultProperty extends BitlapSqlLineProperty("bitlapPromp", Type.STRING, "bitlap")

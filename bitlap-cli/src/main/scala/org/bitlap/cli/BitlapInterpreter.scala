@@ -3,14 +3,14 @@ package org.bitlap.cli
 
 import org.bitlap.cli.BitlapInterpreter.CliCommands.{ server, sql }
 import org.bitlap.cli.Command.{ Server, Sql }
-import org.bitlap.cli.interactive.{ BitlapSqlApplication, BitlapSqlLineProperty }
+import org.bitlap.cli.interactive.{ BitlapSqlApplication, BitlapSqlLineDefaultProperty }
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import sqlline.{ SqlLine, SqlLineOpts }
 import zio.ZIO
 import zio.cli.HelpDoc.Span.text
 import zio.cli.{ Args, CliApp, HelpDoc, Options, Command => ZioCliCommand }
-import zio.console.{ putStr, Console }
+import zio.console.{ putStr, putStrLn, Console }
 
 import java.io.{ File, IOException }
 import scala.collection.mutable.ArrayBuffer
@@ -21,7 +21,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 trait BitlapInterpreter {
 
-  def sqlBuild: List[String] => String = (args: List[String]) => StringEx.trimMargin(args.mkString(" "), '"', '\'')
+  def sqlBuild: List[String] => String = (args: List[String]) => args.map(_.trim).mkString("'", " ", "'")
 
   import BitlapInterpreter.bitlap
 
@@ -32,13 +32,14 @@ trait BitlapInterpreter {
     command = bitlap
   ) {
     case sql: Command.Sql =>
-      putStr(s"Executing `bitlap sql` with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
+      putStrLn(s"Executing `bitlap sql` with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
     case Command.Server(operate) =>
-      putStr(s"Executing `bitlap server` with args: $operate")
+      putStrLn(s"Executing `bitlap server` with args: $operate")
   }
 
   private def handleSqlCli(sql: Sql): Unit = {
     val conf = new BitlapConf()
+    println(s"conf: ${conf.getConf}, sql: ${sqlBuild(sql.args)}")
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(
       "-d",
@@ -59,7 +60,7 @@ trait BitlapInterpreter {
     // sql line REPL or execute sql directly
     System.setProperty("x.sqlline.basedir", getHistoryPath(projectName))
     val line = new SqlLine()
-    line.getOpts.set(BitlapSqlLineProperty, projectName)
+    line.getOpts.set(BitlapSqlLineDefaultProperty, projectName)
 
     val status = line.begin(sqlArgs.toArray, null, false)
     if (!java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {

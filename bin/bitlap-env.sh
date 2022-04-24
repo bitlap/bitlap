@@ -40,3 +40,4 @@ if [[ -z $JAVA_HOME ]]; then
    fi
  fi
 JAVA=$JAVA_HOME/bin/java
+# JAVA=`whereis java`

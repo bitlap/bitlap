@@ -4,7 +4,7 @@ package org.bitlap.cli
 import zio.{ ExitCode, URIO }
 
 /**
- * Bitlap cli command
+ * This is a zio cli application, based on zio1.
  */
 object BitlapCli extends zio.App with BitlapInterpreter {
 

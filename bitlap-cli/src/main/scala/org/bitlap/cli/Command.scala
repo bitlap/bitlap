@@ -2,7 +2,7 @@
 package org.bitlap.cli
 
 /**
- * This is a zio cli application, based on zio2.
+ * Bitlap cli command.
  *
  * @author 梦境迷离
  * @version 1.0,2022/4/23

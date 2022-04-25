@@ -9,7 +9,7 @@ import zio.ZIO
 import scala.concurrent.Future
 
 /**
- * Monad for backedn, this is because not all subclasses support it.
+ * Monad for backend, this is because not all subclasses support it.
  *
  * @author 梦境迷离
  * @version 1.0,2022/4/25

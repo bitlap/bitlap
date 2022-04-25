@@ -83,7 +83,7 @@
         <smt.version>0.4.2</smt.version>
         <picocli.version>4.6.3</picocli.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
-        <zio.grpc.version>0.5.1</zio.grpc.version>
+        <zio.grpc.version>0.6.0-test1</zio.grpc.version>
         <scalapb.version>0.11.10</scalapb.version>
         <protobuf.version>3.18.2</protobuf.version>
         <grpc.netty.version>1.39.0</grpc.netty.version>

@@ -2,7 +2,7 @@
 package org.bitlap.server.rpc.live
 
 import io.grpc.Status
-import org.bitlap.network.RpcStatus
+import org.bitlap.network.{ Monad, RpcStatus }
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
@@ -12,7 +12,6 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
-import org.bitlap.network.dsl.zioFromFuture
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.rpc.RpcF
 import org.bitlap.server.rpc.backend.FutureRpcBackend
@@ -28,27 +27,27 @@ import scala.concurrent.Future
  */
 case class FutureDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatus {
 
-  private lazy val futureRpcBackend: RpcF[Future] = new FutureRpcBackend
+  private lazy val futureRpcBackend: RpcF[Future] = FutureRpcBackend()
 
-  def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] = zioFromFuture {
-    futureRpcBackend.openSession(request.username, request.password, request.configuration)
-  } { hd =>
-    BOpenSessionResp(
-      successOpt(),
-      configuration = request.configuration,
-      sessionHandle = Some(hd.toBSessionHandle())
-    )
-  }
+  def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
+    Monad.transform(futureRpcBackend) {
+      _.openSession(request.username, request.password, request.configuration)
+    } { hd =>
+      BOpenSessionResp(
+        successOpt(),
+        configuration = request.configuration,
+        sessionHandle = Some(hd.toBSessionHandle())
+      )
+    }
 
-  override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] = zioFromFuture {
-    futureRpcBackend.closeSession(new SessionHandle(request.getSessionHandle))
-  } { _ =>
-    BCloseSessionResp(successOpt())
-  }
+  override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
+    Monad.transform(futureRpcBackend) {
+      _.closeSession(new SessionHandle(request.getSessionHandle))
+    }(_ => BCloseSessionResp(successOpt()))
+
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
-    zioFromFuture {
-      // NOTE：只有这个接口携带了status
-      futureRpcBackend.executeStatement(
+    Monad.transform(futureRpcBackend) {
+      _.executeStatement(
         new SessionHandle(request.getSessionHandle),
         request.statement,
         request.queryTimeout,
@@ -59,49 +58,48 @@ case class FutureDriverServiceLive() extends ZDriverService[Any, Any] with RpcSt
     }
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
-    zioFromFuture {
-      futureRpcBackend.fetchResults(new OperationHandle(request.getOperationHandle))
-    } { hd =>
+    Monad.transform(futureRpcBackend)(_.fetchResults(new OperationHandle(request.getOperationHandle))) { hd =>
       BFetchResultsResp(hd.status.map(_.toBStatus), hd.hasMoreRows, Some(hd.results.toBRowSet))
     }
 
-  override def getSchemas(request: BGetSchemasReq): ZIO[Any, Status, BGetSchemasResp] = zioFromFuture {
-    futureRpcBackend.getSchemas(new SessionHandle(request.getSessionHandle), request.catalogName, request.schemaName)
-  } { hd =>
-    BGetSchemasResp(
-      successOpt(),
-      Some(hd.toBOperationHandle())
-    )
-  }
+  override def getSchemas(request: BGetSchemasReq): ZIO[Any, Status, BGetSchemasResp] =
+    Monad.transform(futureRpcBackend) {
+      _.getSchemas(new SessionHandle(request.getSessionHandle), request.catalogName, request.schemaName)
+    } { hd =>
+      BGetSchemasResp(
+        successOpt(),
+        Some(hd.toBOperationHandle())
+      )
+    }
 
-  override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] = zioFromFuture {
+  override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
     // FIXME 参数名不同
     // TODO 返回了 operationHandle，不是具体数据，是不是还要请求一次？改成直接返回数据？
-    futureRpcBackend.getTables(request.schemaName, request.tableName)
-  } { hd =>
-    BGetTablesResp(
-      successOpt(),
-      Some(hd.toBOperationHandle())
-    )
-  }
+    Monad.transform(futureRpcBackend)(_.getTables(request.schemaName, request.tableName)) { hd =>
+      BGetTablesResp(
+        successOpt(),
+        Some(hd.toBOperationHandle())
+      )
+    }
 
-  override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] = zioFromFuture {
-    futureRpcBackend.getColumns(
-      new SessionHandle(request.getSessionHandle),
-      request.schemaName,
-      request.tableName,
-      request.columnName
-    )
-  } { hd =>
-    BGetColumnsResp(
-      successOpt(),
-      Some(hd.toBOperationHandle())
-    )
-  }
+  override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] =
+    Monad.transform(futureRpcBackend) {
+      _.getColumns(
+        new SessionHandle(request.getSessionHandle),
+        request.schemaName,
+        request.tableName,
+        request.columnName
+      )
+    } { hd =>
+      BGetColumnsResp(
+        successOpt(),
+        Some(hd.toBOperationHandle())
+      )
+    }
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
-    zioFromFuture {
-      futureRpcBackend.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
+    Monad.transform(futureRpcBackend) {
+      _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     } { hd =>
       BGetResultSetMetadataResp(
         successOpt(),

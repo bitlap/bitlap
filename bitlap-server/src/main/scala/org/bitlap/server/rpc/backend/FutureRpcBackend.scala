@@ -6,6 +6,7 @@ import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models
 import org.bitlap.network.models.FetchResults
 import org.bitlap.network.rpc.RpcF
+import org.bitlap.tools.apply
 
 import scala.concurrent.Future
 
@@ -15,6 +16,7 @@ import scala.concurrent.Future
  * @author 梦境迷离
  * @version 1.0,2022/4/21
  */
+@apply
 class FutureRpcBackend extends RpcF[Future] {
 
   private lazy val delegateBackend = new ZioRpcBackend()

@@ -571,8 +571,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit = ???
 
   @inline
-  @implicitNotFound("ClassTag must exists")
-  private def getColumnValue[T: ClassTag](columnIndex: Int): T = {
+  private def getColumnValue[T](
+    columnIndex: Int
+  )(implicit @implicitNotFound("Could not find an implicit ClassTag[\\${T}]") t: ClassTag[T]): T = {
     if (row == null) {
       throw BSQLException("No row found.")
     }

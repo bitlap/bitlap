@@ -6,6 +6,7 @@ import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.RpcN
 import org.bitlap.server.rpc.SessionManager
+import org.bitlap.tools.apply
 import zio.ZIO
 
 /**
@@ -14,6 +15,7 @@ import zio.ZIO
  * @author 梦境迷离
  * @version 1.0,2022/4/21
  */
+@apply
 class ZioRpcBackend extends RpcN[ZIO] {
 
   private val sessionManager = new SessionManager()

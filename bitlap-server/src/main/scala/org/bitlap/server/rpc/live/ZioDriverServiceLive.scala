@@ -2,7 +2,7 @@
 package org.bitlap.server.rpc.live
 
 import io.grpc.Status
-import org.bitlap.network.RpcStatus
+import org.bitlap.network.{ Monad, RpcStatus }
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
@@ -12,7 +12,6 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
-import org.bitlap.network.function.errorApplyFunc
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.rpc.RpcN
 import org.bitlap.server.rpc.backend.ZioRpcBackend
@@ -26,42 +25,38 @@ import zio.ZIO
  */
 case class ZioDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatus {
 
-  private lazy val zioRpcBackend: RpcN[ZIO] = new ZioRpcBackend()
+  private lazy val zioRpcBackend: RpcN[ZIO] = ZioRpcBackend()
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
-    zioRpcBackend
-      .openSession(request.username, request.password, request.configuration)
-      .map(shd =>
-        BOpenSessionResp(
-          successOpt(),
-          configuration = request.configuration,
-          sessionHandle = Some(shd.toBSessionHandle())
-        )
+    Monad.mapBoth(zioRpcBackend) {
+      _.openSession(request.username, request.password, request.configuration)
+    } { shd =>
+      BOpenSessionResp(
+        successOpt(),
+        configuration = request.configuration,
+        sessionHandle = Some(shd.toBSessionHandle())
       )
-      .mapError(errorApplyFunc)
+    }
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
-    zioRpcBackend
-      .closeSession(new SessionHandle(request.getSessionHandle))
-      .map(_ => BCloseSessionResp(successOpt()))
-      .mapError(errorApplyFunc)
+    Monad.mapBoth(zioRpcBackend) {
+      _.closeSession(new SessionHandle(request.getSessionHandle))
+    }(_ => BCloseSessionResp(successOpt()))
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
-    zioRpcBackend
-      .executeStatement(
+    Monad.mapBoth(zioRpcBackend) {
+      _.executeStatement(
         new SessionHandle(request.getSessionHandle),
         request.statement,
         request.queryTimeout,
         request.confOverlay
       )
-      .map(hd => BExecuteStatementResp(successOpt(), Some(hd.toBOperationHandle())))
-      .mapError(errorApplyFunc)
+    }(hd => BExecuteStatementResp(successOpt(), Some(hd.toBOperationHandle())))
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
-    zioRpcBackend
-      .fetchResults(new OperationHandle(request.getOperationHandle))
-      .map(_.toBFetchResults)
-      .mapError(errorApplyFunc)
+    Monad.mapBoth(zioRpcBackend) {
+      _.fetchResults(new OperationHandle(request.getOperationHandle))
+    }(_.toBFetchResults)
 
   override def getSchemas(request: BGetSchemasReq): ZIO[Any, Status, BGetSchemasResp] = ???
 
@@ -70,8 +65,7 @@ case class ZioDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatu
   override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] = ???
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
-    zioRpcBackend
-      .getResultSetMetadata(new OperationHandle(request.getOperationHandle))
-      .map(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
-      .mapError(errorApplyFunc)
+    Monad.mapBoth((zioRpcBackend)) {
+      _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
+    }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
 }

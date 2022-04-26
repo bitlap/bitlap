@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-        <dokka.version>1.6.20</dokka.version>
+        <dokka.version>1.6.21</dokka.version>
         <kotlin.version>1.6.21</kotlin.version>
         <kotlinx.coroutines.version>1.6.1-native-mt</kotlinx.coroutines.version>
         <kotest.version>5.2.3</kotest.version>

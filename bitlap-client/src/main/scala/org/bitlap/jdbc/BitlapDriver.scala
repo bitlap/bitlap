@@ -17,8 +17,6 @@ import java.util.logging.Logger
  */
 private[jdbc] abstract class BitlapDriver extends Driver {
 
-  protected val log: slf4j.Logger = LoggerFactory.getLogger(classOf[BitlapDriver].getTypeName)
-
   override def connect(url: String, info: Properties): Connection =
     try BitlapConnection(url, info)
     catch {
@@ -68,7 +66,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     dbProp.required = false
     dbProp.description = "Database name"
 
-    log.info(s"Driver connect to: host[${hostProp.value}],port[${portProp.value}],database:[${dbProp.value}]")
+    println(s"Driver connect to: host[${hostProp.value}],port[${portProp.value}],database:[${dbProp.value}]")
     Array(hostProp, portProp, dbProp)
   }
 
@@ -83,7 +81,8 @@ private[jdbc] abstract class BitlapDriver extends Driver {
   def register(): Unit =
     try java.sql.DriverManager.registerDriver(this)
     catch {
-      case e: Exception => log.error("Error occurred while registering JDBC driver", e)
+      case e: Exception =>
+        throw BSQLException("Error occurred while registering JDBC driver", cause = e)
     }
 
   /**
@@ -96,7 +95,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
   private def parseURL(url: String, defaults: Properties): Properties = {
     val urlProps = if (defaults != null) new Properties(defaults) else new Properties()
     if (!url.startsWith(Utils.URL_PREFIX)) {
-      throw new SQLException("Invalid connection url: $url")
+      throw BSQLException(s"Invalid connection url: $url")
     }
     if (url.length <= Utils.URL_PREFIX.length) return urlProps
 

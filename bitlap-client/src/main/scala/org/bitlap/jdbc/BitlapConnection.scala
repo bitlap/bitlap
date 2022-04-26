@@ -19,8 +19,9 @@ import scala.jdk.CollectionConverters._
  * @since 2021/6/6
  * @version 1.0
  */
-@apply // not support default args
+@apply
 class BitlapConnection(uri: String, info: Properties) extends Connection {
+  // apply not support default args
 
   private var session: SessionHandle = _
   private var closed = true
@@ -29,7 +30,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
-      throw new Exception(s"Invalid URL: $uri")
+      throw BSQLException(s"Invalid URL: $uri")
     }
     // remove prefix
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
@@ -40,12 +41,17 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       //FIXME
       val hostAndPort =
         try parts.map(_(0)).mkString(",").split(":")
-        catch { case e: Exception => e.printStackTrace(); scala.Array("localhost", "23333") }
+        catch {
+          case e: Exception =>
+            e.printStackTrace(); println("Use default port: 23333"); scala.Array("localhost", "23333")
+        }
       client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {
-      case e: Exception => e.printStackTrace()
+      case e: Exception =>
+        e.printStackTrace()
+        throw BSQLException("Bitlap openSession failed", cause = e)
     }
   }
 

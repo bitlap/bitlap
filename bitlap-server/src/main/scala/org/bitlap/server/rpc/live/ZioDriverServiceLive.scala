@@ -65,7 +65,7 @@ case class ZioDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatu
   override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] = ???
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
-    Monad.mapBoth((zioRpcBackend)) {
+    Monad.mapBoth(zioRpcBackend) {
       _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
 }

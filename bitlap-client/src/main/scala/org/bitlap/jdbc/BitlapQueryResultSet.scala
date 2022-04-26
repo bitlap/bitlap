@@ -5,6 +5,7 @@ import org.bitlap.client.BitlapClient
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
+import scala.collection.mutable
 
 import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
 
@@ -18,6 +19,7 @@ class BitlapQueryResultSet(
   private var maxRows: Int,
   override var row: Row = null
 ) extends BitlapBaseResultSet() {
+
   override protected var warningChain: SQLWarning = _
   override protected var columnNames: List[String] = List.empty
   override protected var columnTypes: List[String] = List.empty
@@ -57,8 +59,8 @@ class BitlapQueryResultSet(
       if (client == null || stmtHandle == null) {
         throw BSQLException("Resultset is closed")
       }
-      val namesSb = new StringBuilder()
-      val typesSb = new StringBuilder()
+      val namesSb = new mutable.StringBuilder()
+      val typesSb = new mutable.StringBuilder()
 
       val schema = client.getResultSetMetadata(stmtHandle)
       if (schema == null || schema.columns.isEmpty) {
@@ -96,7 +98,7 @@ class BitlapQueryResultSet(
       if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) {
         val result = client.fetchResults(stmtHandle)
         if (result != null) {
-          fetchedRows = result.rows.toList
+          fetchedRows = result.rows
           fetchedRowsItr = fetchedRows.iterator
         }
       }
@@ -120,14 +122,14 @@ class BitlapQueryResultSet(
 
   override def getMetaData(): ResultSetMetaData = {
     if (closed) {
-      throw new SQLException("Resultset is closed")
+      throw BSQLException("Resultset is closed")
     }
     super.getMetaData()
   }
 
   override def getFetchSize(): Int = {
     if (closed) {
-      throw new SQLException("Resultset is closed")
+      throw BSQLException("Resultset is closed")
     }
     this.fetchSize
   }

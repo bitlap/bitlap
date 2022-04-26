@@ -51,14 +51,14 @@ class BitlapResultSetMetaData(
 
   override def getColumnType(column: Int): Int = {
     if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BSQLException("Invalid column value: $column")
+    if (column < 1 || column > columnTypes.size) throw BSQLException(s"Invalid column index: $column")
     val typ = columnTypes(column - 1)
     ColumnTyped(typ).toValue
   }
 
   override def getColumnTypeName(column: Int): String = {
     if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BSQLException("Invalid column value: $column")
+    if (column < 1 || column > columnTypes.size) throw BSQLException(s"Invalid column index: $column")
     columnTypes(column - 1)
   }
 

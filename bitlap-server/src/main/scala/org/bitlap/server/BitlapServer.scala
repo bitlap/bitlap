@@ -5,6 +5,8 @@ import org.bitlap.server.rpc.live.Live
 import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio.console.Console
 import zio.{ ExitCode, URIO }
+import zio.ZIO
+import zio.console.putStrLn
 
 /**
  * @author 梦境迷离
@@ -20,6 +22,20 @@ class Server(val serverPort: Int) extends ServerMain {
 
 object BitlapServer extends Server(23333) {
 
-  override def run(args: List[String]): URIO[zio.ZEnv with Console, ExitCode] = super.run(args)
+  override def run(args: List[String]): URIO[zio.ZEnv with Console, ExitCode] =
+    (for {
+      _ <- putStrLn("""
+                      |    __    _ __  __          
+                      |   / /_  (_) /_/ /___ _____ 
+                      |  / __ \/ / __/ / __ `/ __ \
+                      | / /_/ / / /_/ / /_/ / /_/ /
+                      |/_.___/_/\__/_/\__,_/ .___/ 
+                      |                   /_/   
+                      |""".stripMargin)
+      r <- super.run(args)
+    } yield r).foldM(
+      e => ZIO.fail(e).exitCode,
+      _ => ZIO.effectTotal(ExitCode.success)
+    )
 
 }

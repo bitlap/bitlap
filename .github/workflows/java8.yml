@@ -22,10 +22,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '8'
-      
+
       - name: Checking Code Style
         run: ./mvnw spotless:check
-        
+
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots package
   
@@ -45,12 +45,12 @@ jobs:
       # because there are some error tests      
       - name: Test
         run: ./mvnw test -Dmaven.test.failure.ignore=true
-#
-#      - name: Aggregate coverage report
-#        run: ./mvnw cobertura:cobertura
-#
-#      - name: Upload test coverage report
-#        run: bash <(curl -s https://codecov.io/bash)
+ 
+      - name: Aggregate coverage report
+        run: ./mvnw cobertura:cobertura
+
+      - name: Upload test coverage report
+        run: bash <(curl -s https://codecov.io/bash)
   
   
   ci:

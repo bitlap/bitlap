@@ -2,9 +2,9 @@
 | ------------- | --------------- | ----------------------------------------- |
 | ![Stage]      | ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
 
-| Maven Central                                                                    | Chat                              | Nexus Snapshots                                                  |
-| --------------------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
-| [![Maven Central][Badge-Maven]][Link-Maven] | [![Chat][Badge-Chat]][Link-Chat] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] |
+| Maven Central    | Nexus Snapshots    |     Chat  |
+| ---------------- | ------------------ | --------- |
+| [![Maven Central][Badge-Maven]][Link-Maven] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] | [![Chat][Badge-Chat]][Link-Chat]  |
 
 
 # bitlap

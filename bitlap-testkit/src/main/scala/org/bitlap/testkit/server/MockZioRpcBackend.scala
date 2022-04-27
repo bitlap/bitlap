@@ -2,10 +2,9 @@
 package org.bitlap.testkit.server
 
 import org.bitlap.network.OperationType
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
+import org.bitlap.network.handles.{ HandleIdentifier, OperationHandle, SessionHandle }
+import org.bitlap.network.models._
 import org.bitlap.network.rpc.RpcN
-import org.bitlap.server.rpc.SessionManager
 import org.bitlap.tools.apply
 import zio.ZIO
 
@@ -18,54 +17,37 @@ import zio.ZIO
 @apply
 class MockZioRpcBackend extends RpcN[ZIO] {
 
-  private val sessionManager = new SessionManager()
-  sessionManager.startListener()
-
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, SessionHandle] =
-    ZIO.effect {
-      val session = sessionManager.openSession(username, password, configuration)
-      session.sessionHandle
-    }
+  ): ZIO[Any, Throwable, SessionHandle] = ZIO.succeed(SessionHandle(new HandleIdentifier()))
 
-  override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] =
-    ZIO.effect {
-      sessionManager.closeSession(sessionHandle)
-    }
+  override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] = ZIO.unit
 
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
-    val session = sessionManager.getSession(sessionHandle)
-    sessionManager.refreshSession(sessionHandle, session)
-    session.executeStatement(
-      sessionHandle,
-      statement,
-      confOverlay,
-      queryTimeout
+  ): ZIO[Any, Throwable, OperationHandle] =
+    ZIO.succeed(new OperationHandle(OperationType.EXECUTE_STATEMENT, true, sessionHandle.handleId))
+
+  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] =
+    ZIO.succeed(FetchResults(false, RowSet()))
+
+  override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
+    ZIO.succeed(
+      TableSchema.apply(
+        List(
+          ColumnDesc("time", TypeId.TYPE_ID_INT_TYPE),
+          ColumnDesc("entity", TypeId.TYPE_ID_LONG_TYPE),
+          ColumnDesc("metric_name", TypeId.TYPE_ID_STRING_TYPE),
+          ColumnDesc("metric_value", TypeId.TYPE_ID_INT_TYPE)
+        )
+      )
     )
-  }
-
-  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
-    val operation = sessionManager.operationManager.getOperation(opHandle)
-    val session = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
-    FetchResults(false, session.fetchResults(opHandle))
-  }
-
-  override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
-    val operation = sessionManager.operationManager.getOperation(opHandle)
-    val session = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
-    session.getResultSetMetadata(opHandle)
-  }
 
   override def getColumns(
     sessionHandle: SessionHandle,

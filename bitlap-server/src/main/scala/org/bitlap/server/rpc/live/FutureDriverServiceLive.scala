@@ -2,7 +2,6 @@
 package org.bitlap.server.rpc.live
 
 import io.grpc.Status
-import org.bitlap.network.{ Monad, RpcStatus }
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
@@ -14,7 +13,7 @@ import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSess
 import org.bitlap.network.driver.service.ZioService.ZDriverService
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.rpc.RpcF
-import org.bitlap.server.rpc.backend.FutureRpcBackend
+import org.bitlap.network.{ Monad, RpcStatus }
 import zio.ZIO
 
 import scala.concurrent.Future
@@ -25,9 +24,9 @@ import scala.concurrent.Future
  * @author 梦境迷离
  * @version 1.0,2022/4/21
  */
-case class FutureDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatus {
-
-  private lazy val futureRpcBackend: RpcF[Future] = FutureRpcBackend()
+case class FutureDriverServiceLive(private val futureRpcBackend: RpcF[Future])
+    extends ZDriverService[Any, Any]
+    with RpcStatus {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     Monad.transform(futureRpcBackend) {

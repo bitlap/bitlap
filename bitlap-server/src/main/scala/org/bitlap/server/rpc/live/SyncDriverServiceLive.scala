@@ -15,7 +15,6 @@ import org.bitlap.network.driver.service.ZioService.ZDriverService
 import org.bitlap.network.dsl.zioFrom
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.rpc.{ Identity, RpcF }
-import org.bitlap.server.rpc.backend.SyncRpcBackend
 import zio.{ IO, ZIO }
 
 /**
@@ -24,9 +23,9 @@ import zio.{ IO, ZIO }
  * @author 梦境迷离
  * @version 1.0,2022/4/21
  */
-case class SyncDriverServiceLive() extends ZDriverService[Any, Any] with RpcStatus {
-
-  private lazy val syncRpcBackend: RpcF[Identity] = new SyncRpcBackend
+case class SyncDriverServiceLive(private val syncRpcBackend: RpcF[Identity])
+    extends ZDriverService[Any, Any]
+    with RpcStatus {
 
   def openSession(request: BOpenSessionReq): IO[Status, BOpenSessionResp] = zioFrom {
     val handle = syncRpcBackend.openSession(request.username, request.password, request.configuration)

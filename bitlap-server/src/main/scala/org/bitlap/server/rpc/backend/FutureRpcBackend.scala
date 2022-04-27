@@ -17,9 +17,7 @@ import scala.concurrent.Future
  * @version 1.0,2022/4/21
  */
 @apply
-class FutureRpcBackend extends RpcF[Future] {
-
-  private lazy val delegateBackend = new ZioRpcBackend()
+class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcF[Future] {
 
   override def openSession(
     username: String,

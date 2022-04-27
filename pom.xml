@@ -52,6 +52,7 @@
         <module>bitlap-client</module>
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
+        <module>bitlap-testkit</module>
         <module>integration-test</module>
     </modules>
 
@@ -88,6 +89,7 @@
         <protobuf.version>3.20.1</protobuf.version>
         <grpc.netty.version>1.39.0</grpc.netty.version>
         <zio.version>1.0.14</zio.version>
+        <shapeless.version>2.3.9</shapeless.version>
     </properties>
 
     <dependencies>
@@ -215,7 +217,12 @@
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.chuusai</groupId>
+            <artifactId>shapeless_2.13</artifactId>
+            <version>${shapeless.version}</version>
+        </dependency>
+        
         <!--        <dependency>-->
         <!--            <groupId>io.kotest</groupId>-->
         <!--            <artifactId>kotest-property-jvm</artifactId>-->
@@ -264,6 +271,11 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>integration-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-testkit</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -2,9 +2,9 @@
 | ------------- | --------------- | ----------------------------------------- |
 | ![Stage]      | ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
 
-| Maven Central    | Nexus Snapshots    |     Chat  |
+| Maven Central    | Nexus Snapshots    |     Discord  |
 | ---------------- | ------------------ | --------- |
-| [![Maven Central][Badge-Maven]][Link-Maven] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] | [![Chat][Badge-Chat]][Link-Chat]  |
+| [![Maven Central][Badge-Maven]][Link-Maven] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] | [![Discord][Badge-Discord]][Link-Discord]  |
 
 
 # bitlap
@@ -64,11 +64,11 @@ SOFTWARE.
 [Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
 [Badge-CI]: https://github.com/bitlap/bitlap/actions/workflows/java8.yml/badge.svg
 [Badge-Maven]: https://img.shields.io/maven-central/v/org.bitlap/bitlap
-[Badge-Chat]: https://badges.gitter.im/bitlap-org/bitlap.svg
+[Badge-Discord]: https://img.shields.io/discord/968687999862841384
 [Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/main/graph/badge.svg?token=9XJ2LC2K8M
 [Badge-Snapshots]: https://img.shields.io/nexus/s/org.bitlap/bitlap-core?server=https%3A%2F%2Fs01.oss.sonatype.org
 
-[Link-Chat]: https://gitter.im/bitlap-org/bitlap?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[Link-Discord]: https://discord.com/invite/vp5stpz6eU
 [Link-Codecov]: https://codecov.io/gh/bitlap/bitlap
 [Link-Maven]: https://search.maven.org/search?q=g:%22org.bitlap%22%20AND%20a:%22bitlap%22
 [Link-Snapshots]: https://s01.oss.sonatype.org/content/repositories/snapshots/org/bitlap/

@@ -23,6 +23,14 @@
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-network</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

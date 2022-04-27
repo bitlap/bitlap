@@ -32,6 +32,6 @@ class CsvConvertSpec extends AnyFlatSpec with Matchers {
     val metrics = CsvParserBuilder.defaultParser.fromResourceFile[Dimension]("simple_data.csv", "dimensions")
     println(metrics)
     metrics.size shouldBe 16
-    metrics.head.dimensions shouldBe  Some(List(Dimension("city", "北京"),Dimension("os", "Mac")))
+    metrics.head.dimensions shouldBe Some(List(Dimension("city", "北京"), Dimension("os", "Mac")))
   }
 }

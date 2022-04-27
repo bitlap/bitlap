@@ -12,7 +12,7 @@ import zio.console.putStrLn
  * @author 梦境迷离
  * @version 1.0,2021/12/3
  */
-class Server(val serverPort: Int) extends ServerMain {
+private class Server(val serverPort: Int) extends ServerMain {
 
   override def port: Int = serverPort
 

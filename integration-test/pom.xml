@@ -16,6 +16,10 @@
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-server</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-testkit</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

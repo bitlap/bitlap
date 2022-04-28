@@ -45,9 +45,6 @@ jobs:
       # because there are some error tests      
       - name: Test
         run: ./mvnw test -Dmaven.test.failure.ignore=true
- 
-      - name: Aggregate coverage report
-        run: ./mvnw jacoco:report
 
       - name: Upload test coverage report
         run: bash <(curl -s https://codecov.io/bash)

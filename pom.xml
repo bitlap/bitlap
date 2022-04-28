@@ -394,8 +394,8 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>jacoco-site</id>
-                        <phase>post-integration-test</phase>
+                        <id>default-report</id>
+                        <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
@@ -470,12 +470,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M6</version>
-                <configuration>
-                    <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
-                    <forkCount>1</forkCount>
-                    <argLine>-Dnet.sf.ehcache.disabled=true</argLine>
-                </configuration>
+                <version>2.22.2</version>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

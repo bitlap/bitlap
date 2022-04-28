@@ -2,10 +2,11 @@
 package org.bitlap.network.test
 
 import junit.framework.TestCase
+import junit.framework.TestCase.assertTrue
 import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
 import org.bitlap.network.{ handles, OperationType }
 import org.junit.Test
-import junit.framework.TestCase.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 
 /**
  * @author 梦境迷离
@@ -73,5 +74,17 @@ class HandleTests extends TestCase("HandleTests") {
     )
 
     assertTrue(new SessionHandle(op.toBSessionHandle()) == op)
+  }
+
+  @Test
+  def testInnerMethod(): Unit = {
+    val handleId = new HandleIdentifier()
+    val op1 = new SessionHandle(handleId)
+    val op2 = new SessionHandle(handleId)
+    val op3 = new SessionHandle(new HandleIdentifier())
+    assertTrue(op1.equals(op2))
+    assertTrue(op1.hashCode() == op2.hashCode())
+    assertFalse(op1.hashCode() == op3.hashCode())
+    assertTrue(op3.toString.contains("handleId"))
   }
 }

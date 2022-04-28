@@ -1,0 +1,19 @@
+coverage:
+  precision: 2
+  round: down
+  range: "50...100"
+
+  status:
+    patch: off
+    project:
+      default:
+        target: auto
+        threshold: 50%
+        base: auto
+
+comment:
+  layout: "header, diff, changes, tree"
+  behavior: default
+
+ignore:
+  - "**/EmbedBitlapServer.scala"

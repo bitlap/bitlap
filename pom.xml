@@ -90,6 +90,7 @@
         <zio.version>1.0.14</zio.version>
         <shapeless.version>2.3.9</shapeless.version>
         <jupiter.version>5.8.2</jupiter.version>
+        <surefire.version>2.22.2</surefire.version>
     </properties>
 
     <dependencies>
@@ -477,14 +478,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit4</artifactId>
-                        <version>2.22.2</version>
-                    </dependency>
-                </dependencies>
+                <version>${surefire.version}</version>
                 <executions>
                     <execution>
                         <id>default-test</id>

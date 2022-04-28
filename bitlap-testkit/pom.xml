@@ -18,12 +18,6 @@
             <version>${shapeless.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.13</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-server</artifactId>
         </dependency>

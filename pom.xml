@@ -77,7 +77,6 @@
         <sqlline.version>1.11.0</sqlline.version>
         <scala.version>2.13.8</scala.version>
         <scala.log.version>2.14.1</scala.log.version>
-        <!--  日志最新依赖Scala2.13.5  -->
         <scala.logging.version>3.9.4</scala.logging.version>
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
@@ -90,6 +89,7 @@
         <grpc.netty.version>1.39.0</grpc.netty.version>
         <zio.version>1.0.14</zio.version>
         <shapeless.version>2.3.9</shapeless.version>
+        <jupiter.version>5.8.2</jupiter.version>
     </properties>
 
     <dependencies>
@@ -169,7 +169,6 @@
             <version>${hutool.version}</version>
         </dependency>
 
-
         <!-- test  -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -189,7 +188,12 @@
             <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -212,23 +216,10 @@
             <version>${smt.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.13</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.chuusai</groupId>
             <artifactId>shapeless_2.13</artifactId>
             <version>${shapeless.version}</version>
         </dependency>
-        
-        <!--        <dependency>-->
-        <!--            <groupId>io.kotest</groupId>-->
-        <!--            <artifactId>kotest-property-jvm</artifactId>-->
-        <!--            <version>${kotest.version}</version>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -400,7 +391,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.testkit
+package org.bitlap.testkit.csv
 
 import shapeless._
 

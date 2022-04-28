@@ -3,6 +3,7 @@ package org.bitlap.testkit.server
 
 import org.bitlap.server.rpc.live.ZioDriverServiceLive
 import zio.{ UIO, ZIO }
+import org.bitlap.server.rpc.backend.ZioRpcBackend
 
 /**
  * Mock live for rpc server.
@@ -14,4 +15,7 @@ import zio.{ UIO, ZIO }
 object MockZioDriverServiceLive {
 
   val mockLive: UIO[ZioDriverServiceLive] = ZIO.succeed(ZioDriverServiceLive(MockZioRpcBackend()))
+
+  val embedLive: UIO[ZioDriverServiceLive] = ZIO.succeed(ZioDriverServiceLive(ZioRpcBackend()))
+
 }

@@ -6,13 +6,11 @@ import org.bitlap.Driver
 import org.bitlap.it.EmbedBitlapServer
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.BeforeAll
 
 import java.sql.{ DriverManager, Statement }
 
 class TestServer extends TestCase("TestServer") {
 
-  @BeforeAll
   def startServer(): Unit = {
     val server = new Thread {
       override def run(): Unit = EmbedBitlapServer.main(Array.empty)
@@ -24,6 +22,7 @@ class TestServer extends TestCase("TestServer") {
 
   @Test
   def testServer {
+    startServer()
     Class.forName(classOf[Driver].getName)
     val con = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
     val stmt: Statement = con.createStatement()

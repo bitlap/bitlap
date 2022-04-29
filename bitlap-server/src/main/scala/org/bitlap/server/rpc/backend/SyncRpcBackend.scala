@@ -5,6 +5,7 @@ import org.bitlap.network.dsl.blocking
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.rpc.{ Identity, RpcF }
+import org.bitlap.tools.apply
 
 /**
  * Sync implementation for jdbc server.
@@ -13,9 +14,8 @@ import org.bitlap.network.rpc.{ Identity, RpcF }
  * @since 2022/04/22
  * @version 1.0
  */
-class SyncRpcBackend extends RpcF[Identity] {
-
-  private lazy val delegateBackend = new ZioRpcBackend()
+@apply
+class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcF[Identity] {
 
   override def openSession(
     username: String,

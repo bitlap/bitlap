@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.live
 
+import org.bitlap.server.rpc.backend.{ FutureRpcBackend, SyncRpcBackend, ZioRpcBackend }
 import zio.{ UIO, ZIO }
 
 /**
@@ -9,10 +10,13 @@ import zio.{ UIO, ZIO }
  */
 object Live {
 
-  lazy val futureLive: UIO[FutureDriverServiceLive] = ZIO.succeed(FutureDriverServiceLive())
+  lazy val zioRpcBackend: ZioRpcBackend = ZioRpcBackend()
 
-  lazy val syncLive: UIO[SyncDriverServiceLive] = ZIO.succeed(SyncDriverServiceLive())
+  lazy val zioLive: UIO[ZioDriverServiceLive] = ZIO.succeed(ZioDriverServiceLive(ZioRpcBackend()))
 
-  lazy val zioLive: UIO[ZioDriverServiceLive] = ZIO.succeed(ZioDriverServiceLive())
+  lazy val futureLive: UIO[FutureDriverServiceLive] =
+    ZIO.succeed(FutureDriverServiceLive(FutureRpcBackend(zioRpcBackend)))
+
+  lazy val syncLive: UIO[SyncDriverServiceLive] = ZIO.succeed(SyncDriverServiceLive(SyncRpcBackend(zioRpcBackend)))
 
 }

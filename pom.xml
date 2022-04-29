@@ -52,6 +52,7 @@
         <module>bitlap-client</module>
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
+        <module>bitlap-testkit</module>
         <module>integration-test</module>
     </modules>
 
@@ -76,7 +77,6 @@
         <sqlline.version>1.11.0</sqlline.version>
         <scala.version>2.13.8</scala.version>
         <scala.log.version>2.14.1</scala.log.version>
-        <!--  日志最新依赖Scala2.13.5  -->
         <scala.logging.version>3.9.4</scala.logging.version>
         <scalatest.version>3.3.0-SNAP3</scalatest.version>
         <sqlline.version>1.12.0</sqlline.version>
@@ -88,6 +88,9 @@
         <protobuf.version>3.20.1</protobuf.version>
         <grpc.netty.version>1.39.0</grpc.netty.version>
         <zio.version>1.0.14</zio.version>
+        <shapeless.version>2.3.9</shapeless.version>
+        <jupiter.version>5.8.2</jupiter.version>
+        <surefire.version>2.22.2</surefire.version>
     </properties>
 
     <dependencies>
@@ -167,7 +170,6 @@
             <version>${hutool.version}</version>
         </dependency>
 
-
         <!-- test  -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -187,7 +189,12 @@
             <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -210,18 +217,10 @@
             <version>${smt.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.13</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
+            <groupId>com.chuusai</groupId>
+            <artifactId>shapeless_2.13</artifactId>
+            <version>${shapeless.version}</version>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>io.kotest</groupId>-->
-        <!--            <artifactId>kotest-property-jvm</artifactId>-->
-        <!--            <version>${kotest.version}</version>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -264,6 +263,11 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>integration-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-testkit</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
@@ -380,16 +384,31 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.9</version>
                 <configuration>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <check />
+                    <excludes>
+                        <exclude>**/org/bitlap/common/bitmap/rbm/**/*.class</exclude>
+                        <exclude>**/org/bitlap/network/driver/proto/**/*.class</exclude>
+                        <exclude>**/org/bitlap/network/driver/service/**/*.class</exclude>
+                    </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -459,7 +478,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${surefire.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

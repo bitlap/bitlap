@@ -1,23 +1,28 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.it.test
+package org.bitlap.it.server
 
+import junit.framework.TestCase
 import org.bitlap.Driver
 import org.bitlap.it.EmbedBitlapServer
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 import java.sql.{ DriverManager, Statement }
 
-class TestServer extends AnyFlatSpec with Matchers {
+class TestServer extends TestCase("TestServer") {
 
-  "test server" should "ok" in {
+  def startServer(): Unit = {
     val server = new Thread {
       override def run(): Unit = EmbedBitlapServer.main(Array.empty)
     }
     server.setDaemon(true)
     server.start()
     Thread.sleep(3000L)
+  }
 
+  @Test
+  def testServer {
+    startServer()
     Class.forName(classOf[Driver].getName)
     val con = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
     val stmt: Statement = con.createStatement()
@@ -26,7 +31,7 @@ class TestServer extends AnyFlatSpec with Matchers {
     stmt.execute("show databases")
     var rs = stmt.getResultSet
     rs.next()
-    rs.getString("database_name") shouldBe "default"
+    assertEquals(rs.getString("database_name"), "default")
 
     // show tables
     val table = "test_table"
@@ -34,7 +39,7 @@ class TestServer extends AnyFlatSpec with Matchers {
     stmt.execute("show tables")
     rs = stmt.getResultSet
     rs.next()
-    rs.getString("table_name") shouldBe table
+    assertEquals(rs.getString("table_name"), table)
 
     // load data
     stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
@@ -48,9 +53,9 @@ class TestServer extends AnyFlatSpec with Matchers {
                     |""".stripMargin)
     rs = stmt.getResultSet
     rs.next()
-    rs.getLong("_time") shouldBe 100
-    rs.getDouble("vv") shouldBe 4
-    rs.getDouble("pv") shouldBe 12
-    rs.getLong("uv") shouldBe 3 // TODO: 兼容类型
+    assertEquals(rs.getLong("_time"), 100)
+    assertEquals(rs.getDouble("vv"), 4, 0)
+    assertEquals(rs.getDouble("pv"), 12, 0)
+    assertEquals(rs.getLong("uv"), 3) // TODO: 兼容类型
   }
 }

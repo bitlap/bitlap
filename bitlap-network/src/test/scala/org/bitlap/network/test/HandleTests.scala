@@ -1,19 +1,22 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.test
 
+import junit.framework.TestCase
+import junit.framework.TestCase.assertTrue
 import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
 import org.bitlap.network.{ handles, OperationType }
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
+import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
 
 /**
  * @author 梦境迷离
  * @since 2021/11/21
  * @version 1.0
  */
-class HandleTests extends AnyFlatSpec with Matchers {
+class HandleTests extends TestCase("HandleTests") {
 
-  "test operationHandle" should "ok" in {
+  @Test
+  def testOperationHandle = {
     val handleId = new handles.HandleIdentifier()
     val op = new handles.OperationHandle(
       OperationType.EXECUTE_STATEMENT,
@@ -21,40 +24,67 @@ class HandleTests extends AnyFlatSpec with Matchers {
       handleId = handleId
     )
 
-    (op.toBOperationHandle().getOperationId == handleId
-      .toBHandleIdentifier()) shouldBe true
+    assertTrue(
+      op.toBOperationHandle().getOperationId == handleId
+        .toBHandleIdentifier()
+    )
 
-    (op.toBOperationHandle().getOperationId.guid == handleId
-      .toBHandleIdentifier()
-      .guid) shouldBe true
+    assertTrue(
+      op.toBOperationHandle().getOperationId.guid == handleId
+        .toBHandleIdentifier()
+        .guid
+    )
 
-    (op.toBOperationHandle().getOperationId.secret == handleId
-      .toBHandleIdentifier()
-      .secret) shouldBe true
+    assertTrue(
+      op.toBOperationHandle().getOperationId.secret == handleId
+        .toBHandleIdentifier()
+        .secret
+    )
 
-    OperationType.getOperationType(
-      op.toBOperationHandle().operationType
-    ) == OperationType.EXECUTE_STATEMENT shouldBe true
+    assertTrue(
+      OperationType.getOperationType(
+        op.toBOperationHandle().operationType
+      ) == OperationType.EXECUTE_STATEMENT
+    )
 
     val h1 = new handles.OperationHandle(op.toBOperationHandle())
-    h1 == op shouldBe true
+    assertTrue(h1 == op)
   }
 
-  "test sessionHandle" should "ok" in {
+  @Test
+  def testSessionHandle = {
     val handleId = new HandleIdentifier()
     val op = new SessionHandle(handleId)
 
-    (op.toBSessionHandle().getSessionId == handleId
-      .toBHandleIdentifier()) shouldBe true
+    assertTrue(
+      op.toBSessionHandle().getSessionId == handleId
+        .toBHandleIdentifier()
+    )
 
-    (op.toBSessionHandle().getSessionId.guid == handleId
-      .toBHandleIdentifier()
-      .guid) shouldBe true
+    assertTrue(
+      op.toBSessionHandle().getSessionId.guid == handleId
+        .toBHandleIdentifier()
+        .guid
+    )
 
-    (op.toBSessionHandle().getSessionId.secret == handleId
-      .toBHandleIdentifier()
-      .secret) shouldBe true
+    assertTrue(
+      op.toBSessionHandle().getSessionId.secret == handleId
+        .toBHandleIdentifier()
+        .secret
+    )
 
-    new SessionHandle(op.toBSessionHandle()) == op shouldBe true
+    assertTrue(new SessionHandle(op.toBSessionHandle()) == op)
+  }
+
+  @Test
+  def testInnerMethod(): Unit = {
+    val handleId = new HandleIdentifier()
+    val op1 = new SessionHandle(handleId)
+    val op2 = new SessionHandle(handleId)
+    val op3 = new SessionHandle(new HandleIdentifier())
+    assertTrue(op1.equals(op2))
+    assertTrue(op1.hashCode() == op2.hashCode())
+    assertFalse(op1.hashCode() == op3.hashCode())
+    assertTrue(op3.toString.contains("handleId"))
   }
 }

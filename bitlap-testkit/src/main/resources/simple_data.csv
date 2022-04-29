@@ -1,0 +1,17 @@
+time,entity,dimensions,metric_name,metric_value
+100,1,{"city":"北京" "os":"Mac"},vv,1
+100,1,{"city":"北京" "os":"Mac"},pv,2
+100,1,{"city":"北京" "os":"Windows"},vv,1
+100,1,{"city":"北京" "os":"Windows"},pv,3
+100,2,{"city":"北京" "os":"Mac"},vv,1
+100,2,{"city":"北京" "os":"Mac"},pv,5
+100,3,{"city":"北京" "os":"Mac"},vv,1
+100,3,{"city":"北京" "os":"Mac"},pv,2
+200,1,{"city":"北京" "os":"Mac"},vv,1
+200,1,{"city":"北京" "os":"Mac"},pv,2
+200,1,{"city":"北京" "os":"Windows"},vv,1
+200,1,{"city":"北京" "os":"Windows"},pv,3
+200,2,{"city":"北京" "os":"Mac"},vv,1
+200,2,{"city":"北京" "os":"Mac"},pv,5
+200,3,{"city":"北京" "os":"Mac"},vv,1
+200,3,{"city":"北京" "os":"Mac"},pv,2

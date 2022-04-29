@@ -3,28 +3,34 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitlap</artifactId>
         <groupId>org.bitlap</groupId>
+        <artifactId>bitlap</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>integration-test</artifactId>
+    <artifactId>bitlap-testkit</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.chuusai</groupId>
+            <artifactId>shapeless_2.13</artifactId>
+            <version>${shapeless.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-testkit</artifactId>
+            <artifactId>bitlap-network</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.scala-tools</groupId>
@@ -34,11 +40,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
         </plugins>
     </build>
+
 </project>

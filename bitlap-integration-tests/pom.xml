@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-testkit</artifactId>
+            <artifactId>bitlap-integration-tests</artifactId>
         </dependency>
     </dependencies>
 

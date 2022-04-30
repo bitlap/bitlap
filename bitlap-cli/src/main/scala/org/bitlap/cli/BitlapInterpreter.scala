@@ -67,7 +67,7 @@ trait BitlapInterpreter {
       // System.exit(status.ordinal)
       status.ordinal()
     } else {
-      -1
+      0
     }
   }
 

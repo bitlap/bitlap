@@ -13,6 +13,11 @@
     
     <dependencies>
         <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>RoaringBitmap</artifactId>
+            <version>${bitmap.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>

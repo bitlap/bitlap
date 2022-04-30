@@ -1,8 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common.bitmap
 
-import org.bitlap.common.bitmap.rbm.longlong.LongConsumer
-import org.bitlap.common.bitmap.rbm.longlong.Roaring64Bitmap
+import org.bitlap.roaringbitmap.longlong.LongConsumer
+import org.bitlap.roaringbitmap.longlong.Roaring64Bitmap
 import org.bitlap.common.doIf
 import org.bitlap.common.utils.PreConditions
 import java.io.ByteArrayInputStream

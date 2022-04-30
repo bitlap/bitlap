@@ -1,12 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common.bitmap
 
+import org.bitlap.common.doIf
+import org.bitlap.common.utils.PreConditions
 import org.bitlap.roaringbitmap.FastAggregation
 import org.bitlap.roaringbitmap.IntConsumer
 import org.bitlap.roaringbitmap.RoaringArray
 import org.bitlap.roaringbitmap.RoaringBitmap
-import org.bitlap.common.doIf
-import org.bitlap.common.utils.PreConditions
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer

@@ -1,12 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.common.bitmap
 
-import org.bitlap.common.bitmap.rbm.FastAggregation
-import org.bitlap.common.bitmap.rbm.IntConsumer
-import org.bitlap.common.bitmap.rbm.RoaringArray
-import org.bitlap.common.bitmap.rbm.RoaringBitmap
 import org.bitlap.common.doIf
 import org.bitlap.common.utils.PreConditions
+import org.bitlap.roaringbitmap.FastAggregation
+import org.bitlap.roaringbitmap.IntConsumer
+import org.bitlap.roaringbitmap.RoaringArray
+import org.bitlap.roaringbitmap.RoaringBitmap
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
@@ -14,7 +14,7 @@ import kotlin.math.max
 
 /**
  * Desc:
- *   Build from RoaringBitmap[commit: fc3754f2]
+ *   Build from [bitlap RoaringBitmap](https://github.com/bitlap/RoaringBitmap/)
  *
  * RBM number: support: 0, 1, ..., 2147483647, -2147483648, -2147483647,..., -1
  *

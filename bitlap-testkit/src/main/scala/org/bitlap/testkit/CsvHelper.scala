@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.csv.core.{ ScalableBuilder, ScalableHelper, StringUtils }
+import org.bitlap.csv.core.{ ScalableBuilder, StringUtils }
 
 import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.mutable.ListBuffer

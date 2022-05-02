@@ -21,7 +21,10 @@ class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
   def testCsvConvert1 {
     val csv = readCsvData("simple_data.csv")
     println(csv)
-    assertTrue(csv.toString() == "List(Metric(100,1,List(Dimension(city,北京), Dimension(os,Mac)),vv,1))")
+    assertEquals(
+      "List(Metric(100,1,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,1,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(100,1,List(Dimension(city,北京), Dimension(os,Windows)),vv,1), Metric(100,1,List(Dimension(city,北京), Dimension(os,Windows)),pv,3), Metric(100,2,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,2,List(Dimension(city,北京), Dimension(os,Mac)),pv,5), Metric(100,3,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,3,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(200,1,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,1,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(200,1,List(Dimension(city,北京), Dimension(os,Windows)),vv,1), Metric(200,1,List(Dimension(city,北京), Dimension(os,Windows)),pv,3), Metric(200,2,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,2,List(Dimension(city,北京), Dimension(os,Mac)),pv,5), Metric(200,3,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,3,List(Dimension(city,北京), Dimension(os,Mac)),pv,2))",
+      csv.toString()
+    )
   }
 
   @Test

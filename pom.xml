@@ -404,7 +404,6 @@
                 <version>0.7.9</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/org/bitlap/common/bitmap/rbm/**/*.class</exclude>
                         <exclude>**/org/bitlap/network/driver/proto/**/*.class</exclude>
                         <exclude>**/org/bitlap/network/driver/service/**/*.class</exclude>
                     </excludes>

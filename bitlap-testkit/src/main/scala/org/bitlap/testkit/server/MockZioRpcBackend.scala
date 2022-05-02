@@ -1,17 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit.server
 
+import com.google.protobuf.ByteString
 import org.bitlap.network.OperationType
 import org.bitlap.network.handles.{ HandleIdentifier, OperationHandle, SessionHandle }
 import org.bitlap.network.models._
 import org.bitlap.network.rpc.RpcN
-import org.bitlap.testkit.Dimension
+import org.bitlap.testkit.{ CsvHelper, Metric }
 import org.bitlap.tools.apply
 import zio.ZIO
-import scala.reflect.classTag
-import com.google.protobuf.ByteString
-import org.bitlap.testkit.Metric
-import org.bitlap.testkit.csv.{ CsvParserBuilder, CsvParserSetting }
 
 /**
  * Mock backend for rpc implementation.
@@ -20,16 +17,9 @@ import org.bitlap.testkit.csv.{ CsvParserBuilder, CsvParserSetting }
  * @version 1.0,2022/4/27
  */
 @apply
-class MockZioRpcBackend extends RpcN[ZIO] {
+class MockZioRpcBackend extends RpcN[ZIO] with CsvHelper {
 
-  private val input = CsvParserSetting
-    .builder[Dimension]()
-    .fileName("simple_data.csv")
-    .classTag(classTag = classTag[Dimension])
-    .dimensionName("dimensions")
-    .build()
-
-  val metrics: Seq[Metric] = CsvParserBuilder.MetricParser.fromResourceFile[Dimension](input)
+  val metrics: Seq[Metric] = readCsvData("simple_data.csv")
 
   override def openSession(
     username: String,
@@ -52,7 +42,7 @@ class MockZioRpcBackend extends RpcN[ZIO] {
       List(
         ByteString.copyFromUtf8(metric.time.toString),
         ByteString.copyFromUtf8(metric.entity.toString),
-        ByteString.copyFromUtf8(metric.dimensions.map(_.map(_.value)).getOrElse(Nil).headOption.getOrElse("")),
+        ByteString.copyFromUtf8(metric.dimensions.map(_.value).headOption.getOrElse("")),
         ByteString.copyFromUtf8(metric.name),
         ByteString.copyFromUtf8(metric.value.toString)
       )

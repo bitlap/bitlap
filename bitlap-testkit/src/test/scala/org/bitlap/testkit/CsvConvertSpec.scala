@@ -2,15 +2,12 @@
 package org.bitlap.testkit
 
 import junit.framework.TestCase
-import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.OperationType
-import org.bitlap.testkit.csv.{ CsvConverter, CsvParserBuilder, CsvParserSetting }
+import org.bitlap.network.handles.OperationHandle
 import org.bitlap.testkit.server.MockZioRpcBackend
-import org.junit.Assert.{ assertEquals, assertTrue }
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import scala.reflect.classTag
-import scala.util.Success
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /**
  * csv test
@@ -18,34 +15,16 @@ import scala.util.Success
  * @author 梦境迷离
  * @version 1.0,2022/4/27
  */
-class CsvConvertSpec extends TestCase("CsvConvertSpec") {
+class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
 
   @Test
   def testCsvConvert1 {
-    val input = """John,Carmack,23,0,,100
-               Brian,Fargo,35,,,110
-               Markus,Persson,32,,,120"""
-
-    val persons = CsvConverter[List[Person]].from(input)
-    println(persons)
-    assertTrue(persons.getOrElse(List.empty).size == 3)
-    assertEquals(persons.map(_.head), Success(Person("John", "Carmack", 23, Some(0), None, 100)))
-  }
-
-  @Test
-  def testCsvLoaderBuilder1 {
-    val input = CsvParserSetting
-      .builder[Dimension]()
-      .fileName("simple_data.csv")
-      .classTag(classTag = classTag[Dimension])
-      .dimensionName("dimensions")
-      .build()
-
-    println(input)
-    val metrics = CsvParserBuilder.MetricParser.fromResourceFile[Dimension](input)
-    println(metrics)
-    assertEquals(metrics.size, 16)
-    assertEquals(metrics.head.dimensions, Some(List(Dimension("city", "北京"), Dimension("os", "Mac"))))
+    val csv = readCsvData("simple_data.csv")
+    println(csv)
+    assertEquals(
+      "List(Metric(100,1,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,1,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(100,1,List(Dimension(city,北京), Dimension(os,Windows)),vv,1), Metric(100,1,List(Dimension(city,北京), Dimension(os,Windows)),pv,3), Metric(100,2,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,2,List(Dimension(city,北京), Dimension(os,Mac)),pv,5), Metric(100,3,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(100,3,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(200,1,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,1,List(Dimension(city,北京), Dimension(os,Mac)),pv,2), Metric(200,1,List(Dimension(city,北京), Dimension(os,Windows)),vv,1), Metric(200,1,List(Dimension(city,北京), Dimension(os,Windows)),pv,3), Metric(200,2,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,2,List(Dimension(city,北京), Dimension(os,Mac)),pv,5), Metric(200,3,List(Dimension(city,北京), Dimension(os,Mac)),vv,1), Metric(200,3,List(Dimension(city,北京), Dimension(os,Mac)),pv,2))",
+      csv.toString()
+    )
   }
 
   @Test

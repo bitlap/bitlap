@@ -25,7 +25,7 @@
             <!--  use zio1.x, not support 2.0         -->
             <groupId>dev.zio</groupId>
             <artifactId>zio-cli_2.13</artifactId>
-            <version>0.1.0</version> 
+            <version>0.2.6</version> 
         </dependency>
     </dependencies>
 

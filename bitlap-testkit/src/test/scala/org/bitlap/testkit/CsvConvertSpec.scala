@@ -7,7 +7,6 @@ import org.bitlap.network.handles.OperationHandle
 import org.bitlap.testkit.server.MockZioRpcBackend
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertTrue
 
 /**
  * csv test

@@ -12,9 +12,8 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
-import org.bitlap.network.dsl.zioFrom
+import org.bitlap.network._
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.rpc.Identity
 import zio.{ IO, ZIO }
 
 /** A zio-grpc server implement by sync backend.

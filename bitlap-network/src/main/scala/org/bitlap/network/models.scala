@@ -7,10 +7,10 @@ import org.bitlap.network.driver.proto._
 import org.bitlap.network.models.StatusCode.StatusCode
 import org.bitlap.network.models.TypeId.TypeId
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 object models {
 
@@ -63,8 +63,7 @@ object models {
     )
   }
 
-  /**
-   * The wrapper class of the Proto buffer `BRow`.
+  /** The wrapper class of the Proto buffer `BRow`.
    */
   final case class Row(values: List[ByteString] = Nil) extends Model {
     def toBRow: BRow = BRow(values)
@@ -82,8 +81,7 @@ object models {
       )
   }
 
-  /**
-   * The wrapper class of the Proto buffer `BColumnDesc`.
+  /** The wrapper class of the Proto buffer `BColumnDesc`.
    */
   final case class ColumnDesc(
     columnName: String,
@@ -99,8 +97,7 @@ object models {
       ColumnDesc(bColumnDesc.columnName, TypeId.fromBOperationType(bColumnDesc.typeDesc))
   }
 
-  /**
-   * The wrapper class of the Proto buffer `BTypeId`.
+  /** The wrapper class of the Proto buffer `BTypeId`.
    */
   object TypeId extends Enumeration {
 
@@ -169,8 +166,7 @@ object models {
     }
   }
 
-  /**
-   * The wrapper class of the Proto buffer `BStatusCode`.
+  /** The wrapper class of the Proto buffer `BStatusCode`.
    */
   object StatusCode extends Enumeration {
 

@@ -1,23 +1,21 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.dsl.blocking
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models
 import org.bitlap.network.models.FetchResults
-import org.bitlap.network.rpc.RpcF
+import org.bitlap.network._
 import org.bitlap.tools.apply
 
 import scala.concurrent.Future
 
-/**
- * Async implementation for jdbc server.
+/** Async implementation for jdbc server.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/21
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/21
  */
 @apply
-class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcF[Future] {
+class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Future] {
 
   override def openSession(
     username: String,

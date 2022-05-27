@@ -3,10 +3,10 @@ package org.bitlap.network
 
 import org.bitlap.network.driver.proto.BOperationType
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 object OperationType extends Enumeration {
 

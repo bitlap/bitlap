@@ -10,15 +10,15 @@ import org.bitlap.common.utils.StringEx
 import sqlline.{ SqlLine, SqlLineOpts }
 import zio.ZIO
 import zio.cli.HelpDoc.Span.text
-import zio.cli.{ Args, CliApp, HelpDoc, Options, Command => ZioCliCommand }
+import zio.cli.{ Args, CliApp, Command => ZioCliCommand, HelpDoc, Options }
 import zio.console.{ putStrLn, Console }
 
 import java.io.{ File, IOException }
 import scala.collection.mutable.ArrayBuffer
 
-/**
- * @author 梦境迷离
- * @version 1.0,2022/4/24
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/24
  */
 trait BitlapInterpreter {
 
@@ -40,7 +40,7 @@ trait BitlapInterpreter {
   }
 
   private def handleSqlCli(sql: Sql): Int = {
-    val conf = new BitlapConf()
+    val conf        = new BitlapConf()
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(
       "-d",
@@ -73,7 +73,7 @@ trait BitlapInterpreter {
 
   private def getHistoryPath(projectName: String): String = {
     val home = System.getProperty("user.home")
-    val os = System.getProperty("os.name").toLowerCase
+    val os   = System.getProperty("os.name").toLowerCase
     val child = if (os.contains("windows")) {
       projectName
     } else {
@@ -113,8 +113,8 @@ object BitlapInterpreter {
   object CliOptions {
 
     val serverHelp: HelpDoc = HelpDoc.p("Server commands, such as: start, stop, restart, status.")
-    val sqlHelp: HelpDoc = HelpDoc.p("A bitlap subcommand for sql.")
-    val help: HelpDoc = HelpDoc.p("bitlap cli command.")
+    val sqlHelp: HelpDoc    = HelpDoc.p("A bitlap subcommand for sql.")
+    val help: HelpDoc       = HelpDoc.p("bitlap cli command.")
 
     val serverOpt: Options[String] = Options
       .text("server")

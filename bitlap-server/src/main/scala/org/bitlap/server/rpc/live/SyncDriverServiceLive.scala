@@ -2,7 +2,7 @@
 package org.bitlap.server.rpc.live
 
 import io.grpc.Status
-import org.bitlap.network.RpcStatus
+import org.bitlap.network.{ Rpc, RpcStatus }
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
@@ -12,18 +12,17 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
-import org.bitlap.network.dsl.zioFrom
+import org.bitlap.network._
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.rpc.{ Identity, RpcF }
 import zio.{ IO, ZIO }
 
-/**
- * A zio-grpc server implement by sync backend.
+/** A zio-grpc server implement by sync backend.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/21
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/21
  */
-case class SyncDriverServiceLive(private val syncRpcBackend: RpcF[Identity])
+case class SyncDriverServiceLive(private val syncRpcBackend: Rpc[Identity])
     extends ZDriverService[Any, Any]
     with RpcStatus {
 

@@ -7,10 +7,10 @@ import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
 
-/**
- * @author 梦境迷离
- * @since 2021/6/12
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/6/12
+ *  @version 1.0
  */
 class BitlapDataSource extends DataSource {
 

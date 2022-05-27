@@ -12,19 +12,18 @@ import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesRes
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.rpc.RpcF
-import org.bitlap.network.{ Monad, RpcStatus }
+import org.bitlap.network.{ Monad, Rpc, RpcStatus }
 import zio.ZIO
 
 import scala.concurrent.Future
 
-/**
- * A zio-grpc server implement by future backend.
+/** A zio-grpc server implement by future backend.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/21
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/21
  */
-case class FutureDriverServiceLive(private val futureRpcBackend: RpcF[Future])
+case class FutureDriverServiceLive(private val futureRpcBackend: Rpc[Future])
     extends ZDriverService[Any, Any]
     with RpcStatus {
 

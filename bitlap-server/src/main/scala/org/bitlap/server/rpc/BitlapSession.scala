@@ -8,21 +8,21 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-/**
- * @author 梦境迷离
- * @version 1.0,2021/12/3
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2021/12/3
  */
 class BitlapSession extends Session {
 
-  override val sessionState: AtomicBoolean = new AtomicBoolean(false)
+  override val sessionState: AtomicBoolean          = new AtomicBoolean(false)
   override var sessionHandle: handles.SessionHandle = _
-  override var password: String = _
-  override var username: String = _
-  override val creationTime: Long = System.currentTimeMillis()
-  override var sessionConf: BitlapConf = _
-  override var sessionManager: SessionManager = _
-  override var lastAccessTime: Long = System.currentTimeMillis()
-  override var operationManager: OperationManager = _
+  override var password: String                     = _
+  override var username: String                     = _
+  override val creationTime: Long                   = System.currentTimeMillis()
+  override var sessionConf: BitlapConf              = _
+  override var sessionManager: SessionManager       = _
+  override var lastAccessTime: Long                 = System.currentTimeMillis()
+  override var operationManager: OperationManager   = _
 
   private val opHandleSet = ListBuffer[handles.OperationHandle]()
 
@@ -71,7 +71,7 @@ class BitlapSession extends Session {
   override def fetchResults(
     operationHandle: handles.OperationHandle
   ): models.RowSet = {
-    val op = operationManager.getOperation(operationHandle)
+    val op   = operationManager.getOperation(operationHandle)
     val rows = op.getNextResultSet()
     op.remove(operationHandle) // TODO: work with fetch offset & size
     rows

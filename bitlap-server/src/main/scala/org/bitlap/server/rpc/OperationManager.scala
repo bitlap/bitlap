@@ -7,18 +7,17 @@ import org.bitlap.network.handles.OperationHandle
 
 import scala.collection.mutable
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 class OperationManager {
 
   private val handleToOperation: mutable.HashMap[OperationHandle, Operation] =
     mutable.HashMap[OperationHandle, Operation]()
 
-  /**
-   * Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
+  /** Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
    */
   def newExecuteStatementOperation(
     parentSession: Session,

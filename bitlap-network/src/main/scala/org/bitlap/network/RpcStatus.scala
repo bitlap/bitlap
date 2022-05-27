@@ -3,10 +3,10 @@ package org.bitlap.network
 
 import org.bitlap.network.driver.proto.{ BStatus, BStatusCode }
 
-/**
- * @author 梦境迷离
- * @since 2021/12/5
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/12/5
+ *  @version 1.0
  */
 trait RpcStatus {
 

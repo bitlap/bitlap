@@ -9,10 +9,10 @@ import scala.collection.mutable
 
 import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
 
-/**
- * @author 梦境迷离
- * @since 2021/6/12
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/6/12
+ *  @version 1.0
  */
 class BitlapQueryResultSet(
   private var client: BitlapClient,
@@ -20,19 +20,19 @@ class BitlapQueryResultSet(
   override var row: Row = null
 ) extends BitlapBaseResultSet() {
 
-  override protected var warningChain: SQLWarning = _
+  override protected var warningChain: SQLWarning  = _
   override protected var columnNames: List[String] = List.empty
   override protected var columnTypes: List[String] = List.empty
 
-  private var emptyResultSet = false
-  private var rowsFetched = 0
+  private var emptyResultSet    = false
+  private var rowsFetched       = 0
   protected var closed: Boolean = false
-  protected var fetchSize = 0
+  protected var fetchSize       = 0
 
-  private var fetchedRows: List[Row] = List.empty
+  private var fetchedRows: List[Row]        = List.empty
   private var fetchedRowsItr: Iterator[Row] = fetchedRows.iterator
-  private var sessHandle: SessionHandle = _
-  private var stmtHandle: OperationHandle = _
+  private var sessHandle: SessionHandle     = _
+  private var stmtHandle: OperationHandle   = _
 
   def this(builder: Builder) = {
     this(builder.client, builder.maxRows)
@@ -153,21 +153,20 @@ object BitlapQueryResultSet {
   def builder(): Builder = new Builder()
 
   class Builder {
-    var client: BitlapClient = _
+    var client: BitlapClient        = _
     var stmtHandle: OperationHandle = _
-    var sessHandle: SessionHandle = _
+    var sessHandle: SessionHandle   = _
 
-    /**
-     * Sets the limit for the maximum number of rows that any ResultSet object produced by this
-     * Statement can contain to the given number. If the limit is exceeded, the excess rows
-     * are silently dropped. The value must be >= 0, and 0 means there is not limit.
+    /** Sets the limit for the maximum number of rows that any ResultSet object produced by this Statement can contain
+     *  to the given number. If the limit is exceeded, the excess rows are silently dropped. The value must be >= 0, and
+     *  0 means there is not limit.
      */
-    var maxRows = 0
-    var retrieveSchema = true
+    var maxRows                = 0
+    var retrieveSchema         = true
     var colNames: List[String] = List.empty
     var colTypes: List[String] = List.empty
-    var fetchSize = 50
-    var emptyResultSet = false
+    var fetchSize              = 50
+    var emptyResultSet         = false
 
     def setClient(client: BitlapClient): Builder = {
       this.client = client

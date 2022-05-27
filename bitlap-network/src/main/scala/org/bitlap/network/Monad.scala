@@ -2,17 +2,15 @@
 package org.bitlap.network
 
 import io.grpc.Status
-import org.bitlap.network.dsl.zioFromFuture
-import org.bitlap.network.function.errorApplyFunc
 import zio.ZIO
 
 import scala.concurrent.Future
 
-/**
- * Monad for backend, this is because not all subclasses support it.
+/** Monad for backend, this is because not all subclasses support it.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/25
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/25
  */
 object Monad {
 

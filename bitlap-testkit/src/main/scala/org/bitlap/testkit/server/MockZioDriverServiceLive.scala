@@ -5,11 +5,11 @@ import org.bitlap.server.rpc.live.ZioDriverServiceLive
 import zio.{ UIO, ZIO }
 import org.bitlap.server.rpc.backend.ZioRpcBackend
 
-/**
- * Mock live for rpc server.
+/** Mock live for rpc server.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/27
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/27
  */
 
 object MockZioDriverServiceLive {

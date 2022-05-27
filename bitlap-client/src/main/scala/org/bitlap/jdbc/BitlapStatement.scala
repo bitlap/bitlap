@@ -6,12 +6,12 @@ import org.bitlap.network.handles._
 
 import java.sql._
 
-/**
- * Bitlap Statement
+/** Bitlap Statement
  *
- * @author 梦境迷离
- * @since 2021/6/6
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/6/6
+ *  @version 1.0
  */
 class BitlapStatement(
   private val sessHandle: SessionHandle,
@@ -19,28 +19,23 @@ class BitlapStatement(
 ) extends Statement {
 
   private var stmtHandle: OperationHandle = _
-  private val fetchSize = 50
+  private val fetchSize                   = 50
 
-  /**
-   * We need to keep a reference to the result set to support the following:
+  /** We need to keep a reference to the result set to support the following:
    *
-   * statement.execute(String sql);
-   * statement.getResultSet();
+   *  statement.execute(String sql); statement.getResultSet();
    */
   private var resultSet: ResultSet = _
 
-  /**
-   * The maximum number of rows this statement should return (0 => all rows)
+  /** The maximum number of rows this statement should return (0 => all rows)
    */
   private var maxRows = 0
 
-  /**
-   * Add SQLWarnings to the warningChain if needed
+  /** Add SQLWarnings to the warningChain if needed
    */
   private var warningChain: SQLWarning = _
 
-  /**
-   * Keep state so we can fail certain calls made after close();
+  /** Keep state so we can fail certain calls made after close();
    */
   private var closed = false
 

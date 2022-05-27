@@ -1,21 +1,20 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.dsl.blocking
+import org.bitlap.network._
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.{ Identity, RpcF }
 import org.bitlap.tools.apply
 
-/**
- * Sync implementation for jdbc server.
+/** Sync implementation for jdbc server.
  *
- * @author 梦境迷离
- * @since 2022/04/22
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2022/04/22
+ *  @version 1.0
  */
 @apply
-class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcF[Identity] {
+class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Identity] {
 
   override def openSession(
     username: String,

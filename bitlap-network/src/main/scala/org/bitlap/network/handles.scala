@@ -9,33 +9,31 @@ import org.bitlap.tools.{ apply, toString }
 import java.nio.ByteBuffer
 import java.util.UUID
 
-/**
- * TODO fix
+/** TODO fix
  *
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 object handles {
 
-  /**
-   * 抽象处理器
+  /** 抽象处理器
    *
-   * @param handleId
+   *  @param handleId
    */
-  abstract class Handle(
+  sealed abstract class Handle(
     val handleId: HandleIdentifier = new HandleIdentifier()
   ) {
 
     // super不能直接引用handleId属性
     def getHandleId(): HandleIdentifier = handleId
 
-    def this(bHandleIdentifier: BHandleIdentifier) = {
+    def this(bHandleIdentifier: BHandleIdentifier) =
       this(new HandleIdentifier(bHandleIdentifier))
-    }
 
     override def hashCode(): Int = {
-      val prime = 31
+      val prime  = 31
       var result = 1
       result = prime * result + handleId.hashCode()
       result
@@ -61,11 +59,10 @@ object handles {
     def toString: String
   }
 
-  /**
-   * 统一标识符定义
+  /** 统一标识符定义
    *
-   * @param publicId
-   * @param secretId
+   *  @param publicId
+   *  @param secretId
    */
   @toString(includeFieldNames = true)
   class HandleIdentifier(
@@ -82,9 +79,9 @@ object handles {
     }
 
     def toBHandleIdentifier(): BHandleIdentifier = {
-      val guid = new Array[Byte](16)
-      val secret = new Array[Byte](16)
-      val guidBB = ByteBuffer.wrap(guid)
+      val guid     = new Array[Byte](16)
+      val secret   = new Array[Byte](16)
+      val guidBB   = ByteBuffer.wrap(guid)
       val secretBB = ByteBuffer.wrap(secret)
       guidBB.putLong(this.publicId.getMostSignificantBits)
       guidBB.putLong(this.publicId.getLeastSignificantBits)
@@ -95,7 +92,7 @@ object handles {
 
     // 理论上hashCode和equals也可以用，@equalsAndHashCode
     override def hashCode(): Int = {
-      val prime = 31
+      val prime  = 31
       var result = 1
       result = prime * result + publicId.hashCode()
       result = prime * result + secretId.hashCode()
@@ -123,10 +120,9 @@ object handles {
     }
   }
 
-  /**
-   * 会话处理器句柄
+  /** 会话处理器句柄
    *
-   * @param handleId
+   *  @param handleId
    */
   @toString(includeFieldNames = true)
   @apply
@@ -161,13 +157,12 @@ object handles {
     override val handleId: HandleIdentifier = new HandleIdentifier()
   ) extends Handle(handleId) {
 
-    def this(bOperationHandle: BOperationHandle) = {
+    def this(bOperationHandle: BOperationHandle) =
       this(
         OperationType.getOperationType(bOperationHandle.operationType),
         bOperationHandle.hasResultSet,
         new HandleIdentifier(bOperationHandle.getOperationId)
       )
-    }
 
     def toBOperationHandle(): BOperationHandle =
       BOperationHandle(
@@ -177,7 +172,7 @@ object handles {
       )
 
     override def hashCode(): Int = {
-      val prime = 31
+      val prime  = 31
       var result = super.hashCode()
       result = prime * result + opType.hashCode()
       result

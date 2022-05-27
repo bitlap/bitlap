@@ -437,7 +437,7 @@
 
                         <!--   为了统一格式化，仅能在root模块执行spotless命令，否则找不到文件  -->
                         <scalafmt>
-                            <version>2.7.5</version>
+                            <version>3.5.3</version>
                             <file>.scalafmt.conf</file>
                         </scalafmt>
                         <licenseHeader>

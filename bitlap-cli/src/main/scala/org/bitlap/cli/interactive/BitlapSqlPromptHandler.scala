@@ -14,7 +14,7 @@ class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends Prom
     url: String,
     defaultPrompt: String
   ): String = {
-    val sb = new mutable.StringBuilder(this.prompt)
+    val sb     = new mutable.StringBuilder(this.prompt)
     val schema = sqlLine.getConnectionMetadata.getCurrentSchema
     if (!StringEx.nullOrBlank(schema)) {
       sb.append(s" ($schema)")

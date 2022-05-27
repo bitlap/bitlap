@@ -1,22 +1,21 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc.backend
 
-import org.bitlap.network.OperationType
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.RpcN
+import org.bitlap.network.{ OperationType, RpcZIO }
 import org.bitlap.server.rpc.SessionManager
 import org.bitlap.tools.apply
 import zio.ZIO
 
-/**
- * Async implementation based ZIO for jdbc server.
+/** Async implementation based ZIO for jdbc server.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/21
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/21
  */
 @apply
-class ZioRpcBackend extends RpcN[ZIO] {
+class ZioRpcBackend extends RpcZIO {
 
   private val sessionManager = new SessionManager()
   sessionManager.startListener()
@@ -55,14 +54,14 @@ class ZioRpcBackend extends RpcN[ZIO] {
 
   override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
-    val session = operation.parentSession
+    val session   = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
     FetchResults(false, session.fetchResults(opHandle))
   }
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
-    val session = operation.parentSession
+    val session   = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
     session.getResultSetMetadata(opHandle)
   }

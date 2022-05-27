@@ -1,13 +1,37 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** All exceptions for network and server.
+ *
+ *  @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
-case class NetworkException(
-  code: Int,
-  msg: String = "",
-  cause: Throwable = null
-) extends Throwable(msg, cause)
+sealed trait NetworkException extends Throwable with Product {
+  val code: Int
+  val msg: Option[String]      = None
+  val cause: Option[Throwable] = None
+}
+
+object NetworkException {
+
+  final case class RpcException(
+    code: Int,
+    override val msg: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException
+
+  final case class SQLExecuteException(
+    code: Int,
+    override val msg: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException
+
+  final case class ServerIntervalException(
+    code: Int,
+    override val msg: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException
+
+}

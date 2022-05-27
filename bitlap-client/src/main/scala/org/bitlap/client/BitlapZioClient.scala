@@ -9,31 +9,29 @@ import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
 import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
-import org.bitlap.network.function.statusApplyFunc
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.rpc.RpcN
-import org.bitlap.network.{ handles, RpcStatus }
+import org.bitlap.network.{ handles, RpcStatus, RpcZIO }
 import scalapb.zio_grpc.ZManagedChannel
 import zio.{ Layer, ZIO }
-
+import org.bitlap.network._
 import scala.jdk.CollectionConverters._
 
-/**
- * This class mainly wraps zio rpc calling procedures.
+/** This class mainly wraps zio rpc calling procedures.
  *
- * @author 梦境迷离
- * @since 2021/11/21
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/11/21
+ *  @version 1.0
  */
 private[bitlap] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
-    extends RpcN[ZIO]
+    extends RpcZIO
     with RpcStatus {
 
   private lazy val conf: BitlapConf = new BitlapConf(props.asJava)
-  val readTimeout: java.lang.Long = conf.get(BitlapConf.NODE_READ_TIMEOUT)
+  val readTimeout: java.lang.Long   = conf.get(BitlapConf.NODE_READ_TIMEOUT)
 
-  val maxRows = 50
+  val maxRows   = 50
   val fetchType = 1
 
   private val clientLayer: Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(

@@ -9,9 +9,9 @@ import org.bitlap.tools.apply
 import java.sql.{ ResultSet, Types }
 import scala.collection.mutable.ListBuffer
 
-/**
- * @author 梦境迷离
- * @version 1.0,2021/12/3
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2021/12/3
  */
 @apply
 class BitlapOperation(

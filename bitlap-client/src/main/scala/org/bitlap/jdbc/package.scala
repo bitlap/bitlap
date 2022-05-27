@@ -3,9 +3,9 @@ package org.bitlap
 
 import java.sql.Types
 
-/**
- * @author 梦境迷离
- * @version 1.0,2022/4/18
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/18
  */
 package object jdbc {
 
@@ -41,14 +41,14 @@ package object jdbc {
   }
 
   private[jdbc] object ColumnType {
-    case object STRING extends ColumnType
-    case object BOOLEAN extends ColumnType
-    case object DOUBLE extends ColumnType
-    case object BYTE extends ColumnType
+    case object STRING    extends ColumnType
+    case object BOOLEAN   extends ColumnType
+    case object DOUBLE    extends ColumnType
+    case object BYTE      extends ColumnType
     case object TIMESTAMP extends ColumnType
-    case object INT extends ColumnType
-    case object LONG extends ColumnType
-    case object SHORT extends ColumnType
+    case object INT       extends ColumnType
+    case object LONG      extends ColumnType
+    case object SHORT     extends ColumnType
   }
 
   import org.bitlap.jdbc.ColumnType._

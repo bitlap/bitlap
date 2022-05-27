@@ -12,17 +12,16 @@ import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesRes
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.rpc.RpcN
-import org.bitlap.network.{ Monad, RpcStatus }
+import org.bitlap.network.{ Monad, RpcStatus, RpcZIO }
 import zio.ZIO
 
-/**
- * A zio-grpc server implement by zio backend.
+/** A zio-grpc server implement by zio backend.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/21
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/21
  */
-case class ZioDriverServiceLive(private val zioRpcBackend: RpcN[ZIO]) extends ZDriverService[Any, Any] with RpcStatus {
+case class ZioDriverServiceLive(private val zioRpcBackend: RpcZIO) extends ZDriverService[Any, Any] with RpcStatus {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     Monad.mapBoth(zioRpcBackend) {

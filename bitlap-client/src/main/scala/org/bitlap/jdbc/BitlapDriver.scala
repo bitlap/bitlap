@@ -8,12 +8,9 @@ import java.sql.{ Connection, Driver, DriverPropertyInfo, SQLException }
 import java.util.Properties
 import java.util.logging.Logger
 
-/**
- * Desc: JDBC driver for bitlap
+/** Desc: JDBC driver for bitlap
  *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/4/16
+ *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/4/16
  */
 private[jdbc] abstract class BitlapDriver extends Driver {
 
@@ -23,17 +20,15 @@ private[jdbc] abstract class BitlapDriver extends Driver {
       case ex: Exception => throw BSQLException(ex.toString)
     }
 
-  /**
-   * Checks whether a given url is in a valid format.
+  /** Checks whether a given url is in a valid format.
    *
-   * The current uri format is: `jdbc:bitlap://[host[:port]]`
+   *  The current uri format is: `jdbc:bitlap://[host[:port]]`
    *
-   * jdbc:bitlap://                 - run in embedded mode
-   * jdbc:bitlap://localhost        - connect to localhost default port (10000)
-   * jdbc:bitlap://localhost:5050   - connect to localhost port 5050
+   *  jdbc:bitlap:// - run in embedded mode jdbc:bitlap://localhost - connect to localhost default port (10000)
+   *  jdbc:bitlap://localhost:5050 - connect to localhost port 5050
    *
-   * TODO: - write a better regex.
-   *       - decide on uri format
+   *  TODO: - write a better regex.
+   *    - decide on uri format
    */
   override def acceptsURL(url: String): Boolean =
     if (url == null || url.isEmpty) false
@@ -85,12 +80,11 @@ private[jdbc] abstract class BitlapDriver extends Driver {
         throw BSQLException("Error occurred while registering JDBC driver", cause = e)
     }
 
-  /**
-   * Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
+  /** Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
    *
-   * @param url
-   * @param defaults
-   * @return
+   *  @param url
+   *  @param defaults
+   *  @return
    */
   private def parseURL(url: String, defaults: Properties): Properties = {
     val urlProps = if (defaults != null) new Properties(defaults) else new Properties()

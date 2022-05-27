@@ -4,12 +4,12 @@ package org.bitlap.client
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ RowSet, TableSchema }
 
-/**
- * This class mainly wraps synchronous calls.
+/** This class mainly wraps synchronous calls.
  *
- * @author 梦境迷离
- * @since 2021/11/21
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/11/21
+ *  @version 1.0
  */
 private[bitlap] class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
 

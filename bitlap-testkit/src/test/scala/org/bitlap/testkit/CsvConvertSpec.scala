@@ -8,11 +8,11 @@ import org.bitlap.testkit.server.MockZioRpcBackend
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/**
- * csv test
+/** csv test
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/27
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/27
  */
 class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
 
@@ -29,7 +29,7 @@ class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
   @Test
   def testMockZioRpcBackend1 {
     val backend = MockZioRpcBackend()
-    val ret = backend.fetchResults(new OperationHandle(OperationType.EXECUTE_STATEMENT))
+    val ret     = backend.fetchResults(new OperationHandle(OperationType.EXECUTE_STATEMENT))
     val syncRet = zio.Runtime.default.unsafeRun(ret)
     println(syncRet)
     assertEquals(syncRet.results.rows.head.values.map(v => v.toStringUtf8), List("100", "1", "北京", "vv", "1"))

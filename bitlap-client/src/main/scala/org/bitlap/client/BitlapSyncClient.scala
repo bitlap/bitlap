@@ -1,21 +1,20 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.network.RpcStatus
-import org.bitlap.network.dsl.blocking
+import org.bitlap.network.{ Rpc, RpcStatus }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
-import org.bitlap.network.rpc.{ Identity, RpcF }
+import org.bitlap.network._
 
-/**
- * This class mainly wraps zio asynchronous calls.
+/** This class mainly wraps zio asynchronous calls.
  *
- * @author 梦境迷离
- * @since 2021/11/21
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/11/21
+ *  @version 1.0
  */
 private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
-    extends RpcF[Identity]
+    extends Rpc[Identity]
     with RpcStatus {
 
   private lazy val delegateClient = new BitlapZioClient(uri, port, props)

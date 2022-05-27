@@ -7,40 +7,41 @@ import org.bitlap.network.models.{ RowSet, TableSchema }
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Bitlap Session interface.
+/** Bitlap Session interface.
  *
- * @author 梦境迷离
- * @since 2021/6/6
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/6/6
+ *  @version 1.0
  */
 trait Session {
 
-  val sessionState: AtomicBoolean
   var sessionHandle: SessionHandle
   var password: String
   var username: String
-  val creationTime: Long
   var sessionConf: BitlapConf
   var sessionManager: SessionManager
-
   var lastAccessTime: Long
   var operationManager: OperationManager
 
-  /**
-   * open Session
+  def sessionState: AtomicBoolean
+
+  def creationTime: Long
+
+  /** open Session
    *
-   * @param sessionConfMap
-   * @return SessionHandle The Session handle
+   *  @param sessionConfMap
+   *  @return
+   *    SessionHandle The Session handle
    */
   def open(sessionConfMap: Map[String, String] = Map.empty): SessionHandle
 
-  /**
-   * execute statement
+  /** execute statement
    *
-   * @param statement
-   * @param confOverlay
-   * @return OperationHandle The Operate handle
+   *  @param statement
+   *  @param confOverlay
+   *  @return
+   *    OperationHandle The Operate handle
    */
   def executeStatement(
     sessionHandle: SessionHandle,
@@ -48,13 +49,13 @@ trait Session {
     confOverlay: Map[String, String]
   ): OperationHandle
 
-  /**
-   * execute statement
+  /** execute statement
    *
-   * @param statement
-   * @param confOverlay
-   * @param queryTimeout
-   * @return OperationHandle The Operate handle
+   *  @param statement
+   *  @param confOverlay
+   *  @param queryTimeout
+   *  @return
+   *    OperationHandle The Operate handle
    */
   def executeStatement(
     sessionHandle: SessionHandle,
@@ -69,8 +70,7 @@ trait Session {
 
   // TODO: close OperationHandle
 
-  /**
-   * close Session
+  /** close Session
    */
   def close()
 }

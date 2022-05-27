@@ -9,10 +9,10 @@ import org.bitlap.network.models
 
 import scala.collection.mutable
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 abstract class Operation(
   val parentSession: Session,

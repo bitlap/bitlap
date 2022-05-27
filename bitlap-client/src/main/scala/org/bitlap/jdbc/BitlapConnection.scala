@@ -12,21 +12,21 @@ import java.util.concurrent.Executor
 import java.{ sql, util }
 import scala.jdk.CollectionConverters._
 
-/**
- * Bitlap Connection
+/** Bitlap Connection
  *
- * @author 梦境迷离
- * @since 2021/6/6
- * @version 1.0
+ *  @author
+ *    梦境迷离
+ *  @since 2021/6/6
+ *  @version 1.0
  */
 @apply
 class BitlapConnection(uri: String, info: Properties) extends Connection {
   // apply not support default args
 
-  private var session: SessionHandle = _
-  private var closed = true
+  private var session: SessionHandle   = _
+  private var closed                   = true
   private var warningChain: SQLWarning = _
-  private var client: BitlapClient = _
+  private var client: BitlapClient     = _
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
@@ -34,11 +34,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     }
     // remove prefix
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
-    val hosts = uriWithoutPrefix.split(",")
+    val hosts            = uriWithoutPrefix.split(",")
     // parse uri
     val parts = hosts.map(it => it.split("/"))
     try {
-      //FIXME
+      // FIXME
       val hostAndPort =
         try parts.map(_(0)).mkString(",").split(":")
         catch {
@@ -60,9 +60,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def isWrapperFor(iface: Class[_]): Boolean = ???
 
   override def close(): Unit =
-    try if (session != null) {
-      client.closeSession(session)
-    } finally closed = true
+    try
+      if (session != null) {
+        client.closeSession(session)
+      }
+    finally closed = true
 
   override def createStatement(): Statement =
     if (session != null) {

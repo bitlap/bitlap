@@ -3,10 +3,10 @@ package org.bitlap.jdbc
 
 import java.sql.{ ResultSetMetaData, Types }
 
-/**
- * @author 梦境迷离
- * @since 2021/6/12
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/6/12
+ *  @version 1.0
  */
 class BitlapResultSetMetaData(
   private val columnNames: List[String],

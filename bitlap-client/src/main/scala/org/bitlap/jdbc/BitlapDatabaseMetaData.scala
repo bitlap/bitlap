@@ -6,10 +6,10 @@ import org.bitlap.network.handles.SessionHandle
 
 import java.sql.{ Connection, DatabaseMetaData, ResultSet, RowIdLifetime }
 
-/**
- * @author 梦境迷离
- * @since 2021/6/12
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/6/12
+ *  @version 1.0
  */
 class BitlapDatabaseMetaData(
   private val session: SessionHandle,

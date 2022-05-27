@@ -9,15 +9,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
 import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 
-/**
- * @author 梦境迷离
- * @since 2021/11/20
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/20
+ *  @version 1.0
  */
 class SessionManager extends LazyLogging {
 
   val operationManager: OperationManager = new OperationManager()
-  val start = new AtomicBoolean(false)
+  val start                              = new AtomicBoolean(false)
 
   private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()

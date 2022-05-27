@@ -3,9 +3,9 @@ package org.bitlap.testkit
 
 import org.bitlap.csv.core.{ ScalableBuilder, StringUtils }
 
-/**
- * @author 梦境迷离
- * @version 1.0,2022/5/2
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2022/5/2
  */
 trait CsvHelper {
 

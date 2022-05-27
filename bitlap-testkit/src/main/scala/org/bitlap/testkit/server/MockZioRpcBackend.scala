@@ -2,22 +2,21 @@
 package org.bitlap.testkit.server
 
 import com.google.protobuf.ByteString
-import org.bitlap.network.OperationType
+import org.bitlap.network.{ OperationType, RpcZIO }
 import org.bitlap.network.handles.{ HandleIdentifier, OperationHandle, SessionHandle }
 import org.bitlap.network.models._
-import org.bitlap.network.rpc.RpcN
 import org.bitlap.testkit.{ CsvHelper, Metric }
 import org.bitlap.tools.apply
 import zio.ZIO
 
-/**
- * Mock backend for rpc implementation.
+/** Mock backend for rpc implementation.
  *
- * @author 梦境迷离
- * @version 1.0,2022/4/27
+ *  @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/27
  */
 @apply
-class MockZioRpcBackend extends RpcN[ZIO] with CsvHelper {
+class MockZioRpcBackend extends RpcZIO with CsvHelper {
 
   val metrics: Seq[Metric] = readCsvData("simple_data.csv")
 

@@ -3,9 +3,9 @@ package org.bitlap.testkit.server
 
 import scalapb.zio_grpc.{ ServerMain, ServiceList }
 
-/**
- * @author 梦境迷离
- * @version 1.0,2022/4/27
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2022/4/27
  */
 trait EmbedMockServer extends ServerMain {
 

@@ -24,7 +24,7 @@ class TestServer extends TestCase("TestServer") {
   def testServer {
     startServer()
     Class.forName(classOf[Driver].getName)
-    val con = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+    val con             = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
     val stmt: Statement = con.createStatement()
 
     // show databases

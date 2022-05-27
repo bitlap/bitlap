@@ -13,10 +13,10 @@ import java.util.Calendar
 import scala.annotation.implicitNotFound
 import scala.reflect.{ classTag, ClassTag }
 
-/**
- * @author 梦境迷离
- * @since 2021/8/23
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/8/23
+ *  @version 1.0
  */
 abstract class BitlapBaseResultSet extends ResultSet {
 
@@ -438,8 +438,8 @@ abstract class BitlapBaseResultSet extends ResultSet {
         _wasNull = true
       }
 
-      val typeName = classTag[T].runtimeClass.getTypeName
-      val valueStr = bColumnValue.toStringUtf8
+      val typeName   = classTag[T].runtimeClass.getTypeName
+      val valueStr   = bColumnValue.toStringUtf8
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
       (columnType match {
         case TypeId.TYPE_ID_STRING_TYPE => valueStr

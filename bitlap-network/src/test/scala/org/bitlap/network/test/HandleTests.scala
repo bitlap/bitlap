@@ -8,10 +8,10 @@ import org.bitlap.network.{ handles, OperationType }
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertFalse
 
-/**
- * @author 梦境迷离
- * @since 2021/11/21
- * @version 1.0
+/** @author
+ *    梦境迷离
+ *  @since 2021/11/21
+ *  @version 1.0
  */
 class HandleTests extends TestCase("HandleTests") {
 
@@ -54,7 +54,7 @@ class HandleTests extends TestCase("HandleTests") {
   @Test
   def testSessionHandle = {
     val handleId = new HandleIdentifier()
-    val op = new SessionHandle(handleId)
+    val op       = new SessionHandle(handleId)
 
     assertTrue(
       op.toBSessionHandle().getSessionId == handleId
@@ -79,9 +79,9 @@ class HandleTests extends TestCase("HandleTests") {
   @Test
   def testInnerMethod(): Unit = {
     val handleId = new HandleIdentifier()
-    val op1 = new SessionHandle(handleId)
-    val op2 = new SessionHandle(handleId)
-    val op3 = new SessionHandle(new HandleIdentifier())
+    val op1      = new SessionHandle(handleId)
+    val op2      = new SessionHandle(handleId)
+    val op3      = new SessionHandle(new HandleIdentifier())
     assertTrue(op1.equals(op2))
     assertTrue(op1.hashCode() == op2.hashCode())
     assertFalse(op1.hashCode() == op3.hashCode())

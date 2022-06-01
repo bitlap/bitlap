@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.network.{ Rpc, RpcStatus }
+import org.bitlap.network.{ Rpc, RpcStatusBuilder }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
 import org.bitlap.network._
@@ -14,8 +14,8 @@ import org.bitlap.network._
  *  @version 1.0
  */
 private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
-    extends Rpc[Identity]
-    with RpcStatus {
+    extends RpcIdentity
+    with RpcStatusBuilder {
 
   private lazy val delegateClient = new BitlapZioClient(uri, port, props)
 
@@ -23,11 +23,11 @@ private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String
     username: String,
     password: String,
     configuration: Map[String, String]
-  ): Identity[SessionHandle] = blocking {
+  ): Identity[SessionHandle] = delegateClient.sync {
     delegateClient.openSession(username, password, configuration)
   }
 
-  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = blocking {
+  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = delegateClient.sync {
     delegateClient.closeSession(sessionHandle)
   }
 
@@ -36,15 +36,15 @@ private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String
     statement: String,
     queryTimeout: Long = delegateClient.readTimeout,
     confOverlay: Map[String, String] = Map.empty
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.executeStatement(sessionHandle, statement, queryTimeout, confOverlay)
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = blocking {
+  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = delegateClient.sync {
     delegateClient.fetchResults(opHandle)
   }
 
-  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = blocking {
+  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateClient.sync {
     delegateClient.getResultSetMetadata(opHandle)
   }
 
@@ -53,14 +53,14 @@ private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String
     schemaName: String,
     tableName: String,
     columnName: String
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.getColumns(sessionHandle, tableName, schemaName, columnName)
   }
 
-  override def getDatabases(pattern: String): Identity[OperationHandle] = blocking {
+  override def getDatabases(pattern: String): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.getDatabases(pattern)
   }
-  override def getTables(database: String, pattern: String): Identity[OperationHandle] = blocking {
+  override def getTables(database: String, pattern: String): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.getTables(database, pattern)
   }
 
@@ -68,7 +68,7 @@ private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String
     sessionHandle: SessionHandle,
     catalogName: String,
     schemaName: String
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

@@ -11,7 +11,7 @@ import zio.{ UIO, ZIO }
  */
 object Services {
 
-  lazy val zioRpcBackend: ZioRpcBackend = ZioRpcBackend()
+  private lazy val zioRpcBackend: ZioRpcBackend = ZioRpcBackend()
 
   lazy val zioLive: UIO[ZioDriverServiceLive] = ZIO.succeed(ZioDriverServiceLive(ZioRpcBackend()))
 

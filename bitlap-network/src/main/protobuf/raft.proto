@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_package = "org.bitlap.network";
+option java_multiple_files = true;
+option java_outer_classname = "RaftService";
+
+
+service RaftService {
+  rpc submit (RaftCommandReq) returns (RaftCommandResp) {}
+}
+
+message RaftCommandReq {
+  bytes data = 1;
+  CommandType type = 2;
+}
+
+message RaftCommandResp {
+  bytes data = 1;
+}
+
+enum CommandType {
+  MESSAGE = 0;
+  COMMAND = 1;
+}

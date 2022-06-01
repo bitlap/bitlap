@@ -8,7 +8,7 @@ import org.bitlap.network.driver.proto.{ BStatus, BStatusCode }
  *  @since 2021/12/5
  *  @version 1.0
  */
-trait RpcStatus {
+trait RpcStatusBuilder {
 
   def successOpt(): Option[BStatus] = Some(success())
 

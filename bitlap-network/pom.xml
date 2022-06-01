@@ -83,6 +83,8 @@
                 <artifactId>protoc-jar-maven-plugin</artifactId>
                 <version>3.11.4</version>
                 <configuration>
+                    <!--   Trigger download for Mac M1                 -->
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
                     <includeMavenTypes>transitive</includeMavenTypes>
                     <outputTargets>
                         <outputTarget>

@@ -11,8 +11,7 @@ import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.{ handles, RpcStatus, RpcZIO }
-import scalapb.zio_grpc.ZManagedChannel
+import org.bitlap.network.{ handles, RpcStatusBuilder, RpcZio }
 import zio.{ Layer, ZIO }
 import org.bitlap.network._
 import scala.jdk.CollectionConverters._
@@ -25,8 +24,8 @@ import scala.jdk.CollectionConverters._
  *  @version 1.0
  */
 private[bitlap] class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
-    extends RpcZIO
-    with RpcStatus {
+    extends RpcZio
+    with RpcStatusBuilder {
 
   private lazy val conf: BitlapConf = new BitlapConf(props.asJava)
   val readTimeout: java.lang.Long   = conf.get(BitlapConf.NODE_READ_TIMEOUT)
@@ -35,7 +34,7 @@ private[bitlap] class BitlapZioClient(uri: String, port: Int, props: Map[String,
   val fetchType = 1
 
   private val clientLayer: Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
-    ZManagedChannel(ManagedChannelBuilder.forAddress(uri, port).usePlaintext())
+    scalapb.zio_grpc.ZManagedChannel(ManagedChannelBuilder.forAddress(uri, port).usePlaintext())
   )
 
   override def openSession(

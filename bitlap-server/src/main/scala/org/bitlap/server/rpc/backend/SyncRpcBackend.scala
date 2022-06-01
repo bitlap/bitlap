@@ -14,17 +14,17 @@ import org.bitlap.tools.apply
  *  @version 1.0
  */
 @apply
-class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Identity] {
+class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcIdentity {
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): Identity[SessionHandle] = blocking {
+  ): Identity[SessionHandle] = delegateBackend.sync {
     delegateBackend.openSession(username, password, configuration)
   }
 
-  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = blocking {
+  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = delegateBackend.sync {
     delegateBackend.closeSession(sessionHandle)
   }
 
@@ -33,7 +33,7 @@ class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Ide
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateBackend.sync {
     delegateBackend.executeStatement(
       sessionHandle,
       statement,
@@ -42,11 +42,11 @@ class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Ide
     )
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = blocking {
+  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = delegateBackend.sync {
     delegateBackend.fetchResults(opHandle)
   }
 
-  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = blocking {
+  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateBackend.sync {
     delegateBackend.getResultSetMetadata(opHandle)
   }
 
@@ -55,15 +55,15 @@ class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Ide
     schemaName: String,
     tableName: String,
     columnName: String
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateBackend.sync {
     delegateBackend.getColumns(sessionHandle, schemaName, tableName, columnName)
   }
 
-  override def getDatabases(pattern: String): Identity[OperationHandle] = blocking {
+  override def getDatabases(pattern: String): Identity[OperationHandle] = delegateBackend.sync {
     delegateBackend.getDatabases(pattern)
   }
 
-  override def getTables(database: String, pattern: String): Identity[OperationHandle] = blocking {
+  override def getTables(database: String, pattern: String): Identity[OperationHandle] = delegateBackend.sync {
     delegateBackend.getTables(database, pattern)
   }
 
@@ -71,7 +71,7 @@ class SyncRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Ide
     sessionHandle: SessionHandle,
     catalogName: String,
     schemaName: String
-  ): Identity[OperationHandle] = blocking {
+  ): Identity[OperationHandle] = delegateBackend.sync {
     delegateBackend.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

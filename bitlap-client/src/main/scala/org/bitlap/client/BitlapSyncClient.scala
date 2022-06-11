@@ -13,9 +13,7 @@ import org.bitlap.network._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
-    extends RpcIdentity
-    with RpcStatusBuilder {
+class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) extends RpcIdentity with RpcStatusBuilder {
 
   private lazy val delegateClient = new BitlapZioClient(uri, port, props)
 

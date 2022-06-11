@@ -23,9 +23,7 @@ import scala.jdk.CollectionConverters._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapZioClient(uri: String, port: Int, props: Map[String, String])
-    extends RpcZio
-    with RpcStatusBuilder {
+class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extends RpcZio with RpcStatusBuilder {
 
   private lazy val conf: BitlapConf = new BitlapConf(props.asJava)
   val readTimeout: java.lang.Long   = conf.get(BitlapConf.NODE_READ_TIMEOUT)

@@ -38,29 +38,29 @@ class RaftServerSpec extends TestCase("RaftServerSpec") {
       )
     }
 
-  def test_3_server(): Unit = {
-    val configs = generateConfigs()
-    val program = for {
-      servers <- ZIO.collectAll(configs.map(c => createRaftServer[Int](c, configs.toSet - c)))
-      client  <- RaftClient(configs)
-      fibers  <- ZIO.collectAll(servers.map(_.run.fork))
-      r <- ZIO.collectAll(servers.map(_.getState)).repeatUntil { states =>
-        states.count(_ == NodeState.Leader) == 1 &&
-        states.count(_ == NodeState.Follower) == 2
-      }
-      _ <- ZIO.collectAll((1 to 5).map(i => client.submitCommand(WriteKey(Key(s"key-$i"), i))))
-      _ <- ZIO.collectAll(
-        (1 to 5).map(i =>
-          client.submitQuery[Int](ReadKey(Key(s"key-$i"))).repeatUntil { result =>
-            result.contains(i)
-          }
-        )
-      )
-      _ <- ZIO.collectAll(fibers.map(_.interrupt))
-    } yield r
-
-    val future = zio.Runtime.default.unsafeRunToFuture(program)
-    val ret    = Await.result(future, 100.seconds)
-    println(ret)
-  }
+//  def test_3_server(): Unit = {
+//    val configs = generateConfigs()
+//    val program = for {
+//      servers <- ZIO.collectAll(configs.map(c => createRaftServer[Int](c, configs.toSet - c)))
+//      client  <- RaftClient(configs)
+//      fibers  <- ZIO.collectAll(servers.map(_.run.fork))
+//      r <- ZIO.collectAll(servers.map(_.getState)).repeatUntil { states =>
+//        states.count(_ == NodeState.Leader) == 1 &&
+//        states.count(_ == NodeState.Follower) == 2
+//      }
+//      _ <- ZIO.collectAll((1 to 5).map(i => client.submitCommand(WriteKey(Key(s"key-$i"), i))))
+//      _ <- ZIO.collectAll(
+//        (1 to 5).map(i =>
+//          client.submitQuery[Int](ReadKey(Key(s"key-$i"))).repeatUntil { result =>
+//            result.contains(i)
+//          }
+//        )
+//      )
+//      _ <- ZIO.collectAll(fibers.map(_.interrupt))
+//    } yield r
+//
+//    val future = zio.Runtime.default.unsafeRunToFuture(program)
+//    val ret    = Await.result(future, 100.seconds)
+//    println(ret)
+//  }
 }

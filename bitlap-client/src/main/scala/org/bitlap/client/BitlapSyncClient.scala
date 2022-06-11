@@ -13,7 +13,7 @@ import org.bitlap.network._
  *  @since 2021/11/21
  *  @version 1.0
  */
-private[bitlap] class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
+class BitlapSyncClient(uri: String, port: Int, props: Map[String, String])
     extends RpcIdentity
     with RpcStatusBuilder {
 

@@ -72,7 +72,7 @@ final class RaftServer[T](
       _    <- sendMessages
     } yield ()).provideLayer(ZEnv.live)
 
-  def getState: ZIO[Any, Nothing, NodeState] = raftRef.get.flatMap(_.nodeState)
+//  def getState: ZIO[Any, Nothing, NodeState] = raftRef.get.flatMap(_.nodeState)
 
 }
 

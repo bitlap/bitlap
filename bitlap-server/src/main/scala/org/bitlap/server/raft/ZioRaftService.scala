@@ -51,7 +51,7 @@ final class ZioRaftService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
       raft    <- raftRef.get
       response <- command match {
         case w: WriteCommand => raft.submitCommand(w)
-        case r: ReadCommand  => raft.submitQuery(r)
+//        case r: ReadCommand  => raft.submitQuery(r)
       }
     } yield serde.serialize(response)
 }

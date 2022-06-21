@@ -89,6 +89,8 @@
         <zio.version>1.0.14</zio.version>
         <jupiter.version>5.8.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
+        <zio-raft.version>0.3.0</zio-raft.version>
+        <rocksdb.version>7.3.1</rocksdb.version>
     </properties>
 
     <dependencies>

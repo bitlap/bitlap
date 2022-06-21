@@ -62,7 +62,7 @@
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <dokka.version>1.6.21</dokka.version>
-        <kotlin.version>1.6.21</kotlin.version>
+        <kotlin.version>1.7.0</kotlin.version>
         <kotlinx.coroutines.version>1.6.1-native-mt</kotlinx.coroutines.version>
         <kotest.version>5.2.3</kotest.version>
         <kotlin.logging.version>2.1.21</kotlin.logging.version>
@@ -89,6 +89,8 @@
         <zio.version>1.0.14</zio.version>
         <jupiter.version>5.8.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
+        <zio-raft.version>0.3.0</zio-raft.version>
+        <rocksdb.version>7.2.2</rocksdb.version>
     </properties>
 
     <dependencies>

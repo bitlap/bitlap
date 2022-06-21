@@ -28,6 +28,16 @@
             <artifactId>grpc-services</artifactId>
             <version>${grpc.netty.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ariskk</groupId>
+            <artifactId>zio-raft_2.13</artifactId>
+            <version>${zio-raft.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <version>${rocksdb.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

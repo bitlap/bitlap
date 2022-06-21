@@ -11,9 +11,9 @@ import org.bitlap.network.models.{ RowSet, TableSchema }
  *  @since 2021/11/21
  *  @version 1.0
  */
-private[bitlap] class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
+class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
 
-  private val rpcClient = new BitlapSyncClient(uri, port, props)
+  private lazy val rpcClient: BitlapSyncClient = new BitlapSyncClient(uri, port, props)
 
   def openSession(): SessionHandle =
     rpcClient

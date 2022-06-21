@@ -11,8 +11,9 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
+import org.bitlap.network.{ errorApplyFunc, RpcStatusBuilder, RpcZio }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.{ Monad, RpcStatus, RpcZIO }
+import org.bitlap.tools.apply
 import zio.ZIO
 
 /** A zio-grpc server implement by zio backend.
@@ -21,38 +22,45 @@ import zio.ZIO
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-case class ZioDriverServiceLive(private val zioRpcBackend: RpcZIO) extends ZDriverService[Any, Any] with RpcStatus {
+@apply
+final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio)
+    extends ZDriverService[Any, Any]
+    with RpcStatusBuilder {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
-    Monad.mapBoth(zioRpcBackend) {
-      _.openSession(request.username, request.password, request.configuration)
-    } { shd =>
-      BOpenSessionResp(
-        successOpt(),
-        configuration = request.configuration,
-        sessionHandle = Some(shd.toBSessionHandle())
-      )
-    }
+    zioRpcBackend
+      .map(zioRpcBackend.openSession(request.username, request.password, request.configuration)) { shd =>
+        BOpenSessionResp(
+          successOpt(),
+          configuration = request.configuration,
+          sessionHandle = Some(shd.toBSessionHandle())
+        )
+      }
+      .mapError(errorApplyFunc)
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
-    Monad.mapBoth(zioRpcBackend) {
-      _.closeSession(new SessionHandle(request.getSessionHandle))
-    }(_ => BCloseSessionResp(successOpt()))
+    zioRpcBackend
+      .map(zioRpcBackend.closeSession(new SessionHandle(request.getSessionHandle))) { _ =>
+        BCloseSessionResp(successOpt())
+      }
+      .mapError(errorApplyFunc)
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
-    Monad.mapBoth(zioRpcBackend) {
-      _.executeStatement(
+    zioRpcBackend.map {
+      zioRpcBackend.executeStatement(
         new SessionHandle(request.getSessionHandle),
         request.statement,
         request.queryTimeout,
         request.confOverlay
       )
     }(hd => BExecuteStatementResp(successOpt(), Some(hd.toBOperationHandle())))
+      .mapError(errorApplyFunc)
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
-    Monad.mapBoth(zioRpcBackend) {
-      _.fetchResults(new OperationHandle(request.getOperationHandle))
+    zioRpcBackend.map {
+      zioRpcBackend.fetchResults(new OperationHandle(request.getOperationHandle))
     }(_.toBFetchResults)
+      .mapError(errorApplyFunc)
 
   override def getSchemas(request: BGetSchemasReq): ZIO[Any, Status, BGetSchemasResp] = ???
 
@@ -61,7 +69,9 @@ case class ZioDriverServiceLive(private val zioRpcBackend: RpcZIO) extends ZDriv
   override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] = ???
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
-    Monad.mapBoth(zioRpcBackend) {
-      _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
+    zioRpcBackend.map {
+      zioRpcBackend.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
+      .mapError(errorApplyFunc)
+
 }

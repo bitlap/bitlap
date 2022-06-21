@@ -15,17 +15,17 @@ import scala.concurrent.Future
  *  @version 1.0,2022/4/21
  */
 @apply
-class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[Future] {
+class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends RpcFuture {
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String]
-  ): Future[SessionHandle] = blocking {
+  ): Future[SessionHandle] = delegateBackend.sync {
     delegateBackend.openSession(username, password, configuration).toFuture
   }
 
-  override def closeSession(sessionHandle: SessionHandle): Future[Unit] = blocking {
+  override def closeSession(sessionHandle: SessionHandle): Future[Unit] = delegateBackend.sync {
     delegateBackend.closeSession(sessionHandle).toFuture
   }
 
@@ -34,15 +34,15 @@ class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[F
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String]
-  ): Future[OperationHandle] = blocking {
+  ): Future[OperationHandle] = delegateBackend.sync {
     delegateBackend.executeStatement(sessionHandle, statement, queryTimeout, confOverlay).toFuture
   }
 
-  override def fetchResults(opHandle: OperationHandle): Future[FetchResults] = blocking {
+  override def fetchResults(opHandle: OperationHandle): Future[FetchResults] = delegateBackend.sync {
     delegateBackend.fetchResults(opHandle).toFuture
   }
 
-  override def getResultSetMetadata(opHandle: OperationHandle): Future[models.TableSchema] = blocking {
+  override def getResultSetMetadata(opHandle: OperationHandle): Future[models.TableSchema] = delegateBackend.sync {
     delegateBackend.getResultSetMetadata(opHandle).toFuture
   }
 
@@ -51,15 +51,15 @@ class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[F
     schemaName: String,
     tableName: String,
     columnName: String
-  ): Future[OperationHandle] = blocking {
+  ): Future[OperationHandle] = delegateBackend.sync {
     delegateBackend.getColumns(sessionHandle, schemaName, tableName, columnName).toFuture
   }
 
-  override def getDatabases(pattern: String): Future[OperationHandle] = blocking {
+  override def getDatabases(pattern: String): Future[OperationHandle] = delegateBackend.sync {
     delegateBackend.getDatabases(pattern).toFuture
   }
 
-  override def getTables(database: String, pattern: String): Future[OperationHandle] = blocking {
+  override def getTables(database: String, pattern: String): Future[OperationHandle] = delegateBackend.sync {
     delegateBackend.getTables(database, pattern).toFuture
   }
 
@@ -67,7 +67,7 @@ class FutureRpcBackend(private val delegateBackend: ZioRpcBackend) extends Rpc[F
     sessionHandle: SessionHandle,
     catalogName: String,
     schemaName: String
-  ): Future[OperationHandle] = blocking {
+  ): Future[OperationHandle] = delegateBackend.sync {
     delegateBackend.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

@@ -30,13 +30,15 @@ package object network {
   lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
     RpcException(st.getCode.value(), Option(st.getCode.toStatus.getDescription), Option(st.asException()))
 
-  def blocking[T, Z <: ZIO[_, _, _]](action: => Z): T = runtime.unsafeRun(action.asInstanceOf[ZIO[Any, Throwable, T]])
+  implicit class RpcFutureOps(val rpc: RpcFuture) extends AnyVal {
+    def transform[A, B](fx: RpcFuture => Future[A])(f: A => B): ZIO[Any, Status, B] =
+      IO.fromFuture[A](make => fx(rpc))
+        .map(hd => f(hd))
+        .mapError(errorApplyFunc)
+  }
 
-  def zioFrom[T](action: => T): ZIO[Any, Status, T] =
-    IO.effect(action).mapError { ex => ex.printStackTrace(); Status.fromThrowable(ex) }
-
-  def zioFromFuture[T, R, F[_] <: Future[_]](action: => F[T])(t: T => R): ZIO[Any, Status, R] =
-    IO.fromFuture[T](make => action.asInstanceOf[Future[T]])
-      .map(hd => t(hd))
-      .mapError(errorApplyFunc)
+  implicit class RpcIdentityOps(val rpc: RpcIdentity) extends AnyVal {
+    def zio[T](action: => T): ZIO[Any, Status, T] =
+      IO.effect(action).mapError { ex => ex.printStackTrace(); Status.fromThrowable(ex) }
+  }
 }

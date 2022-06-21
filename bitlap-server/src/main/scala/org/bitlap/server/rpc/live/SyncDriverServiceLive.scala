@@ -26,7 +26,7 @@ case class SyncDriverServiceLive(private val syncRpcBackend: RpcIdentity)
     extends ZDriverService[Any, Any]
     with RpcStatusBuilder {
 
-  def openSession(request: BOpenSessionReq): IO[Status, BOpenSessionResp] = syncRpcBackend.pure {
+  def openSession(request: BOpenSessionReq): IO[Status, BOpenSessionResp] = syncRpcBackend.zio {
     val handle = syncRpcBackend.openSession(request.username, request.password, request.configuration)
     BOpenSessionResp(
       successOpt(),
@@ -34,14 +34,14 @@ case class SyncDriverServiceLive(private val syncRpcBackend: RpcIdentity)
       sessionHandle = Some(handle.toBSessionHandle())
     )
   }
-  override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] = syncRpcBackend.pure {
+  override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] = syncRpcBackend.zio {
     syncRpcBackend.closeSession(new SessionHandle(request.getSessionHandle))
     BCloseSessionResp(successOpt())
 
   }
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
-    syncRpcBackend.pure {
+    syncRpcBackend.zio {
       val handle = syncRpcBackend.executeStatement(
         new SessionHandle(request.getSessionHandle),
         request.statement,
@@ -54,7 +54,7 @@ case class SyncDriverServiceLive(private val syncRpcBackend: RpcIdentity)
   override def fetchResults(
     request: BFetchResultsReq
   ): ZIO[Any, Status, BFetchResultsResp] =
-    syncRpcBackend.pure {
+    syncRpcBackend.zio {
       syncRpcBackend.fetchResults(new OperationHandle(request.getOperationHandle)).toBFetchResults
     }
 
@@ -66,7 +66,7 @@ case class SyncDriverServiceLive(private val syncRpcBackend: RpcIdentity)
 
   override def getResultSetMetadata(
     request: BGetResultSetMetadataReq
-  ): ZIO[Any, Status, BGetResultSetMetadataResp] = syncRpcBackend.pure {
+  ): ZIO[Any, Status, BGetResultSetMetadataResp] = syncRpcBackend.zio {
     val handle = syncRpcBackend.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     BGetResultSetMetadataResp(successOpt(), Some(handle.toBTableSchema))
 

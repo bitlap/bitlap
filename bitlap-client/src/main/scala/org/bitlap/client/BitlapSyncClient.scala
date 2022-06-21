@@ -1,10 +1,9 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.network.{ Rpc, RpcStatusBuilder }
+import org.bitlap.network.{ RpcStatusBuilder, _ }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
-import org.bitlap.network._
 
 /** This class mainly wraps zio asynchronous calls.
  *

@@ -3,9 +3,11 @@ package org.bitlap
 
 import io.grpc.Status
 import org.bitlap.network.NetworkException.RpcException
+import zio.{ IO, ZIO }
 
 import java.io.IOException
 import java.util.concurrent.TimeoutException
+import scala.concurrent.Future
 
 /** @author
  *    梦境迷离
@@ -27,4 +29,16 @@ package object network {
 
   lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
     RpcException(st.getCode.value(), Option(st.getCode.toStatus.getDescription), Option(st.asException()))
+
+  implicit class RpcFutureOps(val rpc: RpcFuture) extends AnyVal {
+    def transform[A, B](fx: RpcFuture => Future[A])(f: A => B): ZIO[Any, Status, B] =
+      IO.fromFuture[A](make => fx(rpc))
+        .map(hd => f(hd))
+        .mapError(errorApplyFunc)
+  }
+
+  implicit class RpcIdentityOps(val rpc: RpcIdentity) extends AnyVal {
+    def zio[T](action: => T): ZIO[Any, Status, T] =
+      IO.effect(action).mapError { ex => ex.printStackTrace(); Status.fromThrowable(ex) }
+  }
 }

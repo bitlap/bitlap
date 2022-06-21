@@ -13,7 +13,7 @@ import org.bitlap.network.models.{ RowSet, TableSchema }
  */
 class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
 
-  private val rpcClient = new BitlapSyncClient(uri, port, props)
+  private lazy val rpcClient: BitlapSyncClient = new BitlapSyncClient(uri, port, props)
 
   def openSession(): SessionHandle =
     rpcClient

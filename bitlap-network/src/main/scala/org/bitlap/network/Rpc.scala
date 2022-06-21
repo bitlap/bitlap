@@ -4,12 +4,6 @@ package org.bitlap.network
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
 
-import io.grpc.Status
-import zio.ZIO
-
-import scala.concurrent.Future
-import zio.IO
-
 /** Rpc api and monad for backends.
  *
  *  @author
@@ -23,14 +17,6 @@ trait Rpc[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
   def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
-
-  def transformZIO[R, A, B](r: R)(fx: R => Future[A])(f: A => B): ZIO[Any, Status, B] =
-    IO.fromFuture[A](make => fx(r))
-      .map(hd => f(hd))
-      .mapError(errorApplyFunc)
-
-  def pure[T](action: => T): ZIO[Any, Status, T] =
-    IO.effect(action).mapError { ex => ex.printStackTrace(); Status.fromThrowable(ex) }
 
   def openSession(
     username: String,

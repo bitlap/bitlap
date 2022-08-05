@@ -63,7 +63,7 @@
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <dokka.version>1.6.21</dokka.version>
         <kotlin.version>1.6.21</kotlin.version>
-        <kotlinx.coroutines.version>1.6.1-native-mt</kotlinx.coroutines.version>
+        <kotlinx.coroutines.version>1.6.3-native-mt</kotlinx.coroutines.version>
         <kotest.version>5.2.3</kotest.version>
         <kotlin.logging.version>2.1.21</kotlin.logging.version>
         <arrow.version>1.0.1</arrow.version>

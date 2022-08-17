@@ -90,7 +90,7 @@
         <jupiter.version>5.8.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
         <zio-raft.version>0.3.0</zio-raft.version>
-        <rocksdb.version>7.2.2</rocksdb.version>
+        <rocksdb.version>7.4.5</rocksdb.version>
     </properties>
 
     <dependencies>

@@ -12,17 +12,17 @@ import junit.framework._
 class SparkSpec extends TestCase("SparkSpec") {
 
   val url = "jdbc:bitlap://localhost:23333/default"
-//
-//  // is OK ?
-//  def write(): Unit =
-//    for {
-//      r <- SparkOperator.createDataFrame(List(Dimension("", "")))
-//      _ <- SparkOperator.write(r)(url, "table", null)
-//    } yield ()
-//
-//  def read(): Unit =
-//    for {
-//      df <- SparkOperator.read(url, "table", null)
-//    } yield df.show()
+
+  // is OK ?
+  def writeDF(): Unit =
+    for {
+      r <- SparkOperator.createDataFrame(List(Dimension("", "")))
+      _ <- r.writeDF(url, "table", null)
+    } yield ()
+
+  def readDF(): Unit =
+    for {
+      df <- SparkOperator.readDF(url, "table", null)
+    } yield df.show()
 
 }

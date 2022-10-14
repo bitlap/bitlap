@@ -15,9 +15,7 @@ trait SparkOperator[F[_]] {
 
   def createDataFrame[T <: SparkData: TypeTag](sqlData: List[T]): F[DataFrame]
 
-  def read(url: String, table: String, properties: Properties): F[DataFrame]
-
-  def write(dataFrame: DataFrame)(url: String, table: String, connectionProperties: Properties): Task[Unit]
+  def readDF(url: String, table: String, properties: Properties): F[DataFrame]
 }
 
 object SparkOperator {
@@ -32,14 +30,8 @@ object SparkOperator {
       .serviceWith[SparkOperator[Task]](_.activeSparkSession())
       .provideLayer(ZLayer.succeed[SparkOperator[Task]](SparkOperatorLive()))
 
-  def read(url: String, table: String, properties: Properties): Task[DataFrame] =
+  def readDF(url: String, table: String, properties: Properties): Task[DataFrame] =
     ZIO
-      .serviceWith[SparkOperator[Task]](_.read(url, table, properties))
+      .serviceWith[SparkOperator[Task]](_.readDF(url, table, properties))
       .provideLayer(ZLayer.succeed[SparkOperator[Task]](SparkOperatorLive()))
-
-  def write(dataFrame: DataFrame)(url: String, table: String, connectionProperties: Properties): Task[Unit] =
-    ZIO
-      .serviceWith[SparkOperator[Task]](_.write(dataFrame)(url, table, connectionProperties))
-      .provideLayer(ZLayer.succeed[SparkOperator[Task]](SparkOperatorLive()))
-
 }

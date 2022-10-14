@@ -18,18 +18,11 @@ final case class SparkOperatorLive() extends SparkOperator[Task] {
   override def activeSparkSession(): Task[SparkSession] =
     ZIO.effect(SparkSession.active)
 
-  override def read(url: String, table: String, properties: Properties): Task[DataFrame] =
+  override def readDF(url: String, table: String, properties: Properties): Task[DataFrame] =
     ZIO
       .service[SparkSession]
       .map(_.read.format(FORMAT).jdbc(url, table, properties))
       .provideLayer(live)
-
-  override def write(dataFrame: DataFrame)(url: String, table: String, connectionProperties: Properties): Task[Unit] =
-    ZIO
-      .service[DataFrame]
-      .map(_.write.format(FORMAT).jdbc(url, table, connectionProperties)) // options ?
-      .provideLayer(ZLayer.succeed(dataFrame))
-
 }
 object SparkOperatorLive {
 

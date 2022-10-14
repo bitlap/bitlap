@@ -3,6 +3,7 @@ package io.bitlap.spark
 import org.apache.spark.sql.{ DataFrame, SparkSession }
 import zio._
 import java.util.Properties
+import scala.reflect.runtime.universe.TypeTag
 
 /** @author
  *    梦境迷离
@@ -12,9 +13,9 @@ trait SparkOperator[F[_]] {
 
   def activeSparkSession(): F[SparkSession]
 
-  def createDataFrame[T <: SparkData](sqlData: List[T]): F[DataFrame]
+  def createDataFrame[T <: SparkData: TypeTag](sqlData: List[T]): F[DataFrame]
 
-  def dataFrame(url: String, table: String, properties: Properties): F[DataFrame]
+  def read(url: String, table: String, properties: Properties): F[DataFrame]
 
   def write(dataFrame: DataFrame)(url: String, table: String, connectionProperties: Properties): Task[Unit]
 }
@@ -31,9 +32,9 @@ object SparkOperator {
       .serviceWith[SparkOperator[Task]](_.activeSparkSession())
       .provideLayer(ZLayer.succeed[SparkOperator[Task]](SparkOperatorLive()))
 
-  def dataFrame(url: String, table: String, properties: Properties): Task[DataFrame] =
+  def read(url: String, table: String, properties: Properties): Task[DataFrame] =
     ZIO
-      .serviceWith[SparkOperator[Task]](_.dataFrame(url, table, properties))
+      .serviceWith[SparkOperator[Task]](_.read(url, table, properties))
       .provideLayer(ZLayer.succeed[SparkOperator[Task]](SparkOperatorLive()))
 
   def write(dataFrame: DataFrame)(url: String, table: String, connectionProperties: Properties): Task[Unit] =

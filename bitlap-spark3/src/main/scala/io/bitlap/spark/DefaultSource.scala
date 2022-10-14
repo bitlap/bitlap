@@ -20,11 +20,12 @@ final class DefaultSource extends RelationProvider with SchemaRelationProvider {
     parameters: Map[String, String],
     schema: StructType
   ): BaseRelation = {
-    val path    = parameters.get("path")
     val charSet = parameters.getOrElse("charSet", "UTF-8")
-    path match {
-      case Some(p) => new DataSourceRelation(sqlContext, p, charSet, schema)
-      case _       => throw new IllegalArgumentException("Path is required for files")
+    val url     = parameters.get("url")
+    val path    = parameters.get("path")
+    (path, url) match {
+      case (Some(pt), Some(ul)) => new DataSourceRelation(sqlContext, ul, pt, charSet, schema)
+      case _                    => throw new IllegalArgumentException("Both path and url are required!")
     }
   }
 }

@@ -13,7 +13,7 @@ class TestServer extends TestCase("TestServer") {
 
   def startServer(): Unit = {
     val server = new Thread {
-      override def run(): Unit = EmbedBitlapServer.main(Array())
+      override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
     }
     server.setDaemon(true)
     server.start()

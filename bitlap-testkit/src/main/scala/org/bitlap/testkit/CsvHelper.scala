@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.csv.core.{ ScalableBuilder, StringUtils }
+import org.bitlap.csv.{ ScalableBuilder, StringUtils }
 
 /** @author
  *    梦境迷离
@@ -16,6 +16,6 @@ trait CsvHelper {
         _.dimensions,
         dims => StringUtils.extractJsonValues[Dimension](dims)((k, v) => Dimension(k, v))
       )
-      .convertFrom(reader, "utf-8")
+      .convertFrom(reader)
   }.collect { case Some(v) => v }
 }

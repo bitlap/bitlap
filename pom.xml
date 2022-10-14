@@ -13,7 +13,7 @@
     <name>bitlap</name>
     <description>A table schema-less OLAP Analytics Engine for Big Data.</description>
     <url>https://github.com/bitlap/bitlap</url>
-    <inceptionYear>2020</inceptionYear>
+    <inceptionYear>2022</inceptionYear>
 
     <licenses>
         <license>
@@ -53,7 +53,6 @@
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
         <module>bitlap-testkit</module>
-        <module>bitlap-integration-tests</module>
     </modules>
 
     <properties>
@@ -62,16 +61,16 @@
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <dokka.version>1.6.21</dokka.version>
-        <kotlin.version>1.6.21</kotlin.version>
-        <kotlinx.coroutines.version>1.6.1-native-mt</kotlinx.coroutines.version>
-        <kotest.version>5.2.3</kotest.version>
-        <kotlin.logging.version>2.1.21</kotlin.logging.version>
-        <arrow.version>1.0.1</arrow.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <log4j.version>2.17.2</log4j.version>
+        <kotlin.version>1.7.20</kotlin.version>
+        <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
+        <kotest.version>5.5.0</kotest.version>
+        <kotlin.logging.version>3.0.0</kotlin.logging.version>
+        <arrow.version>1.1.2</arrow.version>
+        <slf4j.version>2.0.3</slf4j.version>
+        <log4j.version>2.19.0</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <hutool.version>5.8.2</hutool.version>
-        <joda.version>2.10.14</joda.version>
+        <hutool.version>5.8.8</hutool.version>
+        <joda.version>2.11.2</joda.version>
         <gson.version>2.9.0</gson.version>
         <calcite.version>1.30.0</calcite.version>
         <kotlin.cli.version>0.3.4</kotlin.cli.version>
@@ -80,14 +79,14 @@
         <scala.log.version>2.14.1</scala.log.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <smt.version>0.5.4</smt.version>
+        <smt.version>0.8.0</smt.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
-        <zio.grpc.version>0.5.1</zio.grpc.version>
+        <zio.grpc.version>0.5.2</zio.grpc.version>
         <scalapb.version>0.11.11</scalapb.version>
         <protobuf.version>3.20.1</protobuf.version>
         <grpc.netty.version>1.39.0</grpc.netty.version>
         <zio.version>1.0.15</zio.version>
-        <jupiter.version>5.8.2</jupiter.version>
+        <jupiter.version>5.9.0</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
         <zio-raft.version>0.3.0</zio-raft.version>
         <rocksdb.version>7.2.2</rocksdb.version>
@@ -213,12 +212,17 @@
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-tools_2.13</artifactId>
+            <artifactId>smt-annotations_2.13</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-csv-core_2.13</artifactId>
+            <artifactId>smt-common_2.13</artifactId>
+            <version>${smt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>smt-csv_2.13</artifactId>
             <version>${smt.version}</version>
         </dependency>
     </dependencies>
@@ -258,11 +262,6 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>bitlap-spark3</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bitlap</groupId>
-                <artifactId>integration-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -426,7 +425,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.22.8</version>
+                <version>2.27.2</version>
                 <configuration>
                     <scala>
                         <!-- These are the defaults, you can override if you want -->

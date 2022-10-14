@@ -6,7 +6,7 @@ import org.bitlap.network.models.{ FetchResults, TableSchema }
 import org.bitlap.network.{ OperationType, RpcZio }
 import org.bitlap.server.rpc.SessionManager
 import org.bitlap.tools.apply
-import zio.ZIO
+import zio._
 
 /** Async implementation based ZIO for jdbc server.
  *

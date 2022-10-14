@@ -4,7 +4,7 @@ import com.ariskk.raft.model.NodeId
 import com.ariskk.raft.statemachine.{ Key, KeyValueStore, ReadKey, WriteKey }
 import junit.framework.TestCase
 import org.bitlap.server.raft.storage.RocksDBStorage
-import zio.ZIO
+import zio._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

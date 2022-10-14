@@ -6,12 +6,12 @@ import com.ariskk.raft.model.{ Command, Message, RaftException, Serde }
 import com.ariskk.raft.model.Command.{ ReadCommand, WriteCommand }
 import com.google.protobuf.ByteString
 import io.grpc.Status
-import org.bitlap.network.RpcStatusBuilder
+import org.bitlap.network.RpcStatus
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq, RaftCommandResp }
 import org.bitlap.network.raft.ZioRaft.ZRaftService
 import org.bitlap.tools.apply
 import scalapb.zio_grpc.{ ServerMain, ServiceList }
-import zio.{ ExitCode, Ref, URIO, ZIO }
+import zio._
 import zio.clock.Clock
 import zio.console.{ putStrLn, Console }
 
@@ -24,7 +24,7 @@ import zio.console.{ putStrLn, Console }
 @apply
 final class ZioRaftService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
     extends ZRaftService[Any, Any]
-    with RpcStatusBuilder {
+    with RpcStatus {
 
   override def submit(request: RaftCommandReq): ZIO[Any, Status, RaftCommandResp] = {
     val data = request.data.toByteArray

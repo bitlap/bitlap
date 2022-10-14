@@ -1,10 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.slf4j
-import org.slf4j.LoggerFactory
-
-import java.sql.{ Connection, Driver, DriverPropertyInfo, SQLException }
+import java.sql.{ Connection, Driver, DriverPropertyInfo }
 import java.util.Properties
 import java.util.logging.Logger
 

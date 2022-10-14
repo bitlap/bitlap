@@ -1,19 +1,19 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.it.server
+package org.bitlap.testkit
 
 import junit.framework.TestCase
 import org.bitlap.Driver
-import org.bitlap.it.EmbedBitlapServer
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.bitlap.testkit.server.EmbedBitlapServer
 
-import java.sql.{ DriverManager, Statement }
+import java.sql._
 
 class TestServer extends TestCase("TestServer") {
 
   def startServer(): Unit = {
     val server = new Thread {
-      override def run(): Unit = EmbedBitlapServer.main(Array.empty)
+      override def run(): Unit = EmbedBitlapServer.main(Array())
     }
     server.setDaemon(true)
     server.start()

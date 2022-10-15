@@ -12,7 +12,7 @@ import java.util._
  */
 package object spark {
   implicit final class DataFrameOps(val dataFrame: DataFrame) extends AnyVal {
-    def writeDF(url: String, table: String, connectionProperties: Properties): Task[Unit] =
+    def jdbcWrite(url: String, table: String, connectionProperties: Properties): Task[Unit] =
       ZIO
         .service[DataFrame]
         .map(_.write.jdbc(url, table, connectionProperties)) // options ?

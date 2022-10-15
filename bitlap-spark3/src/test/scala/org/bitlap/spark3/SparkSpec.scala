@@ -14,15 +14,15 @@ class SparkSpec extends TestCase("SparkSpec") {
   val url = "jdbc:bitlap://localhost:23333/default"
 
   // is OK ?
-  def writeDF(): Unit =
+  def write(): Unit =
     for {
       r <- SparkOperator.createDataFrame(List(Dimension("", "")))
-      _ <- r.writeDF(url, "table", null)
+      _ <- r.jdbcWrite(url, "table", null)
     } yield ()
 
-  def readDF(): Unit =
+  def read(): Unit =
     for {
-      df <- SparkOperator.readDF(url, "table", null)
+      df <- SparkOperator.jdbcRead(url, "table", null)
     } yield df.show()
 
 }

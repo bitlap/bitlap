@@ -18,7 +18,7 @@ final case class SparkOperatorLive() extends SparkOperator[Task] {
   override def activeSparkSession(): Task[SparkSession] =
     ZIO.effect(SparkSession.active)
 
-  override def readDF(url: String, table: String, properties: Properties): Task[DataFrame] =
+  override def jdbcRead(url: String, table: String, properties: Properties): Task[DataFrame] =
     ZIO
       .service[SparkSession]
       .map(_.read.jdbc(url, table, properties))

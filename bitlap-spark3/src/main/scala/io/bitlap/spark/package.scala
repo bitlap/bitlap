@@ -1,6 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap
-import io.bitlap.spark.SparkOperatorLive._
+
 import org.apache.spark.sql._
 import zio.{ TypeTag => _, _ }
 
@@ -15,7 +15,7 @@ package object spark {
     def writeDF(url: String, table: String, connectionProperties: Properties): Task[Unit] =
       ZIO
         .service[DataFrame]
-        .map(_.write.format(FORMAT).jdbc(url, table, connectionProperties)) // options ?
+        .map(_.write.jdbc(url, table, connectionProperties)) // options ?
         .provideLayer(ZLayer.succeed(dataFrame))
   }
 }

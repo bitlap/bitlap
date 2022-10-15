@@ -21,12 +21,10 @@ final case class SparkOperatorLive() extends SparkOperator[Task] {
   override def readDF(url: String, table: String, properties: Properties): Task[DataFrame] =
     ZIO
       .service[SparkSession]
-      .map(_.read.format(FORMAT).jdbc(url, table, properties))
+      .map(_.read.jdbc(url, table, properties))
       .provideLayer(live)
 }
 object SparkOperatorLive {
-
-  final val FORMAT: String = "io.bitlap.spark"
 
   lazy val session: SparkSession = SparkSession
     .builder()

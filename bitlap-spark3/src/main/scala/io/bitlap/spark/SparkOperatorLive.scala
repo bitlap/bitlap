@@ -1,9 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark
-import org.apache.spark.sql.{ DataFrame, SparkSession }
-import zio.{ TypeTag => _, _ }
-import java.util.Properties
+
 import io.bitlap.spark.SparkOperatorLive._
+import org.apache.spark.sql._
+import zio.{ TypeTag => _, _ }
+
 import scala.reflect.runtime.universe.TypeTag
 
 /** @author
@@ -18,10 +19,10 @@ final case class SparkOperatorLive() extends SparkOperator[Task] {
   override def activeSparkSession(): Task[SparkSession] =
     ZIO.effect(SparkSession.active)
 
-  override def jdbcRead(url: String, table: String, properties: Properties): Task[DataFrame] =
+  override def read(url: String, options: Map[String, String]): Task[DataFrame] =
     ZIO
       .service[SparkSession]
-      .map(_.read.jdbc(url, table, properties))
+      .map(_.read.format(FORMAT).options(options).load())
       .provideLayer(live)
 }
 object SparkOperatorLive {

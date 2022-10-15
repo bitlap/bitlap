@@ -17,12 +17,12 @@ class SparkSpec extends TestCase("SparkSpec") {
   def write(): Unit =
     for {
       r <- SparkOperator.createDataFrame(List(Dimension("", "")))
-      _ <- r.jdbcWrite(url, "table", null)
+      _ <- r.saveToBitlap(Map.empty)
     } yield ()
 
   def read(): Unit =
     for {
-      df <- SparkOperator.jdbcRead(url, "table", null)
+      df <- SparkOperator.read(url, Map.empty)
     } yield df.show()
 
 }

@@ -26,9 +26,9 @@ final class BitlapScanBuilder(private val _schema: StructType, val options: Case
 
   override def build(): Scan = new BitlapScan(schema = schema, options = options, whereClause = whereClause)
 
-  override def pushFilters(filters: Array[Filter]): Array[Filter] = ???
+  override def pushFilters(filters: Array[Filter]): Array[Filter] = Array.empty
 
-  override def pushedFilters(): Array[Filter] = ???
+  override def pushedFilters(): Array[Filter] = Array.empty
 
   override def pruneColumns(requiredSchema: StructType): Unit =
     this.schema = requiredSchema

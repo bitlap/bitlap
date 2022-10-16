@@ -16,13 +16,31 @@ final class BitlapScan(
 ) extends Scan
     with Batch {
 
+  private var bitlapDataSourceReadOptions: BitlapDataSourceReadOptions = _
+
+  private val url   = options.getOrDefault("url", null)
+  private val table = options.getOrDefault("table", null)
+
   override def readSchema(): StructType = schema
 
   override def description: String = this.getClass.toString
 
   override def toBatch: Batch = this
 
-  override def planInputPartitions(): Array[InputPartition] = ???
+  override def planInputPartitions(): Array[InputPartition] = {
+    // BitlapDataSourceReadOptions
+    // selectStatement  and statement
+    // overriddenProps
+    bitlapDataSourceReadOptions = new BitlapDataSourceReadOptions(
+      url,
+      scan = null,
+      tenantId = null,
+      overriddenProps = null,
+      selectStatement = ""
+    )
+    Array.empty
+  }
 
-  override def createReaderFactory(): PartitionReaderFactory = ???
+  override def createReaderFactory(): PartitionReaderFactory =
+    new BitlapPartitionReaderFactory(schema, bitlapDataSourceReadOptions)
 }

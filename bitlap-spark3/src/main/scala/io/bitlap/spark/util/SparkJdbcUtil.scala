@@ -38,6 +38,10 @@ object SparkJdbcUtil {
   private def makeGetters(schema: StructType): Array[JDBCValueGetter] =
     schema.fields.map(sf => makeGetter(sf.dataType, sf.metadata))
 
+  private object Fixed {
+    def unapply(t: DecimalType): Option[(Int, Int)] = Some((t.precision, t.scale))
+  }
+
   private def makeGetter(dt: DataType, metadata: Metadata): JDBCValueGetter = dt match {
     case BooleanType =>
       (rs: ResultSet, row: InternalRow, pos: Int) => row.setBoolean(pos, rs.getBoolean(pos + 1))
@@ -60,10 +64,10 @@ object SparkJdbcUtil {
       // DecimalType(12, 2). Thus, after saving the dataframe into parquet file and then
       // retrieve it, you will get wrong result 199.99.
     // So it is needed to set precision and scale for Decimal based on JDBC metadata.
-    case d @ DecimalType() =>
+    case Fixed(p, s) =>
       (rs: ResultSet, row: InternalRow, pos: Int) =>
         val decimal =
-          nullSafeConvert[java.math.BigDecimal](rs.getBigDecimal(pos + 1), d => Decimal(d, d.precision(), d.scale()))
+          nullSafeConvert[java.math.BigDecimal](rs.getBigDecimal(pos + 1), d => Decimal(d, p, s))
         row.update(pos, decimal)
 
     case DoubleType =>

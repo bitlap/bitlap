@@ -2,6 +2,7 @@
 package org.bitlap.testkit
 
 import org.bitlap.csv.{ ScalableBuilder, StringUtils }
+import org.bitlap.csv.DefaultCsvFormat
 
 /** @author
  *    梦境迷离
@@ -16,6 +17,8 @@ trait CsvHelper {
         _.dimensions,
         dims => StringUtils.extractJsonValues[Dimension](dims)((k, v) => Dimension(k, v))
       )
-      .convertFrom(reader)
+      .convertFrom(reader)(new DefaultCsvFormat {
+        override def ignoreHeader: Boolean = true
+      })
   }.collect { case Some(v) => v }
 }

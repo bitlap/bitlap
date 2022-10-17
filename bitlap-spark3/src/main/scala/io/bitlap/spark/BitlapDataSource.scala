@@ -4,7 +4,7 @@ package io.bitlap.spark
 import org.apache.spark.sql.connector.catalog.{ Table, TableProvider }
 import org.apache.spark.sql.connector.expressions.Transform
 import org.apache.spark.sql.sources.DataSourceRegister
-import org.apache.spark.sql.types.{ DataType, LongType, StringType, StructField, StructType }
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import java.util.{ Map => JMap }
@@ -15,7 +15,6 @@ import scala.jdk.CollectionConverters.MapHasAsScala
  *  @version 1.0,10/15/22
  */
 final class BitlapDataSource extends TableProvider with DataSourceRegister {
-
   private var schema: StructType = _
 
   override def inferSchema(caseInsensitiveStringMap: CaseInsensitiveStringMap): StructType = {
@@ -23,12 +22,24 @@ final class BitlapDataSource extends TableProvider with DataSourceRegister {
     schema = StructType(
       List(
         StructField(
-          "key",
+          "time",
+          LongType
+        ),
+        StructField(
+          "entity",
+          IntegerType
+        ),
+        StructField(
+          "dimensions",
           StringType
         ),
         StructField(
-          "name",
+          "metric_name",
           StringType
+        ),
+        StructField(
+          "metric_value",
+          DoubleType
         )
       )
     )

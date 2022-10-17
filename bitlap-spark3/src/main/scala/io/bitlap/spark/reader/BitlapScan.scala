@@ -36,9 +36,13 @@ final class BitlapScan(
       scan = null,
       tenantId = null,
       overriddenProps = null,
-      selectStatement = ""
+      selectStatement = options.getOrDefault("sql", null)
     )
-    Array.empty
+    Array(
+      new BitlapInputPartition(
+        new BitlapInputSplit
+      )
+    )
   }
 
   override def createReaderFactory(): PartitionReaderFactory =

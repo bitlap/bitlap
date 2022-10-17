@@ -17,6 +17,6 @@ final class BitlapPartitionReaderFactory(
     new BitlapPartitionReader(
       options = options,
       schema = schema,
-      bitlapPartition = inputPartition.asInstanceOf[BitlapPartition]
+      bitlapPartition = inputPartition.asInstanceOf[BitlapInputPartition]
     )
 }

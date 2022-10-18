@@ -2,7 +2,7 @@
 package io.bitlap.spark.reader
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.connector.read.{ InputPartition, PartitionReader, PartitionReaderFactory }
+import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.types.StructType
 
 /** @since 2022/10/16

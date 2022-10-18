@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark.reader
 
-import org.apache.spark.sql.connector.read.{ Batch, InputPartition, PartitionReaderFactory, Scan }
+import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 

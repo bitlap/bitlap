@@ -1,8 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark.reader
 
+import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.InputSplit
 import org.apache.spark.sql.connector.read.InputPartition
+
 import java.io.{ DataInput, DataOutput }
 import org.apache.spark.SerializableWritable
 
@@ -18,7 +20,7 @@ final class BitlapInputPartition(
     new SerializableWritable[BitlapInputSplit](bitlapInputSplit)
 }
 
-final class BitlapInputSplit extends InputSplit with Serializable {
+final class BitlapInputSplit extends InputSplit with Serializable with Writable {
   override def getLength: Long = 1
 
   override def getLocations: Array[String] = Array()

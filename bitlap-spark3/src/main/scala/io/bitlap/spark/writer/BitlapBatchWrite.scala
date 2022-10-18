@@ -1,8 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark.writer
 
-import org.apache.spark.sql.connector.write.{ BatchWrite, LogicalWriteInfo }
-import org.apache.spark.sql.connector.write.{ DataWriterFactory, PhysicalWriteInfo, WriterCommitMessage }
+import org.apache.spark.sql.connector.write._
 
 /** @author
  *    梦境迷离
@@ -13,13 +12,14 @@ final class BitlapBatchWrite(
   options: Map[String, String]
 ) extends BatchWrite {
 
-  private val bitlapOptions: BitlapDataSourceWriteOptions = new BitlapDataSourceWriteOptions(
+  private lazy val bitlapOptions: BitlapDataSourceWriteOptions = new BitlapDataSourceWriteOptions(
     tableName = options.getOrElse("table", null),
     url = options.getOrElse("url", null),
     scan = null,
     tenantId = null,
     schema = null,
-    overriddenProps = null
+    overriddenProps = null,
+    false
   )
 
   override def createBatchWriterFactory(physicalWriteInfo: PhysicalWriteInfo): DataWriterFactory =

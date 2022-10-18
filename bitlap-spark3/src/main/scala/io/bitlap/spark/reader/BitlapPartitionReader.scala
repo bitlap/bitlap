@@ -8,7 +8,7 @@ import org.apache.spark.sql.connector.read.PartitionReader
 import org.apache.spark.sql.types.StructType
 
 import java.io.IOException
-import java.sql.{ DriverManager, ResultSet, SQLException }
+import java.sql._
 
 /** @since 2022/10/16
  *  @author

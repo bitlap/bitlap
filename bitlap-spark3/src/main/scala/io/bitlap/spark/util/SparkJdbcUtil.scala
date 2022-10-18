@@ -8,12 +8,16 @@ import org.apache.spark.sql.catalyst.util.{ DateTimeUtils, GenericArrayData }
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
+import org.apache.spark.sql.jdbc.{ JdbcDialect, JdbcType }
 
 import java.sql.{ PreparedStatement, ResultSet }
+import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils.getCommonJDBCType
+import java.util.Locale
+import java.sql.Connection
 
 /** @author
  *    梦境迷离
- *  @version 1.0,2022/10/17
+ *  @version 1.0,2022/10/16
  */
 object SparkJdbcUtil {
 
@@ -40,6 +44,58 @@ object SparkJdbcUtil {
 
   private object Fixed {
     def unapply(t: DecimalType): Option[(Int, Int)] = Some((t.precision, t.scale))
+  }
+
+  // take from Spark JdbcUtils.scala, cannot be used directly because the method is private
+  def makeSetter(conn: Connection, dialect: JdbcDialect, dataType: DataType): JDBCValueSetter = dataType match {
+    case IntegerType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setInt(pos + 1, row.getInt(pos))
+
+    case LongType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setLong(pos + 1, row.getLong(pos))
+
+    case DoubleType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setDouble(pos + 1, row.getDouble(pos))
+
+    case FloatType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setFloat(pos + 1, row.getFloat(pos))
+
+    case ShortType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setInt(pos + 1, row.getShort(pos))
+
+    case ByteType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setInt(pos + 1, row.getByte(pos))
+
+    case BooleanType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setBoolean(pos + 1, row.getBoolean(pos))
+
+    case StringType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setString(pos + 1, row.getString(pos))
+
+    case BinaryType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setBytes(pos + 1, row.getAs[Array[Byte]](pos))
+
+    case TimestampType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setTimestamp(pos + 1, row.getAs[java.sql.Timestamp](pos))
+
+    case DateType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setDate(pos + 1, row.getAs[java.sql.Date](pos))
+
+    case t: DecimalType =>
+      (stmt: PreparedStatement, row: Row, pos: Int) => stmt.setBigDecimal(pos + 1, row.getDecimal(pos))
+
+    case ArrayType(et, _) =>
+      // remove type length parameters from end of type name
+      val typeName = getJdbcType(et, dialect).databaseTypeDefinition
+        .toLowerCase(Locale.ROOT)
+        .split("\\(")(0)
+      (stmt: PreparedStatement, row: Row, pos: Int) =>
+        val array = conn.createArrayOf(typeName, row.getSeq[AnyRef](pos).toArray)
+        stmt.setArray(pos + 1, array)
+
+    case _ =>
+      (_: PreparedStatement, _: Row, pos: Int) =>
+        throw new IllegalArgumentException(s"Can't translate non-null value for field $pos")
   }
 
   private def makeGetter(dt: DataType, metadata: Metadata): JDBCValueGetter = dt match {
@@ -272,4 +328,11 @@ object SparkJdbcUtil {
           null.asInstanceOf[InternalRow]
         }
     }
+
+  // taken from Spark JdbcUtils
+  def getJdbcType(dt: DataType, dialect: JdbcDialect): JdbcType =
+    dialect
+      .getJDBCType(dt)
+      .orElse(getCommonJDBCType(dt))
+      .getOrElse(throw new IllegalArgumentException(s"Can't get JDBC type for ${dt.catalogString}"))
 }

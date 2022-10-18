@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark
 
-import org.apache.spark.sql.connector.catalog.{ Table, TableProvider }
+import org.apache.spark.sql.connector.catalog.TableProvider
 import org.apache.spark.sql.connector.expressions.Transform
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.types._
@@ -17,7 +17,10 @@ import scala.jdk.CollectionConverters.MapHasAsScala
 final class BitlapDataSource extends TableProvider with DataSourceRegister {
   private var schema: StructType = _
 
-  override def inferSchema(caseInsensitiveStringMap: CaseInsensitiveStringMap): StructType = {
+  override def inferSchema(options: CaseInsensitiveStringMap): StructType = {
+    if (options.get("table") == null) throw new RuntimeException("No Bitlap option table defined")
+    if (options.get("url") == null) throw new RuntimeException("No Bitlap option url defined")
+
     // mock data
     schema = StructType(
       List(
@@ -46,7 +49,7 @@ final class BitlapDataSource extends TableProvider with DataSourceRegister {
     schema
   }
 
-  override def getTable(schema: StructType, transforms: Array[Transform], properties: JMap[String, String]): Table =
+  override def getTable(schema: StructType, transforms: Array[Transform], properties: JMap[String, String]) =
     new BitlapTable(schema, properties.asScala.toMap)
 
   override def shortName(): String = "bitlap"

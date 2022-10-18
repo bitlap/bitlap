@@ -1,12 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package io.bitlap.spark.reader
 
-import org.apache.spark.sql.connector.read.{
-  Scan,
-  ScanBuilder,
-  SupportsPushDownFilters,
-  SupportsPushDownRequiredColumns
-}
+import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
@@ -24,11 +19,14 @@ final class BitlapScanBuilder(private val _schema: StructType, val options: Case
 
   protected var whereClause: String = _
 
+  private val pushedFilterList = Array[Filter]()
+
   override def build(): Scan = new BitlapScan(schema = schema, options = options, whereClause = whereClause)
 
-  override def pushFilters(filters: Array[Filter]): Array[Filter] = Array.empty
+  override def pushFilters(filters: Array[Filter]): Array[Filter] =
+    Array.empty
 
-  override def pushedFilters(): Array[Filter] = Array.empty
+  override def pushedFilters(): Array[Filter] = pushedFilterList
 
   override def pruneColumns(requiredSchema: StructType): Unit =
     this.schema = requiredSchema

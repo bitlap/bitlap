@@ -3,14 +3,14 @@ package io.bitlap.spark
 
 import io.bitlap.spark.reader.BitlapScanBuilder
 import io.bitlap.spark.writer.BitlapWriteBuilder
-import org.apache.spark.sql.connector.catalog.{ SupportsRead, SupportsWrite, TableCapability }
+import org.apache.spark.sql.connector.catalog._
 import org.apache.spark.sql.connector.read.ScanBuilder
-import org.apache.spark.sql.connector.write.{ LogicalWriteInfo, WriteBuilder }
+import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import java.util.{ Map => JMap, Set => JSet }
-import scala.jdk.CollectionConverters.{ MapHasAsJava, SetHasAsJava }
+import scala.jdk.CollectionConverters._
 
 /** @author
  *    梦境迷离

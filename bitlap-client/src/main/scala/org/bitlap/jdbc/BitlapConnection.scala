@@ -87,9 +87,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getAutoCommit: Boolean = ???
 
-  override def commit(): Unit = ???
+  override def commit(): Unit = ()
 
-  override def rollback(): Unit = ???
+  override def rollback(): Unit = ()
 
   override def getMetaData: DatabaseMetaData = ???
 

@@ -11,10 +11,10 @@ import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemas
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService.ZDriverService
-import org.bitlap.network.{ errorApplyFunc, RpcStatusBuilder, RpcZio }
+import org.bitlap.network.{ errorApplyFunc, RpcStatus, RpcZio }
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.tools.apply
-import zio.ZIO
+import zio._
 
 /** A zio-grpc server implement by zio backend.
  *
@@ -23,9 +23,7 @@ import zio.ZIO
  *  @version 1.0,2022/4/21
  */
 @apply
-final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio)
-    extends ZDriverService[Any, Any]
-    with RpcStatusBuilder {
+final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDriverService[Any, Any] with RpcStatus {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     zioRpcBackend

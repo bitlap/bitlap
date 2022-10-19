@@ -34,8 +34,8 @@ class BitlapOperation(
         case Types.BOOLEAN   => models.TypeId.TYPE_ID_BOOLEAN_TYPE
         case Types.TIMESTAMP => models.TypeId.TYPE_ID_TIMESTAMP_TYPE
         case Types.TINYINT   => models.TypeId.TYPE_ID_BYTE_TYPE
-        // TODO more
-        case _ => models.TypeId.TYPE_ID_UNSPECIFIED
+        // TODO more 暂时不使用TYPE_ID_UNSPECIFIED，避免报错
+        case _ => models.TypeId.TYPE_ID_STRING_TYPE
       }
       models.ColumnDesc(colName, colType)
     }
@@ -53,7 +53,7 @@ class BitlapOperation(
           case Types.BOOLEAN                => ByteString.copyFromUtf8(rs.getBoolean(it).toString)
           case Types.TIMESTAMP              => ByteString.copyFromUtf8(rs.getLong(it).toString)
           // TODO more
-          case _ => ByteString.copyFrom(rs.getBytes(it))
+          case _ => ByteString.empty()
         }
       }
       rows.append(models.Row(cl.toList))

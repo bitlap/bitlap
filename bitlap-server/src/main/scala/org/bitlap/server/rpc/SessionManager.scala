@@ -90,12 +90,7 @@ class SessionManager extends LazyLogging {
 
   def closeSession(sessionHandle: SessionHandle) = {
     SessionManager.sessionAddLock.synchronized {
-      val v = handleToSession.remove(sessionHandle)
-      if (v == null) {
-        throw new BitlapException(s"Session does not exist: $sessionHandle")
-      } else {
-        v
-      }
+      handleToSession.remove(sessionHandle)
     }
     logger.info(
       "Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount()

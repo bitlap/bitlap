@@ -38,6 +38,12 @@
             <artifactId>rocksdbjni</artifactId>
             <version>${rocksdb.version}</version>
         </dependency>
+        <!--      已经交给zio维护，但是zio维护的稳定版尚未发布      -->
+        <dependency>
+            <groupId>io.d11</groupId>
+            <artifactId>zhttp_2.13</artifactId>
+            <version>1.0.0.0-RC29</version>
+        </dependency>
     </dependencies>
 
     <build>

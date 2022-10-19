@@ -456,7 +456,8 @@ abstract class BitlapBaseResultSet extends ResultSet {
         case TypeId.TYPE_ID_TIMESTAMP_TYPE =>
           if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
           else null
-        case _ => throw BSQLException(s"Unrecognized column columnType:$columnType, scalaTypeName:$typeName")
+        case _ => valueStr // FIXME 避免报错
+//        case _ => throw BSQLException(s"Unrecognized column columnType:$columnType, scalaTypeName:$typeName")
       }).asInstanceOf[T]
     } catch {
       case e: Exception => throw e

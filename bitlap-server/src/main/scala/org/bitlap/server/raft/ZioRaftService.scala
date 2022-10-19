@@ -3,17 +3,15 @@ package org.bitlap.server.raft
 
 import com.ariskk.raft.Raft
 import com.ariskk.raft.model.{ Command, Message, RaftException, Serde }
-import com.ariskk.raft.model.Command.{ ReadCommand, WriteCommand }
+import com.ariskk.raft.model.Command.WriteCommand
 import com.google.protobuf.ByteString
 import io.grpc.Status
 import org.bitlap.network.RpcStatus
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq, RaftCommandResp }
 import org.bitlap.network.raft.ZioRaft.ZRaftService
 import org.bitlap.tools.apply
-import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio._
 import zio.clock.Clock
-import zio.console.{ putStrLn, Console }
 
 /** raft service
  *
@@ -54,24 +52,4 @@ final class ZioRaftService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
 //        case r: ReadCommand  => raft.submitQuery(r)
       }
     } yield serde.serialize(response)
-}
-
-object ZioRaftService {
-
-  @apply
-  final class Server[T](val raftPort: Int, raftRef: Ref[Raft[T]], serdeRef: Ref[Serde]) extends ServerMain {
-
-    override def port: Int = raftPort
-
-    def services: ServiceList[zio.ZEnv] = ServiceList.addM(ZIO.succeed(ZioRaftService(raftRef, serdeRef)))
-
-    override def run(args: List[String]): URIO[zio.ZEnv with Console, ExitCode] =
-      (for {
-        _ <- putStrLn(s"Raft server is listening to port: $raftPort")
-        r <- super.run(args)
-      } yield r).foldM(
-        e => ZIO.fail(e).exitCode,
-        _ => ZIO.effectTotal(ExitCode.success)
-      )
-  }
 }

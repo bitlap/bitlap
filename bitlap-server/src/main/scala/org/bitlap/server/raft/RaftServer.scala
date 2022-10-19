@@ -29,10 +29,10 @@ final class RaftServer[T](
 ) {
 
   private lazy val serverRaft: URIO[zio.ZEnv, ExitCode] =
-    ZioRaftService.Server(config.raftPort, raftRef, serdeRef).run(Nil)
+    new RaftClusterServerProvider(config.raftPort, raftRef, serdeRef).run(Nil)
 
   private lazy val clientRaft: URIO[zio.ZEnv, ExitCode] =
-    ZioRaftService.Server(config.raftClientPort, raftRef, serdeRef).run(Nil)
+    new RaftClusterServerProvider(config.raftClientPort, raftRef, serdeRef).run(Nil)
 
   private lazy val peerChannels: Map[NodeId, ZLayer[Any, Throwable, RaftServiceClient]] = peerConfig
     .map(config =>

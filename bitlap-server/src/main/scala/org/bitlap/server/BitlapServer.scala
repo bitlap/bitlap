@@ -13,12 +13,12 @@ object BitlapServer extends zio.App {
     (for {
       _ <- ZIO.collectAll(BitlapServerProvider.serverProviders.map(_.service(args)))
       _ <- putStrLn("""
-                      |    __    _ __  __          
-                      |   / /_  (_) /_/ /___ _____ 
+                      |    __    _ __  __
+                      |   / /_  (_) /_/ /___ _____
                       |  / __ \/ / __/ / __ `/ __ \
                       | / /_/ / / /_/ / /_/ / /_/ /
-                      |/_.___/_/\__/_/\__,_/ .___/ 
-                      |                   /_/   
+                      |/_.___/_/\__/_/\__,_/ .___/
+                      |                   /_/
                       |""".stripMargin)
     } yield ()).foldM(
       e => ZIO.fail(e).exitCode,

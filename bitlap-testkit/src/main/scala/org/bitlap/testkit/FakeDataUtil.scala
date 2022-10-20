@@ -44,14 +44,14 @@ object FakeDataUtil {
   private final val sdf = new SimpleDateFormat("yyyy-MM-dd")
 
   def randTimestamp: Long = {
-    val date = faker.date().past(10, TimeUnit.DAYS)
+    val date = faker.date().past(30, TimeUnit.DAYS)
     val s    = sdf.format(date)
     sdf.parse(s).getTime / 1000
   }
 
   def randBigNumber: Long = faker.number().numberBetween(0, 1000000000)
 
-  def randSmallNumber: Int = faker.number().numberBetween(0, 100)
+  def randEntityNumber: Int = faker.number().numberBetween(0, 2000000)
 
   def randCity: String = faker.address().city()
 
@@ -72,7 +72,7 @@ object FakeDataUtil {
     (0L until size).map { _ =>
       Metric(
         randTimestamp,
-        randSmallNumber,
+        randEntityNumber,
         randDimensions,
         randMetricName,
         randBigNumber

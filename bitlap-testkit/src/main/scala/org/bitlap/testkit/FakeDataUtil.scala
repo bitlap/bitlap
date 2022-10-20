@@ -71,7 +71,7 @@ object FakeDataUtil {
   def randMetrics(size: Long): List[Metric] =
     (0L until size).map { _ =>
       Metric(
-        randTimestamp, // use randTimestamp
+        randTimestamp,
         randSmallNumber,
         randDimensions,
         randMetricName,

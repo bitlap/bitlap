@@ -31,7 +31,7 @@ class MDContainer<I : HasMetricKey, R>(private val keySize: Int) : LinkedHashMap
             arrayOfNulls<Any>(keySize + metrics.size).let {
                 keys.forEachIndexed { i, key -> it[i] = key }
                 metrics.mapIndexed { i, p ->
-                    it[i + keySize] = value[p] ?: defaultValue
+                    it[i + keySize] = value[p] ?: defaultValue()
                 }
                 Row(it)
             }

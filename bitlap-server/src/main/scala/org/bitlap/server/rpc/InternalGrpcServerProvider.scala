@@ -18,15 +18,8 @@ final class InternalGrpcServerProvider(override val port: Int) extends BitlapSer
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {
-      _ <- putStr(serverType + ": ")
-      _ <- putStrLn("""
-                      |    __    _ __  __          
-                      |   / /_  (_) /_/ /___ _____ 
-                      |  / __ \/ / __/ / __ `/ __ \
-                      | / /_/ / / /_/ / /_/ / /_/ /
-                      |/_.___/_/\__/_/\__,_/ .___/ 
-                      |                   /_/   
-                      |""".stripMargin)
+      _ <- putStr(s"$serverType: Server is listening to port: $port")
+      _ <- super.run(args)
     } yield ()).foldM(
       e => ZIO.fail(e).exitCode,
       _ => ZIO.effectTotal(ExitCode.success)

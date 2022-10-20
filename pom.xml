@@ -90,6 +90,7 @@
         <surefire.version>2.22.2</surefire.version>
         <zio-raft.version>0.3.0</zio-raft.version>
         <rocksdb.version>7.6.0</rocksdb.version>
+        <circe.version>0.14.2</circe.version>
     </properties>
 
     <dependencies>
@@ -229,6 +230,26 @@
             <groupId>org.bitlap</groupId>
             <artifactId>smt-csv_2.13</artifactId>
             <version>${smt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic-extras_2.13</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-parser_2.13</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic_2.13</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-core_2.13</artifactId>
+            <version>${circe.version}</version>
         </dependency>
     </dependencies>
 

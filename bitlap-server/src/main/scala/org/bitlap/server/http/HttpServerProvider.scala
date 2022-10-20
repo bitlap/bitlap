@@ -1,22 +1,58 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.http
+import io.circe.syntax.EncoderOps
 import org.bitlap.server.BitlapServerProvider
-import zhttp.http.Method
-import zhttp.http.Response
-import zhttp.http.Request
-import zhttp.service.Server
 import zhttp.http._
-import zio._
 import zhttp.service.server.ServerChannelFactory
-import zhttp.service.EventLoopGroup
+import zhttp.service.{ EventLoopGroup, Server }
+import zio._
 
+import java.sql.DriverManager
+import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
+/** Test http://localhost:8080/sql
+ *  @param port
+ */
 final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
 
+  private val table = "table_test"
+
+  Class.forName(classOf[org.bitlap.Driver].getName)
+
+  // 测试数据
+  private def initTable(): Unit = {
+    val stmt = getConn.createStatement()
+    stmt.execute(s"create table if not exists $table")
+    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
+  }
+
+  def getConn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+
   private val app = Http.collectZIO[Request] {
-    case Method.GET -> !! / "random" => random.nextString(10).map(Response.text)
-    case Method.GET -> !! / "utc"    => clock.currentDateTime.map(s => Response.text(s.toString))
+    case Method.GET -> !! / "sql" =>
+      ZIO.effect(initTable()) *> ZIO.effect {
+        val stmt = getConn.createStatement()
+        stmt.execute(s"""
+                      |select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                      |from $table
+                      |where _time >= 0
+                      |group by _time
+                      |""".stripMargin)
+        val rs  = stmt.getResultSet
+        val ret = ListBuffer[(Long, Double, Double, Long)]()
+        if (rs != null) {
+          while (rs.next())
+            ret += Tuple4(
+              rs.getLong("_time"),
+              rs.getDouble("vv"),
+              rs.getDouble("pv"),
+              rs.getLong("uv")
+            )
+        }
+        Response.json(ret.asJson.noSpaces)
+      }
+    case Method.GET -> !! / "utc" => clock.currentDateTime.map(s => Response.text(s.toString))
   }
 
   private val server = Server.port(port) ++ Server.paranoidLeakDetection ++ Server.app(app)
@@ -25,7 +61,7 @@ final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
     val nThreads: Int = args.headOption.flatMap(x => Try(x.toInt).toOption).getOrElse(0)
     server.make
       .use(_ =>
-        console.putStrLn(s"$serverType: Server started on port $port")
+        console.putStrLn(s"$serverType: Server is listening to port: $port")
           *> ZIO.never
       )
       .provideCustomLayer(ServerChannelFactory.auto ++ EventLoopGroup.auto(nThreads))

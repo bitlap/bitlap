@@ -49,20 +49,24 @@ object RaftClusterServerProvider extends BitlapServerProvider {
       )
     }
 
-  def startServer(numberOfNodes: Int = 3): ZIO[Any, Throwable, IndexedSeq[Int]] = {
+  def startServer(numberOfNodes: Int = 3): ZIO[Any, Throwable, IndexedSeq[(Int, Int)]] = {
     val configs = generateConfigs(numberOfNodes)
     for {
       servers <- ZIO.collectAll(configs.map(c => createRaftServer[Int](c, configs.toSet - c)))
       fibers  <- ZIO.collectAll(servers.map(_.run.fork))
       _       <- ZIO.collectAll(fibers.map(_.interrupt))
-    } yield configs.map(_.raftPort)
+    } yield configs.map(c => c.raftPort -> c.raftClientPort)
 
   }
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {
       r <- startServer()
-      _ <- putStrLn(s"$serverType: Raft cluster servers are listening to port: ${r.mkString(",")}")
+      _ <- putStrLn(
+        s"$serverType: Raft cluster servers are listening to server port: ${r
+            .map(_._1)
+            .mkString(",")} and client port: ${r.map(_._2).mkString(",")}"
+      )
     } yield r).foldM(
       e => ZIO.fail(e).exitCode,
       _ => ZIO.effectTotal(ExitCode.success)

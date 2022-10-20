@@ -62,7 +62,7 @@ SOFTWARE.
 ```
 
 [Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
-[Badge-CI]: https://github.com/bitlap/bitlap/actions/workflows/java8.yml/badge.svg
+[Badge-CI]: https://github.com/bitlap/bitlap/actions/workflows/ci.yml/badge.svg
 [Badge-Maven]: https://img.shields.io/maven-central/v/org.bitlap/bitlap
 [Badge-Discord]: https://img.shields.io/discord/968687999862841384
 [Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/main/graph/badge.svg?token=9XJ2LC2K8M

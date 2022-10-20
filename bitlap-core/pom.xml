@@ -85,7 +85,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.3</version>
+            <version>5.2.2</version>
         </dependency>
     </dependencies>
 
@@ -161,7 +161,7 @@
             <plugin> <!-- generate sources from fmpp -->
                 <groupId>org.apache.drill.tools</groupId>
                 <artifactId>drill-fmpp-maven-plugin</artifactId>
-                <version>1.20.2</version>
+                <version>1.20.0</version>
                 <executions>
                     <execution>
                         <id>generate-fmpp</id>
@@ -180,7 +180,7 @@
             <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <id>javacc</id>

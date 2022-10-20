@@ -11,7 +11,9 @@ import java.sql.DriverManager
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
-/** Test http://localhost:8080/sql
+/** Test http://localhost:8080/init
+ *
+ *  http://localhost:8080/sql
  *  @param port
  */
 final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
@@ -30,13 +32,14 @@ final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
   def getConn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
   private val app = Http.collectZIO[Request] {
-    case Method.GET -> !! / "sql" =>
-      ZIO.effect(initTable()) *> ZIO.effect {
+    case Method.GET -> !! / "init" => ZIO.effect(initTable()).map(_ => Response.json("true"))
+    case req @ Method.GET -> !! / "sql" =>
+      ZIO.effect {
         val stmt = getConn.createStatement()
         stmt.execute(s"""
                       |select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
                       |from $table
-                      |where _time >= 0
+                      |where _time >= ${req.url.queryParams.getOrElse("_time", Nil).headOption.getOrElse(100)}
                       |group by _time
                       |""".stripMargin)
         val rs  = stmt.getResultSet

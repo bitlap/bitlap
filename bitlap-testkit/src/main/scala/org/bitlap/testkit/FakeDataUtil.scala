@@ -44,7 +44,7 @@ object FakeDataUtil {
   private final val sdf = new SimpleDateFormat("yyyy-MM-dd")
 
   def randTimestamp: Long = {
-    val date = faker.date().past(365, TimeUnit.DAYS)
+    val date = faker.date().past(10, TimeUnit.DAYS)
     val s    = sdf.format(date)
     sdf.parse(s).getTime / 1000
   }

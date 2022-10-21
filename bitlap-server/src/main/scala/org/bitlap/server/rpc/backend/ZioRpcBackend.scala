@@ -52,11 +52,16 @@ class ZioRpcBackend extends RpcZio {
     )
   }
 
-  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
+  override def fetchResults(
+    opHandle: OperationHandle,
+    maxRows: Int,
+    fetchType: Int
+  ): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
     val operation = sessionManager.operationManager.getOperation(opHandle)
     val session   = operation.parentSession
     sessionManager.refreshSession(session.sessionHandle, session)
-    FetchResults(false, session.fetchResults(opHandle))
+    // 支持maxRows，指最多一次取多少数据，相当于分页。与jdbc的maxRows不同
+    FetchResults(hasMoreRows = false, session.fetchResults(opHandle))
   }
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {

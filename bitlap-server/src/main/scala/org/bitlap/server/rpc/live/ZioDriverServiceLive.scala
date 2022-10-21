@@ -56,7 +56,11 @@ final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDri
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
     zioRpcBackend.map {
-      zioRpcBackend.fetchResults(new OperationHandle(request.getOperationHandle))
+      zioRpcBackend.fetchResults(
+        new OperationHandle(request.getOperationHandle),
+        request.maxRows.toInt,
+        request.fetchType
+      )
     }(_.toBFetchResults)
       .mapError(errorApplyFunc)
 

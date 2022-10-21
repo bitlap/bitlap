@@ -31,15 +31,16 @@ class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) exten
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
-    queryTimeout: Long = delegateClient.readTimeout,
+    queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): Identity[OperationHandle] = delegateClient.sync {
     delegateClient.executeStatement(sessionHandle, statement, queryTimeout, confOverlay)
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = delegateClient.sync {
-    delegateClient.fetchResults(opHandle)
-  }
+  override def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults] =
+    delegateClient.sync {
+      delegateClient.fetchResults(opHandle, maxRows, fetchType)
+    }
 
   override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateClient.sync {
     delegateClient.getResultSetMetadata(opHandle)

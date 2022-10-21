@@ -33,15 +33,15 @@ trait Rpc[F[_]] {
     confOverlay: Map[String, String]
   ): F[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): F[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): F[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    schemaName: String = null,
-    tableName: String = null,
-    columnName: String = null
+    schemaName: String,
+    tableName: String,
+    columnName: String
   ): F[OperationHandle]
 
   /** get databases or schemas from catalog

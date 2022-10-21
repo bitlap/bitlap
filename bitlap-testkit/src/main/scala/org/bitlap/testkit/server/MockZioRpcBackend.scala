@@ -36,7 +36,11 @@ class MockZioRpcBackend extends RpcZio with CsvHelper {
   ): ZIO[Any, Throwable, OperationHandle] =
     ZIO.succeed(new OperationHandle(OperationType.EXECUTE_STATEMENT, true, sessionHandle.handleId))
 
-  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] = {
+  override def fetchResults(
+    opHandle: OperationHandle,
+    maxRows: Int,
+    fetchType: Int
+  ): ZIO[Any, Throwable, FetchResults] = {
     val convert = (metric: Metric) =>
       List(
         ByteString.copyFromUtf8(metric.time.toString),

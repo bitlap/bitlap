@@ -2,7 +2,7 @@
 package org.bitlap.client
 
 import io.grpc.ManagedChannelBuilder
-import org.bitlap.common.BitlapConf
+import org.bitlap.network._
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
@@ -11,10 +11,7 @@ import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
-import org.bitlap.network.{ handles, RpcStatus, RpcZio }
 import zio._
-import org.bitlap.network._
-import scala.jdk.CollectionConverters._
 
 /** This class mainly wraps zio rpc calling procedures.
  *
@@ -24,12 +21,6 @@ import scala.jdk.CollectionConverters._
  *  @version 1.0
  */
 class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extends RpcZio with RpcStatus {
-
-  private lazy val conf: BitlapConf = new BitlapConf(props.asJava)
-  val readTimeout: java.lang.Long   = conf.get(BitlapConf.NODE_READ_TIMEOUT)
-
-  val maxRows   = 50
-  val fetchType = 1
 
   private val clientLayer: Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
     scalapb.zio_grpc.ZManagedChannel(ManagedChannelBuilder.forAddress(uri, port).usePlaintext())
@@ -56,7 +47,7 @@ class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extend
   override def executeStatement(
     sessionHandle: handles.SessionHandle,
     statement: String,
-    queryTimeout: Long = readTimeout,
+    queryTimeout: Long,
     confOverlay: Map[String, String]
   ): ZIO[Any, Throwable, OperationHandle] =
     DriverServiceClient
@@ -67,7 +58,11 @@ class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extend
       .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
-  override def fetchResults(opHandle: OperationHandle): ZIO[Any, Throwable, FetchResults] =
+  override def fetchResults(
+    opHandle: OperationHandle,
+    maxRows: Int = 50,
+    fetchType: Int = 1
+  ): ZIO[Any, Throwable, FetchResults] =
     DriverServiceClient
       .fetchResults(
         BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)

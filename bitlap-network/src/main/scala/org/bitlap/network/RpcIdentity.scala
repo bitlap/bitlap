@@ -33,15 +33,15 @@ trait RpcIdentity extends Rpc[Identity] {
     confOverlay: Map[String, String]
   ): Identity[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): Identity[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    schemaName: String = null,
-    tableName: String = null,
-    columnName: String = null
+    schemaName: String,
+    tableName: String,
+    columnName: String
   ): Identity[OperationHandle]
 
   def getDatabases(pattern: String): Identity[OperationHandle]

@@ -38,15 +38,15 @@ trait RpcZio extends Rpc[Task] {
     confOverlay: Map[String, String]
   ): Task[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): Task[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Task[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null,
-    columnName: String = null
+    tableName: String,
+    schemaName: String,
+    columnName: String
   ): Task[OperationHandle]
 
   def getDatabases(pattern: String): Task[OperationHandle]

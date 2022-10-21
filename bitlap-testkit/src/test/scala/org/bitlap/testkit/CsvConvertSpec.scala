@@ -29,7 +29,7 @@ class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
   @Test
   def testMockZioRpcBackend1 {
     val backend = MockZioRpcBackend()
-    val ret     = backend.fetchResults(new OperationHandle(OperationType.EXECUTE_STATEMENT))
+    val ret     = backend.fetchResults(new OperationHandle(OperationType.EXECUTE_STATEMENT), 50, 1)
     val syncRet = zio.Runtime.default.unsafeRun(ret)
     println(syncRet)
     assertEquals(syncRet.results.rows.head.values.map(v => v.toStringUtf8), List("100", "1", "北京", "vv", "1"))

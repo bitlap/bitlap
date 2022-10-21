@@ -90,13 +90,13 @@
                         <outputTarget>
                             <type>scalapb</type>
                             <outputOptions>grpc</outputOptions>
-                            <pluginArtifact>com.thesamet.scalapb.zio-grpc:protoc-gen-zio:0.5.1:sh:unix</pluginArtifact>
+                            <pluginArtifact>com.thesamet.scalapb.zio-grpc:protoc-gen-zio:0.5.2:sh:unix</pluginArtifact>
                         </outputTarget>
                         <outputTarget>
                             <!--           阿里云没有支持win的protoc           -->
                             <type>scalapb</type>
                             <outputOptions>grpc</outputOptions>
-                            <pluginArtifact>com.thesamet.scalapb:protoc-gen-scala:0.11.10:sh:unix</pluginArtifact>
+                            <pluginArtifact>com.thesamet.scalapb:protoc-gen-scala:0.11.11:sh:unix</pluginArtifact>
                         </outputTarget>
                     </outputTargets>
                 </configuration>

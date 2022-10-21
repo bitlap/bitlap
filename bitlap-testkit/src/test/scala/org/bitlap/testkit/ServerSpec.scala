@@ -7,9 +7,13 @@ import org.junit.Test
 import java.sql._
 import scala.collection.mutable.ListBuffer
 
-class ServerSpec {
+class ServerSpec extends CsvHelper {
 
   val table = s"test_table_${FakeDataUtil.randBigNumber}"
+
+  // load的是本模块的csv
+  val metrics = readCsvData("simple_data.csv")
+  println(metrics)
 
   private def startServer(): Unit = {
 
@@ -24,7 +28,7 @@ class ServerSpec {
   private def initTable(): Unit = {
     val stmt = conn.createStatement()
     stmt.execute(s"create table if not exists $table")
-    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
+    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table") // load的是server模块的csv
   }
 
   def conn: Connection = {
@@ -39,6 +43,7 @@ class ServerSpec {
     startServer()
     initTable()
     val stmt = conn.createStatement()
+    stmt.setMaxRows(10)
     stmt.execute(s"""
                     |select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
                     |from $table
@@ -57,7 +62,7 @@ class ServerSpec {
         )
     }
 
-    println(ret)
+    assert(ret.size == 10)
     assert(ret.nonEmpty)
   }
 }

@@ -21,28 +21,29 @@ class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) exten
     password: String,
     configuration: Map[String, String]
   ): Identity[SessionHandle] = delegateClient.sync {
-    delegateClient.openSession(username, password, configuration)
+    _.openSession(username, password, configuration)
   }
 
   override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = delegateClient.sync {
-    delegateClient.closeSession(sessionHandle)
+    _.closeSession(sessionHandle)
   }
 
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
-    queryTimeout: Long = delegateClient.readTimeout,
+    queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): Identity[OperationHandle] = delegateClient.sync {
-    delegateClient.executeStatement(sessionHandle, statement, queryTimeout, confOverlay)
+    _.executeStatement(sessionHandle, statement, queryTimeout, confOverlay)
   }
 
-  override def fetchResults(opHandle: OperationHandle): Identity[FetchResults] = delegateClient.sync {
-    delegateClient.fetchResults(opHandle)
-  }
+  override def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults] =
+    delegateClient.sync {
+      _.fetchResults(opHandle, maxRows, fetchType)
+    }
 
   override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateClient.sync {
-    delegateClient.getResultSetMetadata(opHandle)
+    _.getResultSetMetadata(opHandle)
   }
 
   override def getColumns(
@@ -51,14 +52,14 @@ class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) exten
     tableName: String,
     columnName: String
   ): Identity[OperationHandle] = delegateClient.sync {
-    delegateClient.getColumns(sessionHandle, tableName, schemaName, columnName)
+    _.getColumns(sessionHandle, tableName, schemaName, columnName)
   }
 
   override def getDatabases(pattern: String): Identity[OperationHandle] = delegateClient.sync {
-    delegateClient.getDatabases(pattern)
+    _.getDatabases(pattern)
   }
   override def getTables(database: String, pattern: String): Identity[OperationHandle] = delegateClient.sync {
-    delegateClient.getTables(database, pattern)
+    _.getTables(database, pattern)
   }
 
   override def getSchemas(
@@ -66,6 +67,6 @@ class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) exten
     catalogName: String,
     schemaName: String
   ): Identity[OperationHandle] = delegateClient.sync {
-    delegateClient.getSchemas(sessionHandle, catalogName, schemaName)
+    _.getSchemas(sessionHandle, catalogName, schemaName)
   }
 }

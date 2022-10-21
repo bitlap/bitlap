@@ -12,15 +12,15 @@ import zio.ZIO
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcZio extends Rpc[Task] {
+trait RpcZio extends Rpc[Task] { self =>
 
   override def pure[A](a: A): Task[A] = Task.succeed(a)
 
-  override def map[A, B](fa: Task[A])(f: A => B): Task[B] = fa.map(f)
+  override def map[A, B](fa: self.type => Task[A])(f: A => B): Task[B] = fa(this).map(f)
 
-  override def flatMap[A, B](fa: Task[A])(f: A => Task[B]): Task[B] = fa.flatMap(f)
+  override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T, Z <: ZIO[_, _, _]](action: => Z)(implicit runtime: zio.Runtime[Any] = zio.Runtime.default): T =
+  def sync[T, Z <: ZIO[_, _, _]](action: self.type => Z)(implicit runtime: zio.Runtime[Any] = zio.Runtime.default): T =
     runtime.unsafeRun(action.asInstanceOf[ZIO[Any, Throwable, T]])
 
   def openSession(
@@ -38,15 +38,15 @@ trait RpcZio extends Rpc[Task] {
     confOverlay: Map[String, String]
   ): Task[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): Task[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Task[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null,
-    columnName: String = null
+    tableName: String,
+    schemaName: String,
+    columnName: String
   ): Task[OperationHandle]
 
   def getDatabases(pattern: String): Task[OperationHandle]

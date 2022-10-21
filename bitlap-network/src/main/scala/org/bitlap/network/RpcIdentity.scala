@@ -10,13 +10,13 @@ import org.bitlap.network.models.{ FetchResults, TableSchema }
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcIdentity extends Rpc[Identity] {
+trait RpcIdentity extends Rpc[Identity] { self =>
 
   def pure[A](a: A): Identity[A] = a
 
-  def map[A, B](fa: Identity[A])(f: A => B): Identity[B] = f(fa)
+  def map[A, B](fa: self.type => Identity[A])(f: A => B): Identity[B] = f(fa(this))
 
-  def flatMap[A, B](fa: Identity[A])(f: A => Identity[B]): Identity[B] = f(fa)
+  def flatMap[A, B](fa: self.type => Identity[A])(f: A => Identity[B]): Identity[B] = f(fa(this))
 
   def openSession(
     username: String,
@@ -33,15 +33,15 @@ trait RpcIdentity extends Rpc[Identity] {
     confOverlay: Map[String, String]
   ): Identity[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle): Identity[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults]
 
   def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema]
 
   def getColumns(
     sessionHandle: SessionHandle,
-    schemaName: String = null,
-    tableName: String = null,
-    columnName: String = null
+    schemaName: String,
+    tableName: String,
+    columnName: String
   ): Identity[OperationHandle]
 
   def getDatabases(pattern: String): Identity[OperationHandle]

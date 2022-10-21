@@ -19,7 +19,8 @@ class BitlapStatement(
 ) extends Statement {
 
   private var stmtHandle: OperationHandle = _
-  private val fetchSize                   = 50
+  private var fetchSize                   = 50
+  private var queryTimeout                = 30
 
   /** We need to keep a reference to the result set to support the following:
    *
@@ -62,15 +63,19 @@ class BitlapStatement(
 
   override def setMaxFieldSize(max: Int): Unit = ???
 
-  override def getMaxRows: Int = ???
+  override def getMaxRows: Int = maxRows
 
-  override def setMaxRows(max: Int): Unit = ???
+  override def setMaxRows(max: Int): Unit = {
+    if (max < 0) throw new SQLException("max must be >= 0")
+    maxRows = max
+  }
 
   override def setEscapeProcessing(enable: Boolean): Unit = ???
 
-  override def getQueryTimeout: Int = ???
+  override def getQueryTimeout: Int = queryTimeout
 
-  override def setQueryTimeout(seconds: Int): Unit = ???
+  override def setQueryTimeout(seconds: Int): Unit =
+    queryTimeout = seconds
 
   override def cancel(): Unit = ???
 
@@ -90,7 +95,7 @@ class BitlapStatement(
     if (closed) throw BSQLException("Can't execute after statement has been closed")
     try {
       resultSet = null
-      stmtHandle = client.executeStatement(sessHandle, sql)
+      stmtHandle = client.executeStatement(sessHandle, sql, queryTimeout)
       if (stmtHandle == null || !stmtHandle.hasResultSet) {
         return false
       }
@@ -118,21 +123,24 @@ class BitlapStatement(
 
   override def getUpdateCount(): Int = ???
 
-  override def getMoreResults(): Boolean = ???
+  override def getMoreResults(): Boolean = false
 
   override def getMoreResults(current: Int): Boolean = ???
 
   override def setFetchDirection(direction: Int): Unit = ???
 
-  override def getFetchDirection(): Int = ???
+  override def getFetchDirection(): Int = ResultSet.FETCH_FORWARD
 
-  override def setFetchSize(rows: Int): Unit = ???
+  override def setFetchSize(rows: Int): Unit =
+    if (rows > 0) fetchSize = rows
+    else if (rows == 0) fetchSize = 50
+    else throw new SQLException("Fetch size must be greater or equal to 0")
 
   override def getFetchSize(): Int = fetchSize
 
   override def getResultSetConcurrency(): Int = ???
 
-  override def getResultSetType(): Int = ???
+  override def getResultSetType(): Int = ResultSet.TYPE_FORWARD_ONLY
 
   override def addBatch(sql: String): Unit = ???
 

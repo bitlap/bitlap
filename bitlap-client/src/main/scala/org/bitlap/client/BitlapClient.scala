@@ -23,35 +23,37 @@ class BitlapClient(uri: String, port: Int, props: Map[String, String]) {
   def closeSession(sessionHandle: SessionHandle): Unit =
     rpcClient.closeSession(sessionHandle)
 
-  def executeStatement(sessionHandle: SessionHandle, statement: String): OperationHandle =
+  def executeStatement(sessionHandle: SessionHandle, statement: String, queryTimeout: Long): OperationHandle =
     rpcClient
       .executeStatement(
         statement = statement,
-        sessionHandle = sessionHandle
+        sessionHandle = sessionHandle,
+        queryTimeout = queryTimeout,
+        confOverlay = props
       )
 
-  def fetchResults(operationHandle: OperationHandle): RowSet =
-    rpcClient.fetchResults(operationHandle).results
+  def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): RowSet =
+    rpcClient.fetchResults(operationHandle, maxRows, fetchType).results
 
   // make it return schema data, instead of `BOperationHandle` ?
   def getSchemas(
     sessionHandle: SessionHandle,
-    catalogName: String = null,
-    schemaName: String = null
-  ): OperationHandle = ???
+    catalogName: String,
+    schemaName: String
+  ): OperationHandle = rpcClient.getSchemas(sessionHandle, catalogName, schemaName)
 
   def getTables(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null
+    tableName: String,
+    schemaName: String
   ): OperationHandle = ???
 
   def getColumns(
     sessionHandle: SessionHandle,
-    tableName: String = null,
-    schemaName: String = null,
-    columnName: String = null
-  ): OperationHandle = ???
+    tableName: String,
+    schemaName: String,
+    columnName: String
+  ): OperationHandle = rpcClient.getColumns(sessionHandle, schemaName, tableName, columnName)
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
     rpcClient.getResultSetMetadata(operationHandle)

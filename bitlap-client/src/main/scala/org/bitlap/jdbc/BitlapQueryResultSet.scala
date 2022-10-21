@@ -6,8 +6,7 @@ import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
 import scala.collection.mutable
-
-import java.sql.{ ResultSetMetaData, SQLException, SQLWarning }
+import java.sql._
 
 /** @author
  *    梦境迷离
@@ -24,11 +23,11 @@ class BitlapQueryResultSet(
   override protected var columnNames: List[String] = List.empty
   override protected var columnTypes: List[String] = List.empty
 
-  private var emptyResultSet    = false
-  private var rowsFetched       = 0
-  protected var closed: Boolean = false
-  protected var fetchSize       = 0
-
+  private var emptyResultSet                = false
+  private var rowsFetched                   = 0
+  protected var closed: Boolean             = false
+  protected var fetchSize                   = 0
+  private var fetchFirst                    = false
   private var fetchedRows: List[Row]        = List.empty
   private var fetchedRowsItr: Iterator[Row] = fetchedRows.iterator
   private var sessHandle: SessionHandle     = _
@@ -95,8 +94,14 @@ class BitlapQueryResultSet(
     }
     try {
 
+      if (fetchFirst) {
+        fetchedRows = null
+        fetchedRowsItr = null
+        fetchFirst = false
+      }
+
       if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) {
-        val result = client.fetchResults(stmtHandle)
+        val result = client.fetchResults(stmtHandle, maxRows = fetchSize, 1)
         if (result != null) {
           fetchedRows = result.rows
           fetchedRowsItr = fetchedRows.iterator
@@ -147,6 +152,23 @@ class BitlapQueryResultSet(
     this.sessHandle = null
     this.closed = true
   }
+
+  override def beforeFirst(): Unit = {
+    if (closed) throw new SQLException("Resultset is closed")
+    fetchFirst = true
+    rowsFetched = 0
+  }
+
+  override def getType: Int =
+    if (closed) throw new SQLException("Resultset is closed")
+    else ResultSet.TYPE_FORWARD_ONLY
+
+  override def isBeforeFirst: Boolean = {
+    if (closed) throw new SQLException("Resultset is closed")
+    rowsFetched == 0
+  }
+
+  override def getRow: Int = rowsFetched
 }
 
 object BitlapQueryResultSet {

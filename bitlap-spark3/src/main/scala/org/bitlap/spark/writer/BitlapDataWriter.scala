@@ -9,7 +9,7 @@ import org.apache.spark.sql.catalyst.analysis.SimpleAnalyzer
 import org.apache.spark.sql.catalyst.encoders._
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.bitlap.spark.jdbc.BitlapJdbcDialect
-import org.bitlap.spark.util.{QueryUtil, SchemaUtil, SparkJdbcUtil}
+import org.bitlap.spark.util.{ QueryUtil, SchemaUtil, SparkJdbcUtil }
 
 import java.io.IOException
 import java.sql._

@@ -21,7 +21,7 @@ trait RpcZio extends Rpc[Task] { self =>
   override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
   def sync[T, Z <: ZIO[_, _, _]](action: self.type => Z)(implicit runtime: zio.Runtime[Any] = zio.Runtime.default): T =
-    runtime.unsafeRun(action.asInstanceOf[ZIO[Any, Throwable, T]])
+    runtime.unsafeRun(action(this).asInstanceOf[ZIO[Any, Throwable, T]])
 
   def openSession(
     username: String,

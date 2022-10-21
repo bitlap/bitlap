@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.jdbc
+package org.bitlap.spark.jdbc
 
 import zio._
 

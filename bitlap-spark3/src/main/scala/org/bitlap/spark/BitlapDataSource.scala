@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark
+package org.bitlap.spark
 
 import org.apache.spark.sql.connector.catalog.TableProvider
 import org.apache.spark.sql.connector.expressions.Transform

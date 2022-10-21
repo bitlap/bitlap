@@ -1,13 +1,13 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark
+package org.bitlap.spark
 
-import io.bitlap.spark.reader.BitlapScanBuilder
-import io.bitlap.spark.writer.BitlapWriteBuilder
 import org.apache.spark.sql.connector.catalog._
 import org.apache.spark.sql.connector.read.ScanBuilder
 import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
+import org.bitlap.spark.reader.BitlapScanBuilder
+import org.bitlap.spark.writer.BitlapWriteBuilder
 
 import java.util.{ Map => JMap, Set => JSet }
 import scala.jdk.CollectionConverters._

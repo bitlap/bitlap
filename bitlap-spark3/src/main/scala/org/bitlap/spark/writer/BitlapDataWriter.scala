@@ -1,8 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.writer
+package org.bitlap.spark.writer
 
-import io.bitlap.spark.jdbc.BitlapJdbcDialect
-import io.bitlap.spark.util._
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.types.StructType
@@ -10,6 +8,8 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.analysis.SimpleAnalyzer
 import org.apache.spark.sql.catalyst.encoders._
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
+import org.bitlap.spark.jdbc.BitlapJdbcDialect
+import org.bitlap.spark.util.{QueryUtil, SchemaUtil, SparkJdbcUtil}
 
 import java.io.IOException
 import java.sql._

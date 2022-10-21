@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.util
+package org.bitlap.spark.util
 
 /** @author
  *    梦境迷离

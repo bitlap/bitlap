@@ -1,1 +1,1 @@
-io.bitlap.spark.BitlapDataSource
+org.bitlap.spark.BitlapDataSource

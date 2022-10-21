@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.reader
+package org.bitlap.spark.reader
 
 import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.sources.Filter

@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.writer
+package org.bitlap.spark.writer
 
 import org.apache.spark.sql.connector.write.DataWriterFactory
 import org.apache.spark.sql.types.StructType

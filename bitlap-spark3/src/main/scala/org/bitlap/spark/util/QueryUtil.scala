@@ -1,8 +1,9 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.util
+package org.bitlap.spark.util
+
 import com.google.common.base.Joiner
 import com.google.common.collect.Iterables
-import io.bitlap.spark.util.SchemaUtil.getEscapedFullColumnName
+import org.bitlap.spark.util.SchemaUtil.getEscapedFullColumnName
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.BufferHasAsJava

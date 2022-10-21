@@ -1,5 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.reader
+package org.bitlap.spark.reader
+
 import java.util.Properties
 
 /** @since 2022/10/16

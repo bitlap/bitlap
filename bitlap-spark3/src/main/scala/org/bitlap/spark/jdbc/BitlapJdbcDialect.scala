@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package io.bitlap.spark.jdbc
+package org.bitlap.spark.jdbc
 
 import org.apache.spark.sql.jdbc.{ JdbcDialect, JdbcType }
 import org.apache.spark.sql.types.{ BinaryType, ByteType, DataType, ShortType, StringType }

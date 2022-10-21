@@ -10,13 +10,13 @@ import org.bitlap.network.models.{ FetchResults, TableSchema }
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcIdentity extends Rpc[Identity] {
+trait RpcIdentity extends Rpc[Identity] { self =>
 
   def pure[A](a: A): Identity[A] = a
 
-  def map[A, B](fa: Identity[A])(f: A => B): Identity[B] = f(fa)
+  def map[A, B](fa: self.type => Identity[A])(f: A => B): Identity[B] = f(fa(this))
 
-  def flatMap[A, B](fa: Identity[A])(f: A => Identity[B]): Identity[B] = f(fa)
+  def flatMap[A, B](fa: self.type => Identity[A])(f: A => Identity[B]): Identity[B] = f(fa(this))
 
   def openSession(
     username: String,

@@ -27,7 +27,7 @@ final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDri
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     zioRpcBackend
-      .map(zioRpcBackend.openSession(request.username, request.password, request.configuration)) { shd =>
+      .map(_.openSession(request.username, request.password, request.configuration)) { shd =>
         BOpenSessionResp(
           successOpt(),
           configuration = request.configuration,
@@ -38,14 +38,14 @@ final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDri
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
     zioRpcBackend
-      .map(zioRpcBackend.closeSession(new SessionHandle(request.getSessionHandle))) { _ =>
+      .map(_.closeSession(new SessionHandle(request.getSessionHandle))) { _ =>
         BCloseSessionResp(successOpt())
       }
       .mapError(errorApplyFunc)
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
     zioRpcBackend.map {
-      zioRpcBackend.executeStatement(
+      _.executeStatement(
         new SessionHandle(request.getSessionHandle),
         request.statement,
         request.queryTimeout,
@@ -56,7 +56,7 @@ final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDri
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
     zioRpcBackend.map {
-      zioRpcBackend.fetchResults(
+      _.fetchResults(
         new OperationHandle(request.getOperationHandle),
         request.maxRows.toInt,
         request.fetchType
@@ -72,7 +72,7 @@ final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDri
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
     zioRpcBackend.map {
-      zioRpcBackend.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
+      _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
       .mapError(errorApplyFunc)
 

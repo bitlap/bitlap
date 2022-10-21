@@ -12,13 +12,13 @@ import zio.ZIO
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcZio extends Rpc[Task] {
+trait RpcZio extends Rpc[Task] { self =>
 
   override def pure[A](a: A): Task[A] = Task.succeed(a)
 
-  override def map[A, B](fa: Task[A])(f: A => B): Task[B] = fa.map(f)
+  override def map[A, B](fa: self.type => Task[A])(f: A => B): Task[B] = fa(this).map(f)
 
-  override def flatMap[A, B](fa: Task[A])(f: A => Task[B]): Task[B] = fa.flatMap(f)
+  override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
   def sync[T, Z <: ZIO[_, _, _]](action: => Z)(implicit runtime: zio.Runtime[Any] = zio.Runtime.default): T =
     runtime.unsafeRun(action.asInstanceOf[ZIO[Any, Throwable, T]])

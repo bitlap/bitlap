@@ -43,6 +43,7 @@ class ServerSpec extends CsvHelper {
     startServer()
     initTable()
     val stmt = conn.createStatement()
+    stmt.setMaxRows(10)
     stmt.execute(s"""
                     |select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
                     |from $table
@@ -61,7 +62,7 @@ class ServerSpec extends CsvHelper {
         )
     }
 
-    println(ret.size)
+    assert(ret.size == 10)
     assert(ret.nonEmpty)
   }
 }

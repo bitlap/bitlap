@@ -41,11 +41,12 @@
 
 ```scala
 libraryDependencies += (
-  "org.bitlap" % "bitlap-client" % "0.1.0",
-  "org.bitlap" % "smt-common" % "0.9.0"
+  "org.bitlap" % "bitlap-client" % <version>,
+  "org.bitlap" % "smt-common" % <version>
 )
-,
-dependencyOverrides ++= Seq( // 运行时报错 找不到grpc某个类的话，加这几行试试，为了保证io.grpc的所有组件都是一个版本！
+
+// 若运行时报错 找不到grpc某个类的话，加这几行试试，保证io.grpc的所有组件都是一个版本！
+dependencyOverrides ++= Seq(
   "io.grpc" % "grpc-core" % "1.46.0",
   "io.grpc" % "grpc-netty" % "1.46.0"
 )

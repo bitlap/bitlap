@@ -2,10 +2,9 @@
 package org.bitlap.network
 
 import com.google.protobuf.ByteString
+import enumeratum.values._
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
 import org.bitlap.network.driver.proto._
-import org.bitlap.network.models.StatusCode.StatusCode
-import org.bitlap.network.models.TypeId.TypeId
 
 /** @author
  *    梦境迷离
@@ -30,7 +29,7 @@ object models {
   final case class FetchResults(
     hasMoreRows: Boolean,
     results: RowSet,
-    status: Option[Status] = Some(models.Status(StatusCode.STATUS_CODE_SUCCESS_STATUS))
+    status: Option[Status] = Some(models.Status(StatusCode.SuccessStatus))
   ) extends Model {
     def toBFetchResults: BFetchResultsResp =
       BFetchResultsResp(status.map(_.toBStatus), hasMoreRows, Some(results.toBRowSet))
@@ -48,7 +47,7 @@ object models {
   final case class Status(statusCode: StatusCode, sqlState: String = "", errorCode: Int = 0, errorMessage: String = "")
       extends Model {
     def toBStatus: BStatus = BStatus(
-      StatusCode.toStatusCode(statusCode),
+      StatusCode.toBStatusCode(statusCode),
       sqlState,
       errorCode,
       errorMessage
@@ -56,7 +55,7 @@ object models {
   }
   object Status {
     def fromBStatus(bStatus: BStatus): Status = Status(
-      StatusCode.fromBStatusCode(bStatus.statusCode),
+      StatusCode.toStatusCode(bStatus.statusCode),
       bStatus.sqlState,
       bStatus.errorCode,
       bStatus.errorMessage
@@ -89,109 +88,53 @@ object models {
   ) extends Model {
 
     def toBColumnDesc: BColumnDesc =
-      BColumnDesc(typeDesc = TypeId.toBOperationType(typeDesc), columnName = columnName)
+      BColumnDesc(typeDesc = TypeId.toBTypeId(typeDesc), columnName = columnName)
   }
 
   object ColumnDesc {
     def fromBColumnDesc(bColumnDesc: BColumnDesc): ColumnDesc =
-      ColumnDesc(bColumnDesc.columnName, TypeId.fromBOperationType(bColumnDesc.typeDesc))
+      ColumnDesc(bColumnDesc.columnName, TypeId.toTypeId(bColumnDesc.typeDesc))
   }
 
-  /** The wrapper class of the Proto buffer `BTypeId`.
-   */
-  object TypeId extends Enumeration {
+  sealed abstract class TypeId(val value: Int) extends IntEnumEntry
 
-    // define types <=> java.sql.Types in driver
-    type TypeId = Value
-    val TYPE_ID_UNSPECIFIED: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_UNSPECIFIED.index,
-        BTypeId.B_TYPE_ID_UNSPECIFIED.name
-      )
-    val TYPE_ID_STRING_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_STRING_TYPE.index,
-        BTypeId.B_TYPE_ID_STRING_TYPE.name
-      )
-    val TYPE_ID_INT_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_INT_TYPE.index,
-        BTypeId.B_TYPE_ID_INT_TYPE.name
-      )
-    val TYPE_ID_DOUBLE_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_DOUBLE_TYPE.index,
-        BTypeId.B_TYPE_ID_DOUBLE_TYPE.name
-      )
-    val TYPE_ID_LONG_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_LONG_TYPE.index,
-        BTypeId.B_TYPE_ID_LONG_TYPE.name
-      )
-    val TYPE_ID_BOOLEAN_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.index,
-        BTypeId.B_TYPE_ID_BOOLEAN_TYPE.name
-      )
-    val TYPE_ID_TIMESTAMP_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.index,
-        BTypeId.B_TYPE_ID_TIMESTAMP_TYPE.name
-      )
-    val TYPE_ID_SHORT_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_SHORT_TYPE.index,
-        BTypeId.B_TYPE_ID_SHORT_TYPE.name
-      )
+  object TypeId extends IntEnum[TypeId] {
+    final case object Unspecified   extends TypeId(0)
+    final case object StringType    extends TypeId(1)
+    final case object IntType       extends TypeId(2)
+    final case object DoubleType    extends TypeId(3)
+    final case object LongType      extends TypeId(4)
+    final case object BooleanType   extends TypeId(5)
+    final case object TimestampType extends TypeId(6)
+    final case object ShortType     extends TypeId(7)
+    final case object ByteType      extends TypeId(8)
 
-    val TYPE_ID_BYTE_TYPE: TypeId.Value =
-      Value(
-        BTypeId.B_TYPE_ID_BYTE_TYPE.index,
-        BTypeId.B_TYPE_ID_BYTE_TYPE.name
-      )
+    val values: IndexedSeq[TypeId] = findValues
+    def toTypeId(bTypeId: BTypeId): TypeId =
+      TypeId.withValueOpt(bTypeId.value).getOrElse(Unspecified)
+    def toBTypeId(typeId: TypeId): BTypeId =
+      BTypeId.fromValue(typeId.value)
 
-    def toBOperationType(typeId: TypeId): BTypeId =
-      BTypeId.fromValue(typeId.id)
-
-    def fromBOperationType(bTypeId: BTypeId): TypeId = bTypeId match {
-      case BTypeId.B_TYPE_ID_INT_TYPE       => TypeId.TYPE_ID_INT_TYPE
-      case BTypeId.B_TYPE_ID_LONG_TYPE      => TypeId.TYPE_ID_LONG_TYPE
-      case BTypeId.B_TYPE_ID_BYTE_TYPE      => TypeId.TYPE_ID_BYTE_TYPE
-      case BTypeId.B_TYPE_ID_SHORT_TYPE     => TypeId.TYPE_ID_SHORT_TYPE
-      case BTypeId.B_TYPE_ID_DOUBLE_TYPE    => TypeId.TYPE_ID_DOUBLE_TYPE
-      case BTypeId.B_TYPE_ID_UNSPECIFIED    => TypeId.TYPE_ID_UNSPECIFIED
-      case BTypeId.B_TYPE_ID_BOOLEAN_TYPE   => TypeId.TYPE_ID_BOOLEAN_TYPE
-      case BTypeId.B_TYPE_ID_STRING_TYPE    => TypeId.TYPE_ID_STRING_TYPE
-      case BTypeId.B_TYPE_ID_TIMESTAMP_TYPE => TypeId.TYPE_ID_TIMESTAMP_TYPE
-    }
   }
 
   /** The wrapper class of the Proto buffer `BStatusCode`.
    */
-  object StatusCode extends Enumeration {
 
-    type StatusCode = Value
+  sealed abstract class StatusCode(val value: Int) extends IntEnumEntry
 
-    val STATUS_CODE_ERROR_STATUS: models.StatusCode.Value =
-      Value(BStatusCode.B_STATUS_CODE_ERROR_STATUS.index, BStatusCode.B_STATUS_CODE_ERROR_STATUS.name)
-    val STATUS_CODE_SUCCESS_STATUS: models.StatusCode.Value =
-      Value(BStatusCode.B_STATUS_CODE_SUCCESS_STATUS.index, BStatusCode.B_STATUS_CODE_SUCCESS_STATUS.name)
-    val STATUS_CODE_STILL_EXECUTING_STATUS: models.StatusCode.Value = Value(
-      BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS.index,
-      BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS.name
-    )
-    val STATUS_CODE_INVALID_HANDLE_STATUS: models.StatusCode.Value =
-      Value(BStatusCode.B_STATUS_CODE_INVALID_HANDLE_STATUS.index, BStatusCode.B_STATUS_CODE_INVALID_HANDLE_STATUS.name)
+  object StatusCode extends IntEnum[StatusCode] {
+    final case object SuccessStatus        extends StatusCode(0)
+    final case object StillExecutingStatus extends StatusCode(1)
+    final case object ErrorStatus          extends StatusCode(2)
+    final case object InvalidHandleStatus  extends StatusCode(3)
 
-    def toStatusCode(statusCode: StatusCode): BStatusCode =
-      BStatusCode.fromValue(statusCode.id)
+    val values: IndexedSeq[StatusCode] = findValues
 
-    def fromBStatusCode(bStatusCode: BStatusCode): StatusCode = bStatusCode match {
-      case BStatusCode.B_STATUS_CODE_INVALID_HANDLE_STATUS  => StatusCode.STATUS_CODE_INVALID_HANDLE_STATUS
-      case BStatusCode.B_STATUS_CODE_STILL_EXECUTING_STATUS => StatusCode.STATUS_CODE_STILL_EXECUTING_STATUS
-      case BStatusCode.B_STATUS_CODE_SUCCESS_STATUS         => StatusCode.STATUS_CODE_SUCCESS_STATUS
-      case BStatusCode.B_STATUS_CODE_ERROR_STATUS           => StatusCode.STATUS_CODE_ERROR_STATUS
-    }
+    def toBStatusCode(statusCode: StatusCode): BStatusCode =
+      BStatusCode.fromValue(statusCode.value)
+
+    def toStatusCode(bStatusCode: BStatusCode): StatusCode =
+      StatusCode.withValueOpt(bStatusCode.value).getOrElse(InvalidHandleStatus)
 
   }
 

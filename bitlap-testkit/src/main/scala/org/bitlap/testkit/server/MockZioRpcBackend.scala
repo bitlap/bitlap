@@ -34,7 +34,7 @@ class MockZioRpcBackend extends RpcZio with CsvUtil {
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.EXECUTE_STATEMENT, true, sessionHandle.handleId))
+    ZIO.succeed(new OperationHandle(OperationType.ExecuteStatement, true, sessionHandle.handleId))
 
   override def fetchResults(
     opHandle: OperationHandle,
@@ -63,11 +63,11 @@ class MockZioRpcBackend extends RpcZio with CsvUtil {
     ZIO.succeed(
       TableSchema.apply(
         List(
-          ColumnDesc("time", TypeId.TYPE_ID_INT_TYPE),
-          ColumnDesc("entity", TypeId.TYPE_ID_LONG_TYPE),
-          ColumnDesc("dimensions", TypeId.TYPE_ID_STRING_TYPE), // TODO not support object type
-          ColumnDesc("metric_name", TypeId.TYPE_ID_STRING_TYPE),
-          ColumnDesc("metric_value", TypeId.TYPE_ID_INT_TYPE)
+          ColumnDesc("time", TypeId.IntType),
+          ColumnDesc("entity", TypeId.LongType),
+          ColumnDesc("dimensions", TypeId.StringType), // TODO not support object type
+          ColumnDesc("metric_name", TypeId.StringType),
+          ColumnDesc("metric_value", TypeId.IntType)
         )
       )
     )
@@ -77,17 +77,17 @@ class MockZioRpcBackend extends RpcZio with CsvUtil {
     schemaName: String,
     tableName: String,
     columnName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GET_COLUMNS))
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GetColumns))
 
   override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.GET_SCHEMAS)) // TODO add rpc method ??
+    ZIO.succeed(new OperationHandle(OperationType.GetSchemas)) // TODO add rpc method ??
 
   override def getTables(database: String, pattern: String): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.GET_TABLES))
+    ZIO.succeed(new OperationHandle(OperationType.GetTables))
 
   override def getSchemas(
     sessionHandle: SessionHandle,
     catalogName: String,
     schemaName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.succeed(new OperationHandle(OperationType.GET_SCHEMAS))
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.succeed(new OperationHandle(OperationType.GetSchemas))
 }

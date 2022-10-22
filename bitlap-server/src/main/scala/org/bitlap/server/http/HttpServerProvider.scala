@@ -1,16 +1,16 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.http
+
 import io.circe.generic.auto.exportEncoder
 import io.circe.syntax.EncoderOps
-import org.bitlap.common.jdbc.{ GenericRow4, ResultSetTransformer }
+import org.bitlap.common.jdbc._
 import org.bitlap.server.BitlapServerProvider
 import zhttp.http._
 import zhttp.service.server.ServerChannelFactory
-import zhttp.service.{ EventLoopGroup, Server }
+import zhttp.service._
 import zio._
 
 import java.sql.DriverManager
-import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 /** Test http://localhost:8080/init

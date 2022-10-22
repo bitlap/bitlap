@@ -442,18 +442,18 @@ abstract class BitlapBaseResultSet extends ResultSet {
       val valueStr   = bColumnValue.toStringUtf8
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
       (columnType match {
-        case TypeId.TYPE_ID_STRING_TYPE => valueStr
-        case TypeId.TYPE_ID_INT_TYPE =>
+        case TypeId.StringType => valueStr
+        case TypeId.IntType =>
           if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
-        case TypeId.TYPE_ID_DOUBLE_TYPE =>
+        case TypeId.DoubleType =>
           if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
-        case TypeId.TYPE_ID_SHORT_TYPE =>
+        case TypeId.ShortType =>
           if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
-        case TypeId.TYPE_ID_LONG_TYPE =>
+        case TypeId.LongType =>
           if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
-        case TypeId.TYPE_ID_BOOLEAN_TYPE =>
+        case TypeId.BooleanType =>
           if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
-        case TypeId.TYPE_ID_TIMESTAMP_TYPE =>
+        case TypeId.TimestampType =>
           if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
           else null
         case _ => valueStr // FIXME 避免报错

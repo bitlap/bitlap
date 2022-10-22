@@ -2,8 +2,8 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.BitlapNetworkException
-import org.bitlap.network.BitlapNetworkException.ServerIntervalException
+import org.bitlap.network.NetworkException
+import org.bitlap.network.NetworkException.ServerIntervalException
 import org.bitlap.network.handles.SessionHandle
 
 import java.util.concurrent.atomic.AtomicBoolean

@@ -6,7 +6,7 @@ import com.ariskk.raft.model.Command.{ ReadCommand, WriteCommand }
 import com.ariskk.raft.model.CommandResponse._
 import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
-import org.bitlap.network.BitlapNetworkException.RpcException
+import org.bitlap.network.NetworkException.RpcException
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq }
 import org.bitlap.network.raft.ZioRaft.RaftServiceClient
 import zio._

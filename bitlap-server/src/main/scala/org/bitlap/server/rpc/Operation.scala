@@ -2,10 +2,9 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.OperationType.OperationType
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models.RowSet
-import org.bitlap.network.models
+import org.bitlap.network.{ models, OperationType }
 
 import scala.collection.mutable
 

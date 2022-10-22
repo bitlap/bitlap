@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 @apply
 class BitlapOperation(
   parentSession: Session,
-  opType: OperationType.OperationType,
+  opType: OperationType,
   hasResultSet: Boolean = false
 ) extends Operation(parentSession, opType, hasResultSet) {
 
@@ -26,16 +26,16 @@ class BitlapOperation(
     val columns = (1 to metaData.getColumnCount).map { it =>
       val colName = metaData.getColumnName(it)
       val colType = metaData.getColumnType(it) match {
-        case Types.VARCHAR   => models.TypeId.TYPE_ID_STRING_TYPE
-        case Types.SMALLINT  => models.TypeId.TYPE_ID_SHORT_TYPE
-        case Types.INTEGER   => models.TypeId.TYPE_ID_INT_TYPE
-        case Types.BIGINT    => models.TypeId.TYPE_ID_LONG_TYPE
-        case Types.DOUBLE    => models.TypeId.TYPE_ID_DOUBLE_TYPE
-        case Types.BOOLEAN   => models.TypeId.TYPE_ID_BOOLEAN_TYPE
-        case Types.TIMESTAMP => models.TypeId.TYPE_ID_TIMESTAMP_TYPE
-        case Types.TINYINT   => models.TypeId.TYPE_ID_BYTE_TYPE
+        case Types.VARCHAR   => models.TypeId.StringType
+        case Types.SMALLINT  => models.TypeId.ShortType
+        case Types.INTEGER   => models.TypeId.IntType
+        case Types.BIGINT    => models.TypeId.LongType
+        case Types.DOUBLE    => models.TypeId.DoubleType
+        case Types.BOOLEAN   => models.TypeId.BooleanType
+        case Types.TIMESTAMP => models.TypeId.TimestampType
+        case Types.TINYINT   => models.TypeId.ByteType
         // TODO more 暂时不使用TYPE_ID_UNSPECIFIED，避免报错
-        case _ => models.TypeId.TYPE_ID_STRING_TYPE
+        case _ => models.TypeId.StringType
       }
       models.ColumnDesc(colName, colType)
     }

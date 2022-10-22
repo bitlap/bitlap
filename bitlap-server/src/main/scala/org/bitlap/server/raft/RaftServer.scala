@@ -8,7 +8,7 @@ import com.ariskk.raft.storage._
 import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
 import org.bitlap.network.raft.ZioRaft.RaftServiceClient
-import org.bitlap.network.BitlapNetworkException.RpcException
+import org.bitlap.network.NetworkException.RpcException
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq }
 import zio._
 import io.grpc.Status

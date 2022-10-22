@@ -15,48 +15,48 @@ package object jdbc {
     import org.bitlap.jdbc.ColumnType._
 
     @inline final def stringify: String = self match {
-      case STRING    => "STRING"
-      case BOOLEAN   => "BOOLEAN"
-      case DOUBLE    => "DOUBLE"
-      case BYTE      => "BYTE"
-      case TIMESTAMP => "TIMESTAMP"
-      case INT       => "INT"
-      case LONG      => "LONG"
-      case SHORT     => "SHORT"
+      case String    => "String"
+      case Boolean   => "Boolean"
+      case Double    => "Double"
+      case Byte      => "Byte"
+      case Timestamp => "Timestamp"
+      case Int       => "Int"
+      case Long      => "Long"
+      case Short     => "Short"
       case _         => throw BSQLException(s"Unrecognized column type: $self")
     }
 
     @inline final def toType: Int = self match {
-      case STRING    => Types.VARCHAR
-      case BOOLEAN   => Types.BOOLEAN
-      case DOUBLE    => Types.DOUBLE
-      case BYTE      => Types.TINYINT
-      case TIMESTAMP => Types.TIMESTAMP
-      case INT       => Types.INTEGER
-      case LONG      => Types.BIGINT
-      case SHORT     => Types.SMALLINT
+      case String    => Types.VARCHAR
+      case Boolean   => Types.BOOLEAN
+      case Double    => Types.DOUBLE
+      case Byte      => Types.TINYINT
+      case Timestamp => Types.TIMESTAMP
+      case Int       => Types.INTEGER
+      case Long      => Types.BIGINT
+      case Short     => Types.SMALLINT
       case _         => throw BSQLException(s"Unrecognized column type: $self")
     }
 
   }
 
   private[jdbc] object ColumnType {
-    case object STRING    extends ColumnType
-    case object BOOLEAN   extends ColumnType
-    case object DOUBLE    extends ColumnType
-    case object BYTE      extends ColumnType
-    case object TIMESTAMP extends ColumnType
-    case object INT       extends ColumnType
-    case object LONG      extends ColumnType
-    case object SHORT     extends ColumnType
+    case object String    extends ColumnType
+    case object Boolean   extends ColumnType
+    case object Double    extends ColumnType
+    case object Byte      extends ColumnType
+    case object Timestamp extends ColumnType
+    case object Int       extends ColumnType
+    case object Long      extends ColumnType
+    case object Short     extends ColumnType
   }
 
   import org.bitlap.jdbc.ColumnType._
 
   // not reflect
-  private final val types: List[ColumnType] = List(STRING, BOOLEAN, DOUBLE, BYTE, TIMESTAMP, INT, LONG, SHORT)
+  private final val types: List[ColumnType] = List(String, Boolean, Double, Byte, Timestamp, Int, Long, Short)
 
-  case class ColumnTyped(typ: String) extends ColumnType {
+  final case class ColumnTyped(typ: String) extends ColumnType {
     def toValue: Int =
       types
         .find(p => typ == p.stringify)

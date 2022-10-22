@@ -44,13 +44,13 @@ object Constants {
 
   val SERVER_TYPE_NAMES: Map[TypeId, ColumnType] =
     Map(
-      TypeId.StringType    -> ColumnType.STRING,
-      TypeId.IntType       -> ColumnType.INT,
-      TypeId.DoubleType    -> ColumnType.DOUBLE,
-      TypeId.ShortType     -> ColumnType.SHORT,
-      TypeId.BooleanType   -> ColumnType.BOOLEAN,
-      TypeId.LongType      -> ColumnType.LONG,
-      TypeId.TimestampType -> ColumnType.TIMESTAMP,
-      TypeId.ByteType      -> ColumnType.BYTE
+      TypeId.StringType    -> ColumnType.String,
+      TypeId.IntType       -> ColumnType.Int,
+      TypeId.DoubleType    -> ColumnType.Double,
+      TypeId.ShortType     -> ColumnType.Short,
+      TypeId.BooleanType   -> ColumnType.Boolean,
+      TypeId.LongType      -> ColumnType.Long,
+      TypeId.TimestampType -> ColumnType.Timestamp,
+      TypeId.ByteType      -> ColumnType.Byte
     )
 }

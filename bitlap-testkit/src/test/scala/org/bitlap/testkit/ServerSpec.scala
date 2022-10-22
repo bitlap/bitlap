@@ -7,7 +7,7 @@ import org.junit.Test
 import java.sql._
 import scala.collection.mutable.ListBuffer
 
-class ServerSpec extends CsvHelper {
+class ServerSpec extends CsvUtil {
 
   val table = s"test_table_${FakeDataUtil.randBigNumber}"
 

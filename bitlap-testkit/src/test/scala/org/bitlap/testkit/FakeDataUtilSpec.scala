@@ -7,7 +7,7 @@ import java.io.File
  *    梦境迷离
  *  @version 1.0,2022/10/20
  */
-object FakeDataUtilSpec extends CsvHelper with App {
+object FakeDataUtilSpec extends CsvUtil with App {
 
   def generateFakeData(): Boolean = {
     val s: List[Metric] = FakeDataUtil.randMetrics(50)

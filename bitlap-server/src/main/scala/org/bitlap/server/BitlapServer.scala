@@ -12,7 +12,7 @@ object BitlapServer extends zio.App {
   // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {
-      r <- ZIO.collectAll(BitlapServerProvider.serverProviders.map(_.service(args).fork))
+      r <- ZIO.foreach(BitlapServerProvider.serverProviders)(_.service(args).fork)
       _ <- putStrLn("""
                       |    __    _ __  __
                       |   / /_  (_) /_/ /___ _____
@@ -21,7 +21,7 @@ object BitlapServer extends zio.App {
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.collectAll(r.map(_.join))
+      _ <- ZIO.foreach_(r)(_.join)
     } yield ()).foldM(
       e => ZIO.fail(e).exitCode,
       _ => ZIO.effectTotal(ExitCode.success)

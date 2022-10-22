@@ -1,11 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc.backend
+package org.bitlap.server.rpc
 
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
 import org.bitlap.network.{ OperationType, RpcZio }
-import org.bitlap.server.rpc.SessionManager
-import org.bitlap.tools.apply
+import org.bitlap.tools._
 import zio._
 
 /** Async implementation based ZIO for jdbc server.

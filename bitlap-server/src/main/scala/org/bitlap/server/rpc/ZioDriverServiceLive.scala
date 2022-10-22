@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc.live
+package org.bitlap.server.rpc
 
-import io.grpc.Status
+import io.grpc._
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
@@ -10,10 +10,10 @@ import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMeta
 import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
-import org.bitlap.network.driver.service.ZioService.ZDriverService
+import org.bitlap.network.driver.service.ZioService._
+import org.bitlap.network.handles._
 import org.bitlap.network.{ errorApplyFunc, RpcStatus, RpcZio }
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.tools.apply
+import org.bitlap.tools._
 import zio._
 
 /** A zio-grpc server implement by zio backend.

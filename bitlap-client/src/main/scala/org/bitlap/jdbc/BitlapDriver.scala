@@ -29,31 +29,31 @@ private[jdbc] abstract class BitlapDriver extends Driver {
    */
   override def acceptsURL(url: String): Boolean =
     if (url == null || url.isEmpty) false
-    else url.startsWith(Utils.URL_PREFIX)
+    else url.startsWith(Constants.URL_PREFIX)
 
   override def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] = {
     var curInfo: Properties = new Properties(info)
-    if (url != null && url.startsWith(Utils.URL_PREFIX)) {
+    if (url != null && url.startsWith(Constants.URL_PREFIX)) {
       curInfo = parseURL(url, curInfo)
     }
 
     val hostProp = new DriverPropertyInfo(
-      Utils.HOST_PROPERTY_KEY,
-      curInfo.getProperty(Utils.HOST_PROPERTY_KEY, "")
+      Constants.HOST_PROPERTY_KEY,
+      curInfo.getProperty(Constants.HOST_PROPERTY_KEY, "")
     )
     hostProp.required = false
     hostProp.description = "Hostname of Bitlap Server"
 
     val portProp = new DriverPropertyInfo(
-      Utils.PORT_PROPERTY_KEY,
-      curInfo.getProperty(Utils.PORT_PROPERTY_KEY, "")
+      Constants.PORT_PROPERTY_KEY,
+      curInfo.getProperty(Constants.PORT_PROPERTY_KEY, "")
     )
     portProp.required = false
     portProp.description = "Port number of Bitlap Server"
 
     val dbProp = new DriverPropertyInfo(
-      Utils.DBNAME_PROPERTY_KEY,
-      curInfo.getProperty(Utils.DBNAME_PROPERTY_KEY, "default")
+      Constants.DBNAME_PROPERTY_KEY,
+      curInfo.getProperty(Constants.DBNAME_PROPERTY_KEY, "default")
     )
     dbProp.required = false
     dbProp.description = "Database name"
@@ -62,11 +62,11 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     Array(hostProp, portProp, dbProp)
   }
 
-  override def getMajorVersion(): Int = Utils.MAJOR_VERSION
+  override def getMajorVersion(): Int = Constants.MAJOR_VERSION
 
-  override def getMinorVersion(): Int = Utils.MINOR_VERSION
+  override def getMinorVersion(): Int = Constants.MINOR_VERSION
 
-  override def jdbcCompliant(): Boolean = Utils.JDBC_COMPLIANT
+  override def jdbcCompliant(): Boolean = Constants.JDBC_COMPLIANT
 
   override def getParentLogger(): Logger = Logger.getLogger("BitlapDriver")
 
@@ -85,13 +85,13 @@ private[jdbc] abstract class BitlapDriver extends Driver {
    */
   private def parseURL(url: String, defaults: Properties): Properties = {
     val urlProps = if (defaults != null) new Properties(defaults) else new Properties()
-    if (!url.startsWith(Utils.URL_PREFIX)) {
+    if (!url.startsWith(Constants.URL_PREFIX)) {
       throw BSQLException(s"Invalid connection url: $url")
     }
-    if (url.length <= Utils.URL_PREFIX.length) return urlProps
+    if (url.length <= Constants.URL_PREFIX.length) return urlProps
 
     // [hostname]:[port]/[db_name]
-    val connectionInfo: String = url.substring(Utils.URL_PREFIX.length)
+    val connectionInfo: String = url.substring(Constants.URL_PREFIX.length)
 
     // [hostname]:[port]/[db_name]
     val hostPortAndDatabase = connectionInfo.split("/", 2)
@@ -99,17 +99,17 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     // [hostname]:[port]
     if (hostPortAndDatabase(0).nonEmpty) {
       val hostAndPort = hostPortAndDatabase(0).split(":", 2)
-      urlProps.setProperty(Utils.HOST_PROPERTY_KEY, hostAndPort(0))
+      urlProps.setProperty(Constants.HOST_PROPERTY_KEY, hostAndPort(0))
       if (hostAndPort.size > 1) {
-        urlProps.setProperty(Utils.PORT_PROPERTY_KEY, hostAndPort(1))
+        urlProps.setProperty(Constants.PORT_PROPERTY_KEY, hostAndPort(1))
       } else {
-        urlProps.setProperty(Utils.PORT_PROPERTY_KEY, Utils.DEFAULT_PORT)
+        urlProps.setProperty(Constants.PORT_PROPERTY_KEY, Constants.DEFAULT_PORT)
       }
     }
 
     // [db_name]
     if (hostPortAndDatabase.size > 1) {
-      urlProps.setProperty(Utils.DBNAME_PROPERTY_KEY, hostPortAndDatabase(1))
+      urlProps.setProperty(Constants.DBNAME_PROPERTY_KEY, hostPortAndDatabase(1))
     }
     urlProps
   }

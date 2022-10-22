@@ -75,7 +75,7 @@ class BitlapQueryResultSet(
         }
         val columnName = columns(pos).columnName
         columnNames :+= columnName
-        val columnTypeName = Utils.SERVER_TYPE_NAMES(columns(pos).typeDesc).stringify
+        val columnTypeName = Constants.SERVER_TYPE_NAMES(columns(pos).typeDesc).stringify
         columnTypes :+= columnTypeName
         namesSb.append(columnName)
         typesSb.append(columnTypeName)

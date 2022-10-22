@@ -9,7 +9,7 @@ import org.bitlap.network.models.TypeId.TypeId
  *  @since 2021/8/28
  *  @version 1.0
  */
-object Utils {
+object Constants {
 
   /** Major version number of this driver.
    */

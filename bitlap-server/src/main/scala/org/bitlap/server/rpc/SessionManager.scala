@@ -2,7 +2,8 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.common.exception.BitlapException
+import org.bitlap.network.BitlapNetworkException
+import org.bitlap.network.BitlapNetworkException.ServerIntervalException
 import org.bitlap.network.handles.SessionHandle
 
 import java.util.concurrent.atomic.AtomicBoolean
@@ -114,7 +115,7 @@ class SessionManager extends LazyLogging {
     }
     if (session == null) {
       // scala调用kotlin，默认参数被IDE忽略 显示红色。但是maven插件编译是有默认参数的，插件编译通过
-      throw new BitlapException(s"Invalid SessionHandle: $sessionHandle")
+      throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
     }
     session
   }
@@ -125,7 +126,7 @@ class SessionManager extends LazyLogging {
       if (handleToSession.containsKey(sessionHandle)) {
         handleToSession.put(sessionHandle, session)
       } else {
-        throw new BitlapException(s"Invalid SessionHandle: $sessionHandle")
+        throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
 

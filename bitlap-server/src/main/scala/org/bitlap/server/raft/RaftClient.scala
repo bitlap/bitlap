@@ -6,7 +6,7 @@ import com.ariskk.raft.model.Command.{ ReadCommand, WriteCommand }
 import com.ariskk.raft.model.CommandResponse._
 import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
-import org.bitlap.network.NetworkException.RpcException
+import org.bitlap.network.BitlapNetworkException.RpcException
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq }
 import org.bitlap.network.raft.ZioRaft.RaftServiceClient
 import zio._
@@ -39,7 +39,7 @@ final class RaftClient(nodes: Seq[RaftServer.Config], serdeRef: Ref[Serde], lead
       chunks <- RaftServiceClient
         .submit(RaftCommandReq(ByteString.copyFrom(serde.serialize(command)), CommandType.COMMAND))
         .provideLayer(client)
-        .mapError(e => RpcException(-1, cause = Try(e.asInstanceOf[Status].asException()).toOption))
+        .mapError(e => RpcException(msg = "rpc error", cause = Try(e.asInstanceOf[Status].asException()).toOption))
     } yield chunks.data.toByteArray
   }
 
@@ -78,7 +78,7 @@ object RaftClient {
   def apply(nodes: Seq[RaftServer.Config]): IO[RpcException, RaftClient] =
     for {
       serdeRef  <- Ref.make(Serde.kryo)
-      leader    <- ZIO.fromOption(nodes.headOption).mapError(_ => RpcException(-1))
+      leader    <- ZIO.fromOption(nodes.headOption).mapError(_ => RpcException(msg = "raft error"))
       leaderRef <- Ref.make(leader)
     } yield new RaftClient(nodes, serdeRef, leaderRef)
 }

@@ -8,7 +8,7 @@ import com.ariskk.raft.storage._
 import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
 import org.bitlap.network.raft.ZioRaft.RaftServiceClient
-import org.bitlap.network.NetworkException.RpcException
+import org.bitlap.network.BitlapNetworkException.RpcException
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq }
 import zio._
 import io.grpc.Status
@@ -51,7 +51,9 @@ final class RaftServer[T](
         _ <- RaftServiceClient
           .submit(RaftCommandReq(ByteString.copyFrom(serde.serialize(m)), CommandType.MESSAGE))
           .provideLayer(channel)
-          .mapError(e => RpcException(-1, cause = Try(e.asInstanceOf[Status].asException()).toOption))
+          .mapError(e =>
+            RpcException(msg = "raft sendMessage error", cause = Try(e.asInstanceOf[Status].asException()).toOption)
+          )
       } yield ()
     }
 

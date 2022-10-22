@@ -7,7 +7,7 @@ import org.junit._
 
 import java.sql._
 
-class ServerSpec extends CsvHelper {
+class ServerSpec extends CsvUtil {
 
   val table = s"test_table"
 

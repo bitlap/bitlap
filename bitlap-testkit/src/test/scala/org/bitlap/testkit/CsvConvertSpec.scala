@@ -14,7 +14,7 @@ import org.junit.Test
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvHelper {
+class CsvConvertSpec extends TestCase("CsvConvertSpec") with CsvUtil {
 
   @Test
   def testCsvConvert1 {

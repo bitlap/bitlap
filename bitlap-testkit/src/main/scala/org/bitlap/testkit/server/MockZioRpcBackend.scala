@@ -5,7 +5,7 @@ import com.google.protobuf.ByteString
 import org.bitlap.network.{ OperationType, RpcZio }
 import org.bitlap.network.handles.{ HandleIdentifier, OperationHandle, SessionHandle }
 import org.bitlap.network.models._
-import org.bitlap.testkit.{ CsvHelper, Metric }
+import org.bitlap.testkit.{ CsvUtil, Metric }
 import org.bitlap.tools.apply
 import zio.ZIO
 
@@ -16,7 +16,7 @@ import zio.ZIO
  *  @version 1.0,2022/4/27
  */
 @apply
-class MockZioRpcBackend extends RpcZio with CsvHelper {
+class MockZioRpcBackend extends RpcZio with CsvUtil {
 
   val metrics: Seq[Metric] = readCsvData("simple_data.csv")
 

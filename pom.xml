@@ -79,7 +79,7 @@
         <scala.log.version>2.14.1</scala.log.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <smt.version>0.8.0</smt.version>
+        <smt.version>0.9.0</smt.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <zio.grpc.version>0.5.2</zio.grpc.version>
         <scalapb.version>0.11.11</scalapb.version>
@@ -518,6 +518,31 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>linux</id>
+            <properties>
+                <grpc.exe.suffix>sh</grpc.exe.suffix>
+                <grpc.os.family>unix</grpc.os.family>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>Unix</family>
+                </os>
+            </activation>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <properties>
+                <grpc.exe.suffix>bat</grpc.exe.suffix>
+                <grpc.os.family>windows</grpc.os.family>
+            </properties>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+        </profile>
         <profile>
             <id>release</id>
             <distributionManagement>

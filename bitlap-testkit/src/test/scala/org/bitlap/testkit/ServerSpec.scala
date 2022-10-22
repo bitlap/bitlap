@@ -1,19 +1,15 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.testkit.server.EmbedBitlapServer
-import org.junit.Test
+import org.bitlap.common.jdbc._
+import org.bitlap.testkit.server._
+import org.junit._
 
 import java.sql._
-import scala.collection.mutable.ListBuffer
 
 class ServerSpec extends CsvHelper {
 
-  val table = s"test_table_${FakeDataUtil.randBigNumber}"
-
-  // load的是本模块的csv
-  val metrics = readCsvData("simple_data.csv")
-  println(metrics)
+  val table = s"test_table"
 
   private def startServer(): Unit = {
 
@@ -50,19 +46,8 @@ class ServerSpec extends CsvHelper {
                     |where _time >= 0
                     |group by _time
                     |""".stripMargin)
-    val rs  = stmt.getResultSet
-    val ret = ListBuffer[(Long, Double, Double, Long)]()
-    if (rs != null) {
-      while (rs.next())
-        ret += Tuple4(
-          rs.getLong("_time"),
-          rs.getDouble("vv"),
-          rs.getDouble("pv"),
-          rs.getLong("uv")
-        )
-    }
-
-    assert(ret.size == 10)
-    assert(ret.nonEmpty)
+    val rs   = stmt.getResultSet
+    val ret1 = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
+    assert(ret1.nonEmpty)
   }
 }

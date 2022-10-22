@@ -1,9 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server.rpc.live.ZioDriverServiceLive
+import org.bitlap.server.rpc.{ ZioDriverServiceLive, ZioRpcBackend }
 import zio.{ UIO, ZIO }
-import org.bitlap.server.rpc.backend.ZioRpcBackend
 
 /** Mock live for rpc server.
  *

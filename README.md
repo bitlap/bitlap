@@ -19,7 +19,7 @@
 1. Scala 2.13.x
 2. Kotlin 1.7.x
 3. Java 11+
-4. Mac或Linux
+4. Mac、Linux、Windows（需要使用profile）
 
 ## 快速开始
 

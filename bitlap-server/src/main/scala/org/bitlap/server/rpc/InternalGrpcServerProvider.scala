@@ -1,8 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc
 
-import org.bitlap.server.rpc.backend.ZioRpcBackend
-import org.bitlap.server.rpc.live.ZioDriverServiceLive
 import org.bitlap.server.BitlapServerProvider
 import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio._

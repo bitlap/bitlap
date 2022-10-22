@@ -1,6 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.http
+import io.circe.generic.auto.exportEncoder
 import io.circe.syntax.EncoderOps
+import org.bitlap.common.jdbc.{ GenericRow4, ResultSetTransformer }
 import org.bitlap.server.BitlapServerProvider
 import zhttp.http._
 import zhttp.service.server.ServerChannelFactory
@@ -29,10 +31,10 @@ final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
     stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
   }
 
-  def getConn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+  private def getConn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
   private val app = Http.collectZIO[Request] {
-    case Method.GET -> !! / "init" => ZIO.effect(initTable()).map(_ => Response.json("true"))
+    case Method.GET -> !! / "init" => ZIO.effect(initTable()).as(Response.json("true"))
     case req @ Method.GET -> !! / "sql" =>
       ZIO.effect {
         val stmt = getConn.createStatement()
@@ -42,17 +44,9 @@ final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
                       |where _time >= ${req.url.queryParams.getOrElse("_time", Nil).headOption.getOrElse(100)}
                       |group by _time
                       |""".stripMargin)
-        val rs  = stmt.getResultSet
-        val ret = ListBuffer[(Long, Double, Double, Long)]()
-        if (rs != null) {
-          while (rs.next())
-            ret += Tuple4(
-              rs.getLong("_time"),
-              rs.getDouble("vv"),
-              rs.getDouble("pv"),
-              rs.getLong("uv")
-            )
-        }
+        val rs = stmt.getResultSet
+
+        val ret = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
         Response.json(ret.asJson.noSpaces)
       }
     case Method.GET -> !! / "utc" => clock.currentDateTime.map(s => Response.text(s.toString))

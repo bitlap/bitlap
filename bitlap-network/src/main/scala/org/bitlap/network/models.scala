@@ -6,6 +6,8 @@ import enumeratum.values._
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
 import org.bitlap.network.driver.proto._
 
+import java.sql.Types
+
 /** @author
  *    梦境迷离
  *  @since 2021/11/20
@@ -96,24 +98,37 @@ object models {
       ColumnDesc(bColumnDesc.columnName, TypeId.toTypeId(bColumnDesc.typeDesc))
   }
 
-  sealed abstract class TypeId(val value: Int) extends IntEnumEntry
+  sealed abstract class TypeId(val value: Int, val name: String) extends IntEnumEntry
 
   object TypeId extends IntEnum[TypeId] {
-    final case object Unspecified   extends TypeId(0)
-    final case object StringType    extends TypeId(1)
-    final case object IntType       extends TypeId(2)
-    final case object DoubleType    extends TypeId(3)
-    final case object LongType      extends TypeId(4)
-    final case object BooleanType   extends TypeId(5)
-    final case object TimestampType extends TypeId(6)
-    final case object ShortType     extends TypeId(7)
-    final case object ByteType      extends TypeId(8)
+    final case object Unspecified   extends TypeId(0, "Any")
+    final case object StringType    extends TypeId(1, "String")
+    final case object IntType       extends TypeId(2, "Int")
+    final case object DoubleType    extends TypeId(3, "Double")
+    final case object LongType      extends TypeId(4, "Long")
+    final case object BooleanType   extends TypeId(5, "Boolean")
+    final case object TimestampType extends TypeId(6, "Timestamp")
+    final case object ShortType     extends TypeId(7, "Short")
+    final case object ByteType      extends TypeId(8, "Byte")
 
     val values: IndexedSeq[TypeId] = findValues
     def toTypeId(bTypeId: BTypeId): TypeId =
       TypeId.withValueOpt(bTypeId.value).getOrElse(Unspecified)
     def toBTypeId(typeId: TypeId): BTypeId =
       BTypeId.fromValue(typeId.value)
+
+    def jdbc2Bitlap: Map[Int, TypeId] = Map(
+      Types.VARCHAR   -> models.TypeId.StringType,
+      Types.SMALLINT  -> models.TypeId.ShortType,
+      Types.INTEGER   -> models.TypeId.IntType,
+      Types.BIGINT    -> models.TypeId.LongType,
+      Types.DOUBLE    -> models.TypeId.DoubleType,
+      Types.BOOLEAN   -> models.TypeId.BooleanType,
+      Types.TIMESTAMP -> models.TypeId.TimestampType,
+      Types.TINYINT   -> models.TypeId.ByteType
+    )
+
+    def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)
 
   }
 

@@ -58,6 +58,7 @@ class BitlapQueryResultSet(
       if (client == null || stmtHandle == null) {
         throw BSQLException("Resultset is closed")
       }
+      // debug
       val namesSb = new mutable.StringBuilder()
       val typesSb = new mutable.StringBuilder()
 
@@ -75,7 +76,7 @@ class BitlapQueryResultSet(
         }
         val columnName = columns(pos).columnName
         columnNames :+= columnName
-        val columnTypeName = Constants.SERVER_TYPE_NAMES(columns(pos).typeDesc).stringify
+        val columnTypeName = columns(pos).typeDesc.name
         columnTypes :+= columnTypeName
         namesSb.append(columnName)
         typesSb.append(columnTypeName)

@@ -1,6 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
+import org.bitlap.network.models.TypeId
+
 import java.sql.{ ResultSetMetaData, Types }
 
 /** @author
@@ -52,8 +54,11 @@ class BitlapResultSetMetaData(
   override def getColumnType(column: Int): Int = {
     if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
     if (column < 1 || column > columnTypes.size) throw BSQLException(s"Invalid column index: $column")
-    val typ = columnTypes(column - 1)
-    ColumnTyped(typ).toValue
+    val typ        = columnTypes(column - 1)
+    val bitlapType = TypeId.values.find(_.name == typ)
+    if (bitlapType.isEmpty || !TypeId.bitlap2Jdbc.contains(bitlapType.getOrElse(TypeId.Unspecified)))
+      throw BSQLException("Could not determine column type name for ResultSet")
+    TypeId.bitlap2Jdbc(TypeId.values.find(_.name == typ).getOrElse(TypeId.Unspecified))
   }
 
   override def getColumnTypeName(column: Int): String = {

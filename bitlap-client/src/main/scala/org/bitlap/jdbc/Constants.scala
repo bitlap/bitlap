@@ -41,16 +41,4 @@ object Constants {
   /** Property key for the bitlap Server port
    */
   val PORT_PROPERTY_KEY = "PORT"
-
-  val SERVER_TYPE_NAMES: Map[TypeId, ColumnType] =
-    Map(
-      TypeId.StringType    -> ColumnType.String,
-      TypeId.IntType       -> ColumnType.Int,
-      TypeId.DoubleType    -> ColumnType.Double,
-      TypeId.ShortType     -> ColumnType.Short,
-      TypeId.BooleanType   -> ColumnType.Boolean,
-      TypeId.LongType      -> ColumnType.Long,
-      TypeId.TimestampType -> ColumnType.Timestamp,
-      TypeId.ByteType      -> ColumnType.Byte
-    )
 }

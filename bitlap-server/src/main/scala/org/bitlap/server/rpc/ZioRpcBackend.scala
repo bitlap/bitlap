@@ -75,7 +75,7 @@ class ZioRpcBackend extends RpcZio {
     schemaName: String,
     tableName: String,
     columnName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GET_COLUMNS))
+  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GetColumns))
 
   override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
 

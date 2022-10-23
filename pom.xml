@@ -91,9 +91,15 @@
         <zio-raft.version>0.3.0</zio-raft.version>
         <rocksdb.version>7.6.0</rocksdb.version>
         <circe.version>0.14.2</circe.version>
+        <enumeratum.version>1.7.0</enumeratum.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.beachape</groupId>
+            <artifactId>enumeratum_2.13</artifactId>
+            <version>${enumeratum.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>

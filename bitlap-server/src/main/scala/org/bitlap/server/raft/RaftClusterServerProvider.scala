@@ -1,5 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
+
 import com.ariskk.raft.Raft
 import com.ariskk.raft.model.{ NodeId, Serde }
 import com.ariskk.raft.statemachine.KeyValueStore

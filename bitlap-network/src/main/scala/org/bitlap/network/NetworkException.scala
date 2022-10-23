@@ -10,29 +10,29 @@ import org.bitlap.common.exception.BitlapException
  *  @since 2021/11/20
  *  @version 1.0
  */
-sealed abstract class BitlapNetworkException(
+sealed abstract class NetworkException(
   val code: Int = -1,
   val msg: String,
   val cause: Option[Throwable] = None
 ) extends BitlapException(msg, cause.orNull)
     with Product
 
-object BitlapNetworkException {
+object NetworkException {
 
   final case class RpcException(
     override val code: Int = -1,
     override val msg: String,
     override val cause: Option[Throwable] = None
-  ) extends BitlapNetworkException(msg = msg, cause = cause)
+  ) extends NetworkException(msg = msg, cause = cause)
 
   final case class SQLExecuteException(
     override val msg: String,
     override val cause: Option[Throwable] = None
-  ) extends BitlapNetworkException(msg = msg, cause = cause)
+  ) extends NetworkException(msg = msg, cause = cause)
 
   final case class ServerIntervalException(
     override val msg: String,
     override val cause: Option[Throwable] = None
-  ) extends BitlapNetworkException(msg = msg, cause = cause)
+  ) extends NetworkException(msg = msg, cause = cause)
 
 }

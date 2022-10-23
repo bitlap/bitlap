@@ -2,7 +2,7 @@
 package org.bitlap
 
 import io.grpc.Status
-import org.bitlap.network.BitlapNetworkException.RpcException
+import org.bitlap.network.NetworkException.RpcException
 import zio.{ IO, ZIO }
 
 import java.io.IOException

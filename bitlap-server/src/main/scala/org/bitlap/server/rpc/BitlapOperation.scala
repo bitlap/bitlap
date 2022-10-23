@@ -3,7 +3,8 @@ package org.bitlap.server.rpc
 
 import com.google.protobuf.ByteString
 import org.bitlap.core.sql.QueryExecution
-import org.bitlap.network.{ models, OperationType }
+import org.bitlap.network.models._
+import org.bitlap.network._
 import org.bitlap.tools.apply
 
 import java.sql.{ ResultSet, Types }
@@ -16,31 +17,23 @@ import scala.collection.mutable.ListBuffer
 @apply
 class BitlapOperation(
   parentSession: Session,
-  opType: OperationType.OperationType,
+  opType: OperationType,
   hasResultSet: Boolean = false
 ) extends Operation(parentSession, opType, hasResultSet) {
 
-  def wrapper(rs: ResultSet): models.QueryResult = {
+  def wrapper(rs: ResultSet): QueryResult = {
     // get schema
     val metaData = rs.getMetaData
     val columns = (1 to metaData.getColumnCount).map { it =>
       val colName = metaData.getColumnName(it)
-      val colType = metaData.getColumnType(it) match {
-        case Types.VARCHAR   => models.TypeId.TYPE_ID_STRING_TYPE
-        case Types.SMALLINT  => models.TypeId.TYPE_ID_SHORT_TYPE
-        case Types.INTEGER   => models.TypeId.TYPE_ID_INT_TYPE
-        case Types.BIGINT    => models.TypeId.TYPE_ID_LONG_TYPE
-        case Types.DOUBLE    => models.TypeId.TYPE_ID_DOUBLE_TYPE
-        case Types.BOOLEAN   => models.TypeId.TYPE_ID_BOOLEAN_TYPE
-        case Types.TIMESTAMP => models.TypeId.TYPE_ID_TIMESTAMP_TYPE
-        case Types.TINYINT   => models.TypeId.TYPE_ID_BYTE_TYPE
-        // TODO more 暂时不使用TYPE_ID_UNSPECIFIED，避免报错
-        case _ => models.TypeId.TYPE_ID_STRING_TYPE
-      }
-      models.ColumnDesc(colName, colType)
+      val colType = TypeId.jdbc2Bitlap.getOrElse(
+        metaData.getColumnType(it),
+        TypeId.StringType
+      ) // TODO more 暂时不使用TypeId.Unspecified，避免报错
+      ColumnDesc(colName, colType)
     }
     // get row set
-    val rows = ListBuffer[models.Row]()
+    val rows = ListBuffer[Row]()
     while (rs.next()) {
       val cl = (1 to metaData.getColumnCount).map { it =>
         metaData.getColumnType(it) match {
@@ -56,11 +49,11 @@ class BitlapOperation(
           case _ => ByteString.empty()
         }
       }
-      rows.append(models.Row(cl.toList))
+      rows.append(Row(cl.toList))
     }
-    models.QueryResult(
-      models.TableSchema(columns.toList),
-      models.RowSet(rows.toList)
+    QueryResult(
+      TableSchema(columns.toList),
+      RowSet(rows.toList)
     )
   }
 

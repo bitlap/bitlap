@@ -26,7 +26,7 @@ class OperationManager {
   ): Operation = {
     val operation = new BitlapOperation(
       parentSession,
-      OperationType.EXECUTE_STATEMENT,
+      OperationType.ExecuteStatement,
       hasResultSet = true
     )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))

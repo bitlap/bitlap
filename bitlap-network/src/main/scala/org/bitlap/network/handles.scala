@@ -2,9 +2,8 @@
 package org.bitlap.network
 
 import com.google.protobuf.ByteString
-import org.bitlap.network.OperationType.OperationType
-import org.bitlap.network.driver.proto.{ BHandleIdentifier, BOperationHandle, BOperationType, BSessionHandle }
-import org.bitlap.tools.{ apply, toString }
+import org.bitlap.network.driver.proto._
+import org.bitlap.tools._
 
 import java.nio.ByteBuffer
 import java.util.UUID
@@ -168,7 +167,7 @@ object handles {
       BOperationHandle(
         hasResultSet = hasResultSet,
         operationId = Some(handleId.toBHandleIdentifier()),
-        operationType = BOperationType.fromValue(opType.id)
+        operationType = BOperationType.fromValue(opType.value)
       )
 
     override def hashCode(): Int = {

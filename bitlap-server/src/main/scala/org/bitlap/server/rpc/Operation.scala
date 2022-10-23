@@ -2,10 +2,9 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.OperationType.OperationType
 import org.bitlap.network.handles.OperationHandle
-import org.bitlap.network.models.RowSet
-import org.bitlap.network.models
+import org.bitlap.network.models._
+import org.bitlap.network.OperationType
 
 import scala.collection.mutable
 
@@ -35,7 +34,7 @@ abstract class Operation(
   lazy val confOverlay: mutable.Map[String, String] =
     mutable.HashMap[String, String]()
 
-  protected lazy val cache: mutable.HashMap[OperationHandle, models.QueryResult] =
+  protected lazy val cache: mutable.HashMap[OperationHandle, QueryResult] =
     mutable.HashMap()
 
   def run()
@@ -45,8 +44,8 @@ abstract class Operation(
   }
 
   def getNextResultSet(): RowSet =
-    cache.get(opHandle).map(_.rows).getOrElse(models.RowSet())
+    cache.get(opHandle).map(_.rows).getOrElse(RowSet())
 
-  def getResultSetSchema(): models.TableSchema =
-    cache.get(opHandle).map(_.tableSchema).getOrElse(models.TableSchema())
+  def getResultSetSchema(): TableSchema =
+    cache.get(opHandle).map(_.tableSchema).getOrElse(TableSchema())
 }

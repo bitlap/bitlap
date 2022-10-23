@@ -118,14 +118,14 @@ object models {
       BTypeId.fromValue(typeId.value)
 
     def jdbc2Bitlap: Map[Int, TypeId] = Map(
-      Types.VARCHAR   -> models.TypeId.StringType,
-      Types.SMALLINT  -> models.TypeId.ShortType,
-      Types.INTEGER   -> models.TypeId.IntType,
-      Types.BIGINT    -> models.TypeId.LongType,
-      Types.DOUBLE    -> models.TypeId.DoubleType,
-      Types.BOOLEAN   -> models.TypeId.BooleanType,
-      Types.TIMESTAMP -> models.TypeId.TimestampType,
-      Types.TINYINT   -> models.TypeId.ByteType
+      Types.VARCHAR   -> TypeId.StringType,
+      Types.SMALLINT  -> TypeId.ShortType,
+      Types.INTEGER   -> TypeId.IntType,
+      Types.BIGINT    -> TypeId.LongType,
+      Types.DOUBLE    -> TypeId.DoubleType,
+      Types.BOOLEAN   -> TypeId.BooleanType,
+      Types.TIMESTAMP -> TypeId.TimestampType,
+      Types.TINYINT   -> TypeId.ByteType
     )
 
     def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)

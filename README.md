@@ -49,6 +49,10 @@ val ret1: Seq[GenericRow4[Long, Double, Double, Long]] = ResultSetTransformer[Ge
 println(ret1)
 ```
 
+## 如何贡献
+
+[CONTRIBUTING](./CONTRIBUTING.md)
+
 ## 许可
 
 ```

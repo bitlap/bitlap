@@ -84,7 +84,7 @@ SOFTWARE.
 
 [Badge-Discord]: https://img.shields.io/discord/968687999862841384
 
-[Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/main/graph/badge.svg?token=9XJ2LC2K8M
+[Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/dev/graph/badge.svg?token=9XJ2LC2K8M
 
 [Badge-Snapshots]: https://img.shields.io/nexus/s/org.bitlap/bitlap-core?server=https%3A%2F%2Fs01.oss.sonatype.org
 

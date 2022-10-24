@@ -33,7 +33,7 @@
 
 ## 修改默认数据
 - 目前仅能通过classpath导入csv，所以csv在server中，想修改csv得这样操作：
-  1. 使用`bitlap-testkit/src/test/scala/.../FakeDataUtil.scala`
+  1. 使用`bitlap-testkit/src/test/scala/.../GenerateFakeData.scala`
      工具生成csv文件，生成的文件在`bitlap-testkit/src/test/resources/.../simple_data.csv`
   2. 将生成的csv拷贝到`bitlap-server/src/main/resources/simple_data.csv`
   3. `http://localhost:8080/init` ，再次初始化数据

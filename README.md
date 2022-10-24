@@ -13,8 +13,9 @@
 
 ## 通过client查询
 
-**添加依赖**
+### Scala例子
 
+***添加依赖***
 ```scala
 libraryDependencies += (
   "org.bitlap" % "bitlap-client" % "0.1.0-SNAPSHOT",
@@ -27,9 +28,7 @@ dependencyOverrides ++= Seq(
   "io.grpc" % "grpc-netty" % "1.46.0"
 )
 ```
-
-**Scala例子**
-
+***使用***
 ```scala
 Class.forName(classOf[org.bitlap.Driver].getName)
 val statement = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default").createStatement()
@@ -46,8 +45,17 @@ val ret1: Seq[GenericRow4[Long, Double, Double, Long]] = ResultSetTransformer[Ge
 println(ret1)
 ```
 
-**Java例子**
+### Java例子
 
+***添加依赖***
+```xml
+<dependency>
+    <groupId>org.bitlap</groupId>
+    <artifactId>bitlap-client</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+***使用***
 ```java
 public class JavaServerTest {
 

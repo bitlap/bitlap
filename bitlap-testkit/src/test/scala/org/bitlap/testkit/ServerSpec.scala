@@ -9,35 +9,38 @@ import java.sql._
 
 class ServerSpec extends CsvUtil {
 
-  val table = s"test_table"
+  private val table = s"test_table_${FakeDataUtil.randEntityNumber}"
 
-  private def startServer(): Unit = {
+  Class.forName(classOf[org.bitlap.Driver].getName)
 
+  lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+
+  @Before
+  def startServer(): Unit = {
     val server = new Thread {
       override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
     }
     server.setDaemon(true)
     server.start()
     Thread.sleep(3000L)
+
+    initTable()
   }
 
   private def initTable(): Unit = {
     val stmt = conn.createStatement()
     stmt.execute(s"create table if not exists $table")
-    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table") // load的是server模块的csv
+    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
   }
 
-  def conn: Connection = {
-    Class.forName(classOf[org.bitlap.Driver].getName)
-    DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
-  }
+  @After
+  def dropTable(): Unit =
+    conn.createStatement().execute(s"drop table $table cascade")
 
   // 执行FakeDataUtilSpec 生成新的mock数据
   // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
   def query_test1() {
-    startServer()
-    initTable()
     val stmt = conn.createStatement()
     stmt.setMaxRows(10)
     stmt.execute(s"""
@@ -50,4 +53,5 @@ class ServerSpec extends CsvUtil {
     val ret1 = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
     assert(ret1.nonEmpty)
   }
+
 }

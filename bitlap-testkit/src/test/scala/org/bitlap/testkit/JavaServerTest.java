@@ -1,6 +1,7 @@
 package org.bitlap.testkit;
 
 import org.bitlap.testkit.server.EmbedBitlapServer;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class JavaServerTest {
         }
     }
 
-    final String table = "test_table";
+    final static String table = "test_table" + FakeDataUtil.randEntityNumber();
 
     @BeforeClass
     public static void startServer() throws InterruptedException, SQLException {
@@ -37,10 +38,17 @@ public class JavaServerTest {
         initTable();
     }
 
+    @AfterClass
+    public static void dropTable() throws SQLException {
+        Statement stmt = conn().createStatement();
+        stmt.execute("drop table " + table + " cascade");
+    }
+
+
     private static void initTable() throws SQLException {
         Statement stmt = conn().createStatement();
-        stmt.execute("create table if not exists $table");
-        stmt.execute("load data 'classpath:simple_data.csv' overwrite table $table"); // load的是server模块的csv
+        stmt.execute("create table if not exists " + table);
+        stmt.execute("load data 'classpath:simple_data.csv' overwrite table " + table); // load的是server模块的csv
     }
 
     public static Connection conn() throws SQLException {

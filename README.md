@@ -18,8 +18,7 @@
 ***添加依赖***
 ```scala
 libraryDependencies += (
-  "org.bitlap" % "bitlap-client" % "0.1.0-SNAPSHOT",
-  "org.bitlap" % "smt-common" % "0.9.0"
+  "org.bitlap" % "bitlap-client" % "0.1.0-SNAPSHOT"
 )
 
 // 若运行时报错 找不到grpc某个类的话，加这几行试试，保证io.grpc的所有组件都是一个版本！
@@ -28,22 +27,8 @@ dependencyOverrides ++= Seq(
   "io.grpc" % "grpc-netty" % "1.46.0"
 )
 ```
-***使用***
-```scala
-Class.forName(classOf[org.bitlap.Driver].getName)
-val statement = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default").createStatement()
-statement.execute(
-  s"""select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
-     |from table_test
-     |where _time >= 0
-     |group by _time""".stripMargin)
-
-val rowSet: ResultSet = statement.getResultSet
-
-// ResultSetTransformer是个工具类，会把ResultSet提取为Seq，其中GenericRow4表示结果是四列，每个类型需要指定，五列就是GenericRow5，以此类推。
-val ret1: Seq[GenericRow4[Long, Double, Double, Long]] = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rowSet)
-println(ret1)
-```
+***例子***
+[ServerSpec](./bitlap-testkit/src/test/scala/org/bitlap/testkit/ServerSpec.scala)
 
 ### Java例子
 
@@ -55,70 +40,8 @@ println(ret1)
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
-***使用***
-```java
-public class JavaServerTest {
-
-    static {
-        try {
-            Class.forName(org.bitlap.Driver.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    final String table = "test_table";
-
-    @BeforeClass
-    public static void startServer() throws InterruptedException, SQLException {
-        Thread server = new Thread(() -> EmbedBitlapServer.main(new String[0]));
-        server.setDaemon(true);
-        server.start();
-        Thread.sleep(3000L);
-        initTable();
-    }
-
-    private static void initTable() throws SQLException {
-        Statement stmt = conn().createStatement();
-        stmt.execute("create table if not exists $table");
-        stmt.execute("load data 'classpath:simple_data.csv' overwrite table $table"); // load的是server模块的csv
-    }
-
-    public static Connection conn() throws SQLException {
-        return DriverManager.getConnection("jdbc:bitlap://localhost:23333/default");
-    }
-
-    public static class Tuple4 {
-        private Long col1;
-        private Double col2;
-        private Double col3;
-        private Long col4;
-
-        public Tuple4(Long col1, Double col2, Double col3, Long col4) {
-            this.col1 = col1;
-            this.col2 = col2;
-            this.col3 = col3;
-            this.col4 = col4;
-        }
-    }
-
-    @Test
-    public void query_test1() throws SQLException {
-        Statement stmt = conn().createStatement();
-        stmt.setMaxRows(10);
-        stmt.execute("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " + "  from " + table + "   where _time >= 0 " + " group by _time");
-        ResultSet rs = stmt.getResultSet();
-        List<Tuple4> ret = new ArrayList<>();
-        if (rs != null) {
-            while (rs.next()) {
-                ret.add(new Tuple4(rs.getLong("_time"), rs.getDouble("vv"), rs.getDouble("pv"), rs.getLong("uv")));
-            }
-        }
-
-        assert ret.size() > 0;
-    }
-}
-```
+***例子***
+[JavaServerTest](./bitlap-testkit/src/test/scala/org/bitlap/testkit/JavaServerTest.java)
 
 
 ## 如何贡献

@@ -1,9 +1,8 @@
 package org.bitlap.testkit;
 
 import org.bitlap.testkit.server.EmbedBitlapServer;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,24 +28,22 @@ public class JavaServerTest {
 
     final String table = "test_table";
 
-    @Test
-    @BeforeAll
-    public void startServer() throws InterruptedException {
+    @BeforeClass
+    public static void startServer() throws InterruptedException, SQLException {
         Thread server = new Thread(() -> EmbedBitlapServer.main(new String[0]));
         server.setDaemon(true);
         server.start();
         Thread.sleep(3000L);
+        initTable();
     }
 
-    @Test
-    @BeforeEach
-    public void initTable() throws SQLException, ClassNotFoundException {
+    private static void initTable() throws SQLException {
         Statement stmt = conn().createStatement();
         stmt.execute("create table if not exists $table");
         stmt.execute("load data 'classpath:simple_data.csv' overwrite table $table"); // load的是server模块的csv
     }
 
-    public Connection conn() throws SQLException {
+    public static Connection conn() throws SQLException {
         return DriverManager.getConnection("jdbc:bitlap://localhost:23333/default");
     }
 

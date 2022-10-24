@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>bitlap-common</artifactId>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
@@ -44,6 +44,9 @@
                 <groupId>com.github.os72</groupId>
                 <artifactId>protoc-jar-maven-plugin</artifactId>
                 <version>3.11.4</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

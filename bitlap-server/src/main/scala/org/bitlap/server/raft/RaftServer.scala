@@ -28,18 +28,26 @@ final class RaftServer[T](
   serdeRef: Ref[Serde]
 ) {
 
-  private lazy val serverRaft: URIO[zio.ZEnv, ExitCode] =
+  private lazy val interServer: URIO[zio.ZEnv, ExitCode] =
     new RaftClusterServerProvider(config.raftPort, raftRef, serdeRef).run(Nil)
 
-  private lazy val clientRaft: URIO[zio.ZEnv, ExitCode] =
+  private lazy val client: URIO[zio.ZEnv, ExitCode] =
     new RaftClusterServerProvider(config.raftClientPort, raftRef, serdeRef).run(Nil)
 
   private lazy val peerChannels: Map[NodeId, ZLayer[Any, Throwable, RaftServiceClient]] = peerConfig
     .map(config =>
-      config.nodeId -> RaftServiceClient.live(
-        scalapb.zio_grpc
-          .ZManagedChannel(ManagedChannelBuilder.forAddress(config.address, config.raftPort).usePlaintext())
-      )
+      config.nodeId -> {
+        val channel: Layer[Throwable, RaftServiceClient] = RaftServiceClient.live(
+          scalapb.zio_grpc
+            .ZManagedChannel(builder =
+              ManagedChannelBuilder
+                .forAddress(config.address, config.raftPort)
+                .usePlaintext()
+                .asInstanceOf[ManagedChannelBuilder[_]]
+            )
+        )
+        channel
+      }
     )
     .toMap
 
@@ -69,8 +77,8 @@ final class RaftServer[T](
     (for {
       raft <- raftRef.get
       _    <- raft.run.fork
-      _    <- clientRaft.fork
-      _    <- serverRaft.fork
+      _    <- client.fork
+      _    <- interServer.fork
       _    <- sendMessages
     } yield ()).provideLayer(ZEnv.live)
 

@@ -5,6 +5,7 @@ import org.bitlap.csv.{ ScalableBuilder, StringUtils }
 import org.bitlap.csv.DefaultCsvFormat
 import org.bitlap.csv.CsvableBuilder
 import java.io.File
+import java.io.InputStream
 
 /** @author
  *    梦境迷离
@@ -17,15 +18,19 @@ trait CsvUtil {
     override def ignoreHeader: Boolean       = true
   }
 
-  def readCsvData(resourceFileName: String): List[Metric] = {
-    val reader = ClassLoader.getSystemResourceAsStream(resourceFileName)
+  def readCsvData(resource: String): List[Metric] = {
+    val reader = ClassLoader.getSystemResourceAsStream(resource)
+    readCsvData(reader)
+  }
+
+  def readCsvData(resource: InputStream): List[Metric] =
     ScalableBuilder[Metric]
       .setField[List[Dimension]](
         _.dimensions,
         dims => StringUtils.extractJsonValues[Dimension](dims)((k, v) => Dimension(k, v))
       )
-      .convertFrom(reader)
-  }.collect { case Some(v) => v }
+      .convertFrom(resource)
+      .collect { case Some(v) => v }
 
   def writeCsvData(file: File, metrics: List[Metric]): Boolean =
     CsvableBuilder[Metric]

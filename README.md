@@ -6,9 +6,6 @@
 |---------------|-----------------|-------------------------------------------|
 | ![Stage]      | ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
 
-| Maven Central                               | Nexus Snapshots                                                  | Discord                                   |
-|---------------------------------------------|------------------------------------------------------------------|-------------------------------------------|
-| [![Maven Central][Badge-Maven]][Link-Maven] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] | [![Discord][Badge-Discord]][Link-Discord] |
 
 ## 架构
 

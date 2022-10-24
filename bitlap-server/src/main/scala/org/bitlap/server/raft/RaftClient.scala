@@ -6,15 +6,19 @@ import com.ariskk.raft.model.Command.{ ReadCommand, WriteCommand }
 import com.ariskk.raft.model.CommandResponse._
 import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
-import org.bitlap.network.BitlapNetworkException.RpcException
+import org.bitlap.network.NetworkException.RpcException
 import org.bitlap.network.raft.{ CommandType, RaftCommandReq }
 import org.bitlap.network.raft.ZioRaft.RaftServiceClient
 import zio._
 import io.grpc.Status
+import zio.clock.Clock
 
 import scala.util.Try
 import scala.reflect.ClassTag
 import scala.util.Random
+import zio.duration.Duration
+
+import java.util.concurrent.TimeUnit
 
 /** raft client.
  *
@@ -33,25 +37,30 @@ final class RaftClient(nodes: Seq[RaftServer.Config], serdeRef: Ref[Serde], lead
     port: Int
   ): ZIO[Any, RpcException, Array[Byte]] = {
     val client: Layer[Throwable, RaftServiceClient] = RaftServiceClient.live(
-      scalapb.zio_grpc.ZManagedChannel(ManagedChannelBuilder.forAddress(address, port).usePlaintext())
+      scalapb.zio_grpc
+        .ZManagedChannel(builder =
+          ManagedChannelBuilder.forAddress(address, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[_]]
+        )
     )
-    for {
+    (for {
       chunks <- RaftServiceClient
         .submit(RaftCommandReq(ByteString.copyFrom(serde.serialize(command)), CommandType.COMMAND))
         .provideLayer(client)
         .mapError(e => RpcException(msg = "rpc error", cause = Try(e.asInstanceOf[Status].asException()).toOption))
-    } yield chunks.data.toByteArray
+    } yield chunks.data.toByteArray)
+      .retry(Schedule.fibonacci(Duration.apply(100, TimeUnit.MILLISECONDS))) // is it OK?
+      .provideLayer(Clock.live)
   }
 
-  def submitCommand(command: WriteCommand): ZIO[Any, Throwable, Unit] =
+  def submitCommand(command: WriteCommand): ZIO[Any, Throwable, Boolean] =
     for {
       serde    <- serdeRef.get
       leader   <- leaderRef.get
       chunks   <- rpcClient(serde, command, leader.address, leader.raftClientPort)
       response <- ZIO.fromEither(serde.deserialize[CommandResponse](chunks))
-      _ <- response match {
+      res <- response match {
         case Committed =>
-          ZIO.unit
+          ZIO.succeed(true)
         case LeaderNotFoundResponse =>
           shuffleLeaderRef *> submitCommand(command)
         case Redirect(leaderId) =>
@@ -60,10 +69,10 @@ final class RaftClient(nodes: Seq[RaftServer.Config], serdeRef: Ref[Serde], lead
               .fromOption(nodes.find(_.nodeId == leaderId))
               .mapError(_ => new Exception("Failed to find leader in node config"))
             _ <- leaderRef.set(newLeader)
-            _ <- submitCommand(command)
-          } yield ()
+            r <- submitCommand(command)
+          } yield r
       }
-    } yield ()
+    } yield res
 
   def submitQuery[T: ClassTag](query: ReadCommand): ZIO[Any, Throwable, Option[T]] =
     for {

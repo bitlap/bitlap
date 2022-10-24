@@ -19,7 +19,7 @@ class HandleTests extends TestCase("HandleTests") {
   def testOperationHandle = {
     val handleId = new handles.HandleIdentifier()
     val op = new handles.OperationHandle(
-      OperationType.EXECUTE_STATEMENT,
+      OperationType.ExecuteStatement,
       hasResultSet = true,
       handleId = handleId
     )
@@ -44,7 +44,7 @@ class HandleTests extends TestCase("HandleTests") {
     assertTrue(
       OperationType.getOperationType(
         op.toBOperationHandle().operationType
-      ) == OperationType.EXECUTE_STATEMENT
+      ) == OperationType.ExecuteStatement
     )
 
     val h1 = new handles.OperationHandle(op.toBOperationHandle())

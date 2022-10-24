@@ -6,43 +6,20 @@
 |---------------|-----------------|-------------------------------------------|
 | ![Stage]      | ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
 
-| Maven Central                               | Nexus Snapshots                                                  | Discord                                   |
-|---------------------------------------------|------------------------------------------------------------------|-------------------------------------------|
-| [![Maven Central][Badge-Maven]][Link-Maven] | [![Sonatype Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] | [![Discord][Badge-Discord]][Link-Discord] |
 
 ## 架构
 
 ![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
 
-## 环境
-
-1. Scala 2.13.x
-2. Kotlin 1.7.x
-3. Java 11+
-4. Mac、Linux、Windows（需要使用profile）
-
-## 快速开始
-
-1. 安装IDEA插件（可选） [IDEA Plugin Scala-Macro-Tools](https://github.com/bitlap/scala-macro-tools)
-2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
-3. 找到类 `bitlap-server/src/main/scala/../.../BitlapServer.scala`，然后在IDEA中运行该main方法。（Java 9以上需要JVM参数：`--add-exports
-   java.base/jdk.internal.ref=ALL-UNNAMED`）
-4. 浏览器中请求 `http://localhost:8080/init` ，以初始化数据。（使用的数据在`bitlap-server/src/main/resources/simple_data.csv`）
-   - 目前仅能通过classpath导入csv，所以csv在server中，想修改csv得这样操作：
-        1. 使用`bitlap-testkit/src/test/scala/.../FakeDataUtil.scala`
-           工具生成csv文件，生成的文件在`bitlap-testkit/src/test/resources/.../simple_data.csv`
-        2. 将生成的csv拷贝到`bitlap-server/src/main/resources/simple_data.csv`
-        3. `http://localhost:8080/init` ，再次初始化数据
-5. 浏览器中请求：`http://localhost:8080/sql` ，该接口使用固定的SQL查数并返回。
-
 ## 通过client查询
 
-添加依赖
+### Scala例子
 
+***添加依赖***
 ```scala
 libraryDependencies += (
-  "org.bitlap" % "bitlap-client" % <version>,
-  "org.bitlap" % "smt-common" % <version>
+  "org.bitlap" % "bitlap-client" % "0.1.0-SNAPSHOT",
+  "org.bitlap" % "smt-common" % "0.9.0"
 )
 
 // 若运行时报错 找不到grpc某个类的话，加这几行试试，保证io.grpc的所有组件都是一个版本！
@@ -51,9 +28,7 @@ dependencyOverrides ++= Seq(
   "io.grpc" % "grpc-netty" % "1.46.0"
 )
 ```
-
-使用JDBC
-
+***使用***
 ```scala
 Class.forName(classOf[org.bitlap.Driver].getName)
 val statement = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default").createStatement()
@@ -69,6 +44,86 @@ val rowSet: ResultSet = statement.getResultSet
 val ret1: Seq[GenericRow4[Long, Double, Double, Long]] = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rowSet)
 println(ret1)
 ```
+
+### Java例子
+
+***添加依赖***
+```xml
+<dependency>
+    <groupId>org.bitlap</groupId>
+    <artifactId>bitlap-client</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+***使用***
+```java
+public class JavaServerTest {
+
+    static {
+        try {
+            Class.forName(org.bitlap.Driver.class.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    final String table = "test_table";
+
+    @BeforeClass
+    public static void startServer() throws InterruptedException, SQLException {
+        Thread server = new Thread(() -> EmbedBitlapServer.main(new String[0]));
+        server.setDaemon(true);
+        server.start();
+        Thread.sleep(3000L);
+        initTable();
+    }
+
+    private static void initTable() throws SQLException {
+        Statement stmt = conn().createStatement();
+        stmt.execute("create table if not exists $table");
+        stmt.execute("load data 'classpath:simple_data.csv' overwrite table $table"); // load的是server模块的csv
+    }
+
+    public static Connection conn() throws SQLException {
+        return DriverManager.getConnection("jdbc:bitlap://localhost:23333/default");
+    }
+
+    public static class Tuple4 {
+        private Long col1;
+        private Double col2;
+        private Double col3;
+        private Long col4;
+
+        public Tuple4(Long col1, Double col2, Double col3, Long col4) {
+            this.col1 = col1;
+            this.col2 = col2;
+            this.col3 = col3;
+            this.col4 = col4;
+        }
+    }
+
+    @Test
+    public void query_test1() throws SQLException {
+        Statement stmt = conn().createStatement();
+        stmt.setMaxRows(10);
+        stmt.execute("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " + "  from " + table + "   where _time >= 0 " + " group by _time");
+        ResultSet rs = stmt.getResultSet();
+        List<Tuple4> ret = new ArrayList<>();
+        if (rs != null) {
+            while (rs.next()) {
+                ret.add(new Tuple4(rs.getLong("_time"), rs.getDouble("vv"), rs.getDouble("pv"), rs.getLong("uv")));
+            }
+        }
+
+        assert ret.size() > 0;
+    }
+}
+```
+
+
+## 如何贡献
+
+[CONTRIBUTING](./CONTRIBUTING.md)
 
 ## 许可
 
@@ -104,7 +159,7 @@ SOFTWARE.
 
 [Badge-Discord]: https://img.shields.io/discord/968687999862841384
 
-[Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/main/graph/badge.svg?token=9XJ2LC2K8M
+[Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/dev/graph/badge.svg?token=9XJ2LC2K8M
 
 [Badge-Snapshots]: https://img.shields.io/nexus/s/org.bitlap/bitlap-core?server=https%3A%2F%2Fs01.oss.sonatype.org
 

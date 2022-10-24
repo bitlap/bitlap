@@ -1,5 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
+
 import zio.console.putStrLn
 import zio._
 

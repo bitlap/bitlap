@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
+import enumeratum.values._
 import org.bitlap.network.driver.proto.BOperationType
 
 /** @author
@@ -8,44 +9,19 @@ import org.bitlap.network.driver.proto.BOperationType
  *  @since 2021/11/20
  *  @version 1.0
  */
-object OperationType extends Enumeration {
+sealed abstract class OperationType(val value: Int) extends IntEnumEntry
 
-  type OperationType = Value
+object OperationType extends IntEnum[OperationType] {
 
-  val EXECUTE_STATEMENT: OperationType.Value = Value(
-    BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT.index,
-    BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT.name
-  )
-  val GET_COLUMNS: OperationType.Value =
-    Value(
-      BOperationType.B_OPERATION_TYPE_GET_COLUMNS.index,
-      BOperationType.B_OPERATION_TYPE_GET_COLUMNS.name
-    )
-  val GET_SCHEMAS: OperationType.Value =
-    Value(
-      BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.index,
-      BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.name
-    )
-  val GET_TABLES: OperationType.Value =
-    Value(
-      BOperationType.B_OPERATION_TYPE_GET_TABLES.index,
-      BOperationType.B_OPERATION_TYPE_GET_TABLES.name
-    )
-  val UNKNOWN_OPERATION: OperationType.Value =
-    Value(0, "Unknown")
+  final case object UnknownOperation extends OperationType(0)
+  final case object ExecuteStatement extends OperationType(1)
+  final case object GetSchemas       extends OperationType(2)
+  final case object GetTables        extends OperationType(3)
+  final case object GetColumns       extends OperationType(4)
 
-  def getOperationType(bOperationType: BOperationType): OperationType = {
-    val idx = bOperationType match {
-      case BOperationType.B_OPERATION_TYPE_GET_TABLES        => BOperationType.B_OPERATION_TYPE_GET_TABLES.index
-      case BOperationType.B_OPERATION_TYPE_UNSPECIFIED       => BOperationType.B_OPERATION_TYPE_UNSPECIFIED.index
-      case BOperationType.B_OPERATION_TYPE_GET_COLUMNS       => BOperationType.B_OPERATION_TYPE_GET_COLUMNS.index
-      case BOperationType.B_OPERATION_TYPE_GET_SCHEMAS       => BOperationType.B_OPERATION_TYPE_GET_SCHEMAS.index
-      case BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT => BOperationType.B_OPERATION_TYPE_EXECUTE_STATEMENT.index
-      case BOperationType.Unrecognized(i)                    => i
-    }
-    values.find(_.id == idx).getOrElse(UNKNOWN_OPERATION)
-  }
+  val values: IndexedSeq[OperationType] = findValues
 
-  def toBOperationType(operationType: OperationType): BOperationType = BOperationType.fromValue(operationType.id)
+  def getOperationType(bOperationType: BOperationType): OperationType =
+    OperationType.withValueOpt(bOperationType.value).getOrElse(UnknownOperation)
 
 }

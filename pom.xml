@@ -69,7 +69,7 @@
         <slf4j.version>2.0.3</slf4j.version>
         <log4j.version>2.19.0</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <hutool.version>5.8.8</hutool.version>
+        <hutool.version>5.8.9</hutool.version>
         <joda.version>2.11.2</joda.version>
         <gson.version>2.9.0</gson.version>
         <calcite.version>1.32.0</calcite.version>

@@ -38,7 +38,6 @@
             <version>${zio.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/dev.zio/zio-test-junit -->
         <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio-test-junit_2.13</artifactId>

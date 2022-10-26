@@ -53,6 +53,7 @@
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
         <module>bitlap-testkit</module>
+        <module>bitlap-raft</module>
     </modules>
 
     <properties>
@@ -88,7 +89,6 @@
         <zio.version>1.0.15</zio.version>
         <jupiter.version>5.9.1</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
-        <zio-raft.version>0.3.0</zio-raft.version>
         <rocksdb.version>7.6.0</rocksdb.version>
         <circe.version>0.14.2</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
@@ -374,6 +374,7 @@
                     </executions>
                     <configuration>
                         <args>
+                            <arg>-Ywarn-unused</arg> 
                             <arg>-Ymacro-annotations</arg>
                         </args>
                     </configuration>

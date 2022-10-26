@@ -1,0 +1,14 @@
+/* Copyright (c) 2022 bitlap.org */
+package com.ariskk.raft.model
+
+import scala.util.Random
+
+final case class ElectionTimeout(millis: Int) extends AnyVal
+
+object ElectionTimeout {
+  private val base  = 150
+  private val range = 150
+
+  def newTimeout: ElectionTimeout =
+    ElectionTimeout(base + Random.nextInt(range))
+}

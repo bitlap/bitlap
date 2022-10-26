@@ -14,6 +14,6 @@ object Sql {
      * print sql result beautifully
      */
     fun ResultSet.toTable(): DBTable {
-        return DBTablePrinter.getDBTable(this)
+        return DBTablePrinter.from(this)
     }
 }

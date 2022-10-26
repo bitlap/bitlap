@@ -90,7 +90,7 @@
         <surefire.version>2.22.2</surefire.version>
         <zio-raft.version>0.3.0</zio-raft.version>
         <rocksdb.version>7.6.0</rocksdb.version>
-        <circe.version>0.14.2</circe.version>
+        <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
     </properties>
 

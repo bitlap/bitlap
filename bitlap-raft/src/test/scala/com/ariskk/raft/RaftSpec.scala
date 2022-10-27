@@ -1,15 +1,15 @@
 /* Copyright (c) 2022 bitlap.org */
 package com.ariskk.raft
 
-import com.ariskk.raft.model._
-import com.ariskk.raft.model.Message.{ VoteRequest, VoteResponse }
 import zio.duration.durationInt
-import zio.test.{ assertM, TestAspect }
 import zio.test.Assertion.equalTo
 import zio.test.environment.TestClock
-import zio.test.junit.JUnitRunnableSpec
+import zio.test.{ assertM, TestAspect }
 
-object RaftSpec extends JUnitRunnableSpec with BaseSpec {
+import com.ariskk.raft.model.Message.{ VoteRequest, VoteResponse }
+import com.ariskk.raft.model._
+
+object RaftSpec extends BaseSpec {
 
   override def aspects = List(TestAspect.timeout(10.seconds))
 

@@ -1,17 +1,17 @@
 /* Copyright (c) 2022 bitlap.org */
 package com.ariskk.raft
 
-import com.ariskk.raft.statemachine.{ Key, ReadKey }
 import zio.ZIO
 import zio.duration.durationInt
-import zio.test.{ assertM, TestAspect }
 import zio.test.Assertion.equalTo
-import zio.test.junit.JUnitRunnableSpec
+import zio.test.{ assertM, TestAspect }
+
+import com.ariskk.raft.statemachine.{ Key, ReadKey }
 
 /** Those tests use the live clock and emulate a faulty network. `TestCluster` will a) shuffle messages b) drop messages
  *  c) delay messages if `chaos = true`. This is to test protocol resilience under realistic conditions.
  */
-object ClusterSpec extends JUnitRunnableSpec with BaseSpec {
+object ClusterSpec extends BaseSpec {
 
   override def aspects = List(TestAspect.timeout(10.seconds))
 

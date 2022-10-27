@@ -24,15 +24,15 @@ import scala.util.Try
 final class RaftServer[T](
   config: RaftServer.Config,
   peerConfig: Seq[RaftServer.Config],
-  raftRef: Ref[Raft[T]],
+  val raftRef: Ref[Raft[T]],
   serdeRef: Ref[Serde]
 ) {
 
-  private lazy val interServer: URIO[zio.ZEnv, ExitCode] =
-    new RaftClusterServerProvider(config.raftPort, raftRef, serdeRef).run(Nil)
+  private val interServer: URIO[zio.ZEnv, ExitCode] =
+    new RaftInternalGrpcServer(config.raftPort, raftRef, serdeRef).run(Nil)
 
-  private lazy val client: URIO[zio.ZEnv, ExitCode] =
-    new RaftClusterServerProvider(config.raftClientPort, raftRef, serdeRef).run(Nil)
+  private val client: URIO[zio.ZEnv, ExitCode] =
+    new RaftInternalGrpcServer(config.raftClientPort, raftRef, serdeRef).run(Nil)
 
   private lazy val peerChannels: Map[NodeId, ZLayer[Any, Throwable, RaftServiceClient]] = peerConfig
     .map(config =>
@@ -82,7 +82,7 @@ final class RaftServer[T](
       _    <- sendMessages
     } yield ()).provideLayer(ZEnv.live)
 
-//  def getState: ZIO[Any, Nothing, NodeState] = raftRef.get.flatMap(_.nodeState)
+  def getState: ZIO[Any, Nothing, NodeState] = raftRef.get.flatMap(_.nodeState)
 
 }
 
@@ -100,10 +100,11 @@ object RaftServer {
     peerConfig: Seq[Config],
     storage: Storage,
     stateMachine: StateMachine[T]
-  ): UIO[RaftServer[T]] = for {
-    raft     <- Raft[T](config.nodeId, peerConfig.map(_.nodeId).toSet, storage, stateMachine)
-    raftRef  <- Ref.make(raft)
-    serdeRef <- Ref.make(Serde.kryo)
-  } yield new RaftServer[T](config, peerConfig, raftRef, serdeRef)
+  ): UIO[RaftServer[T]] =
+    for {
+      raft     <- Raft[T](config.nodeId, peerConfig.map(_.nodeId).toSet, storage, stateMachine)
+      raftRef  <- Ref.make(raft)
+      serdeRef <- Ref.make(Serde.kryo)
+    } yield new RaftServer[T](config, peerConfig, raftRef, serdeRef)
 
 }

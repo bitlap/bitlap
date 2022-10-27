@@ -9,13 +9,13 @@ import com.ariskk.raft.storage.MemoryStorage.MemoryLog
 
 /** Reference implemantation of `Storage` for testing purposes.
  */
-final class MemoryStorage(
+final class MemoryStorage private (
   private[raft] val listRef: Ref[List[LogEntry]],
   private[raft] val votedForRef: Ref[Option[Vote]],
   private[raft] val termRef: Ref[Term]
 ) extends Storage {
 
-  lazy val log = new MemoryLog(listRef)
+  lazy val log: MemoryLog = new MemoryLog(listRef)
 
   def storeVote(vote: Vote): IO[StorageException, Unit] = votedForRef.set(Option(vote))
 
@@ -29,7 +29,7 @@ final class MemoryStorage(
 
 object MemoryStorage {
 
-  final class MemoryLog(log: Ref[List[LogEntry]]) extends Log {
+  private[raft] final class MemoryLog(log: Ref[List[LogEntry]]) extends Log {
     def append(index: Index, entry: LogEntry): IO[StorageException, Unit] =
       log.update(_.patch(index.index.toInt, Seq(entry), 1))
     def size: IO[StorageException, Long] = log.get.map(_.size.toLong)

@@ -257,6 +257,11 @@
             <artifactId>circe-core_2.13</artifactId>
             <version>${circe.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.4.2</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

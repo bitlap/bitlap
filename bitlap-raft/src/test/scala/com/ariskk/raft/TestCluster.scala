@@ -63,7 +63,7 @@ final class TestCluster[T](nodeRef: Ref[Seq[Raft[T]]], chaos: Boolean) {
 
   }
 
-  def submitCommand(command: WriteCommand): ZIO[Clock, Serializable, Unit] = for {
+  def submitCommand(command: WriteCommand) = for {
     nodes <- getNodes
     ids = nodes.map(_.nodeId)
     states <- ZIO.collectAll(nodes.map(_.nodeState))
@@ -79,8 +79,10 @@ final class TestCluster[T](nodeRef: Ref[Seq[Raft[T]]], chaos: Boolean) {
 
   def queryStateMachines(query: ReadCommand): ZIO[Clock, RaftException, Seq[Option[T]]] = for {
     nodes   <- getNodes
-    results <- ZIO.collectAll(nodes.map(_.submitQuery(query)))
-  } yield results
+    results <- ZIO.collectAll(nodes.map(_.submitUnsafeQuery(query)))
+  } yield results.collect { case CommandResponse.QueryResult(data: Option[_]) =>
+    data.asInstanceOf[Option[T]]
+  }
 }
 
 object TestCluster {

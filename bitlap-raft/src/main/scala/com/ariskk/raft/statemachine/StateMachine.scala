@@ -8,7 +8,7 @@ import com.ariskk.raft.model.RaftException.StateMachineException
 
 /** Very simplistic modeling
  */
-trait StateMachine[T] {
+trait StateMachine[+T] {
   def write: PartialFunction[WriteCommand, IO[StateMachineException, Unit]]
   def read: PartialFunction[ReadCommand, IO[StateMachineException, Option[T]]]
 }

@@ -12,6 +12,7 @@ import org.bitlap.network.raft.ZioRaft.ZRaftService
 import org.bitlap.tools.apply
 import zio._
 import zio.clock.Clock
+import com.ariskk.raft.model.Command.ReadCommand
 
 /** raft service
  *
@@ -20,7 +21,7 @@ import zio.clock.Clock
  *  @version 1.0,2022/6/1
  */
 @apply
-final class ZioRaftService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
+final class RaftGrpcService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
     extends ZRaftService[Any, Any]
     with RpcStatus {
 
@@ -49,7 +50,7 @@ final class ZioRaftService[T](raftRef: Ref[Raft[T]], serdeRef: Ref[Serde])
       raft    <- raftRef.get
       response <- command match {
         case w: WriteCommand => raft.submitCommand(w)
-//        case r: ReadCommand  => raft.submitQuery(r)
+        case r: ReadCommand  => raft.submitQuery(r)
       }
     } yield serde.serialize(response)
 }

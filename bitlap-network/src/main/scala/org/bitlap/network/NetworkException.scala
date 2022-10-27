@@ -14,7 +14,7 @@ sealed abstract class NetworkException(
   val code: Int = -1,
   val msg: String,
   val cause: Option[Throwable] = None
-) extends BitlapException(msg, cause.orNull)
+) extends BitlapException(if (msg == null) "" else msg, cause.orNull)
     with Product
 
 object NetworkException {

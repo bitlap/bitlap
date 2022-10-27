@@ -13,6 +13,11 @@
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-raft</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
             <artifactId>bitlap-client</artifactId>
         </dependency>
         <dependency>
@@ -27,11 +32,6 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
             <version>${grpc.netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ariskk</groupId>
-            <artifactId>zio-raft_2.13</artifactId>
-            <version>${zio-raft.version}</version>
         </dependency>
         <dependency>
             <groupId>org.rocksdb</groupId>

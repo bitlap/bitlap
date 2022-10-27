@@ -12,7 +12,7 @@ import zio.ZIO
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcZio extends Rpc[Task] { self =>
+trait AsyncRpc extends Rpc[Task] { self =>
 
   override def pure[A](a: A): Task[A] = Task.succeed(a)
 

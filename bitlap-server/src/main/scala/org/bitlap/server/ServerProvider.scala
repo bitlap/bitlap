@@ -1,16 +1,15 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
 
-import zio.{ ExitCode, URIO }
 import org.bitlap.server.http.HttpServerProvider
-import org.bitlap.server.raft.RaftClusterServerProvider
 import org.bitlap.server.rpc.InternalGrpcServerProvider
+import zio._
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
  */
-trait BitlapServerProvider {
+trait ServerProvider {
 
   def serverType: String
 
@@ -18,11 +17,10 @@ trait BitlapServerProvider {
 
 }
 
-object BitlapServerProvider {
+object ServerProvider {
 
-  lazy val serverProviders: List[BitlapServerProvider] = List(
+  lazy val serverProviders: List[ServerProvider] = List(
     new InternalGrpcServerProvider(23333),
-    RaftClusterServerProvider,
     new HttpServerProvider(8080)
   )
 }

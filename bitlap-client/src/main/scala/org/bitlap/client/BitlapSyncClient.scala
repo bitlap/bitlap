@@ -12,9 +12,9 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) extends RpcIdentity with RpcStatus {
+class BitlapSyncClient(uri: String, port: Int, props: Map[String, String]) extends SyncRpc with RpcStatus {
 
-  private lazy val delegateClient = new BitlapZioClient(uri, port, props)
+  private lazy val delegateClient = new BitlapAsyncClient(uri, port, props)
 
   override def openSession(
     username: String,

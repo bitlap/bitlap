@@ -4,7 +4,7 @@ package org.bitlap.server.http
 import io.circe.generic.auto.exportEncoder
 import io.circe.syntax.EncoderOps
 import org.bitlap.common.jdbc._
-import org.bitlap.server.BitlapServerProvider
+import org.bitlap.server.ServerProvider
 import zhttp.http._
 import zhttp.service.server.ServerChannelFactory
 import zhttp.service._
@@ -18,7 +18,7 @@ import scala.util.Try
  *  http://localhost:8080/sql
  *  @param port
  */
-final class HttpServerProvider(val port: Int) extends BitlapServerProvider {
+final class HttpServerProvider(val port: Int) extends ServerProvider {
 
   private val table = "table_test"
 

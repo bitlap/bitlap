@@ -13,11 +13,6 @@
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-raft</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
             <artifactId>bitlap-client</artifactId>
         </dependency>
         <dependency>

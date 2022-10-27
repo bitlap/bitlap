@@ -29,7 +29,7 @@ package object network {
   lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
     RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
 
-  implicit final class RpcIdentityOps(val rpc: RpcIdentity) extends AnyVal {
+  implicit final class RpcIdentityOps(val rpc: SyncRpc) extends AnyVal {
     def zio[T](action: => T): ZIO[Any, Status, T] =
       IO.effect(action).mapError { ex => ex.printStackTrace(); Status.fromThrowable(ex) }
   }

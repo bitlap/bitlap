@@ -53,7 +53,6 @@
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
         <module>bitlap-testkit</module>
-        <module>bitlap-raft</module>
     </modules>
 
     <properties>

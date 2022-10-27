@@ -11,6 +11,6 @@ data class DBTable(
 ) {
 
     fun show() {
-        DBTablePrinter.printDBTable(this)
+        DBTablePrinter.print(this)
     }
 }

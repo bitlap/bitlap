@@ -52,7 +52,7 @@ class SqlResult(private val statement: String, private val table: DBTable) {
     internal val result: List<List<Any?>> by lazy {
         mutableListOf<List<Any?>>().apply {
             (0 until table.rowCount).forEach { r ->
-                add(table.columns.map { it.getTypeValue(r) })
+                add(table.columns.map { it.typeValues[r] })
             }
         }
     }

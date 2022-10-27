@@ -11,7 +11,7 @@ import scalapb.zio_grpc.{ ServerMain, ServiceList }
  */
 trait EmbedMockServer extends ServerMain {
 
-  def services: ServiceList[zio.ZEnv] = ServiceList.addM(MockZioDriverServiceLive.embedLive)
+  def services: ServiceList[zio.ZEnv] = ServiceList.addM(MockDriverGrpcServiceLive.embedLive)
 
 }
 

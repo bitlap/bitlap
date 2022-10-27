@@ -10,7 +10,7 @@ import org.bitlap.network.models.{ FetchResults, TableSchema }
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait RpcIdentity extends Rpc[Identity] { self =>
+trait SyncRpc extends Rpc[Identity] { self =>
 
   def pure[A](a: A): Identity[A] = a
 

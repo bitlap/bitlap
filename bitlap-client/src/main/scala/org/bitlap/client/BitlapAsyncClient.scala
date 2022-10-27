@@ -20,7 +20,7 @@ import zio._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extends RpcZio with RpcStatus {
+class BitlapAsyncClient(uri: String, port: Int, props: Map[String, String]) extends AsyncRpc with RpcStatus {
 
   private val clientLayer: Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
     scalapb.zio_grpc.ZManagedChannel(ManagedChannelBuilder.forAddress(uri, port).usePlaintext())
@@ -33,14 +33,13 @@ class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extend
   ): ZIO[Any, Throwable, SessionHandle] =
     DriverServiceClient
       .openSession(BOpenSessionReq(username, password, configuration))
-      .map(r => new SessionHandle(r.getSessionHandle)) // 因为server和client使用一套API。必须转换以下
-      .mapError(statusApplyFunc)
+      .mapBoth(statusApplyFunc, r => new SessionHandle(r.getSessionHandle))
       .provideLayer(clientLayer)
 
   override def closeSession(sessionHandle: handles.SessionHandle): ZIO[Any, Throwable, Unit] =
     DriverServiceClient
       .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
-      .map(_ => ())
+      .as()
       .mapError(statusApplyFunc)
       .provideLayer(clientLayer)
 
@@ -54,8 +53,7 @@ class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extend
       .executeStatement(
         BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), confOverlay, queryTimeout)
       )
-      .map(r => new OperationHandle(r.getOperationHandle))
-      .mapError(statusApplyFunc)
+      .mapBoth(statusApplyFunc, r => new OperationHandle(r.getOperationHandle))
       .provideLayer(clientLayer)
 
   override def fetchResults(
@@ -67,15 +65,13 @@ class BitlapZioClient(uri: String, port: Int, props: Map[String, String]) extend
       .fetchResults(
         BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)
       )
-      .map(r => FetchResults.fromBFetchResultsResp(r))
-      .mapError(statusApplyFunc)
+      .mapBoth(statusApplyFunc, r => FetchResults.fromBFetchResultsResp(r))
       .provideLayer(clientLayer)
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
     DriverServiceClient
       .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
-      .map(t => TableSchema.fromBTableSchema(t.getSchema))
-      .mapError(statusApplyFunc)
+      .mapBoth(statusApplyFunc, t => TableSchema.fromBTableSchema(t.getSchema))
       .provideLayer(clientLayer)
 
   override def getColumns(

@@ -12,7 +12,8 @@ import zio.console._
  */
 final class InternalGrpcServerProvider(override val port: Int) extends ServerProvider with ServerMain {
 
-  def services: ServiceList[zio.ZEnv] = ServiceList.addM(ZIO.succeed(ZioDriverServiceLive(ZioRpcBackend()))) // 可以随意更换实现
+  def services: ServiceList[zio.ZEnv] =
+    ServiceList.addM(ZIO.succeed(DriverGrpcServiceLive(AsyncRpcBackend()))) // 可以随意更换实现
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {

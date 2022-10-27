@@ -3,7 +3,7 @@ package org.bitlap.testkit
 
 import org.bitlap.network.OperationType
 import org.bitlap.network.handles.OperationHandle
-import org.bitlap.testkit.server.MockZioRpcBackend
+import org.bitlap.testkit.server.MockAsyncRpcBackend
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -34,7 +34,7 @@ class CsvConvertSpec extends CsvUtil {
 
   @Test
   def testMockZioRpcBackend1 {
-    val backend = MockZioRpcBackend()
+    val backend = MockAsyncRpcBackend()
     val ret     = backend.fetchResults(new OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Runtime.default.unsafeRun(ret)
     println(syncRet)

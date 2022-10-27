@@ -9,6 +9,6 @@ import scalapb.zio_grpc.{ ServerMain, ServiceList }
  */
 trait MockServer extends ServerMain {
 
-  def services: ServiceList[zio.ZEnv] = ServiceList.addM(MockZioDriverServiceLive.mockLive)
+  def services: ServiceList[zio.ZEnv] = ServiceList.addM(MockDriverGrpcServiceLive.mockLive)
 
 }

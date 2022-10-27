@@ -12,7 +12,7 @@ import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesRes
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService._
 import org.bitlap.network.handles._
-import org.bitlap.network.{ errorApplyFunc, RpcStatus, RpcZio }
+import org.bitlap.network.{ errorApplyFunc, AsyncRpc, RpcStatus }
 import org.bitlap.tools._
 import zio._
 
@@ -23,7 +23,7 @@ import zio._
  *  @version 1.0,2022/4/21
  */
 @apply
-final class ZioDriverServiceLive(private val zioRpcBackend: RpcZio) extends ZDriverService[Any, Any] with RpcStatus {
+final class DriverGrpcServiceLive(private val zioRpcBackend: AsyncRpc) extends ZDriverService[Any, Any] with RpcStatus {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     zioRpcBackend

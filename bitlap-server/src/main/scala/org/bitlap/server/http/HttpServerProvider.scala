@@ -9,6 +9,7 @@ import zhttp.http._
 import zhttp.service.server.ServerChannelFactory
 import zhttp.service._
 import zio._
+import org.bitlap.network.ServerType
 
 import java.sql.DriverManager
 import scala.util.Try
@@ -65,5 +66,5 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
       .exitCode
   }
 
-  override def serverType: String = "HTTP"
+  override def serverType: ServerType = ServerType.Http
 }

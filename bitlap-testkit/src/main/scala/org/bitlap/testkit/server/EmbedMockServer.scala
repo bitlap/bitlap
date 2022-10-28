@@ -4,6 +4,8 @@ package org.bitlap.testkit.server
 import zio.{ ExitCode, URIO }
 import zio.console.Console
 import scalapb.zio_grpc.{ ServerMain, ServiceList }
+import zio.ZIO
+import zio.console.putStrLn
 
 /** @author
  *    梦境迷离
@@ -16,6 +18,9 @@ trait EmbedMockServer extends ServerMain {
 }
 
 object EmbedBitlapServer extends EmbedMockServer {
+
+  override def welcome: ZIO[zio.ZEnv, Throwable, Unit] =
+    putStrLn(s"Mock Server is listening to port: $port")
 
   override def port: Int                                                      = 23333
   override def run(args: List[String]): URIO[zio.ZEnv with Console, ExitCode] = super.run(args)

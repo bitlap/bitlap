@@ -68,7 +68,7 @@
         <arrow.version>1.1.3</arrow.version>
         <slf4j.version>2.0.3</slf4j.version>
         <!--   jraft need 2.17.1     -->
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.19.0</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
         <hutool.version>5.8.9</hutool.version>
         <joda.version>2.12.0</joda.version>

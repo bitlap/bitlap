@@ -24,7 +24,7 @@ object RaftClient {
 
   @Nullable
   def getLeaderAddress(): LeaderAddress = {
-    if(cliClientService == null) {
+    if (cliClientService == null) {
       throw ServerIntervalException("cannot find raft CLI service")
     }
     val rt      = RouteTable.getInstance

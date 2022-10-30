@@ -337,3 +337,14 @@ enum BTypeId {
     B_TYPE_ID_SHORT_TYPE = 7;
     B_TYPE_ID_BYTE_TYPE = 8;
 }
+
+
+message BGetRaftMetadata {
+    message BGetLeaderReq {
+        string  request_id = 1;
+    }
+    message BGetLeaderResp {
+        string  ip = 1;
+        int32  port = 2;
+    }
+}

@@ -30,17 +30,9 @@ trait ServerProvider {
 
 object ServerProvider {
 
-  private lazy val config = ConfigFactory.load().getConfig("bitlap.server.raft")
-  private val raftServerConfig = RaftServerConfig(
-    config.getString("dataPath"),
-    config.getString("groupId"),
-    config.getString("serverAddress"),
-    config.getString("initialServerAddressList")
-  )
-
   lazy val serverProviders: List[ServerProvider] = List(
     new InternalGrpcServerProvider(23332),
     new HttpServerProvider(8081),
-    new RaftServerProvider(raftServerConfig)
+    new RaftServerProvider(RaftServerConfig.raftServerConfig)
   )
 }

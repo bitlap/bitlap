@@ -1,15 +1,13 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
 
-import com.alipay.sofa.jraft.core.StateMachineAdapter
-import java.util.concurrent.atomic.AtomicLong
-import com.alipay.sofa.jraft.Status
-import com.alipay.sofa.jraft.{ Iterator => JRIterator }
+import com.alipay.sofa.jraft.core._
+import com.alipay.sofa.jraft.{ Iterator => JRIterator, Status }
+import org.slf4j._
+
+import java.util.concurrent.atomic._
 import java.util.{ ArrayList => JArrayList, List => JList }
 import scala.jdk.CollectionConverters.CollectionHasAsScala
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.bitlap.server.raft.ElectionOnlyStateMachine
 
 /** @author
  *    梦境迷离

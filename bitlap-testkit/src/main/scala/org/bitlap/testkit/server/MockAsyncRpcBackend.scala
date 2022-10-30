@@ -2,12 +2,12 @@
 package org.bitlap.testkit.server
 
 import com.google.protobuf.ByteString
-import org.bitlap.network.{ AsyncRpc, OperationType }
+import org.bitlap.network.{ AsyncRpc, LeaderAddress, OperationType }
 import org.bitlap.network.handles.{ HandleIdentifier, OperationHandle, SessionHandle }
 import org.bitlap.network.models._
 import org.bitlap.testkit.{ CsvUtil, Metric }
 import org.bitlap.tools.apply
-import zio.ZIO
+import zio.{ Task, ZIO }
 
 /** Mock backend for rpc implementation.
  *

@@ -1,10 +1,13 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
 
+import com.alipay.sofa.jraft.entity.PeerId
 import org.bitlap.network.ServerType
 import org.bitlap.server.ServerProvider
 import zio.console.putStrLn
 import zio.{ ExitCode, Task, URIO, ZIO }
+import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
+import com.alipay.sofa.jraft.RaftGroupService
 
 /** @author
  *    梦境迷离
@@ -44,6 +47,13 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
     Runtime.getRuntime.addShutdownHook(new Thread(() => node.shutdown()))
 
     node.init(electionOpts)
+
+    val serviceId = PeerId.parsePeer(serverIdStr)
+    val rpcServer = RaftRpcServerFactory.createAndStartRaftRpcServer(serviceId.getEndpoint)
+    RaftRpcServerFactory.addRaftRequestProcessors(rpcServer)
+    val cluster = new RaftGroupService(groupId, serviceId, electionOpts.nodeOptions, rpcServer)
+    cluster.start()
+    true
   }
 
   override def serverType: ServerType = ServerType.Raft

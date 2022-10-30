@@ -1,10 +1,9 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
-import zio.Task
-import zio.ZIO
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
+import zio.{ Task, ZIO }
 
 /** Rpc api and monad for zio backend.
  *

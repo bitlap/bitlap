@@ -24,4 +24,6 @@ service DriverService {
 
   rpc GetResultSetMetadata (BGetResultSetMetadata.BGetResultSetMetadataReq) returns (BGetResultSetMetadata.BGetResultSetMetadataResp) {}
 
+  rpc GetLeader (BGetRaftMetadata.BGetLeaderReq) returns (BGetRaftMetadata.BGetLeaderResp) {}
+
 }

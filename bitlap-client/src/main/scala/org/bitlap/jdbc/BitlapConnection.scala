@@ -36,7 +36,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
     val hosts            = uriWithoutPrefix.split(",")
     // parse uri
-    val parts = hosts.map(it => it.split("/"))
+    val parts       = hosts.map(it => it.split("/"))
+    val serverPeers = hosts.map(f => f.split("/")(0))
     try {
       // FIXME
       val hostAndPort =
@@ -45,13 +46,16 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
           case e: Exception =>
             e.printStackTrace(); println("Use default port: 23333"); scala.Array("localhost", "23333")
         }
-      client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, info.asScala.toMap)
+      client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, serverPeers, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {
       case e: Exception =>
         e.printStackTrace()
-        throw BSQLException("Bitlap openSession failed", cause = e)
+        throw BSQLException(
+          s"Bitlap openSession failed, connect to serverPeers: ${serverPeers.mkString("Array(", ", ", ")")}",
+          cause = e
+        )
     }
   }
 

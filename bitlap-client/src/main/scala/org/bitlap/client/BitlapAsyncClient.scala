@@ -24,9 +24,7 @@ import java.util.UUID
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapAsyncClient(uri: String, port: Int, serverPeers: Array[String], props: Map[String, String])
-    extends AsyncRpc
-    with RpcStatus {
+class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
 
   // refactor
   private lazy val serverAddresses =
@@ -44,7 +42,6 @@ class BitlapAsyncClient(uri: String, port: Int, serverPeers: Array[String], prop
         value
       }
     )
-    .filterOrDie(_.exists(_ != null))(BSQLException("Leader not found"))
     .map(_.get)
 
   private lazy val leaderClientLayer = leaderAddress.map(f => clientLayer(f.ip, f.port))
@@ -133,7 +130,9 @@ class BitlapAsyncClient(uri: String, port: Int, serverPeers: Array[String], prop
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[LeaderAddress]] =
     DriverServiceClient
       .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
-      .map(f => Some(LeaderAddress(f.ip, f.port)))
+      .map { f =>
+        if (f == null) None else Some(LeaderAddress(f.ip, f.port))
+      }
       .catchSomeCause {
         case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderAddress]) // ignore this
       }

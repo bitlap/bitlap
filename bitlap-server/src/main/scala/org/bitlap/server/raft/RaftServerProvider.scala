@@ -1,13 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
 
-import com.alipay.sofa.jraft.entity.PeerId
+import com.alipay.sofa.jraft.Node
+import com.alipay.sofa.jraft.option.NodeOptions
 import org.bitlap.network.ServerType
 import org.bitlap.server.ServerProvider
 import zio.console.putStrLn
 import zio.{ ExitCode, Task, URIO, ZIO }
-import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
-import com.alipay.sofa.jraft.RaftGroupService
 
 /** @author
  *    梦境迷离
@@ -17,7 +16,7 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
   // Start elections by 3 instance. Note that if multiple instances are started on the same machine,
   // the first parameter `dataPath` should not be the same.
-  private def runRaft(): Task[Boolean] = ZIO.effect {
+  private def runRaft(): Task[Node] = ZIO.effect {
     val dataPath       = raftServerConfig.dataPath
     val groupId        = raftServerConfig.groupId
     val serverIdStr    = raftServerConfig.serverAddress
@@ -28,7 +27,7 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
       groupId = groupId,
       serverAddress = serverIdStr,
       initialServerAddressList = initialConfStr,
-      null
+      new NodeOptions
     )
     val node = new ElectionNode
     node.addLeaderStateListener(new LeaderStateListener() {
@@ -48,21 +47,17 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
     node.init(electionOpts)
 
-    val serviceId = PeerId.parsePeer(serverIdStr)
-    val rpcServer = RaftRpcServerFactory.createAndStartRaftRpcServer(serviceId.getEndpoint)
-    RaftRpcServerFactory.addRaftRequestProcessors(rpcServer)
-    val cluster = new RaftGroupService(groupId, serviceId, electionOpts.nodeOptions, rpcServer)
-    cluster.start()
-    true
+    node.getNode
   }
 
   override def serverType: ServerType = ServerType.Raft
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (
-      runRaft() *> ZIO.effect(RaftClient.init()) *> putStrLn(s"$serverType: Raft Server started").provideLayer(
-        zio.console.Console.live
-      )
+      runRaft().flatMap(fr => ZIO.effect(RaftClient.init(fr))) *> putStrLn(s"$serverType: Raft Server started")
+        .provideLayer(
+          zio.console.Console.live
+        )
     ).exitCode
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =

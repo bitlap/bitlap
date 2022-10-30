@@ -30,9 +30,9 @@ trait ServerProvider {
 
 object ServerProvider {
 
-  lazy val serverProviders: List[ServerProvider] = List(
-    new InternalGrpcServerProvider(23332),
-    new HttpServerProvider(8081),
-    new RaftServerProvider(RaftServerConfig.raftServerConfig)
-  )
+  def serverProviders(http: Boolean): List[ServerProvider] =
+    (if (http) List(new HttpServerProvider(8081)) else List()) ++ List(
+      new InternalGrpcServerProvider(23333),
+      new RaftServerProvider(RaftServerConfig.raftServerConfig)
+    )
 }

@@ -46,7 +46,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
           case e: Exception =>
             e.printStackTrace(); println("Use default port: 23333"); scala.Array("localhost", "23333")
         }
-      client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, serverPeers, info.asScala.toMap)
+      client = new BitlapClient(serverPeers, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {

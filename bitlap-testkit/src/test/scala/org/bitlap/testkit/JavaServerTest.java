@@ -5,11 +5,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +26,7 @@ public class JavaServerTest {
     final static String table = "test_table" + FakeDataUtil.randEntityNumber();
 
     @BeforeClass
-    public static void startServer() throws InterruptedException, SQLException {
+    public static void startServer() throws SQLException, InterruptedException {
         Thread server = new Thread(() -> EmbedBitlapServer.main(new String[0]));
         server.setDaemon(true);
         server.start();
@@ -70,7 +66,7 @@ public class JavaServerTest {
     }
 
     @Test
-    public void query_test1() throws SQLException {
+    public void query_test1() throws SQLException, InterruptedException {
         Statement stmt = conn().createStatement();
         stmt.setMaxRows(10);
         stmt.execute("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " + "  from " + table + "   where _time >= 0 " + " group by _time");
@@ -83,5 +79,6 @@ public class JavaServerTest {
         }
 
         assert ret.size() > 0;
+        Thread.currentThread().join();
     }
 }

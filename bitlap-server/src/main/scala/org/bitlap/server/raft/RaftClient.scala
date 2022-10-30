@@ -22,22 +22,35 @@ object RaftClient {
     cliClientService.init(new CliOptions)
   }
 
-  @Nullable
-  def getLeaderAddress(): LeaderAddress = {
-    if (cliClientService == null) {
-      throw ServerIntervalException("cannot find raft CLI service")
-    }
-    val rt      = RouteTable.getInstance
-    val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
-    val groupId = RaftServerConfig.raftServerConfig.groupId
-    val timeout = RaftServerConfig.raftServerConfig.timeout
-    rt.updateConfiguration(groupId, conf)
-    val success: Boolean = rt.refreshLeader(cliClientService, groupId, timeout.toMillis.toInt).isOk
-    val leader = if (success) {
-      rt.selectLeader(groupId)
-    } else null
+  private var _node: Node = _
 
-    Option(leader).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
-  }
+  def init(node: Node): Unit =
+    _node = node
+
+  def isLeader: Boolean = _node.isLeader
+
+  @Nullable
+  def getLeaderAddress(): LeaderAddress =
+    if (isLeader) {
+      if (_node == null) {
+        throw ServerIntervalException("cannot find raft CLI service")
+      }
+      Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
+    } else {
+      if (cliClientService == null) {
+        throw ServerIntervalException("cannot find raft CLI service")
+      }
+      val rt      = RouteTable.getInstance
+      val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
+      val groupId = RaftServerConfig.raftServerConfig.groupId
+      val timeout = RaftServerConfig.raftServerConfig.timeout
+      rt.updateConfiguration(groupId, conf)
+      val success: Boolean = rt.refreshLeader(cliClientService, groupId, timeout.toMillis.toInt).isOk
+      val leader = if (success) {
+        rt.selectLeader(groupId)
+      } else null
+      Option(leader).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
+      // RPC
+    }
 
 }

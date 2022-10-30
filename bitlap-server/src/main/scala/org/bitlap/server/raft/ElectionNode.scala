@@ -1,20 +1,16 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
-import com.alipay.sofa.jraft.{ Lifecycle, RaftGroupService }
+import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
-import com.alipay.sofa.jraft.option.NodeOptions
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
+import com.alipay.sofa.jraft._
 import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
 
-import java.io.IOException
+import java.io._
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
-import com.alipay.sofa.jraft.Node
-import com.alipay.sofa.jraft.conf.Configuration
-import java.io.File
-import org.bitlap.server.raft.ElectionNode
-import org.slf4j.LoggerFactory
 
 /** @author
  *    梦境迷离
@@ -37,7 +33,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
       return true
     }
     // node options
-    val nodeOpts = if (opts.nodeOptions == null) new NodeOptions else opts.nodeOptions
+    val nodeOpts = opts.nodeOptions
     this.fsm = new ElectionOnlyStateMachine(this.listeners)
     nodeOpts.setFsm(this.fsm)
     val initialConf = new Configuration

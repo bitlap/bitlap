@@ -84,7 +84,7 @@ final class DriverGrpcServiceLive(private val asyncRpcBackend: AsyncRpc)
   override def getLeader(request: BGetRaftMetadata.BGetLeaderReq): ZIO[Any, Status, BGetRaftMetadata.BGetLeaderResp] = {
     val leaderAddress = Task.effect(RaftClient.getLeaderAddress())
     leaderAddress.flatMap { ld =>
-      if (ld == null || ld.port < 0 || ld.ip == null || ld.ip.isBlank) {
+      if (ld == null || ld.port < 0 || ld.ip == null || ld.ip.isEmpty) {
         Task.fail(LeaderServerNotFoundException(s"requestId: ${request.requestId}"))
       } else {
         Task.succeed(ld)

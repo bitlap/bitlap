@@ -15,7 +15,7 @@ import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSess
 import org.bitlap.network.driver.service.ZioService._
 import org.bitlap.network.handles._
 import org.bitlap.network.{ errorApplyFunc, AsyncRpc, RpcStatus }
-import org.bitlap.server.raft.JRaftClient
+import org.bitlap.server.raft.RaftClient
 import org.bitlap.tools._
 import zio._
 
@@ -82,7 +82,7 @@ final class DriverGrpcServiceLive(private val asyncRpcBackend: AsyncRpc)
       .mapError(errorApplyFunc)
 
   override def getLeader(request: BGetRaftMetadata.BGetLeaderReq): ZIO[Any, Status, BGetRaftMetadata.BGetLeaderResp] = {
-    val leaderAddress = Task.effect(JRaftClient.getLeaderAddress())
+    val leaderAddress = Task.effect(RaftClient.getLeaderAddress())
     leaderAddress.flatMap { ld =>
       if (ld == null || ld.port < 0 || ld.ip == null || ld.ip.isBlank) {
         Task.fail(LeaderServerNotFoundException(s"requestId: ${request.requestId}"))

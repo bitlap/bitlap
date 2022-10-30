@@ -5,6 +5,7 @@ import com.alipay.sofa.jraft._
 import com.alipay.sofa.jraft.option._
 import com.alipay.sofa.jraft.rpc.impl.cli._
 import org.bitlap.network.LeaderAddress
+import org.bitlap.network.NetworkException.ServerIntervalException
 
 import javax.annotation.Nullable
 
@@ -12,13 +13,20 @@ import javax.annotation.Nullable
  *  @author
  *    梦境迷离
  */
-object JRaftClient {
+object RaftClient {
 
-  val cliClientService: CliClientServiceImpl = new CliClientServiceImpl
-  cliClientService.init(new CliOptions)
+  private var cliClientService: CliClientServiceImpl = _
+
+  def init(): Boolean = {
+    cliClientService = new CliClientServiceImpl
+    cliClientService.init(new CliOptions)
+  }
 
   @Nullable
   def getLeaderAddress(): LeaderAddress = {
+    if(cliClientService == null) {
+      throw ServerIntervalException("cannot find raft CLI service")
+    }
     val rt      = RouteTable.getInstance
     val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
     val groupId = RaftServerConfig.raftServerConfig.groupId

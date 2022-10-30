@@ -60,7 +60,9 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (
-      runRaft() *> putStrLn(s"$serverType: Raft Server started").provideLayer(zio.console.Console.live)
+      runRaft() *> ZIO.effect(RaftClient.init()) *> putStrLn(s"$serverType: Raft Server started").provideLayer(
+        zio.console.Console.live
+      )
     ).exitCode
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =

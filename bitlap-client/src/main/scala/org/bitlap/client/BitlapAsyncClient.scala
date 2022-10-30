@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import io.grpc.ManagedChannelBuilder
+import io.grpc.{ ManagedChannelBuilder, Status }
 import org.bitlap.jdbc.BSQLException
 import org.bitlap.network._
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
@@ -132,10 +132,10 @@ class BitlapAsyncClient(uri: String, port: Int, serverPeers: Array[String], prop
 
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Throwable, Option[LeaderAddress]] =
     DriverServiceClient
-      .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId)) // fixme
-      .mapBoth(
-        statusApplyFunc,
-        la =>
-          if (la == null || la.ip == null || la.port < 0 || la.ip.isBlank) None else Some(LeaderAddress(la.ip, la.port))
-      )
+      .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
+      .map(f => Some(LeaderAddress(f.ip, f.port)))
+      .catchSomeCause {
+        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderAddress]) // ignore this
+      }
+      .mapError(statusApplyFunc)
 }

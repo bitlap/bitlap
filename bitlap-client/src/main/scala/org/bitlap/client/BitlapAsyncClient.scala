@@ -130,12 +130,12 @@ class BitlapAsyncClient(uri: String, port: Int, serverPeers: Array[String], prop
     schemaName: String
   ): ZIO[Any, Throwable, OperationHandle] = ???
 
-  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Throwable, Option[LeaderAddress]] =
+  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[LeaderAddress]] =
     DriverServiceClient
       .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
       .map(f => Some(LeaderAddress(f.ip, f.port)))
       .catchSomeCause {
         case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderAddress]) // ignore this
       }
-      .mapError(statusApplyFunc)
+      .catchAll(_ => ZIO.none)
 }

@@ -35,4 +35,8 @@ object NetworkException {
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
 
+  final case class LeaderServerNotFoundException(
+    override val msg: String,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException(msg = msg, cause = cause)
 }

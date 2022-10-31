@@ -2,7 +2,7 @@
 package org.bitlap
 
 import io.grpc.Status
-import org.bitlap.network.NetworkException.RpcException
+import org.bitlap.network.NetworkException.{ LeaderServerNotFoundException, RpcException }
 import zio.{ IO, ZIO }
 
 import java.io.IOException
@@ -16,13 +16,12 @@ package object network {
 
   type Identity[X] = X
 
-  lazy val runtime: zio.Runtime[zio.ZEnv] = zio.Runtime.global
-
   lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) => {
     ex.printStackTrace()
     ex match {
       case _: TimeoutException | _: IOException => Status.UNAVAILABLE
       case _: RpcException                      => Status.INTERNAL
+      case _: LeaderServerNotFoundException     => Status.ABORTED
     }
   }
 

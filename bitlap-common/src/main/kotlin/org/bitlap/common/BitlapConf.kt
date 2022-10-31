@@ -139,7 +139,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
          * Node address, Rpc configuration
          */
         @JvmField
-        val NODE_BIND_HOST = BitlapConfKey<String>("bitlap.node.bind.host").validator(Validators.NOT_BLANK)
+        val NODE_BIND_HOST = BitlapConfKey<String>("bitlap.node.bind.host", "127.0.0.1:23333").validator(Validators.NOT_BLANK)
 
         @JvmField
         val NODE_BIND_PEERS = BitlapConfKey<String>("bitlap.node.bind.peers")
@@ -160,5 +160,17 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
         @JvmField
         val NODE_READ_TIMEOUT = BitlapConfKey("bitlap.node.read.timeout", 10000L)
             .validator { it != null && it >= 1000L }
+
+        @JvmField
+        val RAFT_DATA_PATH = BitlapConfKey<String>("bitlap.node.raft.data", "/tmp/server/bitlap_raft").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val RAFT_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.host", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val RAFT_INITIAL_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.initialServerAddress", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val RAFT_TIMEOUT = BitlapConfKey<String>("bitlap.node.raft.timeout", "10s").validator(Validators.NOT_BLANK)
     }
 }

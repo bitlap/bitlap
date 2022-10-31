@@ -30,13 +30,14 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
-      throw BSQLException(s"Invalid URL: $uri")
+      throw BitlapSQLException(s"Invalid URL: $uri")
     }
     // remove prefix
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
     val hosts            = uriWithoutPrefix.split(",")
     // parse uri
-    val parts = hosts.map(it => it.split("/"))
+    val parts       = hosts.map(it => it.split("/"))
+    val serverPeers = hosts.map(f => f.split("/")(0))
     try {
       // FIXME
       val hostAndPort =
@@ -45,13 +46,16 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
           case e: Exception =>
             e.printStackTrace(); println("Use default port: 23333"); scala.Array("localhost", "23333")
         }
-      client = new BitlapClient(hostAndPort(0), hostAndPort(1).toInt, info.asScala.toMap)
+      client = new BitlapClient(serverPeers, info.asScala.toMap)
       session = client.openSession()
       closed = false
     } catch {
       case e: Exception =>
         e.printStackTrace()
-        throw BSQLException("Bitlap openSession failed", cause = e)
+        throw BitlapSQLException(
+          s"Bitlap openSession failed, connect to serverPeers: ${serverPeers.mkString("Array(", ", ", ")")}",
+          cause = e
+        )
     }
   }
 
@@ -70,7 +74,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if (session != null) {
       new BitlapStatement(session, client)
     } else {
-      throw BSQLException("Statement is closed")
+      throw BitlapSQLException("Statement is closed")
     }
 
   override def isClosed(): Boolean = closed

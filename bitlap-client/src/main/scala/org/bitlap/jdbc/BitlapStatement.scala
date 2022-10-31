@@ -52,7 +52,7 @@ class BitlapStatement(
 
   override def executeQuery(sql: String): ResultSet = {
     if (!execute(sql)) {
-      throw BSQLException("The query did not generate a result set!")
+      throw BitlapSQLException("The query did not generate a result set!")
     }
     resultSet
   }
@@ -92,7 +92,7 @@ class BitlapStatement(
   override def setCursorName(name: String): Unit = ???
 
   override def execute(sql: String): Boolean = {
-    if (closed) throw BSQLException("Can't execute after statement has been closed")
+    if (closed) throw BitlapSQLException("Can't execute after statement has been closed")
     try {
       resultSet = null
       stmtHandle = client.executeStatement(sessHandle, sql, queryTimeout)
@@ -100,7 +100,7 @@ class BitlapStatement(
         return false
       }
     } catch {
-      case ex: Exception => throw BSQLException(ex.toString, cause = ex)
+      case ex: Exception => throw BitlapSQLException(ex.toString, cause = ex)
     }
     resultSet = BitlapQueryResultSet
       .builder()

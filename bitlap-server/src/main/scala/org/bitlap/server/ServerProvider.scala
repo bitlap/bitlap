@@ -1,12 +1,11 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
 
-import com.typesafe.config.ConfigFactory
+import org.bitlap.network.ServerType
 import org.bitlap.server.http.HttpServerProvider
+import org.bitlap.server.raft.{ RaftServerConfig, RaftServerProvider }
 import org.bitlap.server.rpc.InternalGrpcServerProvider
 import zio._
-import org.bitlap.server.raft.{ RaftServerConfig, RaftServerProvider }
-import org.bitlap.network.ServerType
 
 /** @author
  *    梦境迷离
@@ -30,17 +29,9 @@ trait ServerProvider {
 
 object ServerProvider {
 
-  private lazy val config = ConfigFactory.load().getConfig("bitlap.server.raft")
-  private val raftServerConfig = RaftServerConfig(
-    config.getString("dataPath"),
-    config.getString("groupId"),
-    config.getString("serverAddress"),
-    config.getString("initialServerAddressList")
-  )
-
-  lazy val serverProviders: List[ServerProvider] = List(
-    new InternalGrpcServerProvider(23332),
-    new HttpServerProvider(8081),
-    new RaftServerProvider(raftServerConfig)
-  )
+  def serverProviders(http: Boolean): List[ServerProvider] =
+    (if (http) List(new HttpServerProvider(8081)) else List()) ++ List(
+      new InternalGrpcServerProvider(23333),
+      new RaftServerProvider(RaftServerConfig.raftServerConfig)
+    )
 }

@@ -5,11 +5,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +26,7 @@ public class JavaServerTest {
     final static String table = "test_table" + FakeDataUtil.randEntityNumber();
 
     @BeforeClass
-    public static void startServer() throws InterruptedException, SQLException {
+    public static void startServer() throws SQLException, InterruptedException {
         Thread server = new Thread(() -> EmbedBitlapServer.main(new String[0]));
         server.setDaemon(true);
         server.start();

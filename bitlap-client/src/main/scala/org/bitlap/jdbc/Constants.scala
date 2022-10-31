@@ -1,8 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.models.TypeId
-
 /** @author
  *    梦境迷离
  *  @since 2021/8/28

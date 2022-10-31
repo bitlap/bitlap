@@ -6,6 +6,7 @@ import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio._
 import zio.console._
 import org.bitlap.network.ServerType
+import org.bitlap.server.BitlapServerContext
 
 /** @author
  *    梦境迷离
@@ -13,13 +14,17 @@ import org.bitlap.network.ServerType
  */
 final class InternalGrpcServerProvider(override val port: Int) extends ServerProvider with ServerMain {
 
+  private final lazy val backend = AsyncRpcBackend()
+  private final lazy val liver   = DriverGrpcServiceLive(backend)
+
   override def welcome: ZIO[zio.ZEnv, Throwable, Unit] =
     putStrLn(s"$serverType: Server is listening to port: $port")
 
   def services: ServiceList[zio.ZEnv] =
-    ServiceList.addM(ZIO.succeed(DriverGrpcServiceLive(AsyncRpcBackend()))) // 可以随意更换实现
+    ServiceList.addM(ZIO.succeed(liver)) // 可以随意更换实现
 
-  override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] = super.run(args)
+  override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
+    BitlapServerContext.fillRpc(backend) *> super.run(args)
 
   override def serverType: ServerType = ServerType.Grpc
 }

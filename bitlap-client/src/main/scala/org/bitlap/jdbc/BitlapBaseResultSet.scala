@@ -144,7 +144,7 @@ abstract class BitlapBaseResultSet extends ResultSet {
   override def findColumn(columnLabel: String): Int = {
     val columnIndex = columnNames.indexOf(columnLabel)
     if (columnIndex == -1) {
-      throw BSQLException("Bitlap SQL Exception")
+      throw BitlapSQLException("Bitlap SQL Exception")
     }
     columnIndex + 1
   }
@@ -424,12 +424,12 @@ abstract class BitlapBaseResultSet extends ResultSet {
     columnIndex: Int
   )(implicit @implicitNotFound("Could not find an implicit ClassTag[\\${T}]") t: ClassTag[T]): T = {
     if (row == null) {
-      throw BSQLException("No row found.")
+      throw BitlapSQLException("No row found.")
     }
     val colVals = row.values
-    if (colVals == null) throw BSQLException("RowSet does not contain any columns!")
+    if (colVals == null) throw BitlapSQLException("RowSet does not contain any columns!")
     if (columnIndex > colVals.size) {
-      throw BSQLException(s"Invalid columnIndex: $columnIndex")
+      throw BitlapSQLException(s"Invalid columnIndex: $columnIndex")
     }
 
     val bColumnValue = colVals(columnIndex - 1)

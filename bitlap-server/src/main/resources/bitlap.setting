@@ -1,0 +1,13 @@
+# directory
+bitlap.root.dir.data = /tmp/data/bitlap_data
+bitlap.root.dir.local = /tmp/data/bitlap
+
+
+# node information
+bitlap.node.group.id    = bitlap
+bitlap.node.bind.host   = 127.0.0.1:23333
+
+bitlap.node.raft.data   =   /tmp/server/bitlap_raft
+bitlap.node.raft.host   =   127.0.0.1:12222
+bitlap.node.raft.initialServerAddress   =   127.0.0.1:12222
+bitlap.node.raft.timeout=   5s

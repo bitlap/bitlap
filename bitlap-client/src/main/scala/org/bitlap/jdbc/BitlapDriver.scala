@@ -14,7 +14,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
   override def connect(url: String, info: Properties): Connection =
     try BitlapConnection(url, info)
     catch {
-      case ex: Exception => throw BSQLException(ex.toString)
+      case ex: Exception => throw BitlapSQLException(ex.toString)
     }
 
   /** Checks whether a given url is in a valid format.
@@ -74,7 +74,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     try java.sql.DriverManager.registerDriver(this)
     catch {
       case e: Exception =>
-        throw BSQLException("Error occurred while registering JDBC driver", cause = e)
+        throw BitlapSQLException("Error occurred while registering JDBC driver", cause = e)
     }
 
   /** Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
@@ -86,7 +86,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
   private def parseURL(url: String, defaults: Properties): Properties = {
     val urlProps = if (defaults != null) new Properties(defaults) else new Properties()
     if (!url.startsWith(Constants.URL_PREFIX)) {
-      throw BSQLException(s"Invalid connection url: $url")
+      throw BitlapSQLException(s"Invalid connection url: $url")
     }
     if (url.length <= Constants.URL_PREFIX.length) return urlProps
 

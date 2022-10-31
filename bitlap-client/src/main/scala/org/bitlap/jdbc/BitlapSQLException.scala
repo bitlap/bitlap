@@ -8,7 +8,7 @@ import java.sql.SQLException
  *  @since 2021/11/20
  *  @version 1.0
  */
-case class BSQLException(
+case class BitlapSQLException(
   msg: String,
   state: String = null,
   code: Int = -1,

@@ -30,7 +30,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
-      throw BSQLException(s"Invalid URL: $uri")
+      throw BitlapSQLException(s"Invalid URL: $uri")
     }
     // remove prefix
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
@@ -52,7 +52,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     } catch {
       case e: Exception =>
         e.printStackTrace()
-        throw BSQLException(
+        throw BitlapSQLException(
           s"Bitlap openSession failed, connect to serverPeers: ${serverPeers.mkString("Array(", ", ", ")")}",
           cause = e
         )
@@ -74,7 +74,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if (session != null) {
       new BitlapStatement(session, client)
     } else {
-      throw BSQLException("Statement is closed")
+      throw BitlapSQLException("Statement is closed")
     }
 
   override def isClosed(): Boolean = closed

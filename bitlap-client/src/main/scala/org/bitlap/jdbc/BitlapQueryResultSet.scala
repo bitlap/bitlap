@@ -56,7 +56,7 @@ class BitlapQueryResultSet(
   private def retrieveSchema(): Unit =
     try {
       if (client == null || stmtHandle == null) {
-        throw BSQLException("Resultset is closed")
+        throw BitlapSQLException("Resultset is closed")
       }
       // debug
       val namesSb = new mutable.StringBuilder()
@@ -82,13 +82,13 @@ class BitlapQueryResultSet(
         typesSb.append(columnTypeName)
       }
     } catch {
-      case e: SQLException => throw BSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
+      case e: SQLException => throw BitlapSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
       case e: Exception    => throw e
     }
 
   override def next(): Boolean = {
     if (closed || client == null || stmtHandle == null) {
-      throw BSQLException("Resultset is closed")
+      throw BitlapSQLException("Resultset is closed")
     }
     if (emptyResultSet || (1 to rowsFetched).contains(maxRows)) {
       return false
@@ -116,7 +116,7 @@ class BitlapQueryResultSet(
 
       rowsFetched = rowsFetched + 1
     } catch {
-      case e: SQLException => throw BSQLException(msg = "Error retrieving next row", cause = e)
+      case e: SQLException => throw BitlapSQLException(msg = "Error retrieving next row", cause = e)
       case e: Exception    => throw e
     }
 
@@ -128,21 +128,21 @@ class BitlapQueryResultSet(
 
   override def getMetaData(): ResultSetMetaData = {
     if (closed) {
-      throw BSQLException("Resultset is closed")
+      throw BitlapSQLException("Resultset is closed")
     }
     super.getMetaData()
   }
 
   override def getFetchSize(): Int = {
     if (closed) {
-      throw BSQLException("Resultset is closed")
+      throw BitlapSQLException("Resultset is closed")
     }
     this.fetchSize
   }
 
   override def setFetchSize(rows: Int): Unit = {
     if (closed) {
-      throw BSQLException("Resultset is closed")
+      throw BitlapSQLException("Resultset is closed")
     }
     this.fetchSize = rows
   }

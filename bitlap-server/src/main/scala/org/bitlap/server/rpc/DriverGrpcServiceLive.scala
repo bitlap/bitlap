@@ -2,6 +2,7 @@
 package org.bitlap.server.rpc
 
 import io.grpc._
+import org.bitlap.network.{ errorApplyFunc, AsyncRpc, RpcStatus }
 import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
@@ -14,8 +15,7 @@ import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesRes
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
 import org.bitlap.network.driver.service.ZioService._
 import org.bitlap.network.handles._
-import org.bitlap.network.{ errorApplyFunc, AsyncRpc, RpcStatus }
-import org.bitlap.server.raft.RaftClient
+import org.bitlap.server.BitlapServerContext
 import org.bitlap.tools._
 import zio._
 
@@ -82,7 +82,7 @@ final class DriverGrpcServiceLive(private val asyncRpcBackend: AsyncRpc)
       .mapError(errorApplyFunc)
 
   override def getLeader(request: BGetRaftMetadata.BGetLeaderReq): ZIO[Any, Status, BGetRaftMetadata.BGetLeaderResp] = {
-    val leaderAddress = Task.effect(RaftClient.getLeaderAddress())
+    val leaderAddress = Task.effect(BitlapServerContext.getLeaderAddress())
     leaderAddress.flatMap { ld =>
       if (ld == null || ld.port < 0 || ld.ip == null || ld.ip.isEmpty) {
         Task.fail(LeaderServerNotFoundException(s"requestId: ${request.requestId}"))

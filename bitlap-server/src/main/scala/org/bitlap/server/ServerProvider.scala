@@ -1,12 +1,11 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
 
-import com.typesafe.config.ConfigFactory
+import org.bitlap.network.ServerType
 import org.bitlap.server.http.HttpServerProvider
+import org.bitlap.server.raft.{ RaftServerConfig, RaftServerProvider }
 import org.bitlap.server.rpc.InternalGrpcServerProvider
 import zio._
-import org.bitlap.server.raft.{ RaftServerConfig, RaftServerProvider }
-import org.bitlap.network.ServerType
 
 /** @author
  *    梦境迷离

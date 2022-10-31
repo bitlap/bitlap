@@ -14,6 +14,8 @@ import zio.{ ExitCode, Task, URIO, ZIO }
  */
 final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider with zio.App {
 
+  import org.bitlap.server.BitlapServerContext
+
   // Start elections by 3 instance. Note that if multiple instances are started on the same machine,
   // the first parameter `dataPath` should not be the same.
   private def runRaft(): Task[Node] = ZIO.effect {
@@ -54,7 +56,7 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (
-      runRaft().flatMap(fr => ZIO.effect(RaftClient.init(fr))) *> putStrLn(s"$serverType: Raft Server started")
+      runRaft().flatMap(fr => ZIO.effect(BitlapServerContext.init(fr))) *> putStrLn(s"$serverType: Raft Server started")
         .provideLayer(
           zio.console.Console.live
         )

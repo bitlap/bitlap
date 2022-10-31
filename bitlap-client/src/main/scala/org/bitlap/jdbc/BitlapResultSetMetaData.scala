@@ -52,18 +52,18 @@ class BitlapResultSetMetaData(
   override def getCatalogName(column: Int): String = ???
 
   override def getColumnType(column: Int): Int = {
-    if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BSQLException(s"Invalid column index: $column")
+    if (columnTypes.isEmpty) throw BitlapSQLException("Could not determine column type name for ResultSet")
+    if (column < 1 || column > columnTypes.size) throw BitlapSQLException(s"Invalid column index: $column")
     val typ        = columnTypes(column - 1)
     val bitlapType = TypeId.values.find(_.name == typ)
     if (bitlapType.isEmpty || !TypeId.bitlap2Jdbc.contains(bitlapType.getOrElse(TypeId.Unspecified)))
-      throw BSQLException("Could not determine column type name for ResultSet")
+      throw BitlapSQLException("Could not determine column type name for ResultSet")
     TypeId.bitlap2Jdbc(TypeId.values.find(_.name == typ).getOrElse(TypeId.Unspecified))
   }
 
   override def getColumnTypeName(column: Int): String = {
-    if (columnTypes.isEmpty) throw BSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BSQLException(s"Invalid column index: $column")
+    if (columnTypes.isEmpty) throw BitlapSQLException("Could not determine column type name for ResultSet")
+    if (column < 1 || column > columnTypes.size) throw BitlapSQLException(s"Invalid column index: $column")
     columnTypes(column - 1)
   }
 

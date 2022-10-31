@@ -2,7 +2,7 @@
 package org.bitlap.client
 
 import io.grpc.{ ManagedChannelBuilder, Status }
-import org.bitlap.jdbc.BSQLException
+import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network._
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
@@ -26,23 +26,28 @@ import java.util.UUID
  */
 class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
 
+  private def randomRequestId = UUID.randomUUID().toString.replaceAll("-", "")
+
   // refactor
   private lazy val serverAddresses =
     serverPeers
-      .filter(_.contains(":"))
-      .map(s => LeaderAddress(s.split(":")(0).trim, s.split(":")(1).trim.toIntOption.getOrElse(23333)))
+      .filter(_.nonEmpty)
+      .map { s =>
+        val as = if (s.contains(":")) s.split(":").toList else List(s, "23333")
+        LeaderAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
+      }
       .toList
 
-  private val leaderAddress = ZIO
+  private lazy val leaderAddress = ZIO
     .foreach(serverAddresses) { address =>
-      getLeader(UUID.randomUUID().toString.replaceAll("-", "")).provideLayer(clientLayer(address.ip, address.port))
+      getLeader(randomRequestId).provideLayer(clientLayer(address.ip, address.port))
     }
     .map(f =>
       f.collectFirst { case Some(value) =>
         value
       }
     )
-    .map(_.get)
+    .map(l => if (l.isDefined) l.get else throw BitlapSQLException("cannot find a leader"))
 
   private lazy val leaderClientLayer = leaderAddress.map(f => clientLayer(f.ip, f.port))
 

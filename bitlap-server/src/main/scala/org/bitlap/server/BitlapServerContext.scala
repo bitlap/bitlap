@@ -1,31 +1,36 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.raft
+package org.bitlap.server
 
-import com.alipay.sofa.jraft._
-import com.alipay.sofa.jraft.option._
-import com.alipay.sofa.jraft.rpc.impl.cli._
+import com.alipay.sofa.jraft.option.CliOptions
+import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import com.alipay.sofa.jraft.{ JRaftUtils, Node, RouteTable }
 import org.bitlap.network.LeaderAddress
 import org.bitlap.network.NetworkException.ServerIntervalException
+import org.bitlap.server.raft.RaftServerConfig
+import java.util.concurrent.atomic.AtomicBoolean
 
 import javax.annotation.Nullable
 
-/** @since 2022/10/30
- *  @author
+/** @author
  *    梦境迷离
+ *  @version 1.0,2022/10/31
  */
-object RaftClient {
+object BitlapServerContext {
 
+  private val inited = new AtomicBoolean(false)
+
+  @volatile
   private var cliClientService: CliClientServiceImpl = _
 
-  def init(): Boolean = {
-    cliClientService = new CliClientServiceImpl
-    cliClientService.init(new CliOptions)
-  }
-
+  @volatile
   private var _node: Node = _
 
   def init(node: Node): Unit =
-    _node = node
+    if (inited.compareAndSet(false, true)) {
+      _node = node
+      cliClientService = new CliClientServiceImpl
+      cliClientService.init(new CliOptions)
+    }
 
   def isLeader: Boolean = _node.isLeader
 
@@ -33,12 +38,12 @@ object RaftClient {
   def getLeaderAddress(): LeaderAddress =
     if (isLeader) {
       if (_node == null) {
-        throw ServerIntervalException("cannot find raft CLI service")
+        throw ServerIntervalException("cannot find a raft node instance")
       }
       Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
     } else {
       if (cliClientService == null) {
-        throw ServerIntervalException("cannot find raft CLI service")
+        throw ServerIntervalException("cannot find a raft CliClientService instance")
       }
       val rt      = RouteTable.getInstance
       val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)

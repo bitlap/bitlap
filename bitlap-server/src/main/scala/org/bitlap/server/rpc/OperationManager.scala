@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc
 
-import org.bitlap.jdbc.BSQLException
+import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.OperationType
 import org.bitlap.network.handles.OperationHandle
 
@@ -46,7 +46,7 @@ class OperationManager {
     this.synchronized {
       val op = handleToOperation.getOrElse(operationHandle, null)
       if (op == null) {
-        throw BSQLException("Invalid OperationHandle: $operationHandle")
+        throw BitlapSQLException("Invalid OperationHandle: $operationHandle")
       } else {
         op
       }

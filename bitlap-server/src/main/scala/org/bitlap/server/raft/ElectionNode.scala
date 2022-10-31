@@ -7,7 +7,7 @@ import com.alipay.sofa.jraft.util.internal.ThrowUtil
 import com.alipay.sofa.jraft._
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
-import org.bitlap.server.raft.rpc.BGetServerMetadataProcessor
+import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
 
 import java.io._
 import java.nio.file.Paths
@@ -59,7 +59,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     if (!serverId.parse(opts.serverAddress))
       throw new IllegalArgumentException("Fail to parse serverId: " + opts.serverAddress)
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
-    rpcServer.registerProcessor(new BGetServerMetadataProcessor())
+    rpcServer.registerProcessor(new GetServerMetadataProcessor())
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
     if (this.node != null) this.started = true

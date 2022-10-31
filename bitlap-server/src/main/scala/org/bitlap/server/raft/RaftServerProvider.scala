@@ -8,12 +8,15 @@ import org.bitlap.server.ServerProvider
 import zio.console.putStrLn
 import zio.{ Runtime => _, _ }
 import org.bitlap.server.BitlapServerContext
+import org.slf4j.LoggerFactory
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
 final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider with zio.App {
+
+  private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
   private def runRaft(): Task[Node] = ZIO.effect {
     val dataPath       = raftServerConfig.dataPath
@@ -34,12 +37,12 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
         val serverId = node.getNode.getLeaderId
         val ip       = serverId.getIp
         val port     = serverId.getPort
-        println("[ElectionBootstrap] Leader's ip is: " + ip + ", port: " + port)
-        println("[ElectionBootstrap] Leader start on term: " + leaderTerm)
+        LOG.info(s"[ElectionBootstrap] Leader's ip is: $ip, port: $port")
+        LOG.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
       }
 
       override def onLeaderStop(leaderTerm: Long): Unit =
-        println("[ElectionBootstrap] Leader stop on term: " + leaderTerm)
+        LOG.info(s"[ElectionBootstrap] Leader stop on term: $leaderTerm")
     })
 
     Runtime.getRuntime.addShutdownHook(new Thread(() => node.shutdown()))
@@ -55,7 +58,7 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (
-      runRaft().flatMap(fr => ZIO.effect(BitlapServerContext.init(fr))) *> putStrLn(s"$serverType: Raft Server started")
+      runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(s"$serverType: Raft Server started")
         .provideLayer(
           zio.console.Console.live
         )

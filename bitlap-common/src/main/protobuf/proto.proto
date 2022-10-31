@@ -12,11 +12,11 @@ message TablePB {
   map<string, string> props = 5;
 }
 
-message BGetServerMetadata {
-  message BGetServerAddressReq {
+message GetServerMetadata {
+  message GetServerAddressReq {
     string request_id = 1;
   }
-  message BGetServerAddressResp {
+  message GetServerAddressResp {
     string ip = 1;
     uint32 port = 2;
   }

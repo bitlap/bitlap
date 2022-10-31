@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
  */
 final class ElectionOnlyStateMachine extends StateMachineAdapter {
 
-  private val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
+  private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
   private val leaderTerm                            = new AtomicLong(-1L)
   private var listeners: JList[LeaderStateListener] = new JArrayList[LeaderStateListener]

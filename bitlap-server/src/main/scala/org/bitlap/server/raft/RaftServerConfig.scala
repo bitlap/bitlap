@@ -17,6 +17,7 @@ final case class RaftServerConfig(
   serverAddress: String,
   // ip:port,ip:port,ip:port
   initialServerAddressList: String,
+  // 5s 100ms
   timeout: Duration
 )
 object RaftServerConfig {
@@ -25,9 +26,9 @@ object RaftServerConfig {
 
   lazy val raftServerConfig: RaftServerConfig = RaftServerConfig(
     conf.get(BitlapConf.RAFT_DATA_PATH),
-    conf.get(BitlapConf.RAFT_GROUP_ID),
+    conf.get(BitlapConf.NODE_GROUP_ID),
     conf.get(BitlapConf.RAFT_SERVER_ADDRESS),
-    conf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS_LIST),
+    conf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS),
     Duration.apply(conf.get(BitlapConf.RAFT_TIMEOUT))
   )
 }

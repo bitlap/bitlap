@@ -162,18 +162,15 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
             .validator { it != null && it >= 1000L }
 
         @JvmField
-        val RAFT_DATA_PATH = BitlapConfKey<String>("bitlap.server.raft.dataPath", "/tmp/server/bitlap_raft").validator(Validators.NOT_BLANK)
+        val RAFT_DATA_PATH = BitlapConfKey<String>("bitlap.node.raft.data", "/tmp/server/bitlap_raft").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_GROUP_ID = BitlapConfKey<String>("bitlap.server.raft.groupId", "bitlap_raft").validator(Validators.NOT_BLANK)
+        val RAFT_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.host", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.server.raft.serverAddress", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
+        val RAFT_INITIAL_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.initialServerAddress", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_INITIAL_SERVER_ADDRESS_LIST = BitlapConfKey<String>("bitlap.server.raft.initialServerAddressList", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
-
-        @JvmField
-        val RAFT_TIMEOUT = BitlapConfKey<String>("bitlap.server.raft.timeout", "10s").validator(Validators.NOT_BLANK)
+        val RAFT_TIMEOUT = BitlapConfKey<String>("bitlap.node.raft.timeout", "10s").validator(Validators.NOT_BLANK)
     }
 }

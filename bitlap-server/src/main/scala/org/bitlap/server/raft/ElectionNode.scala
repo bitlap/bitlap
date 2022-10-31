@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 import java.io._
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** @author
  *    梦境迷离
@@ -25,10 +26,10 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
   private var node: Node                         = _
   private var fsm: ElectionOnlyStateMachine      = _
 
-  private var started = false
+  private val started = new AtomicBoolean(false)
 
   override def init(opts: ElectionNodeOptions): Boolean = {
-    if (this.started) {
+    if (this.started.compareAndSet(false, true)) {
       LOG.info("[ElectionNode: {}] already started.", opts.serverAddress)
       return true
     }
@@ -60,12 +61,11 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
-    if (this.node != null) this.started = true
-    this.started
+    this.started.get()
   }
 
   override def shutdown(): Unit = {
-    if (!this.started) return
+    if (!this.started.get()) return
     if (this.raftGroupService != null) {
       this.raftGroupService.shutdown()
       try this.raftGroupService.join()
@@ -74,7 +74,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
           ThrowUtil.throwException(e)
       }
     }
-    this.started = false
+    this.started.set(false)
     LOG.info("[ElectionNode] shutdown successfully: {}.", this)
   }
 
@@ -82,7 +82,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
 
   def getFsm: ElectionOnlyStateMachine = fsm
 
-  def isStarted: Boolean = started
+  def isStarted: Boolean = started.get()
 
   def isLeader: Boolean = this.fsm.isLeader
 

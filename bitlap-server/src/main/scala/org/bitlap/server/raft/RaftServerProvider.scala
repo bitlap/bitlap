@@ -6,7 +6,8 @@ import com.alipay.sofa.jraft.option.NodeOptions
 import org.bitlap.network.ServerType
 import org.bitlap.server.ServerProvider
 import zio.console.putStrLn
-import zio.{ ExitCode, Task, URIO, ZIO }
+import zio.{ Runtime => _, _ }
+import org.bitlap.server.BitlapServerContext
 
 /** @author
  *    梦境迷离
@@ -14,10 +15,6 @@ import zio.{ ExitCode, Task, URIO, ZIO }
  */
 final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider with zio.App {
 
-  import org.bitlap.server.BitlapServerContext
-
-  // Start elections by 3 instance. Note that if multiple instances are started on the same machine,
-  // the first parameter `dataPath` should not be the same.
   private def runRaft(): Task[Node] = ZIO.effect {
     val dataPath       = raftServerConfig.dataPath
     val groupId        = raftServerConfig.groupId

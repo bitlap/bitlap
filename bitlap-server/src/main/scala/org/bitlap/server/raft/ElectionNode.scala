@@ -1,11 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
+import com.alipay.sofa.jraft._
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
-import com.alipay.sofa.jraft._
 import org.apache.commons.io.FileUtils
+import org.bitlap.server.raft.rpc.BGetServerMetadataProcessor
 import org.slf4j.LoggerFactory
 
 import java.io._
@@ -59,6 +60,8 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     if (!serverId.parse(opts.serverAddress))
       throw new IllegalArgumentException("Fail to parse serverId: " + opts.serverAddress)
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
+    rpcServer.registerProcessor(new BGetServerMetadataProcessor())
+
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
     this.started.get()

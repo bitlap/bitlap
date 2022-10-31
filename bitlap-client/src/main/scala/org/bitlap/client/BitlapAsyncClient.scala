@@ -2,6 +2,7 @@
 package org.bitlap.client
 
 import io.grpc.{ ManagedChannelBuilder, Status }
+import org.bitlap.common.utils.UuidUtil
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network._
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
@@ -15,8 +16,6 @@ import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models.{ FetchResults, TableSchema }
 import zio._
 
-import java.util.UUID
-
 /** This class mainly wraps zio rpc calling procedures.
  *
  *  @author
@@ -25,8 +24,6 @@ import java.util.UUID
  *  @version 1.0
  */
 class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
-
-  private def randomRequestId = UUID.randomUUID().toString.replaceAll("-", "")
 
   // refactor
   private lazy val serverAddresses =
@@ -40,7 +37,7 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
 
   private lazy val leaderAddress = ZIO
     .foreach(serverAddresses) { address =>
-      getLeader(randomRequestId).provideLayer(clientLayer(address.ip, address.port))
+      getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
     }
     .map(f =>
       f.collectFirst { case Some(value) =>
@@ -136,7 +133,7 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     DriverServiceClient
       .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
       .map { f =>
-        if (f == null) None else Some(LeaderAddress(f.ip, f.port))
+        if (f == null || f.ip.isEmpty) None else Some(LeaderAddress(f.ip.getOrElse("localhost"), f.port))
       }
       .catchSomeCause {
         case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderAddress]) // ignore this

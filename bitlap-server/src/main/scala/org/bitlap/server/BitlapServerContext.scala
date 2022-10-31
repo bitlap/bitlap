@@ -1,14 +1,16 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server
 
+import com.alipay.sofa.jraft.{ JRaftUtils, Node, RouteTable }
 import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import com.alipay.sofa.jraft.{ JRaftUtils, Node, RouteTable }
+import org.bitlap.common.schema.BGetServerMetadata
+import org.bitlap.common.utils.UuidUtil
 import org.bitlap.network.LeaderAddress
-import org.bitlap.network.NetworkException.ServerIntervalException
+import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.server.raft.RaftServerConfig
-import java.util.concurrent.atomic.AtomicBoolean
 
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
 
 /** @author
@@ -38,12 +40,12 @@ object BitlapServerContext {
   def getLeaderAddress(): LeaderAddress =
     if (isLeader) {
       if (_node == null) {
-        throw ServerIntervalException("cannot find a raft node instance")
+        throw LeaderServerNotFoundException("cannot find a raft node instance")
       }
       Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
     } else {
       if (cliClientService == null) {
-        throw ServerIntervalException("cannot find a raft CliClientService instance")
+        throw LeaderServerNotFoundException("cannot find a raft CliClientService instance")
       }
       val rt      = RouteTable.getInstance
       val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
@@ -54,8 +56,22 @@ object BitlapServerContext {
       val leader = if (success) {
         rt.selectLeader(groupId)
       } else null
-      Option(leader).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
-      // RPC
+      if (leader == null) {
+        throw LeaderServerNotFoundException("cannot select a leader")
+      }
+      val result = cliClientService.getRpcClient.invokeSync(
+        leader.getEndpoint,
+        BGetServerMetadata.BGetServerAddressReq
+          .newBuilder()
+          .setRequestId(UuidUtil.uuid())
+          .build(),
+        timeout.toMillis
+      )
+      val re = result.asInstanceOf[BGetServerMetadata.BGetServerAddressResp]
+
+      if (re == null || re.getIp.isEmpty || re.getPort <= 0)
+        throw LeaderServerNotFoundException("cannot find a leader address")
+      else LeaderAddress(re.getIp, re.getPort)
     }
 
 }

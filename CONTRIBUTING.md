@@ -9,7 +9,7 @@
 
 ***核心模块依赖关系***
 
-![](./bitlap-structure.png)
+![](./bitlap-structure-1.png)
 
 - `bitlap-cli`       交互式命令行实现。技术栈：scala、zio-cli
 - `bitlap-client`    JDBC和RPC client实现。技术栈：scala、zio-grpc

@@ -66,7 +66,7 @@ public class JavaServerTest {
     }
 
     @Test
-    public void query_test1() throws SQLException, InterruptedException {
+    public void query_test1() throws SQLException {
         Statement stmt = conn().createStatement();
         stmt.setMaxRows(10);
         stmt.execute("select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv " + "  from " + table + "   where _time >= 0 " + " group by _time");

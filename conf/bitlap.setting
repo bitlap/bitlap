@@ -7,3 +7,10 @@ bitlap.root.dir.local   = /usr/local/var/bitlap
 bitlap.node.group.id    = bitlap
 bitlap.node.bind.host   = 127.0.0.1:23333
 bitlap.node.bind.peers  = 127.0.0.1:23333
+
+
+bitlap.server.raft.dataPath=/tmp/server/abc
+bitlap.server.raft.groupId=abc
+bitlap.server.raft.serverAddress=127.0.0.1:12222
+bitlap.server.raft.initialServerAddressList=127.0.0.1:12222
+bitlap.server.raft.timeout=10s

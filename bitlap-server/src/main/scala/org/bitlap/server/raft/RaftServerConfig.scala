@@ -1,7 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
 
-import com.typesafe.config.ConfigFactory
+import org.bitlap.common.BitlapConf
+
 import scala.concurrent.duration.Duration
 
 /** @author
@@ -20,13 +21,13 @@ final case class RaftServerConfig(
 )
 object RaftServerConfig {
 
-  private lazy val config = ConfigFactory.load().getConfig("bitlap.server.raft")
+  private lazy val conf = new BitlapConf()
 
-  lazy val raftServerConfig = RaftServerConfig(
-    config.getString("dataPath"),
-    config.getString("groupId"),
-    config.getString("serverAddress"),
-    config.getString("initialServerAddressList"),
-    Duration.apply(config.getString("timeout"))
+  lazy val raftServerConfig: RaftServerConfig = RaftServerConfig(
+    conf.get(BitlapConf.RAFT_DATA_PATH),
+    conf.get(BitlapConf.RAFT_GROUP_ID),
+    conf.get(BitlapConf.RAFT_SERVER_ADDRESS),
+    conf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS_LIST),
+    Duration.apply(conf.get(BitlapConf.RAFT_TIMEOUT))
   )
 }

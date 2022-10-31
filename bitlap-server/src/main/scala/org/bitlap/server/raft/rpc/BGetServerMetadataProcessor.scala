@@ -23,8 +23,8 @@ class BGetServerMetadataProcessor(
   private lazy val conf = new BitlapConf()
 
   override def processRequest(request: BGetServerMetadata.BGetServerAddressReq, done: RpcRequestClosure): Message = {
-    val host    = conf.get(BitlapConf.NODE_BIND_HOST)
-    val address = if (host.contains(":")) host.split(":").toList else List(host, "23333")
+    val host    = conf.get(BitlapConf.NODE_BIND_HOST).trim
+    val address = if (host.contains(":")) host.split(":").toList.map(_.trim) else List(host, "23333")
     val ip      = address.head.trim
     val port    = Try(address(1).trim.toInt).getOrElse(23333)
     BGetServerMetadata.BGetServerAddressResp.newBuilder().setIp(ip).setPort(port).build()

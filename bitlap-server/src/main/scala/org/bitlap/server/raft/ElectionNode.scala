@@ -1,18 +1,17 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
-import com.alipay.sofa.jraft._
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
+import com.alipay.sofa.jraft._
 import org.apache.commons.io.FileUtils
-import org.bitlap.server.raft.rpc.BGetServerMetadataProcessor
 import org.slf4j.LoggerFactory
+import org.bitlap.server.raft.rpc.BGetServerMetadataProcessor
 
 import java.io._
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicBoolean
 
 /** @author
  *    梦境迷离
@@ -27,10 +26,10 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
   private var node: Node                         = _
   private var fsm: ElectionOnlyStateMachine      = _
 
-  private val started = new AtomicBoolean(false)
+  private var started = false
 
   override def init(opts: ElectionNodeOptions): Boolean = {
-    if (this.started.compareAndSet(false, true)) {
+    if (this.started) {
       LOG.info("[ElectionNode: {}] already started.", opts.serverAddress)
       return true
     }
@@ -61,14 +60,14 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
       throw new IllegalArgumentException("Fail to parse serverId: " + opts.serverAddress)
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
     rpcServer.registerProcessor(new BGetServerMetadataProcessor())
-
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
-    this.started.get()
+    if (this.node != null) this.started = true
+    this.started
   }
 
   override def shutdown(): Unit = {
-    if (!this.started.get()) return
+    if (!this.started) return
     if (this.raftGroupService != null) {
       this.raftGroupService.shutdown()
       try this.raftGroupService.join()
@@ -77,7 +76,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
           ThrowUtil.throwException(e)
       }
     }
-    this.started.set(false)
+    this.started = false
     LOG.info("[ElectionNode] shutdown successfully: {}.", this)
   }
 
@@ -85,7 +84,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
 
   def getFsm: ElectionOnlyStateMachine = fsm
 
-  def isStarted: Boolean = started.get()
+  def isStarted: Boolean = started
 
   def isLeader: Boolean = this.fsm.isLeader
 

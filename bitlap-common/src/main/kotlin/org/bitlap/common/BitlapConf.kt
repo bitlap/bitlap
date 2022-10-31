@@ -139,7 +139,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
          * Node address, Rpc configuration
          */
         @JvmField
-        val NODE_BIND_HOST = BitlapConfKey<String>("bitlap.node.bind.host").validator(Validators.NOT_BLANK)
+        val NODE_BIND_HOST = BitlapConfKey<String>("bitlap.node.bind.host", "127.0.0.1:23333").validator(Validators.NOT_BLANK)
 
         @JvmField
         val NODE_BIND_PEERS = BitlapConfKey<String>("bitlap.node.bind.peers")

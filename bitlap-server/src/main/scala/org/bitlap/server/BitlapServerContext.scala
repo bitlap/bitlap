@@ -9,7 +9,7 @@ import org.bitlap.common.utils.UuidUtil
 import org.bitlap.network.LeaderAddress
 import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.server.raft.RaftServerConfig
-
+import org.bitlap.common.BitlapConf
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
 
@@ -36,13 +36,20 @@ object BitlapServerContext {
 
   def isLeader: Boolean = _node.isLeader
 
+  private def grpcServerPort: Int = {
+    lazy val conf = new BitlapConf()
+    val address   = conf.get(BitlapConf.NODE_BIND_HOST).trim
+    val ipPorts   = if (address.contains(":")) address.split(":").toList.map(_.trim) else List(address, "23333")
+    ipPorts(1).toIntOption.getOrElse(23333)
+  }
+
   @Nullable
   def getLeaderAddress(): LeaderAddress =
     if (isLeader) {
       if (_node == null) {
         throw LeaderServerNotFoundException("cannot find a raft node instance")
       }
-      Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, l.getPort)).orNull
+      Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, grpcServerPort)).orNull
     } else {
       if (cliClientService == null) {
         throw LeaderServerNotFoundException("cannot find a raft CliClientService instance")

@@ -79,6 +79,5 @@ public class JavaServerTest {
         }
 
         assert ret.size() > 0;
-        Thread.currentThread().join();
     }
 }

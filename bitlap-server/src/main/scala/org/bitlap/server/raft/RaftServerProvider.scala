@@ -46,6 +46,8 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
     node.init(electionOpts)
 
+    while (node.getNode == null)
+      Thread.sleep(1000)
     node.getNode
   }
 

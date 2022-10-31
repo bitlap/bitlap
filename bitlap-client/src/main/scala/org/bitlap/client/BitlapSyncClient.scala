@@ -70,7 +70,7 @@ class BitlapSyncClient(serverPeers: Array[String], props: Map[String, String]) e
     _.getSchemas(sessionHandle, catalogName, schemaName)
   }
 
-  def getLeader(requestId: String): Identity[LeaderAddress] = delegateClient.sync {
+  def getLeader(requestId: String): Identity[LeaderGrpcAddress] = delegateClient.sync {
     _.getLeader(requestId)
   }
 }

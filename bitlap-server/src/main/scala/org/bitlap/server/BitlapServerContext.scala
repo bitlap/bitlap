@@ -6,7 +6,7 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import org.bitlap.common.schema.BGetServerMetadata
 import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.LeaderAddress
+import org.bitlap.network.LeaderGrpcAddress
 import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.server.raft.RaftServerConfig
 import org.bitlap.common.BitlapConf
@@ -44,12 +44,12 @@ object BitlapServerContext {
   }
 
   @Nullable
-  def getLeaderAddress(): LeaderAddress =
+  def getLeaderAddress(): LeaderGrpcAddress =
     if (isLeader) {
       if (_node == null) {
         throw LeaderServerNotFoundException("cannot find a raft node instance")
       }
-      Option(_node.getLeaderId).map(l => LeaderAddress(l.getIp, grpcServerPort)).orNull
+      Option(_node.getLeaderId).map(l => LeaderGrpcAddress(l.getIp, grpcServerPort)).orNull
     } else {
       if (cliClientService == null) {
         throw LeaderServerNotFoundException("cannot find a raft CliClientService instance")
@@ -78,7 +78,7 @@ object BitlapServerContext {
 
       if (re == null || re.getIp.isEmpty || re.getPort <= 0)
         throw LeaderServerNotFoundException("cannot find a leader address")
-      else LeaderAddress(re.getIp, re.getPort)
+      else LeaderGrpcAddress(re.getIp, re.getPort)
     }
 
 }

@@ -31,7 +31,7 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .filter(_.nonEmpty)
       .map { s =>
         val as = if (s.contains(":")) s.split(":").toList else List(s, "23333")
-        LeaderAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
+        LeaderGrpcAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
       }
       .toList
 
@@ -129,14 +129,14 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     schemaName: String
   ): ZIO[Any, Throwable, OperationHandle] = ???
 
-  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[LeaderAddress]] =
+  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[LeaderGrpcAddress]] =
     DriverServiceClient
       .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
       .map { f =>
-        if (f == null || f.ip.isEmpty) None else Some(LeaderAddress(f.ip.getOrElse("localhost"), f.port))
+        if (f == null || f.ip.isEmpty) None else Some(LeaderGrpcAddress(f.ip.getOrElse("localhost"), f.port))
       }
       .catchSomeCause {
-        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderAddress]) // ignore this
+        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderGrpcAddress]) // ignore this
       }
       .catchAll(_ => ZIO.none)
 }

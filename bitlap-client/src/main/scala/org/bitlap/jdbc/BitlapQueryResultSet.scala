@@ -3,12 +3,13 @@ package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import scala.collection.mutable
 import java.sql._
 
-/** @author
+/** bitlap 查询的结果集
+ *  @author
  *    梦境迷离
  *  @since 2021/6/12
  *  @version 1.0

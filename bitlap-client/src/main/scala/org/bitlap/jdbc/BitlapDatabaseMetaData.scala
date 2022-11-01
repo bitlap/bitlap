@@ -4,9 +4,11 @@ package org.bitlap.jdbc
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles.SessionHandle
 
-import java.sql.{ Connection, DatabaseMetaData, ResultSet, RowIdLifetime }
+import java.sql.{ Array => _, _ }
 
-/** @author
+/** bitlap 数据库元数据，暂未使用
+ *
+ *  @author
  *    梦境迷离
  *  @since 2021/6/12
  *  @version 1.0

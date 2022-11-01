@@ -3,9 +3,10 @@ package org.bitlap.jdbc
 
 import org.bitlap.network.models.TypeId
 
-import java.sql.{ ResultSetMetaData, Types }
+import java.sql._
 
-/** @author
+/** bitlap 结果集的元数据实
+ *  @author
  *    梦境迷离
  *  @since 2021/6/12
  *  @version 1.0

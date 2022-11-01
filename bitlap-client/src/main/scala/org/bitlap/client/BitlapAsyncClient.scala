@@ -12,16 +12,16 @@ import org.bitlap.network.driver.proto.BGetRaftMetadata
 import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
 import zio._
 
-/** This class mainly wraps zio rpc calling procedures.
+/** 异步RPC客户端，基于zio-grpc实现
  *
  *  @author
  *    梦境迷离
  *  @since 2021/11/21
- *  @version 1.0
+ *  @version 1.0, zio 1.0
  */
 class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
 

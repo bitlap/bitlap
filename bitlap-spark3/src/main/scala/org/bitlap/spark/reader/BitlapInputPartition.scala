@@ -5,7 +5,7 @@ import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.InputSplit
 import org.apache.spark.sql.connector.read.InputPartition
 
-import java.io.{ DataInput, DataOutput }
+import java.io._
 import org.apache.spark.SerializableWritable
 
 /** @since 2022/10/16

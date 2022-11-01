@@ -8,7 +8,7 @@ import org.bitlap.tools._
 import java.nio.ByteBuffer
 import java.util.UUID
 
-/** TODO fix
+/** 客户端操作的媒介（≈句柄）
  *
  *  @author
  *    梦境迷离
@@ -20,6 +20,7 @@ object handles {
   /** 抽象处理器
    *
    *  @param handleId
+   *    唯一ID
    */
   sealed abstract class Handle(
     val handleId: HandleIdentifier = new HandleIdentifier()

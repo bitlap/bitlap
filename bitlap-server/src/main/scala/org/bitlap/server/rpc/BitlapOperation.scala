@@ -7,10 +7,12 @@ import org.bitlap.network.models._
 import org.bitlap.network._
 import org.bitlap.tools.apply
 
-import java.sql.{ ResultSet, Types }
+import java.sql._
 import scala.collection.mutable.ListBuffer
 
-/** @author
+/** bitlap 客户端操作
+ *
+ *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */

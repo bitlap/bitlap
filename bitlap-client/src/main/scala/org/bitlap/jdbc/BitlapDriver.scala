@@ -1,11 +1,11 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-import java.sql.{ Connection, Driver, DriverPropertyInfo }
+import java.sql.{ Array => _, _ }
 import java.util.Properties
 import java.util.logging.Logger
 
-/** Desc: JDBC driver for bitlap
+/** Desc: bitlap 的JDBC驱动
  *
  *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/4/16
  */

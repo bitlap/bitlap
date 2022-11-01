@@ -5,7 +5,8 @@ import scalapb.zio_grpc.{ ServerMain, ServiceList }
 import zio.console.putStrLn
 import zio.ZIO
 
-/** @author
+/** 用于测试的 bitlap rpc 服务
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */

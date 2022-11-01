@@ -6,7 +6,7 @@ import org.bitlap.network.handles._
 
 import java.sql._
 
-/** Bitlap Statement
+/** bitlap Statement
  *
  *  @author
  *    梦境迷离

@@ -8,7 +8,8 @@ import org.bitlap.network.OperationType
 
 import scala.collection.mutable
 
-/** @author
+/** bitlap 操作
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0

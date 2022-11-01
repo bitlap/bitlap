@@ -4,7 +4,8 @@ package org.bitlap.server
 import zio.console.putStrLn
 import zio._
 
-/** @author
+/** bitlap 聚合服务
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
  */

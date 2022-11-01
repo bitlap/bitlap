@@ -9,10 +9,10 @@ import org.bitlap.tools.apply
 import java.sql._
 import java.util.Properties
 import java.util.concurrent.Executor
-import java.{ sql, util }
+import java._
 import scala.jdk.CollectionConverters._
 
-/** Bitlap Connection
+/** bitlap Connection
  *
  *  @author
  *    梦境迷离

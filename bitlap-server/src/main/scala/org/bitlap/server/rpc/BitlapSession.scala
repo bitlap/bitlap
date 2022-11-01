@@ -9,7 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-/** @author
+/** bitlap 会话
+ *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */

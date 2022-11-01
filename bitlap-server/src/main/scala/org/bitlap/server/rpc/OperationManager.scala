@@ -7,7 +7,8 @@ import org.bitlap.network.handles.OperationHandle
 
 import scala.collection.mutable
 
-/** @author
+/** bitlap 操作管理器
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0

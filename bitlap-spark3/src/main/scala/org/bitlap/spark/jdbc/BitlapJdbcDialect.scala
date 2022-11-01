@@ -1,8 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.spark.jdbc
 
-import org.apache.spark.sql.jdbc.{ JdbcDialect, JdbcType }
-import org.apache.spark.sql.types.{ BinaryType, ByteType, DataType, ShortType, StringType }
+import org.apache.spark.sql.jdbc._
+import org.apache.spark.sql.types._
 
 object BitlapJdbcDialect extends JdbcDialect {
 

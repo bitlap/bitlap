@@ -7,7 +7,8 @@ import java.util.concurrent.TimeUnit
 import java.util.Random
 import java.text.SimpleDateFormat
 
-/** @author
+/** bitlap 假数据创建工具
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/20
  */

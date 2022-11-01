@@ -3,7 +3,7 @@ package org.bitlap.network
 
 import org.bitlap.common.exception.BitlapException
 
-/** All exceptions for network and server.
+/** 网络层和服务层所有通用异常
  *
  *  @author
  *    梦境迷离

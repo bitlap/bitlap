@@ -2,15 +2,15 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.NetworkException
 import org.bitlap.network.NetworkException.ServerIntervalException
 import org.bitlap.network.handles.SessionHandle
 
+import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
-import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
 
-/** @author
+/** bitlap 会话管理器
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0

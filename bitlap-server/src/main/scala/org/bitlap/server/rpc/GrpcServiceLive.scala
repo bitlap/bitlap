@@ -2,7 +2,7 @@
 package org.bitlap.server.rpc
 
 import io.grpc._
-import org.bitlap.network.{ errorApplyFunc, AsyncRpc, RpcStatus }
+import org.bitlap.network._
 import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
@@ -19,16 +19,14 @@ import org.bitlap.server.BitlapServerContext
 import org.bitlap.tools._
 import zio._
 
-/** A zio-grpc server implement by zio backend.
+/** RPC的服务端API实现，基于 zio-grpc,zio 1.0
  *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
 @apply
-final class DriverGrpcServiceLive(private val asyncRpcBackend: AsyncRpc)
-    extends ZDriverService[Any, Any]
-    with RpcStatus {
+final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriverService[Any, Any] with RpcStatus {
 
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     asyncRpcBackend

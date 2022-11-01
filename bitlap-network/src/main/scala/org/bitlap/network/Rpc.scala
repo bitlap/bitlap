@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ FetchResults, TableSchema }
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
 
-/** Rpc api and monad for backends.
+/** 函数式RPC API，客户端和服务端通用。
  *
  *  @author
  *    梦境迷离

@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli
 
-/** Bitlap cli command.
+/** bitlap命令行支持的命令
  *
  *  @author
  *    梦境迷离

@@ -1,7 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-/** @author
+/** bitlap 元数据的结果集，暂未使用
+ *  @author
  *    梦境迷离
  *  @since 2021/8/23
  *  @version 1.0

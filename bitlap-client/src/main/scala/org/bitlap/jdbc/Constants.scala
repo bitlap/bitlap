@@ -1,7 +1,8 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.jdbc
 
-/** @author
+/** bitlap 客户端的常量
+ *  @author
  *    梦境迷离
  *  @since 2021/8/28
  *  @version 1.0

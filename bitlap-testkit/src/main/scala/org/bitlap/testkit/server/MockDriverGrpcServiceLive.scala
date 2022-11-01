@@ -1,11 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server.rpc.{ AsyncRpcBackend, DriverGrpcServiceLive }
-import zio.{ UIO, ZIO }
+import org.bitlap.server.rpc._
+import zio._
 
-/** Mock live for rpc server.
- *
+/** 用于测试的 bitlap rpc 服务端API实现
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/27
@@ -13,8 +12,12 @@ import zio.{ UIO, ZIO }
 
 object MockDriverGrpcServiceLive {
 
-  val mockLive: UIO[DriverGrpcServiceLive] = ZIO.succeed(DriverGrpcServiceLive(MockAsyncRpcBackend()))
+  /** 固定的测试数据
+   */
+  val mockLive: UIO[GrpcServiceLive] = ZIO.succeed(GrpcServiceLive(MockAsyncRpcBackend()))
 
-  val embedLive: UIO[DriverGrpcServiceLive] = ZIO.succeed(DriverGrpcServiceLive(AsyncRpcBackend()))
+  /** 真实数据
+   */
+  val embedLive: UIO[GrpcServiceLive] = ZIO.succeed(GrpcServiceLive(AsyncRpcBackend()))
 
 }

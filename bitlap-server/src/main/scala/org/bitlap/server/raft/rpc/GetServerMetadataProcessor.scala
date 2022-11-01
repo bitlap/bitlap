@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft.rpc
 
-import com.alipay.sofa.jraft.rpc.{ RpcContext, RpcRequestClosure }
+import com.alipay.sofa.jraft.rpc.{ RpcProcessor => _, _ }
 import com.google.protobuf.Message
 import org.bitlap.common.schema.GetServerMetadata
 

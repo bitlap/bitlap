@@ -2,20 +2,22 @@
 package org.bitlap.server.rpc
 
 import org.bitlap.server.ServerProvider
-import scalapb.zio_grpc.{ ServerMain, ServiceList }
+import scalapb.zio_grpc._
 import zio._
 import zio.console._
 import org.bitlap.network.ServerType
 import org.bitlap.server.BitlapServerContext
 
-/** @author
+/** bitlap grpc服务
+ *
+ *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-final class InternalGrpcServerProvider(override val port: Int) extends ServerProvider with ServerMain {
+final class GrpcServerProvider(override val port: Int) extends ServerProvider with ServerMain {
 
   private final lazy val backend = AsyncRpcBackend()
-  private final lazy val liver   = DriverGrpcServiceLive(backend)
+  private final lazy val liver   = GrpcServiceLive(backend)
 
   override def welcome: ZIO[zio.ZEnv, Throwable, Unit] =
     putStrLn(s"$serverType: Server is listening to port: $port")

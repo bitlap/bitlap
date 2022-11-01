@@ -1,9 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.driver.proto.{ BStatus, BStatusCode }
+import org.bitlap.network.driver.proto._
 
-/** @author
+/** bitlap RPC错误码
+ *  @author
  *    梦境迷离
  *  @since 2021/12/5
  *  @version 1.0

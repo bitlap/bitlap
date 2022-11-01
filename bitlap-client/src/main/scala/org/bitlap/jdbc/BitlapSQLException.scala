@@ -3,12 +3,13 @@ package org.bitlap.jdbc
 
 import java.sql.SQLException
 
-/** @author
+/** bitlap 客户端的SQL异常
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0
  */
-case class BitlapSQLException(
+final case class BitlapSQLException(
   msg: String,
   state: String = null,
   code: Int = -1,

@@ -3,11 +3,12 @@ package org.bitlap.server
 
 import org.bitlap.network.ServerType
 import org.bitlap.server.http.HttpServerProvider
-import org.bitlap.server.raft.{ RaftServerConfig, RaftServerProvider }
-import org.bitlap.server.rpc.InternalGrpcServerProvider
+import org.bitlap.server.raft._
+import org.bitlap.server.rpc.GrpcServerProvider
 import zio._
 
-/** @author
+/** bitlap 抽象服务接口
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
  */
@@ -29,9 +30,14 @@ trait ServerProvider {
 
 object ServerProvider {
 
+  /** 所有bitlap 内部服务
+   *  @param http
+   *    是否启动 HTTP 服务
+   *  @return
+   */
   def serverProviders(http: Boolean): List[ServerProvider] =
     (if (http) List(new HttpServerProvider(8081)) else List()) ++ List(
-      new InternalGrpcServerProvider(23333),
+      new GrpcServerProvider(23333),
       new RaftServerProvider(RaftServerConfig.raftServerConfig)
     )
 }

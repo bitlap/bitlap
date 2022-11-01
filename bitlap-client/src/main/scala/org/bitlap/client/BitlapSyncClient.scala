@@ -5,7 +5,7 @@ import org.bitlap.network._
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.models._
 
-/** This class mainly wraps zio asynchronous calls.
+/** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端。
  *
  *  @author
  *    梦境迷离

@@ -4,12 +4,12 @@ package org.bitlap.cli.interactive
 import sqlline.SqlLineProperty
 import sqlline.SqlLineProperty.Type
 
-import java.util
+import java.util.{ Set => JSet }
 import scala.jdk.CollectionConverters._
 
 class BitlapSqlLineProperty(
   name: String,
-  typ: Type,
+  `type`: Type,
   defaultValue: AnyRef,
   couldBeStored: Boolean = true,
   isReadOnly: Boolean = false,
@@ -24,9 +24,9 @@ class BitlapSqlLineProperty(
 
   override def couldBeStored: Boolean = couldBeStored
 
-  override def `type`(): Type = typ
+  override def `type`(): Type = `type`
 
-  override def getAvailableValues: util.Set[String] = availableValues.asJava
+  override def getAvailableValues: JSet[String] = availableValues.asJava
 }
 
 object BitlapSqlLineProperty {

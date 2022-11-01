@@ -3,7 +3,7 @@ package org.bitlap.jdbc
 
 import org.bitlap.network.models._
 
-import java.io.{ InputStream, Reader }
+import java.io._
 import java.math.BigDecimal
 import java.net.URL
 import java.sql._
@@ -11,9 +11,10 @@ import java.time.Instant
 import java.util
 import java.util.Calendar
 import scala.annotation.implicitNotFound
-import scala.reflect.{ classTag, ClassTag }
+import scala.reflect._
 
-/** @author
+/** bitlap 抽象结果集
+ *  @author
  *    梦境迷离
  *  @since 2021/8/23
  *  @version 1.0

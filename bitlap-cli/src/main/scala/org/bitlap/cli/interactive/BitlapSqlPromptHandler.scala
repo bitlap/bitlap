@@ -3,7 +3,7 @@ package org.bitlap.cli.interactive
 
 import org.bitlap.common.utils.StringEx
 import org.bitlap.tools.apply
-import sqlline.{ PromptHandler, SqlLine }
+import sqlline._
 import scala.collection.mutable
 
 @apply

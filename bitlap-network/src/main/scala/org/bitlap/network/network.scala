@@ -2,8 +2,8 @@
 package org.bitlap
 
 import io.grpc.Status
-import org.bitlap.network.NetworkException.{ LeaderServerNotFoundException, RpcException }
-import zio.{ IO, ZIO }
+import org.bitlap.network.NetworkException._
+import zio._
 
 import java.io.IOException
 import java.util.concurrent.TimeoutException

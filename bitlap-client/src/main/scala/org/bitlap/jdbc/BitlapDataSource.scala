@@ -7,7 +7,8 @@ import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
 
-/** @author
+/** bitlap JDBC数据源，目前尚未实现鉴权和连接参数配置。
+ *  @author
  *    梦境迷离
  *  @since 2021/6/12
  *  @version 1.0

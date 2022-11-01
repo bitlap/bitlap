@@ -14,9 +14,11 @@ import org.bitlap.network.ServerType
 import java.sql.DriverManager
 import scala.util.Try
 
-/** Test http://localhost:8080/init
+/** bitlap http服务
  *
- *  http://localhost:8080/sql
+ *  初始化数据接口： http://localhost:8080/init
+ *
+ *  查询数据接口：http://localhost:8080/sql
  *  @param port
  */
 final class HttpServerProvider(val port: Int) extends ServerProvider {

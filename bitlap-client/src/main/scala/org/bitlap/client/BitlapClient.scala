@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
 
-/** This class mainly wraps synchronous calls.
+/** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端。但可以为其添加JDBC专属逻辑。
  *
  *  @author
  *    梦境迷离
@@ -18,7 +18,6 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
   def openSession(): SessionHandle =
     rpcClient
       .openSession(username = "", password = "", configuration = props)
-  // TODO: Add heartbeat
 
   def closeSession(sessionHandle: SessionHandle): Unit =
     rpcClient.closeSession(sessionHandle)

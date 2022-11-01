@@ -3,16 +3,16 @@ package org.bitlap.cli.interactive
 
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.tools.apply
-import sqlline.{ Application, CommandHandler, PromptHandler, SqlLine }
+import sqlline._
 
-import java.util
+import java.util.{ Collection => JCollection }
 
 @apply
 class BitlapSqlApplication extends Application {
 
   override def getCommandHandlers(
     sqlLine: SqlLine
-  ): util.Collection[CommandHandler] =
+  ): JCollection[CommandHandler] =
     super.getCommandHandlers(sqlLine)
 
   override def getPromptHandler(sqlLine: SqlLine): PromptHandler = {

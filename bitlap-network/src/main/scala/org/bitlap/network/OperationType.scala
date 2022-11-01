@@ -4,7 +4,8 @@ package org.bitlap.network
 import enumeratum.values._
 import org.bitlap.network.driver.proto.BOperationType
 
-/** @author
+/** bitlap客户端操作类型
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0

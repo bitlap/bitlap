@@ -10,7 +10,8 @@ import zio.{ Runtime => _, _ }
 import org.bitlap.server.BitlapServerContext
 import org.slf4j.LoggerFactory
 
-/** @author
+/** bitlap raft cluster和rpc服务
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */

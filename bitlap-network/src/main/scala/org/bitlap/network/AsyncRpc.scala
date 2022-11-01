@@ -3,9 +3,9 @@ package org.bitlap.network
 
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
-import zio.{ Task, ZIO }
+import zio._
 
-/** Rpc api and monad for zio backend.
+/** 函数式异步RPC API，客户端和服务端通用，基于 zio 1.0
  *
  *  @author
  *    梦境迷离

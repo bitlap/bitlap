@@ -1,22 +1,23 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.cli
 
-import org.bitlap.cli.BitlapInterpreter.CliCommands.{ server, sql }
+import org.bitlap.cli.BitlapInterpreter.CliCommands._
 import org.bitlap.cli.Command.{ Server, Sql }
 import org.bitlap.cli.interactive.BitlapSqlApplication
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
-import sqlline.{ SqlLine, SqlLineOpts }
-import zio.ZIO
+import sqlline._
+import zio._
 import zio.cli.HelpDoc.Span.text
-import zio.cli.{ Args, CliApp, Command => ZioCliCommand, HelpDoc, Options }
+import zio.cli.{ Command => ZioCliCommand, _ }
 import zio.console.{ putStrLn, Console }
 
-import java.io.{ File, IOException }
+import java.io._
 import scala.collection.mutable.ArrayBuffer
 
-/** @author
+/** 基于zio-cli实现的命令行解释器
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/24
  */

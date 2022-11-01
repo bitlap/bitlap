@@ -17,7 +17,8 @@ import org.bitlap.network.AsyncRpc
 import zio._
 import org.bitlap.network.NetworkException.ServerIntervalException
 
-/** @author
+/** bitlap 服务间上下文，用于grpc,http,raft数据依赖
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */

@@ -8,7 +8,8 @@ import org.bitlap.network.driver.proto._
 
 import java.sql.Types
 
-/** @author
+/** bitlap 数据模型，和数据传输模型（proto）的变换
+ *  @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0

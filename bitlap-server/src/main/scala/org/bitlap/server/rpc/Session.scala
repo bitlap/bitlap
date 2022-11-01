@@ -2,12 +2,12 @@
 package org.bitlap.server.rpc
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
-import org.bitlap.network.models.{ RowSet, TableSchema }
+import org.bitlap.network.handles._
+import org.bitlap.network.models._
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-/** Bitlap Session interface.
+/** bitlap 会话
  *
  *  @author
  *    梦境迷离

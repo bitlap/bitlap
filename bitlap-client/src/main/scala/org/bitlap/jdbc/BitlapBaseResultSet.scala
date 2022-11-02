@@ -5,12 +5,11 @@ import org.bitlap.network.models._
 
 import java.io._
 import java.math.BigDecimal
-import java.net.URL
+import java.net._
 import java.sql._
-import java.time.Instant
 import java.util
 import java.util.Calendar
-import scala.annotation.implicitNotFound
+import scala.annotation._
 import scala.reflect._
 
 /** bitlap 抽象结果集
@@ -84,17 +83,17 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def getBytes(columnLabel: String): scala.Array[Byte] = ???
 
-  override def getDate(columnIndex: Int): Date = ???
+  override def getDate(columnIndex: Int): Date = getColumnValue[Date](columnIndex)
 
-  override def getDate(columnLabel: String): Date = ???
+  override def getDate(columnLabel: String): Date = getDate(findColumn(columnLabel))
 
   override def getDate(columnIndex: Int, cal: Calendar): Date = ???
 
   override def getDate(columnLabel: String, cal: Calendar): Date = ???
 
-  override def getTime(columnIndex: Int): Time = ???
+  override def getTime(columnIndex: Int): Time = getColumnValue[Time](columnIndex)
 
-  override def getTime(columnLabel: String): Time = ???
+  override def getTime(columnLabel: String): Time = getTime(findColumn(columnLabel))
 
   override def getTime(columnIndex: Int, cal: Calendar): Time = ???
 
@@ -420,10 +419,9 @@ abstract class BitlapBaseResultSet extends ResultSet {
 
   override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit = ???
 
-  @inline
-  private def getColumnValue[T](
-    columnIndex: Int
-  )(implicit @implicitNotFound("Could not find an implicit ClassTag[\\${T}]") t: ClassTag[T]): T = {
+//  @inline
+  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  private def getColumnValue[T: ClassTag](columnIndex: Int): T = {
     if (row == null) {
       throw BitlapSQLException("No row found.")
     }
@@ -442,22 +440,25 @@ abstract class BitlapBaseResultSet extends ResultSet {
       val typeName   = classTag[T].runtimeClass.getTypeName
       val valueStr   = bColumnValue.toStringUtf8
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
+      if (columnType == TypeId.StringType || valueStr == null) {
+        return valueStr.asInstanceOf[T]
+      }
+
+      if (valueStr.isEmpty) {
+        return null.asInstanceOf[T]
+      }
+
       (columnType match {
-        case TypeId.StringType => valueStr
-        case TypeId.IntType =>
-          if (valueStr.nonEmpty) Integer.parseInt(valueStr) else null
-        case TypeId.DoubleType =>
-          if (valueStr.nonEmpty) java.lang.Double.parseDouble(valueStr) else null
-        case TypeId.ShortType =>
-          if (valueStr.nonEmpty) java.lang.Short.parseShort(valueStr) else null
-        case TypeId.LongType =>
-          if (valueStr.nonEmpty) java.lang.Long.parseLong(valueStr) else null
-        case TypeId.BooleanType =>
-          if (valueStr.nonEmpty) java.lang.Boolean.valueOf(valueStr) else null
-        case TypeId.TimestampType =>
-          if (valueStr.nonEmpty) Timestamp.from(Instant.ofEpochMilli(java.lang.Long.parseLong(valueStr)))
-          else null
-        case _ => valueStr // FIXME 避免报错
+        case TypeId.IntType       => Integer.parseInt(valueStr)
+        case TypeId.DoubleType    => java.lang.Double.parseDouble(valueStr)
+        case TypeId.ShortType     => java.lang.Short.parseShort(valueStr)
+        case TypeId.LongType      => java.lang.Long.parseLong(valueStr)
+        case TypeId.BooleanType   => java.lang.Boolean.valueOf(valueStr)
+        case TypeId.TimestampType => new Timestamp(java.lang.Long.parseLong(valueStr))
+        case TypeId.FloatType     => java.lang.Float.parseFloat(valueStr)
+        case TypeId.TimeType      => new Time(java.lang.Long.parseLong(valueStr))
+        case TypeId.DateType      => new Date(java.lang.Long.parseLong(valueStr))
+        case _                    => valueStr // FIXME 避免报错
 //        case _ => throw BSQLException(s"Unrecognized column columnType:$columnType, scalaTypeName:$typeName")
       }).asInstanceOf[T]
     } catch {

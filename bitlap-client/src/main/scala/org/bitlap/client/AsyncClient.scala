@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.client
 
-import io.grpc.{ ManagedChannelBuilder, Status }
+import io.grpc._
 import org.bitlap.common.utils.UuidUtil
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network._
@@ -13,7 +13,7 @@ import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetada
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles._
-import org.bitlap.network.models._
+import org.bitlap.network.models.{ Status => _, _ }
 import zio._
 
 /** 异步RPC客户端，基于zio-grpc实现
@@ -23,7 +23,7 @@ import zio._
  *  @since 2021/11/21
  *  @version 1.0, zio 1.0
  */
-class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
+class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
 
   // refactor
   private lazy val serverAddresses =
@@ -31,7 +31,7 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .filter(_.nonEmpty)
       .map { s =>
         val as = if (s.contains(":")) s.split(":").toList else List(s, "23333")
-        LeaderGrpcAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
+        ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
       }
       .toList
 
@@ -129,14 +129,14 @@ class BitlapAsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     schemaName: String
   ): ZIO[Any, Throwable, OperationHandle] = ???
 
-  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[LeaderGrpcAddress]] =
+  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient
       .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
       .map { f =>
-        if (f == null || f.ip.isEmpty) None else Some(LeaderGrpcAddress(f.ip.getOrElse("localhost"), f.port))
+        if (f == null || f.ip.isEmpty) None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port))
       }
       .catchSomeCause {
-        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[LeaderGrpcAddress]) // ignore this
+        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[ServerAddress]) // ignore this
       }
       .catchAll(_ => ZIO.none)
 }

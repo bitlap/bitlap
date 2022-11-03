@@ -6,6 +6,7 @@ import org.bitlap.network.models._
 import org.bitlap.network._
 import org.bitlap.tools._
 import zio._
+import org.bitlap.server.session.SessionManager
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *

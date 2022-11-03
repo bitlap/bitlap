@@ -2,7 +2,7 @@
 package org.bitlap.client
 
 import org.bitlap.network._
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
 /** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端。
@@ -12,9 +12,9 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapSyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncRpc with RpcStatus {
+class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncRpc with RpcStatus {
 
-  private lazy val delegateClient = new BitlapAsyncClient(serverPeers, props)
+  private lazy val delegateClient = new AsyncClient(serverPeers, props)
 
   override def openSession(
     username: String,
@@ -70,7 +70,7 @@ class BitlapSyncClient(serverPeers: Array[String], props: Map[String, String]) e
     _.getSchemas(sessionHandle, catalogName, schemaName)
   }
 
-  def getLeader(requestId: String): Identity[LeaderGrpcAddress] = delegateClient.sync {
+  def getLeader(requestId: String): Identity[ServerAddress] = delegateClient.sync {
     _.getLeader(requestId)
   }
 }

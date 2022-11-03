@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.handles._
@@ -16,13 +16,15 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 trait Session {
 
-  var sessionHandle: SessionHandle
-  var password: String
-  var username: String
-  var sessionConf: BitlapConf
-  var sessionManager: SessionManager
+  val sessionHandle: SessionHandle
+  val password: String
+  val username: String
+  val sessionManager: SessionManager
+
   var lastAccessTime: Long
   var operationManager: OperationManager
+
+  def sessionConf: BitlapConf
 
   def sessionState: AtomicBoolean
 

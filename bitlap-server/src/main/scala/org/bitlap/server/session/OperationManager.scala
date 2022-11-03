@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.OperationType
@@ -25,7 +25,7 @@ class OperationManager {
     statement: String,
     confOverlay: Map[String, String] = Map.empty
   ): Operation = {
-    val operation = new BitlapOperation(
+    val operation = new MemoryOperation(
       parentSession,
       OperationType.ExecuteStatement,
       hasResultSet = true

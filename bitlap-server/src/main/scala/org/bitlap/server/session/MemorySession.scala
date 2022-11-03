@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.handles._
@@ -14,35 +14,24 @@ import scala.jdk.CollectionConverters._
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-class BitlapSession extends Session {
+class MemorySession(
+  val username: String,
+  val password: String,
+  _sessionConf: Map[String, String],
+  val sessionManager: SessionManager,
+  val sessionHandle: SessionHandle = new SessionHandle(new HandleIdentifier()),
+  val sessionState: AtomicBoolean = new AtomicBoolean(false),
+  val creationTime: Long = System.currentTimeMillis()
+) extends Session {
 
-  override val sessionState: AtomicBoolean        = new AtomicBoolean(false)
-  override var sessionHandle: SessionHandle       = _
-  override var password: String                   = _
-  override var username: String                   = _
-  override val creationTime: Long                 = System.currentTimeMillis()
-  override var sessionConf: BitlapConf            = _
-  override var sessionManager: SessionManager     = _
+  this.sessionState.compareAndSet(false, true)
+
   override var lastAccessTime: Long               = System.currentTimeMillis()
   override var operationManager: OperationManager = _
 
   private val opHandleSet = ListBuffer[OperationHandle]()
 
-  def this(
-    username: String,
-    password: String,
-    sessionConf: Map[String, String],
-    sessionManager: SessionManager,
-    sessionHandle: SessionHandle = new SessionHandle(new HandleIdentifier())
-  ) = {
-    this()
-    this.username = username
-    this.sessionHandle = sessionHandle
-    this.password = password
-    this.sessionConf = new BitlapConf(sessionConf.asJava)
-    this.sessionState.compareAndSet(false, true)
-    this.sessionManager = sessionManager
-  }
+  override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
 
   override def open(
     sessionConfMap: Map[String, String]

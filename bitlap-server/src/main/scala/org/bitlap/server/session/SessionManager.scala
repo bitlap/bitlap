@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.network.NetworkException.ServerIntervalException
@@ -76,7 +76,7 @@ class SessionManager extends LazyLogging {
       s"Server get properties [username:$username, password:$password, sessionConf:$sessionConf]"
     )
     SessionManager.sessionAddLock.synchronized {
-      val session = new BitlapSession(
+      val session = new MemorySession(
         username,
         password,
         sessionConf,
@@ -89,7 +89,7 @@ class SessionManager extends LazyLogging {
     }
   }
 
-  def closeSession(sessionHandle: SessionHandle) = {
+  def closeSession(sessionHandle: SessionHandle): Unit = {
     SessionManager.sessionAddLock.synchronized {
       handleToSession.remove(sessionHandle)
     }
@@ -102,7 +102,6 @@ class SessionManager extends LazyLogging {
       //            "instances available for dynamic service discovery. " +
       //            "The last client session has ended - will shutdown now."
       //        )
-      // TODO STOP server
     }
   }
 
@@ -114,7 +113,6 @@ class SessionManager extends LazyLogging {
       handleToSession.get(sessionHandle)
     }
     if (session == null) {
-      // scala调用kotlin，默认参数被IDE忽略 显示红色。但是maven插件编译是有默认参数的，插件编译通过
       throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
     }
     session

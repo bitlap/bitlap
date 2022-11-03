@@ -1,5 +1,5 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.network.handles.OperationHandle

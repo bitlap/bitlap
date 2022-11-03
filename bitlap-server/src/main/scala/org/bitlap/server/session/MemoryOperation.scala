@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.session
 
 import com.google.protobuf.ByteString
 import org.bitlap.core.sql.QueryExecution
+import org.bitlap.network.OperationType
 import org.bitlap.network.models._
-import org.bitlap.network._
 import org.bitlap.tools.apply
 
 import java.sql._
@@ -17,7 +17,7 @@ import scala.collection.mutable.ListBuffer
  *  @version 1.0,2021/12/3
  */
 @apply
-class BitlapOperation(
+class MemoryOperation(
   parentSession: Session,
   opType: OperationType,
   hasResultSet: Boolean = false

@@ -13,7 +13,7 @@ import org.bitlap.network.models._
  */
 class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
-  private lazy val rpcClient: BitlapSyncClient = new BitlapSyncClient(serverPeers, props)
+  private lazy val rpcClient: SyncClient = new SyncClient(serverPeers, props)
 
   def openSession(): SessionHandle =
     rpcClient

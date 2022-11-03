@@ -28,12 +28,12 @@ class BitlapResultSetMetaData(
   override def getColumnDisplaySize(column: Int): Int =
     // taking a stab at appropriate values
     getColumnType(column) match {
-      case Types.VARCHAR | Types.BIGINT => 32
-      case Types.TINYINT                => 1
-      case Types.SMALLINT               => 2
-      case Types.BOOLEAN                => 8
-      case Types.DOUBLE | Types.INTEGER => 16
-      case _                            => 32
+      case Types.VARCHAR | Types.BIGINT               => 32
+      case Types.TINYINT                              => 1
+      case Types.SMALLINT                             => 2
+      case Types.BOOLEAN                              => 8
+      case Types.DOUBLE | Types.INTEGER | Types.FLOAT => 16
+      case _                                          => 32
     }
 
   override def getColumnLabel(column: Int): String = columnNames(column - 1)

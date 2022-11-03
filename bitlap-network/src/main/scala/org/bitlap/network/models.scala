@@ -111,6 +111,9 @@ object models {
     final case object TimestampType extends TypeId(6, "Timestamp")
     final case object ShortType     extends TypeId(7, "Short")
     final case object ByteType      extends TypeId(8, "Byte")
+    final case object FloatType     extends TypeId(9, "Float")
+    final case object TimeType      extends TypeId(10, "Time")
+    final case object DateType      extends TypeId(11, "Date")
 
     val values: IndexedSeq[TypeId] = findValues
     def toTypeId(bTypeId: BTypeId): TypeId =
@@ -126,7 +129,10 @@ object models {
       Types.DOUBLE    -> TypeId.DoubleType,
       Types.BOOLEAN   -> TypeId.BooleanType,
       Types.TIMESTAMP -> TypeId.TimestampType,
-      Types.TINYINT   -> TypeId.ByteType
+      Types.TINYINT   -> TypeId.ByteType,
+      Types.FLOAT     -> TypeId.FloatType,
+      Types.TIME      -> TypeId.TimeType,
+      Types.DATE      -> TypeId.DateType
     )
 
     def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)

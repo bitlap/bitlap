@@ -15,7 +15,7 @@ import org.bitlap.core.data.metadata.Table
 interface BitlapCatalog {
 
     /**
-     * Use [current_database].
+     * Show current_database.
      */
     fun showCurrentDatabase(): String
 

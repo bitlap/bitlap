@@ -9,12 +9,14 @@ import java.sql._
 
 class ServerSpec extends CsvUtil {
 
-  private val table = s"test_table_${FakeDataUtil.randEntityNumber}"
+  private val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
+  private val database = s"test_database_${FakeDataUtil.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
 
   lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
+  // 每个测试都会执行一次，需要修改！
   @Before
   def startServer(): Unit = {
     val server = new Thread {
@@ -52,6 +54,22 @@ class ServerSpec extends CsvUtil {
     val rs   = stmt.getResultSet
     val ret1 = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
     assert(ret1.nonEmpty)
+
+    val stmt2 = conn.createStatement()
+    stmt2.execute(s"create database $database")
+
+    val stmt3 = conn.createStatement()
+    stmt3.execute(s"use $database")
+    val rs2  = stmt3.getResultSet
+    val ret2 = ResultSetTransformer[GenericRow1[Boolean]].toResults(rs2)
+    assert(ret2.nonEmpty && ret2.contains(true))
+
+    val stmt4 = conn.createStatement()
+    stmt4.execute(s"SELECT current_database()")
+    val rs3  = stmt4.getResultSet
+    val ret3 = ResultSetTransformer[GenericRow1[String]].toResults(rs3)
+    assert(ret3.nonEmpty && ret3.contains(database))
+
   }
 
 }

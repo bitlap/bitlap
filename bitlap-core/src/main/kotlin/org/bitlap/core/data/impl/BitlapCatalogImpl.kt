@@ -56,6 +56,25 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         }
     }
 
+    override fun currentDatabase(): String {
+        return BitlapContext.getCurrentDatabase()
+    }
+
+    override fun useDatabase(name: String): Boolean {
+        val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
+        if (cleanName == DEFAULT_DATABASE) {
+            return true
+        }
+        val p = Path(dataPath, cleanName)
+        val exists = fs.exists(p)
+        if (!exists) {
+            throw BitlapException("Unable to use database $cleanName, it does not exist.")
+        }
+
+        BitlapContext.currentContext.set(name)
+        return true
+    }
+
     /**
      * create [Database] with [name].
      *

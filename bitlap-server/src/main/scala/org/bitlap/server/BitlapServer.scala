@@ -23,7 +23,7 @@ object BitlapServer extends zio.App {
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.foreach_(r)(_.join)
+      _ <- ZIO.foreach_(r)(_.interrupt)
     } yield ()).foldM(
       e => ZIO.fail(e).exitCode,
       _ => ZIO.effectTotal(ExitCode.success)

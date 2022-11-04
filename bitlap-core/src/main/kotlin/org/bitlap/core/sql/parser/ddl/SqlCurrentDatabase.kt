@@ -12,13 +12,13 @@ import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
  * Desc:
- *    Parse tree for `SHOW (TABLES | DATASOURCES) [IN schema_name]` statement.
+ *    Parse tree for `select current_database()` statement.
  *
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2021/8/25
  */
-class SqlShowTables(
+class SqlCurrentDatabase(
     override val pos: SqlParserPos,
     val database: SqlIdentifier?,
 ) : BitlapSqlDdlNode(pos, OPERATOR, listOfNotNull(database)) {

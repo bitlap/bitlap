@@ -188,6 +188,17 @@ SqlShowTables SqlShowTables() :
         return new SqlShowTables(getPos(), dbName);
     }
 }
+SqlNode SqlUseDatabase() :
+{
+    SqlIdentifier dbName = null;
+}
+{
+    <USE>
+    dbName = CompoundIdentifier()
+    {
+        return new SqlUseDatabase(getPos(), dbName);
+    }
+}
 
 SqlNode SqlExplainX() :
 {

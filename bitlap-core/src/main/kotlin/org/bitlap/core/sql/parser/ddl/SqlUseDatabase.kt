@@ -7,34 +7,33 @@ import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
-import org.bitlap.core.BitlapContext
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
- * Desc:
- *    Parse tree for `SHOW (TABLES | DATASOURCES) [IN schema_name]` statement.
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/8/25
+ *    Parse tree for `USE database` statement.
  */
-class SqlShowTables(
+class SqlUseDatabase(
     override val pos: SqlParserPos,
     val database: SqlIdentifier?,
 ) : BitlapSqlDdlNode(pos, OPERATOR, listOfNotNull(database)) {
 
     companion object {
-        val OPERATOR = SqlSpecialOperator("SHOW TABLES", SqlKind.OTHER)
+        val OPERATOR = SqlSpecialOperator("USE", SqlKind.OTHER)
     }
 
     override val resultTypes: List<Pair<String, SqlTypeName>>
         get() = listOf(
-            "database_name" to SqlTypeName.VARCHAR,
-            "table_name" to SqlTypeName.VARCHAR,
-            "create_timestamp" to SqlTypeName.TIMESTAMP
+            "result" to SqlTypeName.BOOLEAN
         )
 
     override fun operator(context: DataContext): List<Array<Any?>> {
-        return catalog.listTables(BitlapContext.getCurrentDatabase()).map { arrayOf(it.database, it.name, it.createTime) }
+        if (database == null || database.simple == null) {
+            throw BitlapException("Unable to use database with null.")
+        }
+
+        return listOf(
+            arrayOf(catalog.useDatabase(database.simple!!))
+        )
     }
 }

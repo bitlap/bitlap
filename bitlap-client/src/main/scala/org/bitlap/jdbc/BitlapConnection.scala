@@ -39,13 +39,6 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val parts       = hosts.map(it => it.split("/"))
     val serverPeers = hosts.map(f => f.split("/")(0))
     try {
-      // FIXME
-      val hostAndPort =
-        try parts.map(_(0)).mkString(",").split(":")
-        catch {
-          case e: Exception =>
-            e.printStackTrace(); println("Use default port: 23333"); scala.Array("localhost", "23333")
-        }
       client = new BitlapClient(serverPeers, info.asScala.toMap)
       session = client.openSession()
       closed = false
@@ -180,7 +173,16 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def setSchema(schema: String): Unit = ???
 
-  override def getSchema: String = "default" // TODO: fix me
+  override def getSchema: String = {
+    if (closed) throw BitlapSQLException("Connection is closed")
+    val stmt = createStatement()
+    val res = stmt.executeQuery("SELECT current_database()")
+    if (!res.next) throw  BitlapSQLException("Failed to get schema information")
+    val schemaName = res.getString(1)
+    res.close()
+    stmt.close()
+    schemaName
+  }
 
   override def abort(executor: Executor): Unit = ???
 

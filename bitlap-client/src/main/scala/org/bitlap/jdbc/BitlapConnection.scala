@@ -176,8 +176,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def getSchema: String = {
     if (closed) throw BitlapSQLException("Connection is closed")
     val stmt = createStatement()
-    val res = stmt.executeQuery("SELECT current_database()")
-    if (!res.next) throw  BitlapSQLException("Failed to get schema information")
+    val res  = stmt.executeQuery("SHOW CURRENT_DATABASE")
+    if (!res.next) throw BitlapSQLException("Failed to get schema information")
     val schemaName = res.getString(1)
     res.close()
     stmt.close()

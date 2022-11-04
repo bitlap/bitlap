@@ -40,6 +40,7 @@
     "org.bitlap.core.sql.parser.cmd.SqlExplainX"
     "org.bitlap.core.sql.parser.cmd.SqlLoadData"
     "org.bitlap.core.sql.parser.ddl.SqlUseDatabase"
+    "org.bitlap.core.sql.parser.ddl.SqlShowCurrentDatabase"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -66,6 +67,7 @@
     "UNLOAD"
     "USE"
     "VIEWS"
+    "CURRENT_DATABASE"
   ]
 
   # List of keywords from "keywords" section that are not reserved.
@@ -419,7 +421,8 @@
     "SqlShowTables()"
     "SqlExplainX()"
     "SqlLoadData()"
-    "SqlUseDatabase()"
+    "SqlUseDatabase()",
+    "SqlShowCurrentDatabase()"
   ]
 
   # List of methods for parsing custom literals.

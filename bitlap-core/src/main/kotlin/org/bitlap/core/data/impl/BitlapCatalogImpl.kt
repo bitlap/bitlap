@@ -28,6 +28,15 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
+    companion object {
+        // TODO
+        private var currentContext: String = DEFAULT_DATABASE
+    }
+
+    fun getCurrentDatabase(): String {
+        return currentContext
+    }
+
     private val fs: FileSystem by lazy {
         rootPath.getFileSystem(hadoopConf).also {
             it.setWriteChecksum(false)
@@ -56,8 +65,8 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         }
     }
 
-    override fun currentDatabase(): String {
-        return BitlapContext.getCurrentDatabase()
+    override fun showCurrentDatabase(): String {
+        return getCurrentDatabase()
     }
 
     override fun useDatabase(name: String): Boolean {
@@ -71,12 +80,13 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
             throw BitlapException("Unable to use database $cleanName, it does not exist.")
         }
 
-        BitlapContext.currentContext.set(name)
+        currentContext = cleanName
+
         return true
     }
 
     /**
-     * create [Database] with [name].
+     * Create [Database] with [name].
      *
      * if [ifNotExists] is false, exception will be thrown when [Database] exists, otherwise ignored.
      */

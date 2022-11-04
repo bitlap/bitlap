@@ -14,12 +14,10 @@ import org.bitlap.core.data.metadata.Table
  */
 interface BitlapCatalog {
 
-
     /**
      * Use [current_database].
      */
-    fun currentDatabase(): String
-
+    fun showCurrentDatabase(): String
 
     /**
      * Use [Database] with [name].

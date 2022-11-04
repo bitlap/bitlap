@@ -55,20 +55,11 @@ class ServerSpec extends CsvUtil {
     val ret1 = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
     assert(ret1.nonEmpty)
 
-    val stmt2 = conn.createStatement()
-    stmt2.execute(s"create database $database")
-
-    val stmt3 = conn.createStatement()
-    stmt3.execute(s"use $database")
-    val rs2  = stmt3.getResultSet
-    val ret2 = ResultSetTransformer[GenericRow1[Boolean]].toResults(rs2)
-    assert(ret2.nonEmpty && ret2.contains(true))
-
-    val stmt4 = conn.createStatement()
-    stmt4.execute(s"SELECT current_database()")
-    val rs3  = stmt4.getResultSet
-    val ret3 = ResultSetTransformer[GenericRow1[String]].toResults(rs3)
-    assert(ret3.nonEmpty && ret3.contains(database))
+    stmt.executeQuery(s"create database if not exists $database")
+    stmt.executeQuery(s"use $database")
+    val showRet    = stmt.executeQuery(s"show current_database")
+    val showResult = ResultSetTransformer[GenericRow1[String]].toResults(showRet)
+    assert(showResult.nonEmpty && showResult.exists(_.col1 == database))
 
   }
 

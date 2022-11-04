@@ -199,7 +199,15 @@ SqlNode SqlUseDatabase() :
         return new SqlUseDatabase(getPos(), dbName);
     }
 }
-
+SqlNode SqlShowCurrentDatabase() :
+{
+}
+{
+    <SHOW> <CURRENT_DATABASE>
+    {
+        return new SqlShowCurrentDatabase(getPos());
+    }
+}        
 SqlNode SqlExplainX() :
 {
   SqlNode stmt;

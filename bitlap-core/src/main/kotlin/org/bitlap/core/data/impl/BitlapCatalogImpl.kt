@@ -10,6 +10,7 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.Constants.DEFAULT_DATABASE
+import org.bitlap.core.SessionId
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.data.metadata.Database
 import org.bitlap.core.data.metadata.Table
@@ -28,13 +29,8 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
-    companion object {
-        // TODO
-        private var currentContext: String = DEFAULT_DATABASE
-    }
-
-    fun getCurrentDatabase(): String {
-        return currentContext
+    fun getCurrentDatabase(sessionId: SessionId): String {
+        return BitlapContext.getSession(sessionId).currentSchema
     }
 
     private val fs: FileSystem by lazy {
@@ -65,11 +61,11 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         }
     }
 
-    override fun showCurrentDatabase(): String {
-        return getCurrentDatabase()
+    override fun showCurrentDatabase(sessionId: SessionId): String {
+        return getCurrentDatabase(sessionId)
     }
 
-    override fun useDatabase(name: String): Boolean {
+    override fun useDatabase(sessionId: SessionId, name: String): Boolean {
         val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
         if (cleanName == DEFAULT_DATABASE) {
             return true
@@ -79,9 +75,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         if (!exists) {
             throw BitlapException("Unable to use database $cleanName, it does not exist.")
         }
-
-        currentContext = cleanName
-
+        BitlapContext.updateSession(BitlapContext.getSession(sessionId).copy(currentSchema = cleanName))
         return true
     }
 
@@ -176,10 +170,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
      * List all [Database], it also contains [DEFAULT_DATABASE]
      */
     override fun listDatabases(): List<Database> {
-        return fs.listStatus(dataPath).asSequence()
-            .filter { it.isDirectory }
-            .map { Database(it.path.name) }
-            .toList()
+        return fs.listStatus(dataPath).asSequence().filter { it.isDirectory }.map { Database(it.path.name) }.toList()
     }
 
     /**
@@ -256,10 +247,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     override fun listTables(database: String): List<Table> {
         val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().lowercase()
         val dbDir = Path(dataPath, cleanDBName)
-        return fs.listStatus(dbDir).toList()
-            .parallelStream()
-            .filter { it.isDirectory }
-            .map { fs.readTable(it.path) }
+        return fs.listStatus(dbDir).toList().parallelStream().filter { it.isDirectory }.map { fs.readTable(it.path) }
             .toList()
     }
 }

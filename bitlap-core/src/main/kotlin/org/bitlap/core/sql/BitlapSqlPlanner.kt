@@ -32,7 +32,9 @@ import org.apache.calcite.sql2rel.SqlToRelConverter
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.Frameworks
 import org.apache.calcite.tools.RelBuilder
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.Constants.DEFAULT_DATABASE
+import org.bitlap.core.SessionContext
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
 import org.bitlap.core.sql.rule.ENUMERABLE_RULES
@@ -52,8 +54,9 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
     /**
      * Parse a [statement] to a [RelNode]
      */
-    fun parse(statement: String): BitlapSqlPlan {
+    fun parse(statement: String, sessionContext: SessionContext): BitlapSqlPlan {
         System.setProperty("calcite.default.charset", "utf8")
+        BitlapContext.putIfAbsentSession(sessionContext)
         // get schemas from catalog
         val schema = this.buildSchemas()
         // register user-defined functions
@@ -83,7 +86,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
         }
         return when (sqlNode) {
             is BitlapSqlDdlRel -> {
-                val rel = sqlNode.rel(RelBuilder.create(config))
+                val rel = sqlNode.rel(RelBuilder.create(config), sessionContext.sessionId)
                 BitlapSqlPlan(statement, rel, rel)
             }
             else -> {

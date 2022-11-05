@@ -9,6 +9,7 @@ import org.bitlap.tools.apply
 
 import java.sql._
 import scala.collection.mutable.ListBuffer
+import org.bitlap.core._
 
 /** bitlap 客户端操作
  *
@@ -65,7 +66,17 @@ class MemoryOperation(
   override def run(): Unit =
     cache.put(
       super.getOpHandle,
-      mapTo(new QueryExecution(super.getStatement).execute()) // TODO: add error
+      mapTo(
+        new QueryExecution(
+          super.getStatement,
+          new SessionContext(
+            new SessionId(parentSession.sessionHandle.handleId),
+            parentSession.sessionState,
+            parentSession.creationTime,
+            Constants.DEFAULT_DATABASE
+          )
+        ).execute()
+      )
     )
 
 }

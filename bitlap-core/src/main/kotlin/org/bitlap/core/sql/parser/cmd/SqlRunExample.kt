@@ -7,6 +7,7 @@ import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
+import org.bitlap.core.SessionId
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
@@ -30,7 +31,7 @@ class SqlRunExample(
             "result" to SqlTypeName.VARCHAR,
         )
 
-    override fun operator(context: DataContext): List<Array<Any?>> {
+    override fun operator(sessionId: SessionId, context: DataContext): List<Array<Any?>> {
         return listOf(arrayOf("hello $exampleString"))
     }
 }

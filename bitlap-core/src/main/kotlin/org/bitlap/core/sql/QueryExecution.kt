@@ -5,6 +5,7 @@ import org.apache.calcite.tools.RelRunners
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
+import org.bitlap.core.SessionContext
 import java.sql.ResultSet
 
 /**
@@ -14,7 +15,7 @@ import java.sql.ResultSet
  * Created by IceMimosa
  * Date: 2021/8/6
  */
-class QueryExecution(private val statement: String) {
+class QueryExecution(private val statement: String, private val sessionContext: SessionContext) {
 
     private val runtimeConf: BitlapConf = BitlapContext.bitlapConf // TODO: merge session conf
     private val planner = BitlapContext.sqlPlanner
@@ -24,7 +25,7 @@ class QueryExecution(private val statement: String) {
             return QueryContext.use { ctx ->
                 ctx.runtimeConf = runtimeConf
                 ctx.statement = statement
-                val plan = planner.parse(statement).relOpt
+                val plan = planner.parse(statement, sessionContext).relOpt
                 RelRunners.run(plan).executeQuery()
             }
         } catch (e: Throwable) {

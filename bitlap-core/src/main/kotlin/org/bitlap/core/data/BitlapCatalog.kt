@@ -2,6 +2,7 @@
 package org.bitlap.core.data
 
 import org.bitlap.core.Constants.DEFAULT_DATABASE
+import org.bitlap.core.SessionId
 import org.bitlap.core.data.metadata.Database
 import org.bitlap.core.data.metadata.Table
 
@@ -17,12 +18,12 @@ interface BitlapCatalog {
     /**
      * Show current_database.
      */
-    fun showCurrentDatabase(): String
+    fun showCurrentDatabase(sessionId: SessionId): String
 
     /**
      * Use [Database] with [name].
      */
-    fun useDatabase(name: String): Boolean
+    fun useDatabase(sessionId: SessionId, name: String): Boolean
 
 /**
      * Create [Database] with [name].

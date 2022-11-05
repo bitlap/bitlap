@@ -8,6 +8,7 @@ import io.kotest.assertions.print.print
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.utils.Sql.toTable
 import org.bitlap.common.utils.internal.DBTable
+import org.bitlap.core.SessionContext
 import org.bitlap.core.sql.QueryExecution
 
 /**
@@ -19,7 +20,7 @@ interface SqlChecker {
      * execute sql statement
      */
     fun sql(statement: String): SqlResult {
-        val rs = QueryExecution(statement).execute()
+        val rs = QueryExecution(statement, SessionContext.fakeSession()).execute()
         return SqlResult(statement, rs.toTable())
     }
 

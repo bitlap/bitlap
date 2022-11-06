@@ -7,7 +7,6 @@ import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
-import org.bitlap.core.BitlapContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**

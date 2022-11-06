@@ -16,7 +16,7 @@ class QueryContext : Serializable {
     var statement: String? = null
     var originalPlan: SqlNode? = null
     var currentSelectNode: SqlSelect? = null
-    
+
     @Volatile var sessionId: SessionId? = null
 
     companion object {
@@ -25,7 +25,7 @@ class QueryContext : Serializable {
         }
 
         fun get(): QueryContext = context.get()
-        
+
         fun reset() = context.remove()
 
         fun <T> use(block: (QueryContext) -> T): T {

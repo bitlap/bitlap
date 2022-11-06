@@ -87,7 +87,6 @@ enum BOperationType {
   B_OPERATION_TYPE_EXECUTE_STATEMENT = 1;
   B_OPERATION_TYPE_GET_SCHEMAS = 2;
   B_OPERATION_TYPE_GET_TABLES = 3;
-  B_OPERATION_TYPE_GET_COLUMNS = 4;
 }
 
 message BTableSchema {
@@ -128,7 +127,7 @@ message BGetTables {
 message BGetDatabases {
   message BGetDatabasesReq {
     BSessionHandle session_handle = 1;
-    string  pattern = 3;
+    string  pattern = 2;
   }
 
   message BGetDatabasesResp {

@@ -41,7 +41,7 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
   ): OperationHandle = rpcClient
     .getTables(sessionHandle, database, pattern)
 
-  def getDatabase(
+  def getDatabases(
     sessionHandle: SessionHandle,
     pattern: String
   ): OperationHandle = rpcClient.getDatabases(sessionHandle, pattern)

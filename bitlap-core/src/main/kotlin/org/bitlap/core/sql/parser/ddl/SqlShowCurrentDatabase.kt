@@ -6,7 +6,6 @@ import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
-import org.bitlap.core.SessionId
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
@@ -25,9 +24,9 @@ class SqlShowCurrentDatabase(
             "database_name" to SqlTypeName.VARCHAR
         )
 
-    override fun operator(sessionId: SessionId, context: DataContext): List<Array<Any?>> {
+    override fun operator(context: DataContext): List<Array<Any?>> {
         return listOf(
-            arrayOf(catalog.showCurrentDatabase(sessionId))
+            arrayOf(catalog.showCurrentDatabase())
         )
     }
 }

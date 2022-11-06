@@ -8,7 +8,6 @@ import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.SessionId
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
@@ -28,13 +27,13 @@ class SqlUseDatabase(
             "result" to SqlTypeName.BOOLEAN
         )
 
-    override fun operator(sessionId: SessionId, context: DataContext): List<Array<Any?>> {
+    override fun operator(context: DataContext): List<Array<Any?>> {
         if (database == null || database.simple == null) {
             throw BitlapException("Unable to use database with null.")
         }
 
         return listOf(
-            arrayOf(catalog.useDatabase(sessionId, database.simple!!))
+            arrayOf(catalog.useDatabase(database.simple!!))
         )
     }
 }

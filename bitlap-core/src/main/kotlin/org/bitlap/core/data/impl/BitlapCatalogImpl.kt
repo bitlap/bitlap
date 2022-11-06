@@ -10,7 +10,6 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.Constants.DEFAULT_DATABASE
-import org.bitlap.core.SessionId
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.data.metadata.Database
 import org.bitlap.core.data.metadata.Table
@@ -29,8 +28,8 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
-    fun getCurrentDatabase(sessionId: SessionId): String {
-        return BitlapContext.getSession(sessionId).currentSchema
+    fun getCurrentDatabase(): String {
+        return BitlapContext.getSession().currentSchema
     }
 
     private val fs: FileSystem by lazy {
@@ -61,11 +60,11 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         }
     }
 
-    override fun showCurrentDatabase(sessionId: SessionId): String {
-        return getCurrentDatabase(sessionId)
+    override fun showCurrentDatabase(): String {
+        return getCurrentDatabase()
     }
 
-    override fun useDatabase(sessionId: SessionId, name: String): Boolean {
+    override fun useDatabase(name: String): Boolean {
         val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
         if (cleanName == DEFAULT_DATABASE) {
             return true
@@ -75,7 +74,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         if (!exists) {
             throw BitlapException("Unable to use database $cleanName, it does not exist.")
         }
-        BitlapContext.updateSession(BitlapContext.getSession(sessionId).copy(currentSchema = cleanName))
+        BitlapContext.updateSession(BitlapContext.getSession().copy(currentSchema = cleanName))
         return true
     }
 

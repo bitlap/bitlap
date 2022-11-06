@@ -10,7 +10,6 @@ import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
 import org.apache.hadoop.fs.Path
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.SessionId
 import org.bitlap.core.mdm.BitlapWriter
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
@@ -33,7 +32,7 @@ class SqlLoadData(
             "result" to SqlTypeName.VARCHAR,
         )
 
-    override fun operator(sessionId: SessionId, context: DataContext): List<Array<Any?>> {
+    override fun operator(context: DataContext): List<Array<Any?>> {
         val path = filePath.toString().trim('\'')
         val table = if (tableName.names.size == 1) {
             catalog.getTable(tableName.simple)

@@ -25,6 +25,7 @@ class QueryExecution(private val statement: String, private val sessionContext: 
             return QueryContext.use { ctx ->
                 ctx.runtimeConf = runtimeConf
                 ctx.statement = statement
+                ctx.sessionId = sessionContext.sessionId
                 val plan = planner.parse(statement, sessionContext).relOpt
                 RelRunners.run(plan).executeQuery()
             }

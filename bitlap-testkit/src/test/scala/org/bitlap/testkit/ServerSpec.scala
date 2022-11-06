@@ -4,7 +4,7 @@ package org.bitlap.testkit
 import org.bitlap.common.jdbc._
 import org.bitlap.testkit.server._
 import org.junit._
-import org.bitlap.testkit._
+
 import java.sql._
 
 class ServerSpec extends CsvUtil {

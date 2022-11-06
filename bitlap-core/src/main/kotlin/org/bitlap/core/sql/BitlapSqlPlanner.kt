@@ -86,7 +86,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
         }
         return when (sqlNode) {
             is BitlapSqlDdlRel -> {
-                val rel = sqlNode.rel(RelBuilder.create(config), sessionContext.sessionId)
+                val rel = sqlNode.rel(RelBuilder.create(config))
                 BitlapSqlPlan(statement, rel, rel)
             }
             else -> {

@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.SessionId
 import org.bitlap.core.test.base.BaseLocalFsTest
 
 /**
@@ -44,19 +43,18 @@ class CatalogTest : BaseLocalFsTest() {
         }
 
         "test use database and show current_database" {
-            val sid = SessionId.fakeSessionId()
             val testName = randomTable()
             val catalog = BitlapContext.catalog
             catalog.createDatabase(testName)
-            catalog.useDatabase(SessionId.fakeSessionId(), testName) shouldBe true
+            catalog.useDatabase(testName) shouldBe true
             catalog.dropDatabase(testName)
-            shouldThrow<BitlapException> { catalog.useDatabase(sid, testName) }
+            shouldThrow<BitlapException> { catalog.useDatabase(testName) }
 
             val testName2 = randomTable()
             val catalog2 = BitlapContext.catalog
             catalog2.createDatabase(testName2)
-            catalog2.useDatabase(sid, testName2) shouldBe true
-            catalog2.showCurrentDatabase(sid) shouldBe testName2
+            catalog2.useDatabase(testName2) shouldBe true
+            catalog2.showCurrentDatabase() shouldBe testName2
         }
     }
 }

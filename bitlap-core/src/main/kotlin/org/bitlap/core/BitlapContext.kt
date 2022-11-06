@@ -6,8 +6,9 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.common.EventBus
 import org.bitlap.core.data.impl.BitlapCatalogImpl
 import org.bitlap.core.sql.BitlapSqlPlanner
+import org.bitlap.core.sql.QueryContext
 import org.bitlap.network.handles.HandleIdentifier
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -38,8 +39,17 @@ object BitlapContext {
 
     private val sessionMap = mutableMapOf<HandleIdentifier, SessionContext>()
 
-    fun getSession(sessionId: SessionId): SessionContext {
-        return sessionMap.getOrPut(sessionId.id) { SessionContext.fakeSession(sessionId) }
+    fun getSession(): SessionContext {
+        synchronized(this) {
+            val sessionId = QueryContext.get().sessionId
+            return if (sessionId != null) {
+                sessionMap.getOrPut(sessionId.id) { SessionContext.fakeSession(sessionId) }
+            } else {
+                val newSessionId = SessionId.fakeSessionId()
+                QueryContext.get().sessionId = newSessionId
+                sessionMap.getOrPut(newSessionId.id) { SessionContext.fakeSession(newSessionId) }
+            }
+        }
     }
 
     fun updateSession(sessionContext: SessionContext) {

@@ -2,14 +2,9 @@
 package org.bitlap.core.sql.parser.ddl
 
 import org.apache.calcite.DataContext
-import org.apache.calcite.sql.SqlIdentifier
-import org.apache.calcite.sql.SqlKind
-import org.apache.calcite.sql.SqlLiteral
-import org.apache.calcite.sql.SqlSpecialOperator
-import org.apache.calcite.sql.SqlWriter
+import org.apache.calcite.sql.*
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
-import org.bitlap.core.SessionId
 import org.bitlap.core.sql.parser.BitlapSqlDdlDropNode
 
 /**
@@ -51,7 +46,7 @@ class SqlDropDatabase(
             "result" to SqlTypeName.BOOLEAN
         )
 
-    override fun operator(sessionId: SessionId, context: DataContext): List<Array<Any?>> {
+    override fun operator(context: DataContext): List<Array<Any?>> {
         return listOf(
             arrayOf(catalog.dropDatabase(name.simple, ifExists, cascade))
         )

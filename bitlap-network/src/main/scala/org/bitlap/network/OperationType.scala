@@ -18,7 +18,6 @@ object OperationType extends IntEnum[OperationType] {
   final case object ExecuteStatement extends OperationType(1)
   final case object GetSchemas       extends OperationType(2)
   final case object GetTables        extends OperationType(3)
-  final case object GetColumns       extends OperationType(4)
 
   val values: IndexedSeq[OperationType] = findValues
 

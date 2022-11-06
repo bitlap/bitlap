@@ -37,31 +37,7 @@ trait Rpc[F[_]] { self =>
 
   def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
-  def getColumns(
-    sessionHandle: SessionHandle,
-    schemaName: String,
-    tableName: String,
-    columnName: String
-  ): F[OperationHandle]
+  def getDatabases(sessionHandle: SessionHandle, pattern: String): F[OperationHandle]
 
-  /** get databases or schemas from catalog
-   *
-   *  @see
-   *    `show databases`
-   */
-  def getDatabases(pattern: String): F[OperationHandle]
-
-  /** get tables from catalog with database name
-   *
-   *  @see
-   *    `show tables in [db_name]`
-   */
-  def getTables(database: String, pattern: String): F[OperationHandle]
-
-  /** get schemas from catalog
-   *
-   *  @see
-   *    `show tables in [db_name]`
-   */
-  def getSchemas(sessionHandle: SessionHandle, catalogName: String, schemaName: String): F[OperationHandle]
+  def getTables(sessionHandle: SessionHandle, database: String, pattern: String): F[OperationHandle]
 }

@@ -71,20 +71,11 @@ class AsyncRpcBackend extends AsyncRpc {
     session.getResultSetMetadata(opHandle)
   }
 
-  override def getColumns(
+  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
+
+  override def getTables(
     sessionHandle: SessionHandle,
-    schemaName: String,
-    tableName: String,
-    columnName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GetColumns))
-
-  override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
+    database: String,
+    pattern: String
   ): ZIO[Any, Throwable, OperationHandle] = ???
 }

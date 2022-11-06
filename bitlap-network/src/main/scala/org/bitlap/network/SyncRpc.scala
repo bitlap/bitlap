@@ -37,16 +37,7 @@ trait SyncRpc extends Rpc[Identity] { self =>
 
   def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema]
 
-  def getColumns(
-    sessionHandle: SessionHandle,
-    schemaName: String,
-    tableName: String,
-    columnName: String
-  ): Identity[OperationHandle]
+  def getDatabases(sessionHandle: SessionHandle, pattern: String): Identity[OperationHandle]
 
-  def getDatabases(pattern: String): Identity[OperationHandle]
-
-  def getTables(database: String, pattern: String): Identity[OperationHandle]
-
-  def getSchemas(sessionHandle: SessionHandle, catalogName: String, schemaName: String): Identity[OperationHandle]
+  def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Identity[OperationHandle]
 }

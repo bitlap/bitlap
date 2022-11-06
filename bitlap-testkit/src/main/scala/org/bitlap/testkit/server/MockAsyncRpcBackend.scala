@@ -73,22 +73,13 @@ class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
       )
     )
 
-  override def getColumns(
+  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] =
+    ZIO.succeed(new OperationHandle(OperationType.GetSchemas))
+
+  override def getTables(
     sessionHandle: SessionHandle,
-    schemaName: String,
-    tableName: String,
-    columnName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect(new OperationHandle(OperationType.GetColumns))
-
-  override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.GetSchemas)) // TODO add rpc method ??
-
-  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, OperationHandle] =
+    database: String,
+    pattern: String
+  ): ZIO[Any, Throwable, OperationHandle] =
     ZIO.succeed(new OperationHandle(OperationType.GetTables))
-
-  override def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.succeed(new OperationHandle(OperationType.GetSchemas))
 }

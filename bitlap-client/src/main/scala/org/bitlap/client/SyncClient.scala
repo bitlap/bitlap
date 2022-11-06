@@ -46,29 +46,14 @@ class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends
     _.getResultSetMetadata(opHandle)
   }
 
-  override def getColumns(
-    sessionHandle: SessionHandle,
-    schemaName: String,
-    tableName: String,
-    columnName: String
-  ): Identity[OperationHandle] = delegateClient.sync {
-    _.getColumns(sessionHandle, tableName, schemaName, columnName)
-  }
-
-  override def getDatabases(pattern: String): Identity[OperationHandle] = delegateClient.sync {
-    _.getDatabases(pattern)
-  }
-  override def getTables(database: String, pattern: String): Identity[OperationHandle] = delegateClient.sync {
-    _.getTables(database, pattern)
-  }
-
-  override def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
-  ): Identity[OperationHandle] = delegateClient.sync {
-    _.getSchemas(sessionHandle, catalogName, schemaName)
-  }
+  override def getDatabases(sessionHandle: SessionHandle, pattern: String): Identity[OperationHandle] =
+    delegateClient.sync {
+      _.getDatabases(sessionHandle, pattern)
+    }
+  override def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Identity[OperationHandle] =
+    delegateClient.sync {
+      _.getTables(sessionHandle, database, pattern)
+    }
 
   def getLeader(requestId: String): Identity[ServerAddress] = delegateClient.sync {
     _.getLeader(requestId)

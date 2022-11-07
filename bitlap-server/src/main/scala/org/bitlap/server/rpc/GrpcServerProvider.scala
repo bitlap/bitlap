@@ -26,8 +26,7 @@ final class GrpcServerProvider(override val port: Int) extends ServerProvider wi
     ServiceList.addM(ZIO.succeed(liver)) // 可以随意更换实现
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    (BitlapServerContext.fillRpc(backend) *> super.run(args) *> ZIO.never)
-      .onInterrupt(putStrLn(s"$serverType: Server stopped").ignore)
+    BitlapServerContext.fillRpc(backend) *> super.run(args)
 
   override def serverType: ServerType = ServerType.Grpc
 }

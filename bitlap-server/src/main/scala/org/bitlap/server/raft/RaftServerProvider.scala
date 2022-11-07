@@ -58,8 +58,10 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
   override def serverType: ServerType = ServerType.Raft
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    ((
-      runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(s"$serverType: Raft Server started")
-    ).exitCode *> ZIO.never).onInterrupt(putStrLn(s"$serverType: Raft Server stopped").ignore)
+    ((runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(
+      s"$serverType: Raft Server started"
+    )) *> ZIO.never)
+      .onInterrupt(putStrLn(s"$serverType: Raft Server stopped").ignore)
+      .exitCode
 
 }

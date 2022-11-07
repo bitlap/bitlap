@@ -11,39 +11,6 @@
 
 ![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
 
-## 通过client查询
-
-### Scala例子
-
-***添加依赖***
-```scala
-libraryDependencies += (
-  "org.bitlap" % "bitlap-client" % "0.1.0-SNAPSHOT"
-)
-
-// 若运行时报错 找不到grpc某个类的话，加这几行试试，保证io.grpc的所有组件都是一个版本！
-dependencyOverrides ++= Seq(
-  "io.grpc" % "grpc-core" % "1.46.0",
-  "io.grpc" % "grpc-netty" % "1.46.0"
-)
-```
-***例子***
-[ServerSpec](./bitlap-testkit/src/test/scala/org/bitlap/testkit/ServerSpec.scala)
-
-### Java例子
-
-***添加依赖***
-```xml
-<dependency>
-    <groupId>org.bitlap</groupId>
-    <artifactId>bitlap-client</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-</dependency>
-```
-***例子***
-[JavaServerTest](./bitlap-testkit/src/test/scala/org/bitlap/testkit/JavaServerTest.java)
-
-
 ## 如何贡献
 
 [CONTRIBUTING](./CONTRIBUTING.md)

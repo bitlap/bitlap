@@ -37,3 +37,8 @@
      工具生成csv文件，生成的文件在`bitlap-testkit/src/test/resources/.../simple_data.csv`
   2. 将生成的csv拷贝到`bitlap-server/src/main/resources/simple_data.csv`
   3. `http://localhost:8080/init` ，再次初始化数据
+
+## 打包
+
+1. 打包脚本：`dev/make-tarball.sh`
+2. 在Java11上打包并运行bitlap，需要添加虚拟机参数：`--add-exports xx`、`--add-opens xx`，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`

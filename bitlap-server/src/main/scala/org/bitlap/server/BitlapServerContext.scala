@@ -61,9 +61,11 @@ object BitlapServerContext {
       }
     }.provideLayer(zio.blocking.Blocking.live)
 
-  def isLeader: Boolean =
-    if (_node == null) { false }
-    else _node.isLeader
+  def isLeader: Boolean = {
+    while (_node == null)
+      Thread.sleep(1000)
+    _node.isLeader
+  }
 
   @Nullable
   def getLeaderAddress(): Task[ServerAddress] = Task.effect {

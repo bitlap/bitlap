@@ -8,8 +8,10 @@ import org.bitlap.network._
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
+import org.bitlap.network.driver.proto.BGetDatabases.BGetDatabasesReq
 import org.bitlap.network.driver.proto.BGetRaftMetadata
 import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
+import org.bitlap.network.driver.proto.BGetTables.BGetTablesReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles._
@@ -112,22 +114,25 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
         .provideLayer(l)
     )
 
-  override def getColumns(
+  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .getDatabases(BGetDatabasesReq(Option(sessionHandle.toBSessionHandle()), pattern))
+        .mapBoth(statusApplyFunc, t => new OperationHandle(t.getOperationHandle))
+        .provideLayer(l)
+    )
+
+  override def getTables(
     sessionHandle: SessionHandle,
-    tableName: String,
-    schemaName: String,
-    columnName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getDatabases(pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getTables(database: String, pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
-  ): ZIO[Any, Throwable, OperationHandle] = ???
+    database: String,
+    pattern: String
+  ): ZIO[Any, Throwable, OperationHandle] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .getTables(BGetTablesReq(Option(sessionHandle.toBSessionHandle()), database, pattern))
+        .mapBoth(statusApplyFunc, t => new OperationHandle(t.getOperationHandle))
+        .provideLayer(l)
+    )
 
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient

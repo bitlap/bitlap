@@ -41,5 +41,20 @@ class CatalogTest : BaseLocalFsTest() {
             getTable.createTime shouldNotBe null
             catalog.dropTable(testName)
         }
+
+        "test use database and show current_database" {
+            val testName = randomTable()
+            val catalog = BitlapContext.catalog
+            catalog.createDatabase(testName)
+            catalog.useDatabase(testName) shouldBe true
+            catalog.dropDatabase(testName)
+            shouldThrow<BitlapException> { catalog.useDatabase(testName) }
+
+            val testName2 = randomTable()
+            val catalog2 = BitlapContext.catalog
+            catalog2.createDatabase(testName2)
+            catalog2.useDatabase(testName2) shouldBe true
+            catalog2.showCurrentDatabase() shouldBe testName2
+        }
     }
 }

@@ -31,7 +31,7 @@ class SqlExplainX(
     override fun operator(context: DataContext): List<Array<Any?>> {
         return when (stmt) {
             is SqlSelect -> {
-                val plan = BitlapContext.sqlPlanner.parse(stmt.toString())
+                val plan = BitlapContext.sqlPlanner.parse(stmt.toString(), BitlapContext.getSession())
                 listOf(arrayOf(plan.explain()))
             }
             else -> {

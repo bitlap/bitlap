@@ -28,6 +28,10 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
+    fun getCurrentDatabase(): String {
+        return BitlapContext.getSession().currentSchema
+    }
+
     private val fs: FileSystem by lazy {
         rootPath.getFileSystem(hadoopConf).also {
             it.setWriteChecksum(false)
@@ -56,8 +60,26 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         }
     }
 
+    override fun showCurrentDatabase(): String {
+        return getCurrentDatabase()
+    }
+
+    override fun useDatabase(name: String): Boolean {
+        val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
+        if (cleanName == DEFAULT_DATABASE) {
+            return true
+        }
+        val p = Path(dataPath, cleanName)
+        val exists = fs.exists(p)
+        if (!exists) {
+            throw BitlapException("Unable to use database $cleanName, it does not exist.")
+        }
+        BitlapContext.updateSession(BitlapContext.getSession().copy(currentSchema = cleanName))
+        return true
+    }
+
     /**
-     * create [Database] with [name].
+     * Create [Database] with [name].
      *
      * if [ifNotExists] is false, exception will be thrown when [Database] exists, otherwise ignored.
      */
@@ -147,10 +169,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
      * List all [Database], it also contains [DEFAULT_DATABASE]
      */
     override fun listDatabases(): List<Database> {
-        return fs.listStatus(dataPath).asSequence()
-            .filter { it.isDirectory }
-            .map { Database(it.path.name) }
-            .toList()
+        return fs.listStatus(dataPath).asSequence().filter { it.isDirectory }.map { Database(it.path.name) }.toList()
     }
 
     /**
@@ -227,10 +246,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     override fun listTables(database: String): List<Table> {
         val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().lowercase()
         val dbDir = Path(dataPath, cleanDBName)
-        return fs.listStatus(dbDir).toList()
-            .parallelStream()
-            .filter { it.isDirectory }
-            .map { fs.readTable(it.path) }
+        return fs.listStatus(dbDir).toList().parallelStream().filter { it.isDirectory }.map { fs.readTable(it.path) }
             .toList()
     }
 }

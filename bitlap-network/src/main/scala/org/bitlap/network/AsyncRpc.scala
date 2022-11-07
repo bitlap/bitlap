@@ -41,21 +41,8 @@ trait AsyncRpc extends Rpc[Task] { self =>
 
   def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema]
 
-  def getColumns(
-    sessionHandle: SessionHandle,
-    tableName: String,
-    schemaName: String,
-    columnName: String
-  ): Task[OperationHandle]
+  def getDatabases(sessionHandle: SessionHandle, pattern: String): Task[OperationHandle]
 
-  def getDatabases(pattern: String): Task[OperationHandle]
-
-  def getTables(database: String, pattern: String): Task[OperationHandle]
-
-  def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
-  ): Task[OperationHandle]
+  def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Task[OperationHandle]
 
 }

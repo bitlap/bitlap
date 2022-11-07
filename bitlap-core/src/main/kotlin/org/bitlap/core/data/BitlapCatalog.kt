@@ -15,7 +15,17 @@ import org.bitlap.core.data.metadata.Table
 interface BitlapCatalog {
 
     /**
-     * create [Database] with [name].
+     * Show current_database.
+     */
+    fun showCurrentDatabase(): String
+
+    /**
+     * Use [Database] with [name].
+     */
+    fun useDatabase(name: String): Boolean
+
+/**
+     * Create [Database] with [name].
      *
      * if [ifNotExists] is false, exception will be thrown when [Database] exists, otherwise ignored.
      */

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider with zio.App {
+final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider {
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
@@ -57,15 +57,11 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
   override def serverType: ServerType = ServerType.Raft
 
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    (
-      runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(s"$serverType: Raft Server started")
-        .provideLayer(
-          zio.console.Console.live
-        )
-    ).exitCode
-
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    this.run(args)
+    ((runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(
+      s"$serverType: Raft Server started"
+    )) *> ZIO.never)
+      .onInterrupt(putStrLn(s"$serverType: Raft Server stopped").ignore)
+      .exitCode
 
 }

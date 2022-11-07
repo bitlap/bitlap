@@ -2,20 +2,19 @@
 package org.bitlap.server.rpc
 
 import io.grpc._
+import org.bitlap.network.NetworkException._
 import org.bitlap.network._
-import org.bitlap.network.NetworkException.LeaderServerNotFoundException
 import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
 import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
 import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
-import org.bitlap.network.driver.proto.BGetColumns.{ BGetColumnsReq, BGetColumnsResp }
-import org.bitlap.network.driver.proto.BGetRaftMetadata
+import org.bitlap.network.driver.proto.BGetDatabases.BGetDatabasesResp
 import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
-import org.bitlap.network.driver.proto.BGetSchemas.{ BGetSchemasReq, BGetSchemasResp }
 import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
 import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
+import org.bitlap.network.driver.proto._
 import org.bitlap.network.driver.service.ZioService._
 import org.bitlap.network.handles._
-import org.bitlap.server.BitlapServerContext
+import org.bitlap.server._
 import org.bitlap.tools._
 import zio._
 
@@ -67,16 +66,24 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
     }(_.toBFetchResults)
       .mapError(errorApplyFunc)
 
-  override def getSchemas(request: BGetSchemasReq): ZIO[Any, Status, BGetSchemasResp] = ???
-
-  override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] = ???
-
-  override def getColumns(request: BGetColumnsReq): ZIO[Any, Status, BGetColumnsResp] = ???
-
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
     asyncRpcBackend.map {
       _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
     }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
+      .mapError(errorApplyFunc)
+
+  override def getDatabases(
+    request: BGetDatabases.BGetDatabasesReq
+  ): ZIO[Any, Status, BGetDatabases.BGetDatabasesResp] =
+    asyncRpcBackend.map {
+      _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
+    }(t => BGetDatabasesResp(successOpt(), Option(t.toBOperationHandle())))
+      .mapError(errorApplyFunc)
+
+  override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
+    asyncRpcBackend.map {
+      _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
+    }(t => BGetTablesResp(successOpt(), Option(t.toBOperationHandle())))
       .mapError(errorApplyFunc)
 
   override def getLeader(request: BGetRaftMetadata.BGetLeaderReq): ZIO[Any, Status, BGetRaftMetadata.BGetLeaderResp] = {
@@ -91,7 +98,6 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
       errorApplyFunc,
       t => BGetRaftMetadata.BGetLeaderResp(Option(t.ip), t.port)
     )
-
   }
 
 }

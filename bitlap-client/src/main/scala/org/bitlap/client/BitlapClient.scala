@@ -34,25 +34,17 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): RowSet =
     rpcClient.fetchResults(operationHandle, maxRows, fetchType).results
 
-  // make it return schema data, instead of `BOperationHandle` ?
-  def getSchemas(
-    sessionHandle: SessionHandle,
-    catalogName: String,
-    schemaName: String
-  ): OperationHandle = rpcClient.getSchemas(sessionHandle, catalogName, schemaName)
-
   def getTables(
     sessionHandle: SessionHandle,
-    tableName: String,
-    schemaName: String
-  ): OperationHandle = ???
+    database: String,
+    pattern: String
+  ): OperationHandle = rpcClient
+    .getTables(sessionHandle, database, pattern)
 
-  def getColumns(
+  def getDatabases(
     sessionHandle: SessionHandle,
-    tableName: String,
-    schemaName: String,
-    columnName: String
-  ): OperationHandle = rpcClient.getColumns(sessionHandle, schemaName, tableName, columnName)
+    pattern: String
+  ): OperationHandle = rpcClient.getDatabases(sessionHandle, pattern)
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
     rpcClient.getResultSetMetadata(operationHandle)

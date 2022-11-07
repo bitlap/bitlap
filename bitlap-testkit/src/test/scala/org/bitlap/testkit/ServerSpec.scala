@@ -9,12 +9,12 @@ import java.sql._
 
 class ServerSpec extends CsvUtil {
 
-  private val table = s"test_table_${FakeDataUtil.randEntityNumber}"
+  private val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
+  private val database = s"test_database_${FakeDataUtil.randEntityNumber}"
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
+  implicit lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
-  lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
-
+  // 每个测试都会执行一次，需要修改！
   @Before
   def startServer(): Unit = {
     val server = new Thread {
@@ -28,30 +28,32 @@ class ServerSpec extends CsvUtil {
   }
 
   private def initTable(): Unit = {
-    val stmt = conn.createStatement()
-    stmt.execute(s"create table if not exists $table")
-    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
+    sql"create table if not exists $table"
+    sql"load data 'classpath:simple_data.csv' overwrite table $table"
   }
 
   @After
   def dropTable(): Unit =
-    conn.createStatement().execute(s"drop table $table cascade")
+    sql"drop table $table cascade"
 
   // 执行FakeDataUtilSpec 生成新的mock数据
   // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
   def query_test1() {
-    val stmt = conn.createStatement()
-    stmt.setMaxRows(10)
-    stmt.execute(s"""
-                    |select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
-                    |from $table
-                    |where _time >= 0
-                    |group by _time
-                    |""".stripMargin)
-    val rs   = stmt.getResultSet
+    val rs = sql"""
+       select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+       from $table
+       where _time >= 0
+       group by _time
+       """
     val ret1 = ResultSetTransformer[GenericRow4[Long, Double, Double, Long]].toResults(rs)
     assert(ret1.nonEmpty)
+
+    sql"create database if not exists $database"
+    sql"use $database"
+
+    val showResult = ResultSetTransformer[GenericRow1[String]].toResults(sql"show current_database")
+    assert(showResult.nonEmpty && showResult.exists(_.col1 == database))
   }
 
 }

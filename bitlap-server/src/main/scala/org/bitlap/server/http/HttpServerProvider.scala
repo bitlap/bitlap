@@ -10,6 +10,7 @@ import zhttp.service.server.ServerChannelFactory
 import zhttp.service._
 import zio._
 import org.bitlap.network.ServerType
+import zio.console.putStrLn
 
 import java.sql.DriverManager
 import scala.util.Try
@@ -59,11 +60,9 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
 
   override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] = {
     val nThreads: Int = args.headOption.flatMap(x => Try(x.toInt).toOption).getOrElse(0)
-    server.make
-      .use(_ =>
-        console.putStrLn(s"$serverType: Server is listening to port: $port")
-          *> ZIO.never
-      )
+    (server.make
+      .use(_ => putStrLn(s"$serverType: Server is listening to port: $port")) *> ZIO.never)
+      .onInterrupt(putStrLn(s"$serverType: Server stopped").ignore)
       .provideCustomLayer(ServerChannelFactory.auto ++ EventLoopGroup.auto(nThreads))
       .exitCode
   }

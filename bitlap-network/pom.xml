@@ -47,9 +47,9 @@
             <version>${zio.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>${grpc.netty.version}</version>
+            <artifactId>netty-all</artifactId>
+            <groupId>io.netty</groupId>
+            <version>${netty.version}</version>
         </dependency>
     </dependencies>
 

@@ -21,6 +21,7 @@ abstract class Operation(
   val hasResultSet: Boolean = false
 ) extends LazyLogging {
 
+  @volatile
   private var state: OperationState = OperationState.InitializedState
 
   private var statement: String = _
@@ -55,4 +56,6 @@ abstract class Operation(
 
   def setState(operationState: OperationState): Unit =
     state = operationState
+
+  def getState = state
 }

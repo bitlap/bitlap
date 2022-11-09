@@ -49,9 +49,13 @@ class OperationManager {
     this.synchronized {
       val op = handleToOperation.getOrElse(operationHandle, null)
       if (op == null) {
-        throw BitlapSQLException("Invalid OperationHandle: $operationHandle")
+        throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
       } else {
-        op
+        op.getState match {
+          case OperationState.FinishedState => op
+          case _ =>
+            throw BitlapSQLException(s"Invalid OperationState: ${op.getState}")
+        }
       }
     }
 
@@ -61,8 +65,8 @@ class OperationManager {
       if (op == null) {
         true
       } else {
-        handleToOperation.remove(operationHandle)
         op.setState(OperationState.CanceledState)
+        handleToOperation.remove(operationHandle)
         true
       }
     }
@@ -73,8 +77,8 @@ class OperationManager {
       if (op == null) {
         true
       } else {
-        handleToOperation.remove(operationHandle)
         op.setState(OperationState.ClosedState)
+        handleToOperation.remove(operationHandle)
         true
       }
     }

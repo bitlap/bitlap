@@ -40,4 +40,9 @@ trait Rpc[F[_]] { self =>
   def getDatabases(sessionHandle: SessionHandle, pattern: String): F[OperationHandle]
 
   def getTables(sessionHandle: SessionHandle, database: String, pattern: String): F[OperationHandle]
+
+  def cancelOperation(opHandle: OperationHandle): F[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): F[OperationState]
+
 }

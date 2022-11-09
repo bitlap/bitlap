@@ -45,4 +45,8 @@ trait AsyncRpc extends Rpc[Task] { self =>
 
   def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Task[OperationHandle]
 
+  def cancelOperation(opHandle: OperationHandle): Task[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): Task[OperationState]
+
 }

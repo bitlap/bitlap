@@ -10,6 +10,7 @@ import org.bitlap.tools.apply
 import java.sql._
 import scala.collection.mutable.ListBuffer
 import org.bitlap.core._
+import org.bitlap.network.OperationState
 
 /** bitlap 客户端操作
  *
@@ -63,7 +64,8 @@ class MemoryOperation(
     )
   }
 
-  override def run(): Unit =
+  override def run(): Unit = {
+    super.setState(OperationState.RunningState)
     cache.put(
       super.getOpHandle,
       mapTo(
@@ -78,5 +80,6 @@ class MemoryOperation(
         ).execute()
       )
     )
+  }
 
 }

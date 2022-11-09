@@ -3,6 +3,8 @@ package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles._
+import java.sql.SQLException
+import org.bitlap.network.OperationState._
 
 import java.sql._
 
@@ -39,6 +41,10 @@ class BitlapStatement(
   /** Keep state so we can fail certain calls made after close();
    */
   private var closed = false
+
+  /** Keep state so we can fail certain calls made after cancel().
+   */
+  private var isCancelled = false
 
   override def unwrap[T](iface: Class[T]): T = ???
 
@@ -77,7 +83,22 @@ class BitlapStatement(
   override def setQueryTimeout(seconds: Int): Unit =
     queryTimeout = seconds
 
-  override def cancel(): Unit = ???
+  override def cancel(): Unit = {
+    if (isCancelled) return
+
+    try
+      if (stmtHandle != null) {
+        client.cancelOperation(stmtHandle)
+      }
+    catch {
+      case e: SQLException =>
+        throw e
+      case e: Exception =>
+        throw new SQLException("Failed to cancel statement", "08S01", e)
+    }
+
+    isCancelled = true
+  }
 
   override def getWarnings: SQLWarning = warningChain
 
@@ -102,6 +123,27 @@ class BitlapStatement(
     } catch {
       case ex: Exception => throw BitlapSQLException(ex.toString, cause = ex)
     }
+
+    var operationComplete = false
+
+    while (!operationComplete)
+      try {
+        val statusResp = client.getOperationStatus(stmtHandle)
+        statusResp match {
+          case ClosedState | FinishedState => operationComplete = true
+          case CanceledState =>
+            throw new SQLException("Query was cancelled", "01000")
+          case UnknownState =>
+          case ErrorState =>
+            throw new SQLException("Query was failed", "HY000")
+          case _ =>
+        }
+      } catch {
+        case e: SQLException => throw e
+        case e: Exception =>
+          throw new SQLException(e.toString, "08S01", e)
+      }
+
     resultSet = BitlapQueryResultSet
       .builder()
       .setClient(client)

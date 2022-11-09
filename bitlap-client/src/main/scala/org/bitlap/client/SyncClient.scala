@@ -12,7 +12,7 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncRpc with RpcStatus {
+class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncRpc {
 
   private lazy val delegateClient = new AsyncClient(serverPeers, props)
 
@@ -58,4 +58,14 @@ class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends
   def getLeader(requestId: String): Identity[ServerAddress] = delegateClient.sync {
     _.getLeader(requestId)
   }
+
+  override def cancelOperation(opHandle: OperationHandle): Identity[Unit] =
+    delegateClient.sync {
+      _.cancelOperation(opHandle)
+    }
+
+  override def getOperationStatus(opHandle: OperationHandle): Identity[OperationState] =
+    delegateClient.sync {
+      _.getOperationStatus(opHandle)
+    }
 }

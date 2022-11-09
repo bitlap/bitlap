@@ -3,8 +3,8 @@ package org.bitlap.network
 
 import com.google.protobuf.ByteString
 import enumeratum.values._
-import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
 import org.bitlap.network.driver.proto._
+import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
 
 import java.sql.Types
 
@@ -31,38 +31,18 @@ object models {
 
   final case class FetchResults(
     hasMoreRows: Boolean,
-    results: RowSet,
-    status: Option[Status] = Some(models.Status(StatusCode.SuccessStatus))
+    results: RowSet
   ) extends Model {
     def toBFetchResults: BFetchResultsResp =
-      BFetchResultsResp(status.map(_.toBStatus), hasMoreRows, Some(results.toBRowSet))
+      BFetchResultsResp(hasMoreRows, Some(results.toBRowSet))
   }
 
   object FetchResults {
     def fromBFetchResultsResp(bFetchResults: BFetchResultsResp): FetchResults =
       FetchResults(
         bFetchResults.hasMoreRows,
-        RowSet.fromBRowSet(bFetchResults.getResults),
-        Some(Status.fromBStatus(bFetchResults.getStatus))
+        RowSet.fromBRowSet(bFetchResults.getResults)
       )
-  }
-
-  final case class Status(statusCode: StatusCode, sqlState: String = "", errorCode: Int = 0, errorMessage: String = "")
-      extends Model {
-    def toBStatus: BStatus = BStatus(
-      StatusCode.toBStatusCode(statusCode),
-      sqlState,
-      errorCode,
-      errorMessage
-    )
-  }
-  object Status {
-    def fromBStatus(bStatus: BStatus): Status = Status(
-      StatusCode.toStatusCode(bStatus.statusCode),
-      bStatus.sqlState,
-      bStatus.errorCode,
-      bStatus.errorMessage
-    )
   }
 
   /** The wrapper class of the Proto buffer `BRow`.
@@ -136,27 +116,6 @@ object models {
     )
 
     def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)
-
-  }
-
-  /** The wrapper class of the Proto buffer `BStatusCode`.
-   */
-
-  sealed abstract class StatusCode(val value: Int) extends IntEnumEntry
-
-  object StatusCode extends IntEnum[StatusCode] {
-    final case object SuccessStatus        extends StatusCode(0)
-    final case object StillExecutingStatus extends StatusCode(1)
-    final case object ErrorStatus          extends StatusCode(2)
-    final case object InvalidHandleStatus  extends StatusCode(3)
-
-    val values: IndexedSeq[StatusCode] = findValues
-
-    def toBStatusCode(statusCode: StatusCode): BStatusCode =
-      BStatusCode.fromValue(statusCode.value)
-
-    def toStatusCode(bStatusCode: BStatusCode): StatusCode =
-      StatusCode.withValueOpt(bStatusCode.value).getOrElse(InvalidHandleStatus)
 
   }
 

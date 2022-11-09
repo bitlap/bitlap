@@ -17,6 +17,11 @@ import org.bitlap.network.handles._
 import org.bitlap.server._
 import org.bitlap.tools._
 import zio._
+import org.bitlap.network.OperationState.toBOperationState
+
+import org.bitlap.network.driver.proto.BCancelOperation.{ BCancelOperationReq, BCancelOperationResp }
+import org.bitlap.network.driver.proto.BGetOperationStatus.{ BGetOperationStatusReq, BGetOperationStatusResp }
+import org.bitlap.network.driver.proto.BGetRaftMetadata.{ BGetLeaderReq, BGetLeaderResp }
 
 /** RPC的服务端API实现，基于 zio-grpc,zio 1.0
  *
@@ -25,13 +30,13 @@ import zio._
  *  @version 1.0,2022/4/21
  */
 @apply
-final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriverService[Any, Any] with RpcStatus {
+final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriverService[Any, Any] {
 
+  // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     asyncRpcBackend
       .map(_.openSession(request.username, request.password, request.configuration)) { shd =>
         BOpenSessionResp(
-          successOpt(),
           configuration = request.configuration,
           sessionHandle = Some(shd.toBSessionHandle())
         )
@@ -41,7 +46,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
     asyncRpcBackend
       .map(_.closeSession(new SessionHandle(request.getSessionHandle))) { _ =>
-        BCloseSessionResp(successOpt())
+        BCloseSessionResp()
       }
       .mapError(errorApplyFunc)
 
@@ -53,7 +58,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
         request.queryTimeout,
         request.confOverlay
       )
-    }(hd => BExecuteStatementResp(successOpt(), Some(hd.toBOperationHandle())))
+    }(hd => BExecuteStatementResp(Some(hd.toBOperationHandle())))
       .mapError(errorApplyFunc)
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
@@ -69,7 +74,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
     asyncRpcBackend.map {
       _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
-    }(t => BGetResultSetMetadataResp(successOpt(), Some(t.toBTableSchema)))
+    }(t => BGetResultSetMetadataResp(Some(t.toBTableSchema)))
       .mapError(errorApplyFunc)
 
   override def getDatabases(
@@ -77,16 +82,16 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   ): ZIO[Any, Status, BGetDatabases.BGetDatabasesResp] =
     asyncRpcBackend.map {
       _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
-    }(t => BGetDatabasesResp(successOpt(), Option(t.toBOperationHandle())))
+    }(t => BGetDatabasesResp(Option(t.toBOperationHandle())))
       .mapError(errorApplyFunc)
 
   override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
     asyncRpcBackend.map {
       _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
-    }(t => BGetTablesResp(successOpt(), Option(t.toBOperationHandle())))
+    }(t => BGetTablesResp(Option(t.toBOperationHandle())))
       .mapError(errorApplyFunc)
 
-  override def getLeader(request: BGetRaftMetadata.BGetLeaderReq): ZIO[Any, Status, BGetRaftMetadata.BGetLeaderResp] = {
+  override def getLeader(request: BGetLeaderReq): ZIO[Any, Status, BGetLeaderResp] = {
     val leaderAddress = BitlapServerContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if (ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty) {
@@ -96,8 +101,21 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
       }
     }.mapBoth(
       errorApplyFunc,
-      t => BGetRaftMetadata.BGetLeaderResp(Option(t.ip), t.port)
+      t => BGetLeaderResp(Option(t.ip), t.port)
     )
   }
 
+  override def cancelOperation(
+    request: BCancelOperationReq
+  ): ZIO[Any, Status, BCancelOperationResp] =
+    asyncRpcBackend.map {
+      _.cancelOperation(new OperationHandle(request.getOperationHandle))
+    }(_ => BCancelOperationResp())
+      .mapError(errorApplyFunc)
+
+  override def getOperationStatus(request: BGetOperationStatusReq): ZIO[Any, Status, BGetOperationStatusResp] =
+    asyncRpcBackend.map {
+      _.getOperationStatus(new OperationHandle(request.getOperationHandle))
+    }(t => BGetOperationStatusResp(Option(t).map(toBOperationState)))
+      .mapError(errorApplyFunc)
 }

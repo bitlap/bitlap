@@ -30,35 +30,14 @@ trait Session {
 
   def creationTime: Long
 
-  /** open Session
-   *
-   *  @param sessionConfMap
-   *  @return
-   *    SessionHandle The Session handle
-   */
-  def open(sessionConfMap: Map[String, String] = Map.empty): SessionHandle
+  def open(sessionConfMap: Map[String, String] = Map.empty): Unit
 
-  /** execute statement
-   *
-   *  @param statement
-   *  @param confOverlay
-   *  @return
-   *    OperationHandle The Operate handle
-   */
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
   ): OperationHandle
 
-  /** execute statement
-   *
-   *  @param statement
-   *  @param confOverlay
-   *  @param queryTimeout
-   *  @return
-   *    OperationHandle The Operate handle
-   */
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
@@ -70,9 +49,7 @@ trait Session {
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema
 
-  // TODO: close OperationHandle
+  def close(operationHandle: OperationHandle)
 
-  /** close Session
-   */
-  def close()
+  def cancelOperation(operationHandle: OperationHandle)
 }

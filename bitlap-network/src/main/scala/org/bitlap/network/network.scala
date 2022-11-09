@@ -3,7 +3,6 @@ package org.bitlap
 
 import io.grpc.Status
 import org.bitlap.network.NetworkException._
-import zio._
 
 import java.io.IOException
 import java.util.concurrent.TimeoutException
@@ -22,6 +21,7 @@ package object network {
       case _: TimeoutException | _: IOException => Status.UNAVAILABLE
       case _: RpcException                      => Status.INTERNAL
       case _: LeaderServerNotFoundException     => Status.ABORTED
+      case _: Exception                         => Status.UNKNOWN
     }
   }
 

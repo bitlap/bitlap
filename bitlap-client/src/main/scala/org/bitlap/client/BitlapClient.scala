@@ -3,6 +3,7 @@ package org.bitlap.client
 
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
+import org.bitlap.network.OperationState
 
 /** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端。但可以为其添加JDBC专属逻辑。
  *
@@ -48,4 +49,10 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
     rpcClient.getResultSetMetadata(operationHandle)
+
+  def cancelOperation(opHandle: OperationHandle): Unit =
+    rpcClient.cancelOperation(opHandle)
+
+  def getOperationStatus(opHandle: OperationHandle): OperationState =
+    rpcClient.getOperationStatus(opHandle)
 }

@@ -82,4 +82,9 @@ class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
     pattern: String
   ): ZIO[Any, Throwable, OperationHandle] =
     ZIO.succeed(new OperationHandle(OperationType.GetTables))
+
+  override def cancelOperation(opHandle: OperationHandle): Task[Unit] = Task.unit
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
+    Task.succeed(OperationState.FinishedState)
 }

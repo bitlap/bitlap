@@ -24,4 +24,8 @@ service DriverService {
 
   rpc GetLeader (BGetRaftMetadata.BGetLeaderReq) returns (BGetRaftMetadata.BGetLeaderResp) {}
 
+  rpc CancelOperation (BCancelOperation.BCancelOperationReq) returns (BCancelOperation.BCancelOperationResp) {}
+
+  rpc GetOperationStatus (BGetOperationStatus.BGetOperationStatusReq) returns (BGetOperationStatus.BGetOperationStatusResp) {}
+
 }

@@ -67,6 +67,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     override fun useDatabase(name: String): Boolean {
         val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
         if (cleanName == DEFAULT_DATABASE) {
+            BitlapContext.updateSession(BitlapContext.getSession().copy(currentSchema = DEFAULT_DATABASE))
             return true
         }
         val p = Path(dataPath, cleanName)

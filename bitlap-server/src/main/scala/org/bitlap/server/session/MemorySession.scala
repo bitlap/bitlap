@@ -24,18 +24,17 @@ class MemorySession(
   val creationTime: Long = System.currentTimeMillis()
 ) extends Session {
 
-  this.sessionState.compareAndSet(false, true)
-
-  override var lastAccessTime: Long               = System.currentTimeMillis()
+  override var lastAccessTime: Long               = _
   override var operationManager: OperationManager = _
 
-  private val opHandleSet = ListBuffer[OperationHandle]()
+  private lazy val opHandleSet = ListBuffer[OperationHandle]()
 
   override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
 
-  override def open(
-    sessionConfMap: Map[String, String]
-  ): SessionHandle = ???
+  override def open(sessionConfMap: Map[String, String]): Unit = {
+    this.sessionState.compareAndSet(false, true)
+    lastAccessTime = System.currentTimeMillis()
+  }
 
   override def executeStatement(
     sessionHandle: SessionHandle,
@@ -73,5 +72,19 @@ class MemorySession(
   ): TableSchema =
     operationManager.getOperation(operationHandle).getResultSetSchema()
 
-  override def close(): Unit = ???
+  override def close(operationHandle: OperationHandle): Unit = {
+    val closedOps = new ListBuffer[OperationHandle]()
+    for (opHandle <- opHandleSet) {
+      operationManager.closeOperation(opHandle)
+      closedOps.append(opHandle)
+    }
+    closedOps.zipWithIndex.foreach { case (_, i) =>
+      opHandleSet.remove(i)
+    }
+
+    sessionState.set(false)
+  }
+
+  override def cancelOperation(operationHandle: OperationHandle): Unit =
+    operationManager.cancelOperation(operationHandle)
 }

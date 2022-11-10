@@ -78,4 +78,13 @@ class AsyncRpcBackend extends AsyncRpc {
     database: String,
     pattern: String
   ): ZIO[Any, Throwable, OperationHandle] = ???
+
+  override def cancelOperation(opHandle: OperationHandle): Task[Unit] = {
+    val operation = sessionManager.operationManager.getOperation(opHandle)
+    val session   = operation.parentSession
+    Task.effect(session.cancelOperation(opHandle))
+  }
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
+    Task.effect(OperationState.FinishedState)
 }

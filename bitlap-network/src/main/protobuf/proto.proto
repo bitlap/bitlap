@@ -10,9 +10,8 @@ message BOpenSession {
     map<string, string> configuration = 3;
   }
   message BOpenSessionResp {
-    BStatus status = 1;
-    map<string, string>  configuration = 2;
-    BSessionHandle session_handle = 3;
+    map<string, string>  configuration = 1;
+    BSessionHandle session_handle = 2;
   }
 }
 
@@ -21,7 +20,6 @@ message BCloseSession {
     BSessionHandle session_handle = 1;
   }
   message BCloseSessionResp {
-    BStatus status = 1;
   }
 }
 
@@ -33,8 +31,7 @@ message BExecuteStatement {
     int64 query_timeout = 4;// default 0
   }
   message BExecuteStatementResp {
-    BStatus status = 1;
-    BOperationHandle operation_handle = 2;
+    BOperationHandle operation_handle = 1;
   }
 }
 
@@ -45,9 +42,8 @@ message BFetchResults {
     int32 fetch_type = 3;
   }
   message BFetchResultsResp {
-    BStatus status = 1;
-    bool has_more_rows = 2;
-    BRowSet results = 3;
+    bool has_more_rows = 1;
+    BRowSet results = 2;
   }
 }
 
@@ -120,8 +116,7 @@ message BGetTables {
   }
 
   message BGetTablesResp {
-    BStatus status = 1;
-    BOperationHandle operation_handle = 2;
+    BOperationHandle operation_handle = 1;
   }
 }
 message BGetDatabases {
@@ -131,8 +126,7 @@ message BGetDatabases {
   }
 
   message BGetDatabasesResp {
-    BStatus status = 1;
-    BOperationHandle operation_handle = 2;
+    BOperationHandle operation_handle = 1;
   }
 }
 
@@ -142,8 +136,7 @@ message BGetResultSetMetadata {
   }
 
   message BGetResultSetMetadataResp {
-    BStatus status = 1;
-    BTableSchema schema = 2;
+    BTableSchema schema = 1;
   }
 
 }
@@ -163,6 +156,35 @@ enum BTypeId {
   B_TYPE_ID_DATE_TYPE = 11;
 }
 
+enum BOperationState {
+  B_UNKNOWN_STATE = 0;
+  B_INITIALIZED_STATE = 1;
+  B_RUNNING_STATE = 2;
+  B_FINISHED_STATE = 3;
+  B_CANCELED_STATE = 4;
+  B_CLOSED_STATE = 5;
+  B_ERROR_STATE = 6;
+  B_PENDING_STATE = 7;
+}
+
+message BCancelOperation{
+  message BCancelOperationReq {
+    BOperationHandle operationHandle = 1;
+  }
+
+  message BCancelOperationResp {
+  }
+}
+
+message BGetOperationStatus {
+  message BGetOperationStatusReq {
+    BOperationHandle operationHandle = 1;
+  }
+
+  message BGetOperationStatusResp {
+    optional BOperationState operation_state = 1;
+  }
+}
 
 message BGetRaftMetadata {
   message BGetLeaderReq {

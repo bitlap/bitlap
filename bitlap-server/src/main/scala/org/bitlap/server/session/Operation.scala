@@ -7,6 +7,7 @@ import org.bitlap.network.models._
 import org.bitlap.network.OperationType
 
 import scala.collection.mutable
+import org.bitlap.network.OperationState
 
 /** bitlap 操作
  *  @author
@@ -19,6 +20,9 @@ abstract class Operation(
   val opType: OperationType,
   val hasResultSet: Boolean = false
 ) extends LazyLogging {
+
+  @volatile
+  private var state: OperationState = OperationState.InitializedState
 
   private var statement: String = _
 
@@ -49,4 +53,9 @@ abstract class Operation(
 
   def getResultSetSchema(): TableSchema =
     cache.get(opHandle).map(_.tableSchema).getOrElse(TableSchema())
+
+  def setState(operationState: OperationState): Unit =
+    state = operationState
+
+  def getState = state
 }

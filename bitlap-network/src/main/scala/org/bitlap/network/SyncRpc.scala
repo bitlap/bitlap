@@ -40,4 +40,8 @@ trait SyncRpc extends Rpc[Identity] { self =>
   def getDatabases(sessionHandle: SessionHandle, pattern: String): Identity[OperationHandle]
 
   def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Identity[OperationHandle]
+
+  def cancelOperation(opHandle: OperationHandle): Identity[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): Identity[OperationState]
 }

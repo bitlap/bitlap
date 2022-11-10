@@ -6,6 +6,7 @@ import org.bitlap.network.OperationType
 import org.bitlap.network.handles.OperationHandle
 
 import scala.collection.mutable
+import org.bitlap.network.OperationState
 
 /** bitlap 操作管理器
  *  @author
@@ -34,6 +35,7 @@ class OperationManager {
     operation.setStatement(statement)
     operation.run()
     addOperation(operation)
+    operation.setState(OperationState.FinishedState)
     operation
   }
 
@@ -47,9 +49,37 @@ class OperationManager {
     this.synchronized {
       val op = handleToOperation.getOrElse(operationHandle, null)
       if (op == null) {
-        throw BitlapSQLException("Invalid OperationHandle: $operationHandle")
+        throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
       } else {
-        op
+        op.getState match {
+          case OperationState.FinishedState => op
+          case _ =>
+            throw BitlapSQLException(s"Invalid OperationState: ${op.getState}")
+        }
+      }
+    }
+
+  def cancelOperation(operationHandle: OperationHandle): Boolean =
+    this.synchronized {
+      val op = handleToOperation.getOrElse(operationHandle, null)
+      if (op == null) {
+        true
+      } else {
+        op.setState(OperationState.CanceledState)
+        handleToOperation.remove(operationHandle)
+        true
+      }
+    }
+
+  def closeOperation(operationHandle: OperationHandle): Boolean =
+    this.synchronized {
+      val op = handleToOperation.getOrElse(operationHandle, null)
+      if (op == null) {
+        true
+      } else {
+        op.setState(OperationState.ClosedState)
+        handleToOperation.remove(operationHandle)
+        true
       }
     }
 }

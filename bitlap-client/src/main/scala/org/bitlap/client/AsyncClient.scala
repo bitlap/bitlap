@@ -15,8 +15,10 @@ import org.bitlap.network.driver.proto.BGetTables.BGetTablesReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles._
-import org.bitlap.network.models.{ Status => _, _ }
 import zio._
+import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
+import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
+import org.bitlap.network.models._
 
 /** 异步RPC客户端，基于zio-grpc实现
  *
@@ -25,7 +27,7 @@ import zio._
  *  @since 2021/11/21
  *  @version 1.0, zio 1.0
  */
-class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc with RpcStatus {
+class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc {
 
   // refactor
   private lazy val serverAddresses =
@@ -144,4 +146,20 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
         case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[ServerAddress]) // ignore this
       }
       .catchAll(_ => ZIO.none)
+
+  override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
+        .mapBoth(statusApplyFunc, _ => ())
+        .provideLayer(l)
+    )
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
+        .mapBoth(statusApplyFunc, t => OperationState.toOperationState(t.getOperationState))
+        .provideLayer(l)
+    )
 }

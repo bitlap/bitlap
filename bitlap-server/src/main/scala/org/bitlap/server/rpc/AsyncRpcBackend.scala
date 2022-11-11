@@ -7,6 +7,8 @@ import org.bitlap.network._
 import org.bitlap.tools._
 import zio._
 import org.bitlap.server.session.SessionManager
+import org.bitlap.core.utils.SqlParserUtil
+import org.bitlap.network.NetworkException.SQLExecuteException
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *
@@ -41,16 +43,23 @@ class AsyncRpcBackend extends AsyncRpc {
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
-    val session = sessionManager.getSession(sessionHandle)
-    sessionManager.refreshSession(sessionHandle, session)
-    session.executeStatement(
-      sessionHandle,
-      statement,
-      confOverlay,
-      queryTimeout
-    )
-  }
+  ): ZIO[Any, Throwable, OperationHandle] =
+    ZIO.effect(SqlParserUtil.validateQuery(statement)).flatMap { q =>
+      if (q) ZIO.effect {
+        val session = sessionManager.getSession(sessionHandle)
+        sessionManager.refreshSession(sessionHandle, session)
+        session.executeStatement(
+          sessionHandle,
+          statement,
+          confOverlay,
+          queryTimeout
+        )
+      }
+      else {
+        ZIO.fail(SQLExecuteException(s"Unsupported SQL: $statement"))
+      }
+
+    }
 
   override def fetchResults(
     opHandle: OperationHandle,

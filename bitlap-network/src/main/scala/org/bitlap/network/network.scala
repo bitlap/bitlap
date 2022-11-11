@@ -21,6 +21,7 @@ package object network {
       case _: TimeoutException | _: IOException => Status.UNAVAILABLE
       case _: RpcException                      => Status.INTERNAL
       case _: LeaderServerNotFoundException     => Status.ABORTED
+      case _: SQLExecuteException               => Status.INVALID_ARGUMENT
       case _: Exception                         => Status.UNKNOWN
     }
   }

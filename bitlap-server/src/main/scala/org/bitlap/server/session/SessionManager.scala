@@ -20,30 +20,30 @@ class SessionManager extends LazyLogging {
   val operationManager: OperationManager = new OperationManager()
   val start                              = new AtomicBoolean(false)
 
-  private lazy val handleToSession: ConcurrentHashMap[SessionHandle, Session] =
+  private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
 
   private lazy val sessionThread: Thread = new Thread { // register center
     override def run(): Unit =
       while (!Thread.currentThread().isInterrupted) {
-        logger.info(s"There are [${handleToSession.size}] surviving sessions")
+        logger.info(s"[${sessionStore.size}] sessions exists")
         try {
-          handleToSession.asScala.foreach { case (sessionHandle, session) =>
+          sessionStore.asScala.foreach { case (sessionHandle, session) =>
             if (!session.sessionState.get()) {
-              handleToSession.remove(sessionHandle)
+              sessionStore.remove(sessionHandle)
               logger.info(
-                s"Session state is false, remove session: $sessionHandle"
+                s"Session state is false, remove session [$sessionHandle]"
               )
             }
 
             val now = System.currentTimeMillis()
             if (session.lastAccessTime + 20 * 60 * 1000 < now) {
-              handleToSession.remove(sessionHandle)
+              sessionStore.remove(sessionHandle)
               logger.info(
-                s"Session has not been visited for 20 minutes, remove session: $sessionHandle"
+                s"Session has not been visited for 20 minutes, remove session [$sessionHandle]"
               )
             } else {
-              logger.info(s"SessionId: ${sessionHandle.handleId}")
+              logger.info(s"SessionId [${sessionHandle.handleId}]")
             }
           }
 
@@ -71,10 +71,7 @@ class SessionManager extends LazyLogging {
     username: String,
     password: String,
     sessionConf: Map[String, String]
-  ): Session = {
-    logger.info(
-      s"Server get properties [username:$username, password:$password, sessionConf:$sessionConf]"
-    )
+  ): Session =
     SessionManager.sessionAddLock.synchronized {
       val session = new MemorySession(
         username,
@@ -83,19 +80,18 @@ class SessionManager extends LazyLogging {
         this
       )
       session.open(sessionConf)
-      handleToSession.put(session.sessionHandle, session)
+      sessionStore.put(session.sessionHandle, session)
       session.operationManager = operationManager
-      logger.info(s"Create session: ${session.sessionHandle}")
+      logger.info(s"Create session [${session.sessionHandle}]")
       return session
     }
-  }
 
   def closeSession(sessionHandle: SessionHandle): Unit = {
     SessionManager.sessionAddLock.synchronized {
-      handleToSession.remove(sessionHandle)
+      sessionStore.remove(sessionHandle)
     }
     logger.info(
-      "Session closed, " + sessionHandle + ", current sessions:" + getOpenSessionCount()
+      s"Close session [$sessionHandle], [${getOpenSessionCount()}] sessions exists"
     )
     if (getOpenSessionCount() == 0) {
       //        log.warn(
@@ -107,11 +103,11 @@ class SessionManager extends LazyLogging {
   }
 
   private def getOpenSessionCount(): Int =
-    handleToSession.size
+    sessionStore.size
 
   def getSession(sessionHandle: SessionHandle): Session = {
     val session: Session = SessionManager.sessionAddLock.synchronized {
-      handleToSession.get(sessionHandle)
+      sessionStore.get(sessionHandle)
     }
     if (session == null) {
       throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
@@ -122,8 +118,8 @@ class SessionManager extends LazyLogging {
   def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
     SessionManager.sessionAddLock.synchronized {
       session.lastAccessTime = System.currentTimeMillis()
-      if (handleToSession.containsKey(sessionHandle)) {
-        handleToSession.put(sessionHandle, session)
+      if (sessionStore.containsKey(sessionHandle)) {
+        sessionStore.put(sessionHandle, session)
       } else {
         throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
       }

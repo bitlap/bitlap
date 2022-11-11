@@ -27,14 +27,14 @@ package object network {
   }
 
   lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
-    st match {
-      case Status.INTERNAL =>
+    st.getCode match {
+      case c if c.value() == Status.INTERNAL.getCode.value() =>
         RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
-      case Status.ABORTED =>
+      case c if c.value() == Status.ABORTED.getCode.value() =>
         LeaderServerNotFoundException(st.getCode.toStatus.getDescription, Option(st.asException()))
-      case Status.INVALID_ARGUMENT =>
+      case c if c.value() == Status.INVALID_ARGUMENT.getCode.value() =>
         SQLExecuteException(st.getCode.toStatus.getDescription, Option(st.asException()))
-      case Status.UNKNOWN =>
+      case c if c.value() == Status.UNKNOWN.getCode.value() =>
         new Exception(st.getCode.toStatus.getDescription, st.asException())
     }
 

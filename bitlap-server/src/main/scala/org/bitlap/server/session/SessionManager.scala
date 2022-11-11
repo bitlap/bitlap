@@ -79,7 +79,7 @@ class SessionManager extends LazyLogging {
         sessionConf,
         this
       )
-      session.open(sessionConf)
+      session.open()
       sessionStore.put(session.sessionHandle, session)
       session.operationManager = operationManager
       logger.info(s"Create session [${session.sessionHandle}]")

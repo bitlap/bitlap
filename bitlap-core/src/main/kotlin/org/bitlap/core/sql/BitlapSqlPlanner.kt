@@ -23,7 +23,6 @@ import org.apache.calcite.sql2rel.RelDecorrelator
 import org.apache.calcite.sql2rel.SqlToRelConverter
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.RelBuilder
-import org.bitlap.core.SessionContext
 import org.bitlap.core.data.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
 import org.bitlap.core.sql.rule.ENUMERABLE_RULES
@@ -42,7 +41,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
     /**
      * Parse a [statement] to a [RelNode]
      */
-    fun parse(statement: String, sessionContext: SessionContext): BitlapSqlPlan {
+    fun parse(statement: String): BitlapSqlPlan {
         System.setProperty("calcite.default.charset", "utf8")
         val config = SqlParserUtil.frameworksConfig(catalog)
         // parser sql to sql node

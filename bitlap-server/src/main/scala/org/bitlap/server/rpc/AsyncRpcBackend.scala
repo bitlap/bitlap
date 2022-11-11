@@ -33,7 +33,7 @@ class AsyncRpcBackend extends AsyncRpc {
   ): ZIO[Any, Throwable, SessionHandle] =
     ZIO.effect {
       val session     = sessionManager.openSession(username, password, configuration)
-      val coreSession = BitlapContext.getSession
+      val coreSession = BitlapContext.initSession(session.sessionHandle.handleId)
       val newCoreSession = coreSession.copy(
         new SessionId(session.sessionHandle.handleId),
         session.sessionState,

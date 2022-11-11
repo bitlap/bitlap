@@ -30,7 +30,7 @@ trait Session {
 
   def creationTime: Long
 
-  def open(sessionConfMap: Map[String, String] = Map.empty): Unit
+  def open(): Unit
 
   def executeStatement(
     sessionHandle: SessionHandle,

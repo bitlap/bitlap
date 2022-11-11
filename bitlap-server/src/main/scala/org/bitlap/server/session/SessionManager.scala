@@ -51,7 +51,7 @@ class SessionManager extends LazyLogging {
         } catch {
           case e: Exception =>
             logger.error(
-              s"Failed to listen for session, error: $e.localizedMessage",
+              s"Failed to listen for session, error: ${e.getLocalizedMessage}",
               e
             )
         }

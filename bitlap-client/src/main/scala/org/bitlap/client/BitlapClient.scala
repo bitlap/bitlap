@@ -16,20 +16,29 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
   private lazy val rpcClient: SyncClient = new SyncClient(serverPeers, props)
 
-  def openSession(): SessionHandle =
+  def openSession(
+    username: String = "",
+    password: String = "",
+    config: Map[String, String] = Map.empty
+  ): SessionHandle =
     rpcClient
-      .openSession(username = "", password = "", configuration = props)
+      .openSession(username, password, config)
 
   def closeSession(sessionHandle: SessionHandle): Unit =
     rpcClient.closeSession(sessionHandle)
 
-  def executeStatement(sessionHandle: SessionHandle, statement: String, queryTimeout: Long): OperationHandle =
+  def executeStatement(
+    sessionHandle: SessionHandle,
+    statement: String,
+    queryTimeout: Long,
+    config: Map[String, String] = Map.empty
+  ): OperationHandle =
     rpcClient
       .executeStatement(
         statement = statement,
         sessionHandle = sessionHandle,
         queryTimeout = queryTimeout,
-        confOverlay = props
+        confOverlay = config
       )
 
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): RowSet =

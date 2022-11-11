@@ -9,6 +9,9 @@ import zio._
 import org.bitlap.server.session.SessionManager
 import org.bitlap.core.utils.SqlParserUtil
 import org.bitlap.network.NetworkException.SQLExecuteException
+import org.bitlap.core.BitlapContext
+import org.bitlap.core.SessionId
+import org.bitlap.jdbc.Constants
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *
@@ -29,7 +32,15 @@ class AsyncRpcBackend extends AsyncRpc {
     configuration: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, SessionHandle] =
     ZIO.effect {
-      val session = sessionManager.openSession(username, password, configuration)
+      val session     = sessionManager.openSession(username, password, configuration)
+      val coreSession = BitlapContext.getSession
+      val newCoreSession = coreSession.copy(
+        new SessionId(session.sessionHandle.handleId),
+        session.sessionState,
+        session.creationTime,
+        configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
+      )
+      BitlapContext.updateSession(newCoreSession)
       session.sessionHandle
     }
 

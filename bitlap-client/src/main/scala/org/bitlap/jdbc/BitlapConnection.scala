@@ -36,8 +36,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
     val hosts            = uriWithoutPrefix.split(",")
     // parse uri
-    val parts       = hosts.map(it => it.split("/"))
     val serverPeers = hosts.map(f => f.split("/")(0))
+    val db          = hosts.filter(_.contains("/")).map(_.split("/")(1)).headOption.getOrElse(Constants.DEFAULT_DB)
+    info.put(Constants.DBNAME_PROPERTY_KEY, db)
     try {
       client = new BitlapClient(serverPeers, info.asScala.toMap)
       session = client.openSession()

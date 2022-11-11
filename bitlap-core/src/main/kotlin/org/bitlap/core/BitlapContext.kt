@@ -39,6 +39,7 @@ object BitlapContext {
 
     private val sessionMap = mutableMapOf<HandleIdentifier, SessionContext>()
 
+    @JvmStatic
     fun getSession(): SessionContext {
         synchronized(this) {
             val sessionId = QueryContext.get().sessionId
@@ -52,12 +53,9 @@ object BitlapContext {
         }
     }
 
+    @JvmStatic
     fun updateSession(sessionContext: SessionContext) {
         sessionMap[sessionContext.sessionId.id] = sessionContext
-    }
-
-    fun putIfAbsentSession(sessionContext: SessionContext) {
-        sessionMap.putIfAbsent(sessionContext.sessionId.id, sessionContext)
     }
 }
 

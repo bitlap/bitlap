@@ -4,9 +4,6 @@ package org.bitlap
 import io.grpc.Status
 import org.bitlap.network.NetworkException._
 
-import java.io.IOException
-import java.util.concurrent.TimeoutException
-
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/4/21
@@ -18,14 +15,27 @@ package object network {
   lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) => {
     ex.printStackTrace()
     ex match {
-      case _: TimeoutException | _: IOException => Status.UNAVAILABLE
-      case _: RpcException                      => Status.INTERNAL
-      case _: LeaderServerNotFoundException     => Status.ABORTED
-      case _: SQLExecuteException               => Status.INVALID_ARGUMENT
-      case _: Exception                         => Status.UNKNOWN
+      case e: RpcException =>
+        Status.INTERNAL.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
+      case e: LeaderServerNotFoundException =>
+        Status.ABORTED.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
+      case e: SQLExecuteException =>
+        Status.INVALID_ARGUMENT.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
+      case e: Exception =>
+        Status.UNKNOWN.withDescription(e.getLocalizedMessage).withCause(e.getCause)
     }
   }
 
   lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
-    RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
+    st match {
+      case Status.INTERNAL =>
+        RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
+      case Status.ABORTED =>
+        LeaderServerNotFoundException(st.getCode.toStatus.getDescription, Option(st.asException()))
+      case Status.INVALID_ARGUMENT =>
+        SQLExecuteException(st.getCode.toStatus.getDescription, Option(st.asException()))
+      case Status.UNKNOWN =>
+        new Exception(st.getCode.toStatus.getDescription, st.asException())
+    }
+
 }

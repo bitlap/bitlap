@@ -31,7 +31,7 @@ class MemorySession(
 
   override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
 
-  override def open(sessionConfMap: Map[String, String]): Unit = {
+  override def open(): Unit = {
     this.sessionState.compareAndSet(false, true)
     lastAccessTime = System.currentTimeMillis()
   }
@@ -44,7 +44,7 @@ class MemorySession(
     val operation = operationManager.newExecuteStatementOperation(
       this,
       statement,
-      confOverlay
+      _sessionConf ++ confOverlay
     )
     opHandleSet.append(operation.opHandle)
     operation.opHandle

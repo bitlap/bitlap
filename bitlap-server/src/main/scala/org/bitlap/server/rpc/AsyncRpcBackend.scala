@@ -7,6 +7,11 @@ import org.bitlap.network._
 import org.bitlap.tools._
 import zio._
 import org.bitlap.server.session.SessionManager
+import org.bitlap.core.utils.SqlParserUtil
+import org.bitlap.network.NetworkException.SQLExecuteException
+import org.bitlap.core.BitlapContext
+import org.bitlap.core.SessionId
+import org.bitlap.jdbc.Constants
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *
@@ -27,7 +32,15 @@ class AsyncRpcBackend extends AsyncRpc {
     configuration: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, SessionHandle] =
     ZIO.effect {
-      val session = sessionManager.openSession(username, password, configuration)
+      val session     = sessionManager.openSession(username, password, configuration)
+      val coreSession = BitlapContext.initSession(session.sessionHandle.handleId)
+      val newCoreSession = coreSession.copy(
+        new SessionId(session.sessionHandle.handleId),
+        session.sessionState,
+        session.creationTime,
+        configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
+      )
+      BitlapContext.updateSession(newCoreSession)
       session.sessionHandle
     }
 
@@ -41,16 +54,23 @@ class AsyncRpcBackend extends AsyncRpc {
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, OperationHandle] = ZIO.effect {
-    val session = sessionManager.getSession(sessionHandle)
-    sessionManager.refreshSession(sessionHandle, session)
-    session.executeStatement(
-      sessionHandle,
-      statement,
-      confOverlay,
-      queryTimeout
-    )
-  }
+  ): ZIO[Any, Throwable, OperationHandle] =
+    ZIO.effect(SqlParserUtil.validateQuery(statement)).flatMap { q =>
+      if (q) ZIO.effect {
+        val session = sessionManager.getSession(sessionHandle)
+        sessionManager.refreshSession(sessionHandle, session)
+        session.executeStatement(
+          sessionHandle,
+          statement,
+          confOverlay,
+          queryTimeout
+        )
+      }
+      else {
+        ZIO.fail(SQLExecuteException(s"Unsupported SQL: $statement"))
+      }
+
+    }
 
   override def fetchResults(
     opHandle: OperationHandle,

@@ -53,7 +53,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
 
     val dbProp = new DriverPropertyInfo(
       Constants.DBNAME_PROPERTY_KEY,
-      curInfo.getProperty(Constants.DBNAME_PROPERTY_KEY, "default")
+      curInfo.getProperty(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
     )
     dbProp.required = false
     dbProp.description = "Database name"

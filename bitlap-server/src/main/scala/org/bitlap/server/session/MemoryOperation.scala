@@ -71,12 +71,7 @@ class MemoryOperation(
       mapTo(
         new QueryExecution(
           super.getStatement,
-          new SessionContext(
-            new SessionId(parentSession.sessionHandle.handleId),
-            parentSession.sessionState,
-            parentSession.creationTime,
-            Constants.DEFAULT_DATABASE
-          )
+          new SessionId(parentSession.sessionHandle.handleId)
         ).execute()
       )
     )

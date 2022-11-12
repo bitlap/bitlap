@@ -19,6 +19,7 @@ import zio._
 import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
 import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
 import org.bitlap.network.models._
+import org.bitlap.jdbc.Constants
 
 /** 异步RPC客户端，基于zio-grpc实现
  *
@@ -34,8 +35,8 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
     serverPeers
       .filter(_.nonEmpty)
       .map { s =>
-        val as = if (s.contains(":")) s.split(":").toList else List(s, "23333")
-        ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(23333))
+        val as = if (s.contains(":")) s.split(":").toList else List(s, Constants.DEFAULT_PORT)
+        ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
       }
       .toList
 
@@ -65,7 +66,7 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
   ): ZIO[Any, Throwable, SessionHandle] =
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
-        .openSession(BOpenSessionReq(username, password, configuration))
+        .openSession(BOpenSessionReq(username, password, props ++ configuration))
         .mapBoth(statusApplyFunc, r => new SessionHandle(r.getSessionHandle))
         .provideLayer(l)
     )
@@ -88,7 +89,7 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .executeStatement(
-          BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), confOverlay, queryTimeout)
+          BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), props ++ confOverlay, queryTimeout)
         )
         .mapBoth(statusApplyFunc, r => new OperationHandle(r.getOperationHandle))
         .provideLayer(l)

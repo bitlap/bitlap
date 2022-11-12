@@ -34,6 +34,6 @@ class SqlShowTables(
         )
 
     override fun operator(context: DataContext): List<Array<Any?>> {
-        return catalog.listTables(catalog.getCurrentDatabase()).map { arrayOf(it.database, it.name, it.createTime) }
+        return catalog.listTables(catalog.currentDatabase()).map { arrayOf(it.database, it.name, it.createTime) }
     }
 }

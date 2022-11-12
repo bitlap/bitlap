@@ -27,7 +27,7 @@ object Constants {
 
   /** If host is provided, without a port
    */
-  val DEFAULT_PORT = "10000"
+  val DEFAULT_PORT = "23333"
 
   /** Property key for the database name
    */
@@ -40,4 +40,6 @@ object Constants {
   /** Property key for the bitlap Server port
    */
   val PORT_PROPERTY_KEY = "PORT"
+
+  val DEFAULT_DB = "default"
 }

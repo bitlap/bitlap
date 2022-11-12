@@ -28,7 +28,7 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
-    fun getCurrentDatabase(): String {
+    fun currentDatabase(): String {
         return BitlapContext.getSession().currentSchema
     }
 
@@ -61,7 +61,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     override fun showCurrentDatabase(): String {
-        return getCurrentDatabase()
+        return currentDatabase()
     }
 
     override fun useDatabase(name: String): Boolean {

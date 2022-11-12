@@ -4,6 +4,7 @@ package org.bitlap.core
 import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.EventBus
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.data.impl.BitlapCatalogImpl
 import org.bitlap.core.sql.BitlapSqlPlanner
 import org.bitlap.core.sql.QueryContext
@@ -41,23 +42,32 @@ object BitlapContext {
 
     fun getSession(): SessionContext {
         synchronized(this) {
+            val sessionId = QueryContext.get().sessionId ?: throw BitlapException("Not found sessionId")
+            return sessionMap[sessionId.id] ?: throw BitlapException("Not found session by sessionId: ${sessionId.id}")
+        }
+    }
+
+    @JvmStatic
+    fun initSession(id: HandleIdentifier): SessionContext {
+        synchronized(this) {
             val sessionId = QueryContext.get().sessionId
             return if (sessionId != null) {
-                sessionMap.getOrPut(sessionId.id) { SessionContext.fakeSession(sessionId) }
+                sessionMap.getOrPut(sessionId.id) {
+                    val newSessionId = SessionId(id)
+                    QueryContext.get().sessionId = newSessionId
+                    SessionContext.fakeSession(newSessionId)
+                }
             } else {
-                val newSessionId = SessionId.fakeSessionId()
+                val newSessionId = SessionId(id)
                 QueryContext.get().sessionId = newSessionId
                 sessionMap.getOrPut(newSessionId.id) { SessionContext.fakeSession(newSessionId) }
             }
         }
     }
 
+    @JvmStatic
     fun updateSession(sessionContext: SessionContext) {
         sessionMap[sessionContext.sessionId.id] = sessionContext
-    }
-
-    fun putIfAbsentSession(sessionContext: SessionContext) {
-        sessionMap.putIfAbsent(sessionContext.sessionId.id, sessionContext)
     }
 }
 

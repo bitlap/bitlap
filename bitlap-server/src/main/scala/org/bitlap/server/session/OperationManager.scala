@@ -16,7 +16,7 @@ import org.bitlap.network.OperationState
  */
 class OperationManager {
 
-  private val handleToOperation: mutable.HashMap[OperationHandle, Operation] =
+  private val operationStore: mutable.HashMap[OperationHandle, Operation] =
     mutable.HashMap[OperationHandle, Operation]()
 
   /** Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
@@ -41,13 +41,13 @@ class OperationManager {
 
   def addOperation(operation: Operation) {
     this.synchronized {
-      handleToOperation.put(operation.opHandle, operation)
+      operationStore.put(operation.opHandle, operation)
     }
   }
 
   def getOperation(operationHandle: OperationHandle): Operation =
     this.synchronized {
-      val op = handleToOperation.getOrElse(operationHandle, null)
+      val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {
         throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
       } else {
@@ -61,24 +61,24 @@ class OperationManager {
 
   def cancelOperation(operationHandle: OperationHandle): Boolean =
     this.synchronized {
-      val op = handleToOperation.getOrElse(operationHandle, null)
+      val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {
         true
       } else {
         op.setState(OperationState.CanceledState)
-        handleToOperation.remove(operationHandle)
+        operationStore.remove(operationHandle)
         true
       }
     }
 
   def closeOperation(operationHandle: OperationHandle): Boolean =
     this.synchronized {
-      val op = handleToOperation.getOrElse(operationHandle, null)
+      val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {
         true
       } else {
         op.setState(OperationState.ClosedState)
-        handleToOperation.remove(operationHandle)
+        operationStore.remove(operationHandle)
         true
       }
     }

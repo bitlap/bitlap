@@ -32,8 +32,20 @@ trait DataSerializer {
           targetType match {
             case TypeId.BooleanType => byteBuffer.getInt == 1
             case TypeId.StringType  => byteBuffer.getInt.toString
+            case TypeId.LongType    => byteBuffer.getInt.toLong
+            case TypeId.DoubleType  => byteBuffer.getInt.toDouble
+            case TypeId.FloatType   => byteBuffer.getInt.toFloat
             case _                  => byteBuffer.getInt
           }
+        case TypeId.ByteType =>
+          targetType match {
+            case TypeId.StringType => byteBuffer.get().toString
+            case TypeId.IntType    => byteBuffer.get().toInt
+            case TypeId.ShortType  => byteBuffer.get().toShort
+            case TypeId.LongType   => byteBuffer.get().toLong
+            case _                 => byteBuffer.get()
+          }
+
         case TypeId.DoubleType =>
           targetType match {
             case TypeId.StringType => byteBuffer.getDouble.toString
@@ -53,7 +65,6 @@ trait DataSerializer {
         case TypeId.LongType =>
           targetType match {
             case TypeId.StringType => byteBuffer.getLong.toString
-            case TypeId.IntType    => byteBuffer.getLong.toInt
             case TypeId.DoubleType => byteBuffer.getLong.toDouble
             case _                 => byteBuffer.getLong
           }
@@ -62,6 +73,8 @@ trait DataSerializer {
           targetType match {
             case TypeId.StringType => (byteBuffer.get() == 1).toString
             case TypeId.IntType    => byteBuffer.get().toInt
+            case TypeId.ShortType  => byteBuffer.get().toShort
+            case TypeId.ByteType   => byteBuffer.get()
             case _                 => byteBuffer.get() == 1
           }
 
@@ -88,12 +101,7 @@ trait DataSerializer {
             case _                 => new Date(byteBuffer.getLong)
           }
         case TypeId.StringType =>
-          targetType match {
-            case TypeId.IntType   => new String(byteBuffer.array()).toInt
-            case TypeId.LongType  => new String(byteBuffer.array()).toLong
-            case TypeId.ShortType => new String(byteBuffer.array()).toShort
-            case _                => new String(byteBuffer.array())
-          }
+          new String(byteBuffer.array())
         case TypeId.Unspecified =>
           throw DataFormatException(msg = s"Incompatible type for realType:$realType, targetType:$targetType")
       }
@@ -109,7 +117,7 @@ trait DataSerializer {
 
   def serialize(any: Any): ByteBuffer = {
     val buffer = new ByteArrayOutputStream()
-    Using.resource(new DataOutputStream(buffer)) { d =>
+    Using.resources(buffer, new DataOutputStream(buffer)) { (_, d) =>
       any match {
         case i: Boolean   => d.writeBoolean(i)
         case i: Short     => d.writeShort(i)
@@ -126,8 +134,6 @@ trait DataSerializer {
       }
       d.flush()
     }
-    val r = ByteBuffer.wrap(buffer.toByteArray)
-    buffer.close()
-    r
+    ByteBuffer.wrap(buffer.toByteArray)
   }
 }

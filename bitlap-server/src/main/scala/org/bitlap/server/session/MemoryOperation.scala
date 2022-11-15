@@ -24,7 +24,7 @@ final class MemoryOperation(
   opType: OperationType,
   hasResultSet: Boolean = false
 ) extends Operation(parentSession, opType, hasResultSet)
-    with DataSerializer {
+    with BitlapSerde {
 
   def mapTo(rs: ResultSet): QueryResult = {
     // get schema

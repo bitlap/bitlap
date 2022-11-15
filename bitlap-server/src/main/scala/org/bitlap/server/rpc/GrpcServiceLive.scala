@@ -40,61 +40,75 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
         OperationMustOnLeaderException(),
         _.openSession(request.username, request.password, request.configuration)
       )
-      .map(shd =>
-        BOpenSessionResp(
-          configuration = request.configuration,
-          sessionHandle = Some(shd.toBSessionHandle())
-        )
+      .mapBoth(
+        errorApplyFunc,
+        shd =>
+          BOpenSessionResp(
+            configuration = request.configuration,
+            sessionHandle = Some(shd.toBSessionHandle())
+          )
       )
-      .mapError(errorApplyFunc)
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
     asyncRpcBackend
-      .map(_.closeSession(new SessionHandle(request.getSessionHandle))) { _ =>
-        BCloseSessionResp()
-      }
-      .mapError(errorApplyFunc)
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.closeSession(new SessionHandle(request.getSessionHandle))
+      )
+      .mapBoth(errorApplyFunc, _ => BCloseSessionResp())
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
-    asyncRpcBackend.map {
-      _.executeStatement(
-        new SessionHandle(request.getSessionHandle),
-        request.statement,
-        request.queryTimeout,
-        request.confOverlay
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.executeStatement(
+          new SessionHandle(request.getSessionHandle),
+          request.statement,
+          request.queryTimeout,
+          request.confOverlay
+        )
       )
-    }(hd => BExecuteStatementResp(Some(hd.toBOperationHandle())))
-      .mapError(errorApplyFunc)
+      .mapBoth(errorApplyFunc, hd => BExecuteStatementResp(Some(hd.toBOperationHandle())))
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
-    asyncRpcBackend.map {
-      _.fetchResults(
-        new OperationHandle(request.getOperationHandle),
-        request.maxRows.toInt,
-        request.fetchType
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.fetchResults(new OperationHandle(request.getOperationHandle), request.maxRows.toInt, request.fetchType)
       )
-    }(_.toBFetchResults)
-      .mapError(errorApplyFunc)
+      .mapBoth(errorApplyFunc, _.toBFetchResults)
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
-    asyncRpcBackend.map {
-      _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
-    }(t => BGetResultSetMetadataResp(Some(t.toBTableSchema)))
-      .mapError(errorApplyFunc)
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
+      )
+      .mapBoth(errorApplyFunc, t => BGetResultSetMetadataResp(Some(t.toBTableSchema)))
 
   override def getDatabases(
     request: BGetDatabases.BGetDatabasesReq
   ): ZIO[Any, Status, BGetDatabases.BGetDatabasesResp] =
-    asyncRpcBackend.map {
-      _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
-    }(t => BGetDatabasesResp(Option(t.toBOperationHandle())))
-      .mapError(errorApplyFunc)
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
+      )
+      .mapBoth(errorApplyFunc, t => BGetDatabasesResp(Option(t.toBOperationHandle())))
 
   override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
-    asyncRpcBackend.map {
-      _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
-    }(t => BGetTablesResp(Option(t.toBOperationHandle())))
-      .mapError(errorApplyFunc)
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
+      )
+      .mapBoth(errorApplyFunc, t => BGetTablesResp(Option(t.toBOperationHandle())))
 
   override def getLeader(request: BGetLeaderReq): ZIO[Any, Status, BGetLeaderResp] = {
     val leaderAddress = BitlapServerContext.getLeaderAddress()
@@ -113,14 +127,20 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   override def cancelOperation(
     request: BCancelOperationReq
   ): ZIO[Any, Status, BCancelOperationResp] =
-    asyncRpcBackend.map {
-      _.cancelOperation(new OperationHandle(request.getOperationHandle))
-    }(_ => BCancelOperationResp())
-      .mapError(errorApplyFunc)
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.cancelOperation(new OperationHandle(request.getOperationHandle))
+      )
+      .mapBoth(errorApplyFunc, _ => BCancelOperationResp())
 
   override def getOperationStatus(request: BGetOperationStatusReq): ZIO[Any, Status, BGetOperationStatusResp] =
-    asyncRpcBackend.map {
-      _.getOperationStatus(new OperationHandle(request.getOperationHandle))
-    }(t => BGetOperationStatusResp(Option(t).map(toBOperationState)))
-      .mapError(errorApplyFunc)
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.getOperationStatus(new OperationHandle(request.getOperationHandle))
+      )
+      .mapBoth(errorApplyFunc, t => BGetOperationStatusResp(Option(t).map(toBOperationState)))
 }

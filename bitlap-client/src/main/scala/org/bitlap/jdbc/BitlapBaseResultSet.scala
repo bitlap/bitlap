@@ -2,7 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.network.models._
-import org.bitlap.network.DataSerializer
+import org.bitlap.network.BitlapSerde
 
 import java.io._
 import java.math.BigDecimal
@@ -19,7 +19,7 @@ import scala.reflect._
  *  @since 2021/8/23
  *  @version 1.0
  */
-abstract class BitlapBaseResultSet extends ResultSet with DataSerializer {
+abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
 
   protected var warningChain: SQLWarning
   protected var row: Row

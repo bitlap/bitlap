@@ -1,18 +1,18 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network.test
 
-import org.bitlap.network.DataSerializer
+import org.bitlap.network.BitlapSerde
 import org.bitlap.network.models.TypeId
 import org.junit.Test
-import java.sql.Date
 
+import java.sql.{ Date, Time, Timestamp }
 import java.io._
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/11/15
  */
-class DataSerializerSpec extends DataSerializer {
+class DataSerializerSpec extends BitlapSerde {
 
   @Test
   def testSerializeJavaInt(): Unit = {
@@ -93,6 +93,76 @@ class DataSerializerSpec extends DataSerializer {
     val d1 = deserialize[Float](TypeId.FloatType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getFloat == d1)
+  }
+
+  @Test
+  def testSerializeTimestamp(): Unit = {
+    val time             = new Timestamp(System.currentTimeMillis())
+    val s                = serialize(time)
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeLong(time.getTime)
+    dataOutputStream.flush()
+
+    val d1 = deserialize[Timestamp](TypeId.TimestampType, buffer.toByteArray)
+
+    assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
+
+  @Test
+  def testSerializeTime(): Unit = {
+    val time             = new Time(System.currentTimeMillis())
+    val s                = serialize(time)
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeLong(time.getTime)
+    dataOutputStream.flush()
+
+    val d1 = deserialize[Time](TypeId.TimeType, buffer.toByteArray)
+
+    assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
+
+  @Test
+  def testSerializeDate(): Unit = {
+    val time             = new Date(System.currentTimeMillis())
+    val s                = serialize(time)
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeLong(time.getTime)
+    dataOutputStream.flush()
+
+    val d1 = deserialize[Date](TypeId.DateType, buffer.toByteArray)
+
+    assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
+
+  @Test
+  def testSerializeDateCanBeLong(): Unit = {
+    val time             = new Date(System.currentTimeMillis())
+    val s                = serialize(time)
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeLong(time.getTime)
+    dataOutputStream.flush()
+
+    val d1 = deserialize[Long](TypeId.DateType, buffer.toByteArray)
+
+    assert(s.asReadOnlyByteBuffer().getLong == d1)
+  }
+
+  @Test
+  def testSerializeTimestampCanBeString(): Unit = {
+    val time             = new Timestamp(System.currentTimeMillis())
+    val s                = serialize(time)
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeLong(time.getTime)
+    dataOutputStream.flush()
+
+    val d1 = deserialize[String](TypeId.TimestampType, buffer.toByteArray)
+
+    assert(new Timestamp((s.asReadOnlyByteBuffer().getLong)).toString == d1)
   }
 
   @Test

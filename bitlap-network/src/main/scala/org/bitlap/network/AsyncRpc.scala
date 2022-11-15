@@ -19,8 +19,15 @@ trait AsyncRpc extends Rpc[Task] { self =>
 
   override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T, Z <: ZIO[_, _, _]](action: self.type => Z)(implicit runtime: zio.Runtime[Any] = zio.Runtime.default): T =
-    runtime.unsafeRun(action(this).asInstanceOf[ZIO[Any, Throwable, T]])
+  def sync[T, E <: Throwable, Z <: ZIO[_, _, _]](action: self.type => Z)(implicit
+    runtime: zio.Runtime[Any] = zio.Runtime.default
+  ): T =
+    runtime.unsafeRun(action(this).asInstanceOf[ZIO[Any, E, T]])
+
+  def filter[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =
+    if (predicate) {
+      fa(this)
+    } else { ZIO.fail(exception) }
 
   def openSession(
     username: String,

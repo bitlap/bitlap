@@ -40,4 +40,9 @@ object NetworkException {
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
+
+  final case class OperationMustOnLeaderException(
+    override val msg: String = "This operation is not allowed on non leader nodes",
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException(msg = msg, cause = cause)
 }

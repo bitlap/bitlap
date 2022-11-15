@@ -9,6 +9,7 @@ import org.bitlap.network.models._
 import org.bitlap.server.session.SessionManager
 import org.bitlap.tools._
 import zio._
+import org.bitlap.common.exception.SQLExecutedException
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *
@@ -18,8 +19,6 @@ import zio._
  */
 @apply
 class AsyncRpcBackend extends AsyncRpc {
-
-  import org.bitlap.common.exception.SQLExecutedException
 
   private val sessionManager = SessionManager()
   sessionManager.startListener()

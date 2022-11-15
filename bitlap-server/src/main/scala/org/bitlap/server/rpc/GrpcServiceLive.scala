@@ -35,12 +35,17 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     asyncRpcBackend
-      .map(_.openSession(request.username, request.password, request.configuration)) { shd =>
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.openSession(request.username, request.password, request.configuration)
+      )
+      .map(shd =>
         BOpenSessionResp(
           configuration = request.configuration,
           sessionHandle = Some(shd.toBSessionHandle())
         )
-      }
+      )
       .mapError(errorApplyFunc)
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =

@@ -2,12 +2,18 @@
 package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.NetworkException.ServerIntervalException
+import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.handles.SessionHandle
 
 import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
+import org.bitlap.jdbc.BitlapSQLException
+import org.bitlap.network.OperationState
+import org.bitlap.network.handles.OperationHandle
+import org.bitlap.tools.apply
+
+import scala.collection._
 
 /** bitlap 会话管理器
  *  @author
@@ -15,10 +21,12 @@ import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
  *  @since 2021/11/20
  *  @version 1.0
  */
-class SessionManager extends LazyLogging {
+@apply
+final class SessionManager extends LazyLogging {
 
-  val operationManager: OperationManager = new OperationManager()
-  val start                              = new AtomicBoolean(false)
+  val start = new AtomicBoolean(false)
+  val operationStore: mutable.HashMap[OperationHandle, Operation] =
+    mutable.HashMap[OperationHandle, Operation]()
 
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
@@ -64,9 +72,6 @@ class SessionManager extends LazyLogging {
       sessionThread.start()
     }
 
-  // service, provider, conf, discover
-  // session life cycle manage
-
   def openSession(
     username: String,
     password: String,
@@ -81,7 +86,6 @@ class SessionManager extends LazyLogging {
       )
       session.open()
       sessionStore.put(session.sessionHandle, session)
-      session.operationManager = operationManager
       logger.info(s"Create session [${session.sessionHandle}]")
       return session
     }
@@ -93,13 +97,6 @@ class SessionManager extends LazyLogging {
     logger.info(
       s"Close session [$sessionHandle], [${getOpenSessionCount()}] sessions exists"
     )
-    if (getOpenSessionCount() == 0) {
-      //        log.warn(
-      //          "This instance of Bitlap has been removed from the list of server " +
-      //            "instances available for dynamic service discovery. " +
-      //            "The last client session has ended - will shutdown now."
-      //        )
-    }
   }
 
   private def getOpenSessionCount(): Int =
@@ -110,7 +107,7 @@ class SessionManager extends LazyLogging {
       sessionStore.get(sessionHandle)
     }
     if (session == null) {
-      throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
+      throw InternalException(s"Invalid SessionHandle: $sessionHandle")
     }
     session
   }
@@ -121,10 +118,29 @@ class SessionManager extends LazyLogging {
       if (sessionStore.containsKey(sessionHandle)) {
         sessionStore.put(sessionHandle, session)
       } else {
-        throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
+        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
 
+  def addOperation(operation: Operation) {
+    this.synchronized {
+      operationStore.put(operation.opHandle, operation)
+    }
+  }
+
+  def getOperation(operationHandle: OperationHandle): Operation =
+    this.synchronized {
+      val op = operationStore.getOrElse(operationHandle, null)
+      if (op == null) {
+        throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
+      } else {
+        op.getState match {
+          case OperationState.FinishedState => op
+          case _ =>
+            throw BitlapSQLException(s"Invalid OperationState: ${op.getState}")
+        }
+      }
+    }
 }
 object SessionManager {
   private val sessionAddLock: Object = new Object

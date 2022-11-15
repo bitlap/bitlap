@@ -2,6 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.network.models._
+import org.bitlap.network.DataSerializer
 
 import java.io._
 import java.math.BigDecimal
@@ -18,7 +19,7 @@ import scala.reflect._
  *  @since 2021/8/23
  *  @version 1.0
  */
-abstract class BitlapBaseResultSet extends ResultSet {
+abstract class BitlapBaseResultSet extends ResultSet with DataSerializer {
 
   protected var warningChain: SQLWarning
   protected var row: Row
@@ -437,32 +438,11 @@ abstract class BitlapBaseResultSet extends ResultSet {
         _wasNull = true
       }
 
-      val typeName   = classTag[T].runtimeClass.getTypeName
-      val valueStr   = bColumnValue.toStringUtf8
-      val columnType = getSchema.columns(columnIndex - 1).typeDesc
-      if (columnType == TypeId.StringType || valueStr == null) {
-        return valueStr.asInstanceOf[T]
-      }
-
-      if (valueStr.isEmpty) {
-        return null.asInstanceOf[T]
-      }
-
-      (columnType match {
-        case TypeId.IntType       => Integer.parseInt(valueStr)
-        case TypeId.DoubleType    => java.lang.Double.parseDouble(valueStr)
-        case TypeId.ShortType     => java.lang.Short.parseShort(valueStr)
-        case TypeId.LongType      => java.lang.Long.parseLong(valueStr)
-        case TypeId.BooleanType   => java.lang.Boolean.valueOf(valueStr)
-        case TypeId.TimestampType => new Timestamp(java.lang.Long.parseLong(valueStr))
-        case TypeId.FloatType     => java.lang.Float.parseFloat(valueStr)
-        case TypeId.TimeType      => new Time(java.lang.Long.parseLong(valueStr))
-        case TypeId.DateType      => new Date(java.lang.Long.parseLong(valueStr))
-        case _                    => valueStr // FIXME 避免报错
-//        case _ => throw BSQLException(s"Unrecognized column columnType:$columnType, scalaTypeName:$typeName")
-      }).asInstanceOf[T]
+      val columnType  = getSchema.columns(columnIndex - 1).typeDesc
+      val bufferArray = bColumnValue.asReadOnlyByteBuffer()
+      deserialize[T](columnType, bufferArray)
     } catch {
-      case e: Exception => throw e
+      case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = e.getCause)
     }
   }
 

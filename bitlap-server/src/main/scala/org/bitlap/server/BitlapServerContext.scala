@@ -8,14 +8,14 @@ import org.bitlap.common.utils.UuidUtil
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.GetServerMetadata
 import org.bitlap.network.ServerAddress
-import org.bitlap.network.NetworkException.LeaderServerNotFoundException
+import org.bitlap.network.NetworkException.LeaderNotFoundException
 import org.bitlap.server.raft.RaftServerConfig
 
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
 import org.bitlap.network.AsyncRpc
 import zio._
-import org.bitlap.network.NetworkException.ServerIntervalException
+import org.bitlap.network.NetworkException.InternalException
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
  *  @author
@@ -38,7 +38,7 @@ object BitlapServerContext {
 
   def asyncRpc: AsyncRpc =
     if (_asyncRpc == null) {
-      throw ServerIntervalException("cannot find an AsyncRpc instance")
+      throw InternalException("cannot find an AsyncRpc instance")
     } else {
       _asyncRpc
     }
@@ -71,12 +71,12 @@ object BitlapServerContext {
   def getLeaderAddress(): Task[ServerAddress] = Task.effect {
     if (isLeader) {
       if (_node == null) {
-        throw LeaderServerNotFoundException("cannot find a raft node instance")
+        throw LeaderNotFoundException("cannot find a raft node instance")
       }
       Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
     } else {
       if (cliClientService == null) {
-        throw LeaderServerNotFoundException("cannot find a raft CliClientService instance")
+        throw LeaderNotFoundException("cannot find a raft CliClientService instance")
       }
       val rt      = RouteTable.getInstance
       val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
@@ -88,7 +88,7 @@ object BitlapServerContext {
         rt.selectLeader(groupId)
       } else null
       if (leader == null) {
-        throw LeaderServerNotFoundException("cannot select a leader")
+        throw LeaderNotFoundException("cannot select a leader")
       }
       val result = cliClientService.getRpcClient.invokeSync(
         leader.getEndpoint,
@@ -101,7 +101,7 @@ object BitlapServerContext {
       val re = result.asInstanceOf[GetServerMetadata.GetServerAddressResp]
 
       if (re == null || re.getIp.isEmpty || re.getPort <= 0)
-        throw LeaderServerNotFoundException("cannot find a leader address")
+        throw LeaderNotFoundException("cannot find a leader address")
       else ServerAddress(re.getIp, re.getPort)
     }
   }

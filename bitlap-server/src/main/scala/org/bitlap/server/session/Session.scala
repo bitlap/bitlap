@@ -22,7 +22,6 @@ trait Session {
   val sessionManager: SessionManager
 
   var lastAccessTime: Long
-  var operationManager: OperationManager
 
   def sessionConf: BitlapConf
 
@@ -51,5 +50,5 @@ trait Session {
 
   def close(operationHandle: OperationHandle)
 
-  def cancelOperation(operationHandle: OperationHandle)
+  def cancel(operationHandle: OperationHandle)
 }

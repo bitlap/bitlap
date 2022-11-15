@@ -3,6 +3,7 @@ package org.bitlap
 
 import io.grpc.Status
 import org.bitlap.network.NetworkException._
+import org.bitlap.common.exception.SQLExecutedException
 
 /** @author
  *    梦境迷离
@@ -10,17 +11,17 @@ import org.bitlap.network.NetworkException._
  */
 package object network {
 
-  type Identity[X] = X
+  type Identity[T] = T
 
   lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) => {
     ex.printStackTrace()
     ex match {
       case e: RpcException =>
         Status.INTERNAL.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
-      case e: LeaderServerNotFoundException =>
+      case e: LeaderNotFoundException =>
         Status.ABORTED.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
-      case e: SQLExecuteException =>
-        Status.INVALID_ARGUMENT.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
+      case e: SQLExecutedException =>
+        Status.INVALID_ARGUMENT.withDescription(e.getLocalizedMessage).withCause(e.getCause)
       case e: Exception =>
         Status.UNKNOWN.withDescription(e.getLocalizedMessage).withCause(e.getCause)
     }
@@ -31,9 +32,9 @@ package object network {
       case c if c.value() == Status.INTERNAL.getCode.value() =>
         RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
       case c if c.value() == Status.ABORTED.getCode.value() =>
-        LeaderServerNotFoundException(st.getCode.toStatus.getDescription, Option(st.asException()))
+        LeaderNotFoundException(st.getCode.toStatus.getDescription, Option(st.asException()))
       case c if c.value() == Status.INVALID_ARGUMENT.getCode.value() =>
-        SQLExecuteException(st.getCode.toStatus.getDescription, Option(st.asException()))
+        new SQLExecutedException(st.getCode.toStatus.getDescription, st.asException())
       case c if c.value() == Status.UNKNOWN.getCode.value() =>
         new Exception(st.getCode.toStatus.getDescription, st.asException())
     }

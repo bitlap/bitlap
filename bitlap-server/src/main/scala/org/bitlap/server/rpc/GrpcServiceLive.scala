@@ -95,7 +95,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
     val leaderAddress = BitlapServerContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if (ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty) {
-        Task.fail(LeaderServerNotFoundException(s"requestId: ${request.requestId}"))
+        Task.fail(LeaderNotFoundException(s"requestId: ${request.requestId}"))
       } else {
         Task.succeed(ld)
       }

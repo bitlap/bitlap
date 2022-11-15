@@ -41,7 +41,7 @@ final class MemoryOperation(
     val rows = ListBuffer[Row]()
     while (rs.next()) {
       val cl = (1 to metaData.getColumnCount).map { it =>
-        val buff = metaData.getColumnType(it) match {
+        metaData.getColumnType(it) match {
           case Types.VARCHAR                => serialize(rs.getString(it))
           case Types.SMALLINT               => serialize(rs.getShort(it))
           case Types.TINYINT                => serialize(rs.getByte(it))
@@ -55,7 +55,6 @@ final class MemoryOperation(
           case Types.DATE                   => serialize(rs.getDate(it).getTime)
           case tp                           => throw DataFormatException(msg = s"Unsupported type:$tp")
         }
-        ByteString.copyFrom(buff)
       }
       rows.append(Row(cl.toList))
     }

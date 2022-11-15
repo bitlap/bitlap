@@ -25,7 +25,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Int](TypeId.IntType, buffer.toByteArray)
 
-    assert(s.getInt == d1)
+    assert(s.asReadOnlyByteBuffer().getInt == d1)
   }
 
   @Test
@@ -39,7 +39,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Long](TypeId.LongType, buffer.toByteArray)
 
-    assert(s.getLong == d1)
+    assert(s.asReadOnlyByteBuffer().getLong == d1)
   }
 
   @Test
@@ -52,7 +52,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Short](TypeId.ShortType, buffer.toByteArray)
 
-    assert(s.getShort() == d1)
+    assert(s.asReadOnlyByteBuffer().getShort() == d1)
   }
 
   @Test
@@ -65,7 +65,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Double](TypeId.DoubleType, buffer.toByteArray)
 
-    assert(s.getDouble == d1)
+    assert(s.asReadOnlyByteBuffer().getDouble == d1)
   }
 
   @Test
@@ -78,7 +78,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Float](TypeId.FloatType, buffer.toByteArray)
 
-    assert(s.getFloat == d1)
+    assert(s.asReadOnlyByteBuffer().getFloat == d1)
   }
 
   @Test
@@ -91,7 +91,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[String](TypeId.StringType, buffer.toByteArray)
 
-    assert(s"${new String(s.array())}" == d1)
+    assert(s"${new String(s.toByteArray)}" == d1)
   }
 
   @Test
@@ -105,7 +105,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[String](TypeId.IntType, buffer.toByteArray)
 
-    assert(s.getInt == d1.toInt)
+    assert(s.asReadOnlyByteBuffer().getInt == d1.toInt)
   }
 
   @Test
@@ -120,7 +120,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Date](TypeId.DateType, buffer.toByteArray)
 
-    assert(s.getLong == d1.getTime)
+    assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
   }
 
   @Test
@@ -133,7 +133,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[Boolean](TypeId.BooleanType, buffer.toByteArray)
 
-    assert(s.get() == 1 && d1)
+    assert(s.asReadOnlyByteBuffer().get() == 1 && d1)
   }
 
   @Test
@@ -146,7 +146,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[String](TypeId.BooleanType, buffer.toByteArray)
 
-    assert(s.get() == 1 && d1 == "true")
+    assert(s.asReadOnlyByteBuffer().get() == 1 && d1 == "true")
   }
 
   @Test
@@ -159,7 +159,7 @@ class DataSerializerSpec extends DataSerializer {
 
     val d1 = deserialize[String](TypeId.ShortType, buffer.toByteArray)
 
-    assert(s.getShort() == d1.toShort)
+    assert(s.asReadOnlyByteBuffer().getShort() == d1.toShort)
   }
 
 }

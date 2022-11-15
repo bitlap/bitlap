@@ -438,9 +438,8 @@ abstract class BitlapBaseResultSet extends ResultSet with DataSerializer {
         _wasNull = true
       }
 
-      val columnType  = getSchema.columns(columnIndex - 1).typeDesc
-      val bufferArray = bColumnValue.asReadOnlyByteBuffer()
-      deserialize[T](columnType, bufferArray)
+      val columnType = getSchema.columns(columnIndex - 1).typeDesc
+      deserialize[T](columnType, bColumnValue)
     } catch {
       case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = e.getCause)
     }

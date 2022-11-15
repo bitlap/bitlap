@@ -15,6 +15,20 @@ import java.io._
 class DataSerializerSpec extends DataSerializer {
 
   @Test
+  def testSerializeJavaInt(): Unit = {
+    val s = serialize(Integer.valueOf(100))
+
+    val buffer           = new ByteArrayOutputStream()
+    val dataOutputStream = new DataOutputStream(buffer)
+    dataOutputStream.writeInt(Integer.valueOf(100))
+    dataOutputStream.flush()
+
+    val d1 = deserialize[Int](TypeId.IntType, buffer.toByteArray)
+
+    assert(s.asReadOnlyByteBuffer().getInt == d1)
+  }
+
+  @Test
   def testSerializeInt(): Unit = {
     val s = serialize(100)
 

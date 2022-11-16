@@ -2,18 +2,17 @@
 package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
+import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
-import org.bitlap.network.handles.SessionHandle
+import org.bitlap.network.OperationState
+import org.bitlap.network.handles._
+import org.bitlap.tools.apply
 
 import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
-import org.bitlap.jdbc.BitlapSQLException
-import org.bitlap.network.OperationState
-import org.bitlap.network.handles.OperationHandle
-import org.bitlap.tools.apply
-
 import scala.collection._
+import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
 
 /** bitlap 会话管理器
  *  @author
@@ -24,8 +23,11 @@ import scala.collection._
 @apply
 final class SessionManager extends LazyLogging {
 
-  val start = new AtomicBoolean(false)
-  val operationStore: mutable.HashMap[OperationHandle, Operation] =
+  private val start = new AtomicBoolean(false)
+
+  lazy val opHandleSet = ListBuffer[OperationHandle]()
+
+  lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
     mutable.HashMap[OperationHandle, Operation]()
 
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
@@ -93,6 +95,18 @@ final class SessionManager extends LazyLogging {
   def closeSession(sessionHandle: SessionHandle): Unit = {
     SessionManager.sessionAddLock.synchronized {
       sessionStore.remove(sessionHandle)
+    }
+    val closedOps = new ListBuffer[OperationHandle]()
+    for (opHandle <- opHandleSet) {
+      val op = operationStore.getOrElse(opHandle, null)
+      if (op != null) {
+        op.setState(OperationState.ClosedState)
+        operationStore.remove(opHandle)
+      }
+      closedOps.append(opHandle)
+    }
+    closedOps.zipWithIndex.foreach { case (_, i) =>
+      opHandleSet.remove(i)
     }
     logger.info(
       s"Close session [$sessionHandle], [${getOpenSessionCount()}] sessions exists"

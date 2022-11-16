@@ -7,8 +7,6 @@ import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
 /** bitlap 会话
@@ -26,12 +24,7 @@ final class MemorySession(
   val creationTime: Long = System.currentTimeMillis()
 ) extends Session {
 
-  private val operationStore: mutable.HashMap[OperationHandle, Operation] =
-    mutable.HashMap[OperationHandle, Operation]()
-
   override var lastAccessTime: Long = _
-
-  private lazy val opHandleSet = ListBuffer[OperationHandle]()
 
   override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
 
@@ -44,15 +37,12 @@ final class MemorySession(
     sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
-  ): OperationHandle = {
-    val operation = newExecuteStatementOperation(
+  ): OperationHandle =
+    newExecuteStatementOperation(
       this,
       statement,
       _sessionConf ++ confOverlay
-    )
-    opHandleSet.append(operation.opHandle)
-    operation.opHandle
-  }
+    ).opHandle
 
   override def executeStatement(
     sessionHandle: SessionHandle,
@@ -78,31 +68,19 @@ final class MemorySession(
 
   override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val closedOps = new ListBuffer[OperationHandle]()
-      for (opHandle <- opHandleSet) {
-        val op = operationStore.getOrElse(operationHandle, null)
-        if (op != null) {
-          op.setState(OperationState.ClosedState)
-          operationStore.remove(operationHandle)
-        }
-        closedOps.append(opHandle)
+      val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+      if (op != null) {
+        op.setState(OperationState.ClosedState)
+        removeOperation(operationHandle)
       }
-      closedOps.zipWithIndex.foreach { case (_, i) =>
-        opHandleSet.remove(i)
-      }
-
-      sessionState.set(false)
     }
 
   override def cancelOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = operationStore.getOrElse(operationHandle, null)
-      if (op == null) {
-        true
-      } else {
+      val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+      if (op != null) {
         op.setState(OperationState.CanceledState)
-        operationStore.remove(operationHandle)
-        true
+        removeOperation(operationHandle)
       }
     }
 
@@ -127,7 +105,18 @@ final class MemorySession(
 
   private def addOperation(operation: Operation) {
     this.synchronized {
-      operationStore.put(operation.opHandle, operation)
+      sessionManager.opHandleSet.append(operation.opHandle)
+      sessionManager.operationStore.put(operation.opHandle, operation)
+    }
+  }
+
+  private def removeOperation(operationHandle: OperationHandle) {
+    this.synchronized {
+      sessionManager.operationStore.remove(operationHandle)
+      val idx = sessionManager.opHandleSet.indexOf(operationHandle)
+      if (idx != -1) {
+        sessionManager.opHandleSet.remove(idx)
+      }
     }
   }
 }

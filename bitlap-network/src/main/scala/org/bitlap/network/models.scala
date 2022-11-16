@@ -129,7 +129,7 @@ object models {
   }
 
   object OperationStatus {
-    def fromBOperationStateResultResp(getOperationStatusResp: BGetOperationStatusResp): OperationStatus =
+    def fromBOperationStatusResp(getOperationStatusResp: BGetOperationStatusResp): OperationStatus =
       OperationStatus(
         getOperationStatusResp.hasResultSet,
         getOperationStatusResp.operationState.map(OperationState.toOperationState)

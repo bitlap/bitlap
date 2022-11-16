@@ -68,7 +68,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if (session != null) {
       new BitlapStatement(session, client)
     } else {
-      throw BitlapSQLException("Statement is closed")
+      throw BitlapSQLException("Can't create Statement, connection is closed");
     }
 
   override def isClosed(): Boolean = closed
@@ -89,15 +89,18 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def rollback(): Unit = ()
 
-  override def getMetaData: DatabaseMetaData = ???
+  override def getMetaData: DatabaseMetaData = {
+    if (closed) throw new SQLException("Connection is closed")
+    new BitlapDatabaseMetaData(this, session, client)
+  }
 
   override def setReadOnly(readOnly: Boolean): Unit = ???
 
-  override def isReadOnly: Boolean = ???
+  override def isReadOnly: Boolean = false
 
   override def setCatalog(catalog: String): Unit = ???
 
-  override def getCatalog: String = ???
+  override def getCatalog: String = ""
 
   override def setTransactionIsolation(level: Int): Unit = ???
 
@@ -158,7 +161,18 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def createSQLXML(): SQLXML = ???
 
-  override def isValid(timeout: Int): Boolean = ???
+  override def isValid(timeout: Int): Boolean = {
+    if (timeout < 0) throw new SQLException("timeout value was negative")
+    if (closed) return false
+    var rc = false
+    try {
+      new BitlapDatabaseMetaData(this, session, client).getDatabaseProductName
+      rc = true
+    } catch {
+      case _: SQLException =>
+    }
+    rc
+  }
 
   override def setClientInfo(name: String, value: String): Unit = ???
 
@@ -172,17 +186,31 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def createStruct(typeName: String, attributes: scala.Array[AnyRef]): Struct = ???
 
-  override def setSchema(schema: String): Unit = ???
+  override def setSchema(schema: String): Unit = {
+    // JDK 1.7
+    if (closed) throw new SQLException("Connection is closed")
+    if (schema == null || schema.isEmpty) throw new SQLException("Schema name is null or empty")
+    if (schema.contains(";")) throw new SQLException("invalid schema name")
+    var stmt: Statement = null
+    try {
+      stmt = createStatement()
+      stmt.execute("USE " + schema)
+    } finally if (stmt != null) stmt.close()
+  }
 
   override def getSchema: String = {
     if (closed) throw BitlapSQLException("Connection is closed")
-    val stmt = createStatement()
-    val res  = stmt.executeQuery("SHOW CURRENT_DATABASE")
-    if (!res.next) throw BitlapSQLException("Failed to get schema information")
-    val schemaName = res.getString(1)
-    res.close()
-    stmt.close()
-    schemaName
+    var res: ResultSet  = null
+    var stmt: Statement = null
+    try {
+      stmt = createStatement()
+      res = stmt.executeQuery("SHOW CURRENT_DATABASE")
+      if (res == null || !res.next) throw BitlapSQLException("Failed to get schema information")
+    } finally {
+      if (res != null) res.close()
+      if (stmt != null) stmt.close()
+    }
+    res.getString(1)
   }
 
   override def abort(executor: Executor): Unit = ???

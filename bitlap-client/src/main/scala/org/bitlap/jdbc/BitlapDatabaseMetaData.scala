@@ -269,7 +269,7 @@ class BitlapDatabaseMetaData(
     tableNamePattern: String,
     types: Array[String]
   ): ResultSet = {
-    val stmt = client.getTables(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"), tableNamePattern)
+    val stmt = client.getTables(session, Option(schemaPattern).getOrElse("%"), tableNamePattern)
     BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).setSessionHandle(session).build()
   }
 

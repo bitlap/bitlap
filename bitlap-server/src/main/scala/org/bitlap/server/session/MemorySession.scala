@@ -7,6 +7,7 @@ import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
 import java.util.concurrent.atomic.AtomicBoolean
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
@@ -24,6 +25,9 @@ final class MemorySession(
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
   val creationTime: Long = System.currentTimeMillis()
 ) extends Session {
+
+  private val operationStore: mutable.HashMap[OperationHandle, Operation] =
+    mutable.HashMap[OperationHandle, Operation]()
 
   override var lastAccessTime: Long = _
 
@@ -76,10 +80,10 @@ final class MemorySession(
     this.synchronized {
       val closedOps = new ListBuffer[OperationHandle]()
       for (opHandle <- opHandleSet) {
-        val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+        val op = operationStore.getOrElse(operationHandle, null)
         if (op != null) {
           op.setState(OperationState.ClosedState)
-          sessionManager.operationStore.remove(operationHandle)
+          operationStore.remove(operationHandle)
         }
         closedOps.append(opHandle)
       }
@@ -92,12 +96,12 @@ final class MemorySession(
 
   override def cancel(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+      val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {
         true
       } else {
         op.setState(OperationState.CanceledState)
-        sessionManager.operationStore.remove(operationHandle)
+        operationStore.remove(operationHandle)
         true
       }
     }
@@ -115,10 +119,15 @@ final class MemorySession(
       hasResultSet = true
     )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
+    addOperation(operation)
     operation.setStatement(statement)
     operation.run()
-    sessionManager.addOperation(operation)
-    operation.setState(OperationState.FinishedState)
     operation
+  }
+
+  private def addOperation(operation: Operation) {
+    this.synchronized {
+      operationStore.put(operation.opHandle, operation)
+    }
   }
 }

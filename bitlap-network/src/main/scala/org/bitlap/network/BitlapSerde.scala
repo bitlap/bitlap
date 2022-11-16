@@ -69,7 +69,7 @@ trait BitlapSerde {
         case i: Time                => d.writeLong(i.getTime)
         case i: Date                => d.writeLong(i.getTime)
         case i: String              => d.writeChars(i)
-        case i                      => throw DataFormatException(msg = s"Unsupported type:$i")
+        case i                      => throw DataFormatException(msg = s"Unsupported data:$i")
       }
       d.flush()
     }

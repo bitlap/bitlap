@@ -1,16 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.session
 
-import com.google.protobuf.ByteString
+import org.bitlap.core._
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network._
 import org.bitlap.network.models._
-import org.bitlap.tools.apply
+import org.bitlap.network.NetworkException.DataFormatException
 
 import java.sql._
 import scala.collection.mutable.ListBuffer
-import org.bitlap.core._
-import org.bitlap.network.NetworkException.DataFormatException
 
 /** bitlap 客户端操作
  *
@@ -18,7 +16,6 @@ import org.bitlap.network.NetworkException.DataFormatException
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-@apply
 final class MemoryOperation(
   parentSession: Session,
   opType: OperationType,
@@ -66,15 +63,22 @@ final class MemoryOperation(
 
   override def run(): Unit = {
     super.setState(OperationState.RunningState)
-    cache.put(
-      super.getOpHandle,
-      mapTo(
-        new QueryExecution(
-          super.getStatement,
-          new SessionId(parentSession.sessionHandle.handleId)
-        ).execute()
+    try {
+      cache.put(
+        super.getOpHandle,
+        mapTo(
+          new QueryExecution(
+            super.getStatement,
+            new SessionId(parentSession.sessionHandle.handleId)
+          ).execute()
+        )
       )
-    )
+      super.setState(OperationState.FinishedState)
+    } catch {
+      case e: Exception =>
+        super.setState(OperationState.ErrorState)
+        throw e
+    }
   }
 
 }

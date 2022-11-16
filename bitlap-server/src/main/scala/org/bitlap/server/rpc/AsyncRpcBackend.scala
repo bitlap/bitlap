@@ -55,7 +55,6 @@ class AsyncRpcBackend extends AsyncRpc {
   ): ZIO[Any, Throwable, OperationHandle] =
     ZIO.effect {
       val session = sessionManager.getSession(sessionHandle)
-      sessionManager.refreshSession(sessionHandle, session)
       session.executeStatement(
         sessionHandle,
         statement,
@@ -71,7 +70,6 @@ class AsyncRpcBackend extends AsyncRpc {
   ): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
     val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
     // 支持maxRows，指最多一次取多少数据，相当于分页。与jdbc的maxRows不同
     FetchResults(hasMoreRows = false, session.fetchResults(opHandle))
   }
@@ -79,7 +77,6 @@ class AsyncRpcBackend extends AsyncRpc {
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
     val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
     session.getResultSetMetadata(opHandle)
   }
 

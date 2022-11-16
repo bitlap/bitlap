@@ -99,33 +99,15 @@ final class SessionManager extends LazyLogging {
     )
   }
 
-  private def getOpenSessionCount(): Int =
-    sessionStore.size
-
-  def getSession(sessionHandle: SessionHandle): Session = {
+  def getSession(sessionHandle: SessionHandle): Session = this.synchronized {
     val session: Session = SessionManager.sessionAddLock.synchronized {
       sessionStore.get(sessionHandle)
     }
     if (session == null) {
       throw InternalException(s"Invalid SessionHandle: $sessionHandle")
     }
+    refreshSession(sessionHandle, session)
     session
-  }
-
-  def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
-    SessionManager.sessionAddLock.synchronized {
-      session.lastAccessTime = System.currentTimeMillis()
-      if (sessionStore.containsKey(sessionHandle)) {
-        sessionStore.put(sessionHandle, session)
-      } else {
-        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
-      }
-    }
-
-  def addOperation(operation: Operation) {
-    this.synchronized {
-      operationStore.put(operation.opHandle, operation)
-    }
   }
 
   def getOperation(operationHandle: OperationHandle): Operation =
@@ -134,11 +116,25 @@ final class SessionManager extends LazyLogging {
       if (op == null) {
         throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
       } else {
+        refreshSession(op.parentSession.sessionHandle, op.parentSession)
         op.getState match {
           case OperationState.FinishedState => op
           case _ =>
             throw BitlapSQLException(s"Invalid OperationState: ${op.getState}")
         }
+      }
+    }
+
+  private def getOpenSessionCount(): Int =
+    sessionStore.size
+
+  private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
+    SessionManager.sessionAddLock.synchronized {
+      session.lastAccessTime = System.currentTimeMillis()
+      if (sessionStore.containsKey(sessionHandle)) {
+        sessionStore.put(sessionHandle, session)
+      } else {
+        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
 }

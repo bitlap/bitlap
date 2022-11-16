@@ -5,7 +5,7 @@ import org.bitlap.network.models.TypeId
 
 import java.sql._
 
-/** bitlap 结果集的元数据实
+/** bitlap 结果集的元数据
  *  @author
  *    梦境迷离
  *  @since 2021/6/12

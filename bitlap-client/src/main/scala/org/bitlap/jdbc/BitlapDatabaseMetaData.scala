@@ -6,7 +6,7 @@ import org.bitlap.network.handles.SessionHandle
 
 import java.sql.{ Array => _, _ }
 
-/** bitlap 数据库元数据，暂未使用
+/** bitlap 数据库元数据
  *
  *  @author
  *    梦境迷离
@@ -268,7 +268,10 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet = ???
+  ): ResultSet = {
+    val stmt = client.getTables(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"), tableNamePattern)
+    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).setSessionHandle(session).build()
+  }
 
   override def getSchemas: ResultSet =
     getSchemas(null, null)

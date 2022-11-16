@@ -48,7 +48,7 @@ trait Session {
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema
 
-  def close(operationHandle: OperationHandle)
+  def closeOperation(operationHandle: OperationHandle)
 
-  def cancel(operationHandle: OperationHandle)
+  def cancelOperation(operationHandle: OperationHandle)
 }

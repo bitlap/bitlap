@@ -91,9 +91,16 @@ class AsyncRpcBackend extends AsyncRpc {
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] = {
     val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
-    Task.effect(session.cancel(opHandle))
+    Task.effect(session.cancelOperation(opHandle))
   }
 
-  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
-    Task.effect(OperationState.FinishedState)
+  override def closeOperation(opHandle: OperationHandle): Task[Unit] = {
+    val operation = sessionManager.getOperation(opHandle)
+    val session   = operation.parentSession
+    Task.effect(session.closeOperation(opHandle))
+  }
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
+    Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+
 }

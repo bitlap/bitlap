@@ -5,7 +5,8 @@ import com.google.protobuf.ByteString
 import enumeratum.values._
 import org.bitlap.network.driver.proto._
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
-
+import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusResp
+import org.bitlap.network.OperationState.toBOperationState
 import java.sql.Types
 
 /** bitlap 数据模型，和数据传输模型（proto）的变换
@@ -33,7 +34,7 @@ object models {
     hasMoreRows: Boolean,
     results: RowSet
   ) extends Model {
-    def toBFetchResults: BFetchResultsResp =
+    def toBFetchResultsResp: BFetchResultsResp =
       BFetchResultsResp(hasMoreRows, Some(results.toBRowSet))
   }
 
@@ -117,6 +118,22 @@ object models {
 
     def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)
 
+  }
+
+  final case class OperationStatus(
+    hasResultSet: Option[Boolean],
+    status: Option[OperationState]
+  ) extends Model {
+    def toBGetOperationStatusResp: BGetOperationStatusResp =
+      BGetOperationStatusResp(status.map(toBOperationState), hasResultSet)
+  }
+
+  object OperationStatus {
+    def fromBOperationStateResultResp(getOperationStatusResp: BGetOperationStatusResp): OperationStatus =
+      OperationStatus(
+        getOperationStatusResp.hasResultSet,
+        getOperationStatusResp.operationState.map(OperationState.toOperationState)
+      )
   }
 
 }

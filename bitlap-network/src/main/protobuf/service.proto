@@ -26,6 +26,8 @@ service DriverService {
 
   rpc CancelOperation (BCancelOperation.BCancelOperationReq) returns (BCancelOperation.BCancelOperationResp) {}
 
+  rpc CloseOperation (BCloseOperation.BCloseOperationReq) returns (BCloseOperation.BCloseOperationResp) {}
+
   rpc GetOperationStatus (BGetOperationStatus.BGetOperationStatusReq) returns (BGetOperationStatus.BGetOperationStatusResp) {}
 
 }

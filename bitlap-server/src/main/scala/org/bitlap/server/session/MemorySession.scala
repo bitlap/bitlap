@@ -76,7 +76,7 @@ final class MemorySession(
   ): TableSchema =
     sessionManager.getOperation(operationHandle).getResultSetSchema()
 
-  override def close(operationHandle: OperationHandle): Unit =
+  override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
       val closedOps = new ListBuffer[OperationHandle]()
       for (opHandle <- opHandleSet) {
@@ -94,7 +94,7 @@ final class MemorySession(
       sessionState.set(false)
     }
 
-  override def cancel(operationHandle: OperationHandle): Unit =
+  override def cancelOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
       val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {

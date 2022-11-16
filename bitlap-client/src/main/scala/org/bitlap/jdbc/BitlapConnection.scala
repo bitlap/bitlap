@@ -66,7 +66,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def createStatement(): Statement =
     if (session != null) {
-      new BitlapStatement(session, client)
+      new BitlapStatement(this, session, client)
     } else {
       throw BitlapSQLException("Can't create Statement, connection is closed");
     }

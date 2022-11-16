@@ -18,6 +18,7 @@ import org.bitlap.server._
 import org.bitlap.tools._
 import zio._
 import org.bitlap.network.OperationState.toBOperationState
+import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationResp
 
 import org.bitlap.network.driver.proto.BCancelOperation.{ BCancelOperationReq, BCancelOperationResp }
 import org.bitlap.network.driver.proto.BGetOperationStatus.{ BGetOperationStatusReq, BGetOperationStatusResp }
@@ -79,7 +80,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
         OperationMustOnLeaderException(),
         _.fetchResults(new OperationHandle(request.getOperationHandle), request.maxRows.toInt, request.fetchType)
       )
-      .mapBoth(errorApplyFunc, _.toBFetchResults)
+      .mapBoth(errorApplyFunc, _.toBFetchResultsResp)
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
     asyncRpcBackend
@@ -142,5 +143,14 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
         OperationMustOnLeaderException(),
         _.getOperationStatus(new OperationHandle(request.getOperationHandle))
       )
-      .mapBoth(errorApplyFunc, t => BGetOperationStatusResp(Option(t).map(toBOperationState)))
+      .mapBoth(errorApplyFunc, t => t.toBGetOperationStatusResp)
+
+  override def closeOperation(request: BCloseOperation.BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
+    asyncRpcBackend
+      .filter(
+        BitlapServerContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.closeOperation(new OperationHandle(request.getOperationHandle))
+      )
+      .mapBoth(errorApplyFunc, _ => BCloseOperationResp())
 }

@@ -64,8 +64,13 @@ class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends
       _.cancelOperation(opHandle)
     }
 
-  override def getOperationStatus(opHandle: OperationHandle): Identity[OperationState] =
+  override def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus] =
     delegateClient.sync {
       _.getOperationStatus(opHandle)
+    }
+
+  override def closeOperation(opHandle: OperationHandle): Identity[Unit] =
+    delegateClient.sync {
+      _.closeOperation(opHandle)
     }
 }

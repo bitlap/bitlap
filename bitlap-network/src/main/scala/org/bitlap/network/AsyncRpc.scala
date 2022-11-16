@@ -56,6 +56,8 @@ trait AsyncRpc extends Rpc[Task] { self =>
 
   def cancelOperation(opHandle: OperationHandle): Task[Unit]
 
-  def getOperationStatus(opHandle: OperationHandle): Task[OperationState]
+  def closeOperation(opHandle: OperationHandle): Task[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus]
 
 }

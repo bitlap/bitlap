@@ -5,9 +5,8 @@ import org.bitlap.common.utils.internal.DBTable
 
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-/** Desc: sql 查询的数据封装
- *
- *  Mail: k.chen@nio.com Created by IceMimosa Date: 2022/11/17
+/**
+ * Desc: sql 查询的数据封装
  */
 case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
 
@@ -24,7 +23,7 @@ object SqlData {
       return SqlData(columns)
     }
     val sqlRows = headRow.indices.map { i =>
-      val rs = rows.map(_.get(i))
+      val rs    = rows.map(_.get(i))
       val cells = rs.zipWithIndex.map { case (r, i) => columns(i).name -> r }.toMap
       SqlRow(cells)
     }

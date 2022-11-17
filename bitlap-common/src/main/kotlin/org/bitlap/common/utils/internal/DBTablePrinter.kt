@@ -9,7 +9,6 @@ import java.sql.Types
 /**
  * Desc: Java ResultSet Printer, refer to https://github.com/htorun/dbtableprinter
  *
- * Mail: k.chen@nio.com
  * Created by IceMimosa
  * Date: 2022/10/24
  */

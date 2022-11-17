@@ -8,8 +8,6 @@ import zio.ZIO
 
 import java.nio.charset.Charset
 
-/** Mail: k.chen@nio.com Created by IceMimosa Date: 2022/11/17
- */
 package object http {
 
   implicit class implicits(body: HttpData) {

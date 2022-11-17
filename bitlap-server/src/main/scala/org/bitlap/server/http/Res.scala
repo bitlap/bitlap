@@ -1,11 +1,8 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.http
 
 /**
  * Desc: response 对象
- * 
- * Mail: k.chen@nio.com
- * Created by IceMimosa
- * Date: 2022/11/17
  */
 case class Res(data: Any, success: Boolean, errorCode: Int = -1, errorMsg: String = "")
 

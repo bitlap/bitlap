@@ -53,8 +53,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
         val table = DBTablePrinter.from(rs)
         stmt.close()
         conn.close()
-        Response.json(
-          s"""
+        Response.json(s"""
              |{
              |  "success": true,
              |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}

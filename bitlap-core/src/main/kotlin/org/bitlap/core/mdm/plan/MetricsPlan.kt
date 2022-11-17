@@ -1,9 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.mdm.plan
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.format.DataType
@@ -18,7 +15,7 @@ class MetricsPlan(
     private val timeFilter: PruneTimeFilter,
     private val metrics: List<DataType>,
     private val metricType: Class<out DataType>,
-    private val dimension: Option<String>,
+    private val dimension: String?,
     private val pushedFilter: PrunePushedFilter,
 ) : AbsFetchPlan() {
 
@@ -29,16 +26,16 @@ class MetricsPlan(
         )
         return withFetcher(context) { fetcher ->
             when (dimension) {
-                is None ->
+                null ->
                     fetcher.fetchMetrics(
                         context.table,
                         timeFilter, metrics.map { it.name }, metricType
                     )
-                is Some ->
+                else ->
                     fetcher.fetchMetrics(
                         context.table,
                         timeFilter, metrics.map { it.name }, metricType,
-                        dimension.value, pushedFilter
+                        dimension, pushedFilter
                     )
             }
         }

@@ -1,7 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.table
 
-import arrow.core.toOption
 import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.Enumerable
 import org.apache.calcite.linq4j.Linq4j
@@ -37,8 +36,8 @@ class BitlapSqlQueryMetricTable(
         val projections = projects.map { rowType.fieldList[it].name!! }
         val metricNames = analyzer.getMetricColNames()
         val dimension = analyzer.getDimensionColNamesWithoutTime()
-            .firstOrNull().toOption() // only one or no dimension here
-        val dimensionFilter = this.pushedFilter.filter(dimension.orNull())
+            .firstOrNull() // only one or no dimension here
+        val dimensionFilter = this.pushedFilter.filter(dimension)
 
         val metricParts = metricNames
             .map { analyzer.materializeType(it) }

@@ -9,7 +9,6 @@ import java.sql.Types
 /**
  * Desc: Java ResultSet Printer, refer to https://github.com/htorun/dbtableprinter
  *
- * Mail: k.chen@nio.com
  * Created by IceMimosa
  * Date: 2022/10/24
  */
@@ -112,7 +111,7 @@ object DBTablePrinter {
                     // Use generic SQL type name instead of the actual value for column types BLOB, BINARY etc.
                     "(" + c.typeName + ")"
                 } else {
-                    if (rs.getString(i + 1) == null) "NULL" else rs.getString(i + 1)
+                    if (rs.getObject(i + 1) == null) "NULL" else rs.getObject(i + 1).toString()
                 }
                 when (c.typeCategory) {
                     CATEGORY_DOUBLE ->

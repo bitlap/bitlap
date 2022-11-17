@@ -39,7 +39,7 @@ class ServerSpec extends CsvUtil {
   // 执行FakeDataUtilSpec 生成新的mock数据
   // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
-  def query_test1() {
+  def query_test1(): Unit = {
     val rs = sql"""
        select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
        from $table

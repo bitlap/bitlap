@@ -56,7 +56,10 @@
     </modules>
 
     <properties>
+        <!-- common -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <frontend.project.name>bitlap-server-ui</frontend.project.name>
+        <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
@@ -65,7 +68,7 @@
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
         <kotest.version>5.5.2</kotest.version>
         <kotlin.logging.version>3.0.2</kotlin.logging.version>
-        <arrow.version>1.1.3</arrow.version>
+        <kotlin.logging.version>3.0.0</kotlin.logging.version>
         <slf4j.version>2.0.3</slf4j.version>
         <!--   jraft need 2.17.1     -->
         <log4j.version>2.17.1</log4j.version>
@@ -120,11 +123,6 @@
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
             <version>${kotlin.logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-fx-coroutines-jvm</artifactId>
-            <version>${arrow.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

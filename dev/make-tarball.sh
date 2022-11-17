@@ -8,7 +8,7 @@ find dist/ -name 'bitlap*.tar.gz' | xargs rm -f
 
 # make tar
 TAR_FILE="bitlap-server/target/bitlap*.tar.gz"
-cmd="./mvnw clean package -DskipTests -Passembly -am -pl bitlap-server"
+cmd="./mvnw clean package -DskipTests -Passembly -Pwebapp -am -pl bitlap-server"
 echo "========================================================================================================================================"
 echo "==================  🔥 package start: ${cmd}  ============================"
 echo "========================================================================================================================================"

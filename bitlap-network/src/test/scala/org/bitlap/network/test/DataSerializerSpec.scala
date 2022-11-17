@@ -167,15 +167,16 @@ class DataSerializerSpec extends BitlapSerde {
 
   @Test
   def testSerializeString(): Unit = {
-    val s                = serialize("10")
+    import java.nio.charset.Charset
+    val s                = serialize("test_database_811656")
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
-    dataOutputStream.writeChars("10")
+    dataOutputStream.write("test_database_811656".getBytes(Charset.forName("utf8")))
     dataOutputStream.flush()
 
     val d1 = deserialize[String](TypeId.StringType, buffer.toByteArray)
 
-    assert(s"${new String(s.toByteArray)}" == d1)
+    assert(s"${new String(s.toByteArray, Charset.forName("utf8"))}" == d1)
   }
 
   @Test

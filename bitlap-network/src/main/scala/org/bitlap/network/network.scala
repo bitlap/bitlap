@@ -34,7 +34,7 @@ package object network {
       case c if c.value() == Status.ABORTED.getCode.value() =>
         LeaderNotFoundException(st.getCode.toStatus.getDescription, Option(st.asException()))
       case c if c.value() == Status.INVALID_ARGUMENT.getCode.value() =>
-        new SQLExecutedException(st.getCode.toStatus.getDescription, st.asException())
+        new SQLExecutedException(Option(st.getCode.toStatus.getDescription).getOrElse(""), st.asException())
       case c if c.value() == Status.UNKNOWN.getCode.value() =>
         new Exception(st.getCode.toStatus.getDescription, st.asException())
     }

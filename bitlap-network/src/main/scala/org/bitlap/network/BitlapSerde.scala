@@ -12,6 +12,7 @@ import scala.reflect._
 import scala.util.Using
 import com.google.protobuf.ByteString
 import org.bitlap.network.BitlapDeserializer.parser
+import java.nio.charset.Charset
 
 /** @author
  *    梦境迷离
@@ -30,7 +31,8 @@ trait BitlapSerde {
     val targetType = TypeId.values.find(_.name.toLowerCase == typeName.toLowerCase).getOrElse(TypeId.Unspecified)
     try {
       val r = realType match {
-        case TypeId.StringType => new String(byteString.toByteArray) // 特殊
+        case TypeId.StringType =>
+          new String(byteString.toByteArray, Charset.forName("utf8"))
         case TypeId.Unspecified =>
           throw DataFormatException(msg = s"Incompatible type for realType:$realType, targetType:$targetType")
         case _ => parser(realType).parse[T](readOnlyByteBuffer, targetType, realType)
@@ -68,8 +70,10 @@ trait BitlapSerde {
         case i: Timestamp           => d.writeLong(i.getTime)
         case i: Time                => d.writeLong(i.getTime)
         case i: Date                => d.writeLong(i.getTime)
-        case i: String              => d.writeChars(i)
-        case i                      => throw DataFormatException(msg = s"Unsupported data:$i")
+        case i: String =>
+          val chs = i.getBytes(Charset.forName("utf8"))
+          d.write(chs)
+        case i => throw DataFormatException(msg = s"Unsupported data:$i")
       }
       d.flush()
     }

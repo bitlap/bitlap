@@ -9,8 +9,8 @@ import java.sql._
 
 class ServerSpec extends CsvUtil {
 
-  private val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
-  private val database = s"test_database_${FakeDataUtil.randEntityNumber}"
+  private lazy val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
+  private lazy val database = s"test_database_${FakeDataUtil.randEntityNumber}"
 
   implicit lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
@@ -53,6 +53,8 @@ class ServerSpec extends CsvUtil {
     sql"use $database"
 
     val showResult = ResultSetTransformer[GenericRow1[String]].toResults(sql"show current_database")
+    println(database)
+    println(showResult.map(_.col1))
     assert(showResult.nonEmpty && showResult.exists(_.col1 == database))
   }
 

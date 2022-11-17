@@ -38,7 +38,7 @@ object OperationState extends IntEnum[OperationState] {
       validate(state, newState)
   }
 
-  def validate(oldState: OperationState, newState: OperationState): Unit = {
+  def validate(oldState: OperationState, newState: OperationState): Unit =
     oldState match {
       case InitializedState =>
         newState match {
@@ -46,8 +46,8 @@ object OperationState extends IntEnum[OperationState] {
           case RunningState  =>
           case CanceledState =>
           case ClosedState   =>
-          case TimeoutState =>
-            return
+          case TimeoutState  => ()
+          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
         }
 
       case PendingState =>
@@ -57,8 +57,8 @@ object OperationState extends IntEnum[OperationState] {
           case CanceledState =>
           case ErrorState    =>
           case ClosedState   =>
-          case TimeoutState =>
-            return
+          case TimeoutState  => ()
+          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
         }
 
       case RunningState =>
@@ -67,19 +67,16 @@ object OperationState extends IntEnum[OperationState] {
           case CanceledState =>
           case ErrorState    =>
           case ClosedState   =>
-          case TimeoutState =>
-            return
+          case TimeoutState  => ()
+          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
         }
 
-      case FinishedState =>
-      case CanceledState =>
-      case TimeoutState  =>
-      case ErrorState =>
-        if (ClosedState == newState) return
+      case FinishedState                         =>
+      case CanceledState                         =>
+      case TimeoutState                          =>
+      case ErrorState if ClosedState == newState => ()
       case _ =>
-      // fall-through
+        throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
     }
-    throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
-  }
 
 }

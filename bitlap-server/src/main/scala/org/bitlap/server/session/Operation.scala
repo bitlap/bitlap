@@ -41,7 +41,7 @@ abstract class Operation(
 
   private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)
 
-  def run():Unit
+  def run(): Unit
 
   def remove(operationHandle: OperationHandle) {
     cache.remove(operationHandle)
@@ -57,8 +57,8 @@ abstract class Operation(
     state.validateTransition(operationState)
     val prevState = state
     this.lastAccessTime = System.currentTimeMillis
-    onNewState(state)
     state = operationState
+    onNewState(state)
     state
   }
 
@@ -70,6 +70,7 @@ abstract class Operation(
       case FinishedState =>
       case CanceledState =>
         markOperationCompletedTime()
+      case _ =>
     }
     if (state.terminal) { // Unlock the execution thread as operation is already terminated.
       opTerminateMonitorLatch.countDown()

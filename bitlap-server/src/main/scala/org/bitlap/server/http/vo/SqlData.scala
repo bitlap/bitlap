@@ -5,8 +5,7 @@ import org.bitlap.common.utils.internal.DBTable
 
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-/**
- * Desc: sql 查询的数据封装
+/** Desc: sql 查询的数据封装
  */
 case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
 

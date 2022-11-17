@@ -65,10 +65,10 @@ final class MemoryOperation(
     super.setState(OperationState.RunningState)
     try {
       cache.put(
-        super.getOpHandle,
+        opHandle,
         mapTo(
           new QueryExecution(
-            super.getStatement,
+            statement,
             new SessionId(parentSession.sessionHandle.handleId)
           ).execute()
         )

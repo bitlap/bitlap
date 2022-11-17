@@ -51,4 +51,8 @@ trait Session {
   def closeOperation(operationHandle: OperationHandle)
 
   def cancelOperation(operationHandle: OperationHandle)
+
+  def removeExpiredOperations(handles: List[OperationHandle]): List[Operation]
+
+  def getNoOperationTime: Long
 }

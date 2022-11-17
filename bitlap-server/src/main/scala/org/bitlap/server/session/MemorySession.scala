@@ -8,6 +8,7 @@ import org.bitlap.network.models._
 
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters._
+import scala.collection.mutable.ListBuffer
 
 /** bitlap 会话
  *  @author
@@ -79,10 +80,24 @@ final class MemorySession(
     this.synchronized {
       val op = sessionManager.operationStore.getOrElse(operationHandle, null)
       if (op != null) {
-        op.setState(OperationState.CanceledState)
-        removeOperation(operationHandle)
+        if (op.state.terminal) {
+          println(s"$operationHandle Operation is already aborted in state - ${op.state}")
+        } else {
+          println(s"$operationHandle Attempting to cancel from state - ${op.state}")
+          op.setState(OperationState.CanceledState)
+          removeOperation(operationHandle)
+        }
       }
     }
+
+  override def removeExpiredOperations(handles: List[OperationHandle]): List[Operation] = {
+    val removed = new ListBuffer[Operation]()
+    for (handle <- handles) {
+      val operation = removeTimedOutOperation(handle)
+      operation.foreach(f => removed.append(f))
+    }
+    removed.toList
+  }
 
   /** Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
    */
@@ -98,7 +113,7 @@ final class MemorySession(
     )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
     addOperation(operation)
-    operation.setStatement(statement)
+    operation.statement = statement
     operation.run()
     operation
   }
@@ -110,13 +125,27 @@ final class MemorySession(
     }
   }
 
-  private def removeOperation(operationHandle: OperationHandle) {
+  private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
     this.synchronized {
-      sessionManager.operationStore.remove(operationHandle)
+      val r   = sessionManager.operationStore.remove(operationHandle)
       val idx = sessionManager.opHandleSet.indexOf(operationHandle)
       if (idx != -1) {
         sessionManager.opHandleSet.remove(idx)
       }
+      r
     }
+
+  private def removeTimedOutOperation(operationHandle: OperationHandle): Option[Operation] = {
+    val operation = sessionManager.operationStore.get(operationHandle)
+    if (operation != null && operation.get.isTimedOut(System.currentTimeMillis)) {
+      return removeOperation(operationHandle)
+    }
+    operation
+  }
+
+  override def getNoOperationTime: Long = {
+    val noMoreOpHandle = sessionManager.opHandleSet.isEmpty
+    if (noMoreOpHandle) System.currentTimeMillis - lastAccessTime
+    else 0
   }
 }

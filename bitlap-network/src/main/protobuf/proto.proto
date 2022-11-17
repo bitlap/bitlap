@@ -165,6 +165,7 @@ enum BOperationState {
   B_CLOSED_STATE = 5;
   B_ERROR_STATE = 6;
   B_PENDING_STATE = 7;
+  B_TIMEOUT_STATE = 8;
 }
 
 message BCancelOperation{

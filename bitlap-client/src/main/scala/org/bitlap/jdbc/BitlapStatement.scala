@@ -3,10 +3,10 @@ package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles._
-import java.sql.SQLException
 import org.bitlap.network.OperationState._
-import java.sql._
 import org.bitlap.network.models._
+
+import java.sql._
 
 /** bitlap Statement
  *
@@ -208,17 +208,18 @@ class BitlapStatement(
     while (!isOperationComplete)
       try {
         if (Thread.currentThread.isInterrupted) throw BitlapSQLException("Interrupted wait for operation!")
-
         status = client.getOperationStatus(stmtHandle)
         status.status match {
           case Some(ClosedState | FinishedState) => isOperationComplete = true
           case Some(CanceledState) =>
             throw BitlapSQLException("Query was cancelled", "01000")
-          case Some(UnknownState) =>
+          case Some(TimeoutState) =>
+            throw new SQLTimeoutException(s"Query timed out after $queryTimeout seconds")
           case Some(ErrorState) =>
             throw BitlapSQLException("Query was failed", "HY000")
+          case Some(UnknownState) =>
+            throw BitlapSQLException("Unknown query", "HY000")
           case _ =>
-            throw BitlapSQLException("Query was failed", s"$status")
         }
       } catch {
         case e: SQLException => throw e

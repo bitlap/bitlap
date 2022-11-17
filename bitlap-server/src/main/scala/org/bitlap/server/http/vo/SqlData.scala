@@ -7,10 +7,10 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 /** Desc: sql 查询的数据封装
  */
-case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
+final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
 
-case class SqlColumn(name: String)
-case class SqlRow(cells: Map[String, String] = Map.empty)
+final case class SqlColumn(name: String)
+final case class SqlRow(cells: Map[String, String] = Map.empty)
 
 object SqlData {
   def fromDBTable(table: DBTable): SqlData = {

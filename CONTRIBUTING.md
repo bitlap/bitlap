@@ -28,8 +28,8 @@
 2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
 3. 找到类 `bitlap-server/src/main/scala/../.../BitlapServer.scala`，然后在IDEA中运行该main方法。（Java 9以上需要JVM参数：`--add-exports
    java.base/jdk.internal.ref=ALL-UNNAMED`）
-4. 浏览器中请求 `http://localhost:8080/init` ，以初始化数据。（使用的数据在`bitlap-server/src/main/resources/simple_data.csv`）
-5. 浏览器中请求：`http://localhost:8080/sql` ，该接口使用固定的SQL查数并返回。
+4. 浏览器中请求 `http://localhost:18081/init` ，以初始化数据。（使用的数据在`bitlap-server/src/main/resources/simple_data.csv`）
+5. 浏览器中请求：`http://localhost:18081/sql` ，该接口使用固定的SQL查数并返回。
 
 ## 修改默认数据
 - 目前仅能通过classpath导入csv，所以csv在server中，想修改csv得这样操作：

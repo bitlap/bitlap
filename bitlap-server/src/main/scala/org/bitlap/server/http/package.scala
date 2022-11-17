@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 
 package object http {
 
-  implicit class implicits(body: HttpData) {
+  implicit final class implicits(val body: HttpData) extends AnyVal {
     def toJson: ZIO[Any, Throwable, Json] =
       body.toByteBuf
         .map(buf => buf.toString(Charset.defaultCharset()))

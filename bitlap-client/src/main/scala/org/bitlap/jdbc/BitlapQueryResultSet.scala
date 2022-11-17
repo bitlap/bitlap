@@ -7,6 +7,7 @@ import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import scala.collection.mutable
 import java.sql._
+import org.bitlap.network.models.OperationStatus
 
 /** bitlap 查询的结果集
  *  @author
@@ -24,21 +25,22 @@ class BitlapQueryResultSet(
   override protected var columnNames: List[String] = List.empty
   override protected var columnTypes: List[String] = List.empty
 
-  private var emptyResultSet                = false
-  private var rowsFetched                   = 0
-  protected var closed: Boolean             = false
-  protected var fetchSize                   = 0
-  private var fetchFirst                    = false
-  private var fetchedRows: List[Row]        = List.empty
-  private var fetchedRowsItr: Iterator[Row] = fetchedRows.iterator
-  private var sessHandle: SessionHandle     = _
-  private var stmtHandle: OperationHandle   = _
+  private var emptyResultSet                   = false
+  private var rowsFetched                      = 0
+  protected var closed: Boolean                = false
+  protected var fetchSize                      = 0
+  private var fetchFirst                       = false
+  private var fetchedRows: List[Row]           = List.empty
+  private var fetchedRowsItr: Iterator[Row]    = fetchedRows.iterator
+  private var stmtHandle: OperationHandle      = _
+  private var operationStatus: OperationStatus = _
+  private var statement: Statement             = _
 
   def this(builder: Builder) = {
     this(builder.client, builder.maxRows)
     this.client = builder.client
+    this.statement = builder.statement
     this.stmtHandle = builder.stmtHandle
-    this.sessHandle = builder.sessHandle
     this.fetchSize = builder.fetchSize
     if (builder.retrieveSchema) {
       retrieveSchema()
@@ -83,8 +85,7 @@ class BitlapQueryResultSet(
         typesSb.append(columnTypeName)
       }
     } catch {
-      case e: SQLException => throw BitlapSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
-      case e: Exception    => throw e
+      case e: Exception => throw BitlapSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
     }
 
   override def next(): Boolean = {
@@ -94,6 +95,13 @@ class BitlapQueryResultSet(
     if (emptyResultSet || (1 to rowsFetched).contains(maxRows)) {
       return false
     }
+
+    statement match {
+      case st: BitlapStatement if operationStatus == null || !operationStatus.hasResultSet.getOrElse(false) =>
+        operationStatus = st.waitForOperationToComplete()
+      case _ =>
+    }
+
     try {
 
       if (fetchFirst) {
@@ -117,8 +125,7 @@ class BitlapQueryResultSet(
 
       rowsFetched = rowsFetched + 1
     } catch {
-      case e: SQLException => throw BitlapSQLException(msg = "Error retrieving next row", cause = e)
-      case e: Exception    => throw e
+      case e: Exception => throw BitlapSQLException(msg = "Error retrieving next row", cause = e)
     }
 
     true
@@ -148,11 +155,27 @@ class BitlapQueryResultSet(
     this.fetchSize = rows
   }
 
+  private def closeOperationHandle(stmtHandle: OperationHandle): Unit =
+    try
+      if (stmtHandle != null) {
+        client.closeOperation(stmtHandle)
+      }
+    catch {
+      case e: Exception =>
+        throw BitlapSQLException(e.toString, "08S01", cause = e)
+    }
   override def close(): Unit = {
-    this.client = null
-    this.stmtHandle = null
-    this.sessHandle = null
-    this.closed = true
+    if (this.statement != null && this.statement.isInstanceOf[BitlapStatement]) {
+      val s = this.statement.asInstanceOf[BitlapStatement]
+      s.closeOnResultSetCompletion
+    } else {
+      closeOperationHandle(stmtHandle)
+    }
+
+    client = null
+    stmtHandle = null
+    closed = true
+    operationStatus = null
   }
 
   override def beforeFirst(): Unit = {
@@ -174,12 +197,15 @@ class BitlapQueryResultSet(
 }
 
 object BitlapQueryResultSet {
-  def builder(): Builder = new Builder()
 
-  class Builder {
+  def builder(): Builder = new Builder(null.asInstanceOf[Statement])
+
+  def builder(statement: Statement): Builder = new Builder(statement)
+
+  class Builder(_statement: Statement) {
+    val statement: Statement        = _statement
     var client: BitlapClient        = _
     var stmtHandle: OperationHandle = _
-    var sessHandle: SessionHandle   = _
 
     /** Sets the limit for the maximum number of rows that any ResultSet object produced by this Statement can contain
      *  to the given number. If the limit is exceeded, the excess rows are silently dropped. The value must be >= 0, and
@@ -199,11 +225,6 @@ object BitlapQueryResultSet {
 
     def setStmtHandle(stmtHandle: OperationHandle): Builder = {
       this.stmtHandle = stmtHandle
-      this
-    }
-
-    def setSessionHandle(sessHandle: SessionHandle): Builder = {
-      this.sessHandle = sessHandle
       this
     }
 

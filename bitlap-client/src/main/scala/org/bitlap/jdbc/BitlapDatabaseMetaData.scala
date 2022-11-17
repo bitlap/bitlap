@@ -270,7 +270,7 @@ class BitlapDatabaseMetaData(
     types: Array[String]
   ): ResultSet = {
     val stmt = client.getTables(session, Option(schemaPattern).getOrElse("%"), tableNamePattern)
-    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).setSessionHandle(session).build()
+    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
   }
 
   override def getSchemas: ResultSet =
@@ -401,7 +401,7 @@ class BitlapDatabaseMetaData(
 
   override def getSchemas(catalog: String, schemaPattern: String): ResultSet = {
     val stmt = client.getDatabases(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"))
-    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).setSessionHandle(session).build()
+    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
   }
 
   override def supportsStoredFunctionsUsingCallSyntax(): Boolean = ???

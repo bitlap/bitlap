@@ -41,7 +41,7 @@ abstract class Operation(
 
   private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)
 
-  def run()
+  def run():Unit
 
   def remove(operationHandle: OperationHandle) {
     cache.remove(operationHandle)

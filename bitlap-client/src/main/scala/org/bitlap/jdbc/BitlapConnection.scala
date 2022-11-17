@@ -6,11 +6,14 @@ import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
 import org.bitlap.network.handles._
 import org.bitlap.tools.apply
 
-import java.sql._
-import java.util.Properties
-import java.util.concurrent.Executor
 import java._
+import java.io._
+import java.sql._
+import java.util.{ ArrayList => JArrayList, List => _, Properties }
+import java.util.concurrent.Executor
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+import scala.util.control.Breaks._
 
 /** bitlap Connection
  *
@@ -27,6 +30,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   private var closed                   = true
   private var warningChain: SQLWarning = _
   private var client: BitlapClient     = _
+  private var initFile: String         = _
+  private var maxRetries               = 1
 
   {
     if (!uri.startsWith(URI_PREFIX)) {
@@ -39,18 +44,116 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val serverPeers = hosts.map(f => f.split("/")(0))
     val db          = hosts.filter(_.contains("/")).map(_.split("/")(1)).headOption.getOrElse(Constants.DEFAULT_DB)
     info.put(Constants.DBNAME_PROPERTY_KEY, db)
-    try {
-      client = new BitlapClient(serverPeers, info.asScala.toMap)
-      session = client.openSession()
-      closed = false
-    } catch {
-      case e: Exception =>
-        e.printStackTrace()
-        throw BitlapSQLException(
-          s"Bitlap openSession failed, connect to serverPeers: ${serverPeers.mkString("Array(", ", ", ")")}",
-          cause = e
-        )
+
+    // TODO get args from url query parameters
+    if (info.containsKey("initFile")) {
+      initFile = info.getProperty("initFile")
     }
+
+    if (info.containsKey("retries")) {
+      maxRetries = info.getProperty("retries").toInt
+    }
+    var numRetries    = 0
+    val retryInterval = 1000L
+    breakable {
+      while (numRetries < maxRetries)
+        try {
+          client = new BitlapClient(serverPeers, info.asScala.toMap)
+          session = client.openSession()
+          executeInitSql()
+          closed = false
+          break
+        } catch {
+          case e: Exception =>
+            numRetries += 1
+            val errMsg: String = null
+            val warnMsg        = s"Could not open client transport with JDBC Uri: $uriWithoutPrefix: "
+            try close()
+            catch {
+              case _: Exception =>
+            }
+            if (numRetries >= maxRetries)
+              throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = e)
+            else {
+              System.err.println(
+                s"$warnMsg${e.getMessage} Retrying $numRetries of $maxRetries with retry interval $retryInterval ms"
+              )
+              try Thread.sleep(retryInterval)
+              catch {
+                case _: InterruptedException =>
+              }
+            }
+        }
+    }
+  }
+
+  private def executeInitSql(): Unit =
+    if (initFile != null) try {
+      val st = createStatement()
+      try {
+        val sqlList = parseInitFile(initFile)
+        for (sql <- sqlList) {
+          val hasResult = st.execute(sql)
+          if (hasResult) try {
+            val rs = st.getResultSet
+            try while (rs.next) println(rs.getString(1))
+            finally if (rs != null) rs.close()
+          }
+        }
+      } catch {
+        case e: Exception =>
+          throw BitlapSQLException(e.getMessage)
+      } finally if (st != null) st.close()
+    }
+
+  // TODO functional style
+  def parseInitFile(initFile: String): List[String] = {
+    val file                      = new File(initFile)
+    var br: BufferedReader        = null
+    var initSqlList: List[String] = Nil
+    try {
+      val input = new FileInputStream(file)
+      br = new BufferedReader(new InputStreamReader(input, "UTF-8"))
+      var line: String = null
+      val sb           = new mutable.StringBuilder("")
+      while ({
+        line = br.readLine
+        line != null
+      }) {
+        line = line.trim
+        if (line.nonEmpty) {
+          if (line.startsWith("#") || line.startsWith("--")) {
+            // todo: continue is not supported
+          } else {
+            line = line.concat(" ")
+            sb.append(line)
+          }
+        }
+      }
+      initSqlList = getInitSql(sb.toString)
+    } catch {
+      case e: IOException =>
+        throw new IOException(e)
+    } finally if (br != null) br.close()
+    initSqlList
+  }
+
+  // TODO functional style
+  private def getInitSql(sbLine: String): List[String] = {
+    val sqlArray    = sbLine.toCharArray
+    val initSqlList = new JArrayList[String]
+    var index       = 0
+    var beginIndex  = 0
+    while (index < sqlArray.length) {
+      if (sqlArray(index) == ';') {
+        val sql = sbLine.substring(beginIndex, index).trim
+        initSqlList.add(sql)
+        beginIndex = index + 1
+      }
+
+      index += 1
+    }
+    initSqlList.asScala.toList
   }
 
   override def unwrap[T](iface: Class[T]): T = ???

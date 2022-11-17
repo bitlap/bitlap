@@ -107,7 +107,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     }
 
   // TODO functional style
-  def parseInitFile(initFile: String): List[String] = {
+  private def parseInitFile(initFile: String): List[String] = {
     val file                      = new File(initFile)
     var br: BufferedReader        = null
     var initSqlList: List[String] = Nil

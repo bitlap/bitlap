@@ -5,7 +5,7 @@ import org.bitlap.network.models.TypeId
 
 import java.sql._
 
-/** bitlap 结果集的元数据实
+/** bitlap 结果集的元数据
  *  @author
  *    梦境迷离
  *  @since 2021/6/12
@@ -13,8 +13,7 @@ import java.sql._
  */
 class BitlapResultSetMetaData(
   private val columnNames: List[String],
-  private val columnTypes: List[String],
-  private val tableName: String = ""
+  private val columnTypes: List[String]
 ) extends ResultSetMetaData {
 
   override def getColumnCount(): Int = columnNames.size
@@ -36,11 +35,11 @@ class BitlapResultSetMetaData(
       case _                                          => 32
     }
 
-  override def getColumnLabel(column: Int): String = columnNames(column - 1)
+  override def getColumnLabel(column: Int): String = columnNames(toZeroIndex(column))
 
-  override def getColumnName(column: Int): String = columnNames(column - 1)
+  override def getColumnName(column: Int): String = columnNames(toZeroIndex(column))
 
-  override def getSchemaName(column: Int): String = ???
+  override def getSchemaName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getPrecision(column: Int): Int =
     if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a precision limit?
@@ -48,41 +47,46 @@ class BitlapResultSetMetaData(
   override def getScale(column: Int): Int =
     if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a scale limit?
 
-  override def getTableName(column: Int): String = tableName
+  override def getTableName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getCatalogName(column: Int): String = ???
+  override def getCatalogName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getColumnType(column: Int): Int = {
-    if (columnTypes.isEmpty) throw BitlapSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BitlapSQLException(s"Invalid column index: $column")
-    val typ        = columnTypes(column - 1)
+    val typ        = columnTypes(toZeroIndex(column))
     val bitlapType = TypeId.values.find(_.name == typ)
     if (bitlapType.isEmpty || !TypeId.bitlap2Jdbc.contains(bitlapType.getOrElse(TypeId.Unspecified)))
       throw BitlapSQLException("Could not determine column type name for ResultSet")
     TypeId.bitlap2Jdbc(TypeId.values.find(_.name == typ).getOrElse(TypeId.Unspecified))
   }
 
-  override def getColumnTypeName(column: Int): String = {
-    if (columnTypes.isEmpty) throw BitlapSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BitlapSQLException(s"Invalid column index: $column")
-    columnTypes(column - 1)
+  override def getColumnTypeName(column: Int): String = columnTypes(toZeroIndex(column))
+
+  override def isCaseSensitive(column: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isSearchable(column: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isSigned(column: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isReadOnly(column: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isWritable(column: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isDefinitelyWritable(column: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
+
+  override def getColumnClassName(column: Int): String = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
+
+  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
+
+  override def isWrapperFor(iface: Class[_]): Boolean =
+    throw new SQLFeatureNotSupportedException("Method not supported")
+
+  protected def toZeroIndex(column: Int): Int = {
+    if (columnTypes == null) throw BitlapSQLException("Could not determine column type name for ResultSet")
+    if (column < 1 || column > columnTypes.size) throw BitlapSQLException("Invalid column value: " + column)
+    column - 1
   }
-
-  override def isCaseSensitive(column: Int): Boolean = ???
-
-  override def isSearchable(column: Int): Boolean = ???
-
-  override def isSigned(column: Int): Boolean = ???
-
-  override def isReadOnly(column: Int): Boolean = ???
-
-  override def isWritable(column: Int): Boolean = ???
-
-  override def isDefinitelyWritable(column: Int): Boolean = ???
-
-  override def getColumnClassName(column: Int): String = ???
-
-  override def unwrap[T](iface: Class[T]): T = ???
-
-  override def isWrapperFor(iface: Class[_]): Boolean = ???
 }

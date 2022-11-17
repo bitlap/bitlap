@@ -165,6 +165,7 @@ enum BOperationState {
   B_CLOSED_STATE = 5;
   B_ERROR_STATE = 6;
   B_PENDING_STATE = 7;
+  B_TIMEOUT_STATE = 8;
 }
 
 message BCancelOperation{
@@ -176,6 +177,15 @@ message BCancelOperation{
   }
 }
 
+message BCloseOperation{
+  message BCloseOperationReq {
+    BOperationHandle operationHandle = 1;
+  }
+
+  message BCloseOperationResp {
+  }
+}
+
 message BGetOperationStatus {
   message BGetOperationStatusReq {
     BOperationHandle operationHandle = 1;
@@ -183,6 +193,7 @@ message BGetOperationStatus {
 
   message BGetOperationStatusResp {
     optional BOperationState operation_state = 1;
+    optional bool has_result_set = 2;
   }
 }
 

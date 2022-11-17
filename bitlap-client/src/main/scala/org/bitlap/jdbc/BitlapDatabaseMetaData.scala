@@ -6,7 +6,7 @@ import org.bitlap.network.handles.SessionHandle
 
 import java.sql.{ Array => _, _ }
 
-/** bitlap 数据库元数据，暂未使用
+/** bitlap 数据库元数据
  *
  *  @author
  *    梦境迷离
@@ -14,6 +14,7 @@ import java.sql.{ Array => _, _ }
  *  @version 1.0
  */
 class BitlapDatabaseMetaData(
+  private val connection: Connection,
   private val session: SessionHandle,
   private val client: BitlapClient
 ) extends DatabaseMetaData {
@@ -137,7 +138,7 @@ class BitlapDatabaseMetaData(
 
   override def supportsLimitedOuterJoins(): Boolean = ???
 
-  override def getSchemaTerm: String = ???
+  override def getSchemaTerm: String = "database"
 
   override def getProcedureTerm: String = ???
 
@@ -267,9 +268,13 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet = ???
+  ): ResultSet = {
+    val stmt = client.getTables(session, Option(schemaPattern).getOrElse("%"), tableNamePattern)
+    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
+  }
 
-  override def getSchemas: ResultSet = ???
+  override def getSchemas: ResultSet =
+    getSchemas(null, null)
 
   override def getCatalogs: ResultSet = ???
 
@@ -353,7 +358,7 @@ class BitlapDatabaseMetaData(
   override def getUDTs(catalog: String, schemaPattern: String, typeNamePattern: String, types: Array[Int]): ResultSet =
     ???
 
-  override def getConnection: Connection = ???
+  override def getConnection: Connection = this.connection
 
   override def supportsSavepoints(): Boolean = ???
 
@@ -386,7 +391,7 @@ class BitlapDatabaseMetaData(
 
   override def getJDBCMinorVersion: Int = ???
 
-  override def getSQLStateType: Int = ???
+  override def getSQLStateType: Int = DatabaseMetaData.sqlStateSQL99;
 
   override def locatorsUpdateCopy(): Boolean = ???
 
@@ -394,7 +399,10 @@ class BitlapDatabaseMetaData(
 
   override def getRowIdLifetime: RowIdLifetime = ???
 
-  override def getSchemas(catalog: String, schemaPattern: String): ResultSet = ???
+  override def getSchemas(catalog: String, schemaPattern: String): ResultSet = {
+    val stmt = client.getDatabases(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"))
+    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
+  }
 
   override def supportsStoredFunctionsUsingCallSyntax(): Boolean = ???
 

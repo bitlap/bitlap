@@ -43,6 +43,8 @@ trait Rpc[F[_]] { self =>
 
   def cancelOperation(opHandle: OperationHandle): F[Unit]
 
-  def getOperationStatus(opHandle: OperationHandle): F[OperationState]
+  def closeOperation(opHandle: OperationHandle): F[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): F[OperationStatus]
 
 }

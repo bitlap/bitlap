@@ -19,23 +19,34 @@ sealed abstract class NetworkException(
 
 object NetworkException {
 
+  final case class DataFormatException(
+    override val code: Int = -1,
+    override val msg: String,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException(msg = msg, cause = cause)
+
   final case class RpcException(
     override val code: Int = -1,
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
 
-  final case class SQLExecuteException(
+  final case class InternalException(
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
 
-  final case class ServerIntervalException(
+  final case class LeaderNotFoundException(
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
 
-  final case class LeaderServerNotFoundException(
+  final case class OperationMustOnLeaderException(
+    override val msg: String = "This operation is not allowed on non leader nodes",
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException(msg = msg, cause = cause)
+
+  final case class IllegalStateException(
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)

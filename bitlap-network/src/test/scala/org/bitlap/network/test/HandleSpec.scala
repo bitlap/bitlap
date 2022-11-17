@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
  *  @since 2021/11/21
  *  @version 1.0
  */
-class HandleTests extends TestCase("HandleTests") {
+class HandleSpec extends TestCase("HandleTests") {
 
   @Test
   def testOperationHandle = {

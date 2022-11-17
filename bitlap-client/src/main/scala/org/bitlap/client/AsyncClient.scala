@@ -20,6 +20,7 @@ import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
 import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
 import org.bitlap.network.models._
 import org.bitlap.jdbc.Constants
+import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationReq
 
 /** 异步RPC客户端，基于zio-grpc实现
  *
@@ -156,11 +157,19 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
         .provideLayer(l)
     )
 
-  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, t => OperationState.toOperationState(t.getOperationState))
+        .mapBoth(statusApplyFunc, t => OperationStatus.fromBOperationStatusResp(t))
+        .provideLayer(l)
+    )
+
+  override def closeOperation(opHandle: OperationHandle): Task[Unit] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
+        .mapBoth(statusApplyFunc, _ => ())
         .provideLayer(l)
     )
 }

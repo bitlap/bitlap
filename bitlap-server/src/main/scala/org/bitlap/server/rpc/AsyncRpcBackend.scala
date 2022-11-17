@@ -1,17 +1,15 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.rpc
 
+import org.bitlap.core._
+import org.bitlap.jdbc.Constants
+import org.bitlap.network._
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
-import org.bitlap.network._
+import org.bitlap.server.session.SessionManager
 import org.bitlap.tools._
 import zio._
-import org.bitlap.server.session.SessionManager
-import org.bitlap.core.utils.SqlParserUtil
-import org.bitlap.network.NetworkException.SQLExecuteException
-import org.bitlap.core.BitlapContext
-import org.bitlap.core.SessionId
-import org.bitlap.jdbc.Constants
+import org.bitlap.common.exception.SQLExecutedException
 
 /** 异步RPC的服务端实现，基于 zio 1.0
  *
@@ -22,7 +20,7 @@ import org.bitlap.jdbc.Constants
 @apply
 class AsyncRpcBackend extends AsyncRpc {
 
-  private val sessionManager = new SessionManager()
+  private val sessionManager = SessionManager()
   sessionManager.startListener()
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
@@ -55,39 +53,29 @@ class AsyncRpcBackend extends AsyncRpc {
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.effect(SqlParserUtil.validateQuery(statement)).flatMap { q =>
-      if (q) ZIO.effect {
-        val session = sessionManager.getSession(sessionHandle)
-        sessionManager.refreshSession(sessionHandle, session)
-        session.executeStatement(
-          sessionHandle,
-          statement,
-          confOverlay,
-          queryTimeout
-        )
-      }
-      else {
-        ZIO.fail(SQLExecuteException(s"Unsupported SQL: $statement"))
-      }
-
-    }
+    ZIO.effect {
+      val session = sessionManager.getSession(sessionHandle)
+      session.executeStatement(
+        statement,
+        confOverlay,
+        queryTimeout
+      )
+    }.mapError(f => new SQLExecutedException(s"Unsupported SQL: $statement", f.getCause))
 
   override def fetchResults(
     opHandle: OperationHandle,
     maxRows: Int,
     fetchType: Int
   ): ZIO[Any, Throwable, FetchResults] = ZIO.effect {
-    val operation = sessionManager.operationManager.getOperation(opHandle)
+    val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
     // 支持maxRows，指最多一次取多少数据，相当于分页。与jdbc的maxRows不同
     FetchResults(hasMoreRows = false, session.fetchResults(opHandle))
   }
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] = ZIO.effect {
-    val operation = sessionManager.operationManager.getOperation(opHandle)
+    val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
-    sessionManager.refreshSession(session.sessionHandle, session)
     session.getResultSetMetadata(opHandle)
   }
 
@@ -100,11 +88,18 @@ class AsyncRpcBackend extends AsyncRpc {
   ): ZIO[Any, Throwable, OperationHandle] = ???
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] = {
-    val operation = sessionManager.operationManager.getOperation(opHandle)
+    val operation = sessionManager.getOperation(opHandle)
     val session   = operation.parentSession
     Task.effect(session.cancelOperation(opHandle))
   }
 
-  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
-    Task.effect(OperationState.FinishedState)
+  override def closeOperation(opHandle: OperationHandle): Task[Unit] = {
+    val operation = sessionManager.getOperation(opHandle)
+    val session   = operation.parentSession
+    Task.effect(session.closeOperation(opHandle))
+  }
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
+    Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+
 }

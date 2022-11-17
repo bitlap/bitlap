@@ -7,3 +7,5 @@ package org.bitlap.common.exception
  * Date: 2020/12/15
  */
 open class BitlapException @JvmOverloads constructor(msg: String, cause: Throwable? = null) : RuntimeException(msg, cause)
+
+open class SQLExecutedException @JvmOverloads constructor(msg: String, cause: Throwable? = null) : BitlapException(msg, cause)

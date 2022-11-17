@@ -2,12 +2,19 @@
 package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.NetworkException.ServerIntervalException
-import org.bitlap.network.handles.SessionHandle
+import org.bitlap.jdbc.BitlapSQLException
+import org.bitlap.network.NetworkException.InternalException
+import org.bitlap.network.OperationState
+import org.bitlap.network.handles._
+import org.bitlap.server.session.SessionManager._
+import org.bitlap.tools.apply
 
 import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
+import java.util.Date
+import scala.collection._
+import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 /** bitlap 会话管理器
  *  @author
@@ -15,47 +22,53 @@ import scala.jdk.CollectionConverters.ConcurrentMapHasAsScala
  *  @since 2021/11/20
  *  @version 1.0
  */
-class SessionManager extends LazyLogging {
+@apply
+final class SessionManager extends LazyLogging {
 
-  val operationManager: OperationManager = new OperationManager()
-  val start                              = new AtomicBoolean(false)
+  private val start = new AtomicBoolean(false)
+
+  private[session] lazy val opHandleSet = ListBuffer[OperationHandle]()
+
+  private[session] lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
+    mutable.HashMap[OperationHandle, Operation]()
 
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
 
-  private lazy val sessionThread: Thread = new Thread { // register center
-    override def run(): Unit =
+  private def sleepFor(interval: Long): Unit =
+    timeoutCheckerLock.synchronized {
+      try timeoutCheckerLock.wait(interval)
+      catch {
+        case _: InterruptedException =>
+      }
+
+    }
+
+  // TODO get from Session config
+  private final val sessionTimeout = 1000 * 60 * 20
+  private final val interval       = 3000
+
+  private lazy val sessionThread: Thread = new Thread {
+    override def run(): Unit = {
+      sleepFor(interval)
       while (!Thread.currentThread().isInterrupted) {
         logger.info(s"[${sessionStore.size}] sessions exists")
-        try {
-          sessionStore.asScala.foreach { case (sessionHandle, session) =>
-            if (!session.sessionState.get()) {
-              sessionStore.remove(sessionHandle)
-              logger.info(
-                s"Session state is false, remove session [$sessionHandle]"
-              )
-            }
-
-            val now = System.currentTimeMillis()
-            if (session.lastAccessTime + 20 * 60 * 1000 < now) {
-              sessionStore.remove(sessionHandle)
-              logger.info(
-                s"Session has not been visited for 20 minutes, remove session [$sessionHandle]"
-              )
-            } else {
-              logger.info(s"SessionId [${sessionHandle.handleId}]")
-            }
-          }
-
-          TimeUnit.SECONDS.sleep(3)
-        } catch {
-          case e: Exception =>
-            logger.error(
-              s"Failed to listen for session, error: ${e.getLocalizedMessage}",
-              e
+        val current = System.currentTimeMillis
+        for (session <- sessionStore.values().asScala)
+          if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
+            val handle = session.sessionHandle
+            logger.warn(
+              s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
             )
-        }
+            try closeSession(handle)
+            catch {
+              case e: Exception =>
+                logger.warn("Exception is thrown closing session " + handle, e)
+            }
+          } else session.removeExpiredOperations(opHandleSet.toList)
+        sleepFor(interval)
       }
+    }
   }
 
   def startListener(): Unit =
@@ -63,9 +76,6 @@ class SessionManager extends LazyLogging {
       sessionThread.setDaemon(true)
       sessionThread.start()
     }
-
-  // service, provider, conf, discover
-  // session life cycle manage
 
   def openSession(
     username: String,
@@ -81,7 +91,6 @@ class SessionManager extends LazyLogging {
       )
       session.open()
       sessionStore.put(session.sessionHandle, session)
-      session.operationManager = operationManager
       logger.info(s"Create session [${session.sessionHandle}]")
       return session
     }
@@ -90,42 +99,63 @@ class SessionManager extends LazyLogging {
     SessionManager.sessionAddLock.synchronized {
       sessionStore.remove(sessionHandle)
     }
+    val closedOps = new ListBuffer[OperationHandle]()
+    for (opHandle <- opHandleSet) {
+      val op = operationStore.getOrElse(opHandle, null)
+      if (op != null) {
+        op.setState(OperationState.ClosedState)
+        operationStore.remove(opHandle)
+      }
+      closedOps.append(opHandle)
+    }
+    closedOps.zipWithIndex.foreach { case (_, i) =>
+      opHandleSet.remove(i)
+    }
     logger.info(
       s"Close session [$sessionHandle], [${getOpenSessionCount()}] sessions exists"
     )
-    if (getOpenSessionCount() == 0) {
-      //        log.warn(
-      //          "This instance of Bitlap has been removed from the list of server " +
-      //            "instances available for dynamic service discovery. " +
-      //            "The last client session has ended - will shutdown now."
-      //        )
-    }
   }
 
-  private def getOpenSessionCount(): Int =
-    sessionStore.size
-
-  def getSession(sessionHandle: SessionHandle): Session = {
+  def getSession(sessionHandle: SessionHandle): Session = this.synchronized {
     val session: Session = SessionManager.sessionAddLock.synchronized {
       sessionStore.get(sessionHandle)
     }
     if (session == null) {
-      throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
+      throw InternalException(s"Invalid SessionHandle: $sessionHandle")
     }
+    refreshSession(sessionHandle, session)
     session
   }
 
-  def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
+  def getOperation(operationHandle: OperationHandle): Operation =
+    this.synchronized {
+      val op = operationStore.getOrElse(operationHandle, null)
+      if (op == null) {
+        throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
+      } else {
+        refreshSession(op.parentSession.sessionHandle, op.parentSession)
+        op.state match {
+          case OperationState.FinishedState => op
+          case _ =>
+            throw BitlapSQLException(s"Invalid OperationState: ${op.state}")
+        }
+      }
+    }
+
+  private def getOpenSessionCount(): Int =
+    sessionStore.size
+
+  private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
     SessionManager.sessionAddLock.synchronized {
       session.lastAccessTime = System.currentTimeMillis()
       if (sessionStore.containsKey(sessionHandle)) {
         sessionStore.put(sessionHandle, session)
       } else {
-        throw ServerIntervalException(s"Invalid SessionHandle: $sessionHandle")
+        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
-
 }
 object SessionManager {
+  private val timeoutCheckerLock     = new Object
   private val sessionAddLock: Object = new Object
 }

@@ -22,7 +22,6 @@ trait Session {
   val sessionManager: SessionManager
 
   var lastAccessTime: Long
-  var operationManager: OperationManager
 
   def sessionConf: BitlapConf
 
@@ -33,13 +32,11 @@ trait Session {
   def open(): Unit
 
   def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
   ): OperationHandle
 
   def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String] = Map.empty,
     queryTimeout: Long
@@ -49,7 +46,11 @@ trait Session {
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema
 
-  def close(operationHandle: OperationHandle)
+  def closeOperation(operationHandle: OperationHandle)
 
   def cancelOperation(operationHandle: OperationHandle)
+
+  def removeExpiredOperations(handles: List[OperationHandle]): List[Operation]
+
+  def getNoOperationTime: Long
 }

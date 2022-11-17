@@ -1,16 +1,14 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.session
 
-import com.google.protobuf.ByteString
+import org.bitlap.core._
 import org.bitlap.core.sql.QueryExecution
-import org.bitlap.network.OperationType
+import org.bitlap.network._
 import org.bitlap.network.models._
-import org.bitlap.tools.apply
+import org.bitlap.network.NetworkException.DataFormatException
 
 import java.sql._
 import scala.collection.mutable.ListBuffer
-import org.bitlap.core._
-import org.bitlap.network.OperationState
 
 /** bitlap 客户端操作
  *
@@ -18,12 +16,12 @@ import org.bitlap.network.OperationState
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-@apply
-class MemoryOperation(
+final class MemoryOperation(
   parentSession: Session,
   opType: OperationType,
   hasResultSet: Boolean = false
-) extends Operation(parentSession, opType, hasResultSet) {
+) extends Operation(parentSession, opType, hasResultSet)
+    with BitlapSerde {
 
   def mapTo(rs: ResultSet): QueryResult = {
     // get schema
@@ -41,19 +39,18 @@ class MemoryOperation(
     while (rs.next()) {
       val cl = (1 to metaData.getColumnCount).map { it =>
         metaData.getColumnType(it) match {
-          // TODO 现在所有类型都使用ByteString传输，后续定义protobuf数据类型映射SQL类型？
-          case Types.VARCHAR                => ByteString.copyFromUtf8(rs.getString(it)) // FIXME 使用更合理的序列化方式
-          case Types.SMALLINT               => ByteString.copyFromUtf8(rs.getShort(it).toString)
-          case Types.TINYINT                => ByteString.copyFromUtf8(rs.getByte(it).toString)
-          case Types.INTEGER                => ByteString.copyFromUtf8(rs.getInt(it).toString)
-          case Types.BIGINT | Types.NUMERIC => ByteString.copyFromUtf8(rs.getLong(it).toString)
-          case Types.DOUBLE                 => ByteString.copyFromUtf8(rs.getDouble(it).toString)
-          case Types.BOOLEAN                => ByteString.copyFromUtf8(rs.getBoolean(it).toString)
-          case Types.TIMESTAMP              => ByteString.copyFromUtf8(rs.getLong(it).toString)
-          case Types.FLOAT                  => ByteString.copyFromUtf8(rs.getFloat(it).toString)
-          case Types.TIME                   => ByteString.copyFromUtf8(rs.getTime(it).getTime.toString)
-          case Types.DATE                   => ByteString.copyFromUtf8(rs.getDate(it).getTime.toString)
-          case _                            => ByteString.empty()
+          case Types.VARCHAR                => serialize(rs.getString(it))
+          case Types.SMALLINT               => serialize(rs.getShort(it))
+          case Types.TINYINT                => serialize(rs.getByte(it))
+          case Types.INTEGER                => serialize(rs.getInt(it))
+          case Types.BIGINT | Types.NUMERIC => serialize(rs.getLong(it))
+          case Types.DOUBLE                 => serialize(rs.getDouble(it))
+          case Types.BOOLEAN                => serialize(rs.getBoolean(it))
+          case Types.TIMESTAMP              => serialize(rs.getLong(it))
+          case Types.FLOAT                  => serialize(rs.getFloat(it))
+          case Types.TIME                   => serialize(rs.getTime(it).getTime)
+          case Types.DATE                   => serialize(rs.getDate(it).getTime)
+          case tp                           => throw DataFormatException(msg = s"Unsupported type:$tp")
         }
       }
       rows.append(Row(cl.toList))
@@ -66,15 +63,22 @@ class MemoryOperation(
 
   override def run(): Unit = {
     super.setState(OperationState.RunningState)
-    cache.put(
-      super.getOpHandle,
-      mapTo(
-        new QueryExecution(
-          super.getStatement,
-          new SessionId(parentSession.sessionHandle.handleId)
-        ).execute()
+    try {
+      cache.put(
+        opHandle,
+        mapTo(
+          new QueryExecution(
+            statement,
+            new SessionId(parentSession.sessionHandle.handleId)
+          ).execute()
+        )
       )
-    )
+      super.setState(OperationState.FinishedState)
+    } catch {
+      case e: Exception =>
+        super.setState(OperationState.ErrorState)
+        throw e
+    }
   }
 
 }

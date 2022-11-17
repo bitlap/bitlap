@@ -60,16 +60,4 @@ object SqlParserUtil {
             .operatorTable(SqlOperatorTables.chain(listSqlOperatorTable, SqlStdOperatorTable.instance())).build()
         return config
     }
-
-    @JvmStatic
-    fun validateQuery(statement: String): Boolean {
-        val parser = SqlParser.create(statement, parserConfig)
-        try {
-            parser.parseQuery()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-        return true
-    }
 }

@@ -5,9 +5,13 @@ import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models._
 import org.bitlap.network.OperationType
+import java.util.concurrent.TimeUnit
 
 import scala.collection.mutable
 import org.bitlap.network.OperationState
+import org.bitlap.network.OperationState._
+import java.util.concurrent.CountDownLatch
+import org.bitlap.common.BitlapConf
 
 /** bitlap 操作
  *  @author
@@ -21,28 +25,23 @@ abstract class Operation(
   val hasResultSet: Boolean = false
 ) extends LazyLogging {
 
-  @volatile
-  private var state: OperationState = OperationState.InitializedState
+  @volatile var state: OperationState = OperationState.InitializedState
+  val beginTime                       = System.currentTimeMillis()
+  @volatile var lastAccessTime        = beginTime
+  var operationTimeout                = parentSession.sessionConf.get(BitlapConf.NODE_RPC_TIMEOUT)
+  var statement: String               = _
 
-  private var statement: String = _
+  lazy val opHandle: OperationHandle                = new OperationHandle(opType, hasResultSet)
+  lazy val confOverlay: mutable.Map[String, String] = mutable.HashMap[String, String]()
 
-  // super不能用于字段
-  def getStatement: String = statement
-
-  def setStatement(statement: String): Unit =
-    this.statement = statement
-
-  def getOpHandle: OperationHandle = opHandle
-
-  lazy val opHandle: OperationHandle =
-    new OperationHandle(opType, hasResultSet)
-  lazy val confOverlay: mutable.Map[String, String] =
-    mutable.HashMap[String, String]()
-
+  protected var operationStart    = 0L
+  protected var operationComplete = 0L
   protected lazy val cache: mutable.HashMap[OperationHandle, QueryResult] =
     mutable.HashMap()
 
-  def run()
+  private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)
+
+  def run(): Unit
 
   def remove(operationHandle: OperationHandle) {
     cache.remove(operationHandle)
@@ -54,8 +53,53 @@ abstract class Operation(
   def getResultSetSchema(): TableSchema =
     cache.get(opHandle).map(_.tableSchema).getOrElse(TableSchema())
 
-  def setState(operationState: OperationState): Unit =
+  def setState(operationState: OperationState): OperationState = {
+    state.validateTransition(operationState)
+    val prevState = state
+    this.lastAccessTime = System.currentTimeMillis
     state = operationState
+    onNewState(state)
+    state
+  }
 
-  def getState = state
+  protected def onNewState(state: OperationState): Unit = {
+    state match {
+      case RunningState =>
+        markOperationStartTime()
+      case ErrorState    =>
+      case FinishedState =>
+      case CanceledState =>
+        markOperationCompletedTime()
+      case _ =>
+    }
+    if (state.terminal) { // Unlock the execution thread as operation is already terminated.
+      opTerminateMonitorLatch.countDown()
+    }
+  }
+
+  protected def markOperationStartTime(): Unit =
+    operationStart = System.currentTimeMillis
+
+  protected def markOperationCompletedTime(): Unit =
+    operationComplete = System.currentTimeMillis
+
+  /** Wait until the operation terminates and returns false if timeout.
+   *
+   *  @param timeOutMs
+   *    \- timeout in milli-seconds
+   *  @return
+   *    true if operation is terminated or false if timed-out
+   *  @throws InterruptedException
+   */
+  @throws[InterruptedException]
+  def waitToTerminate(timeOutMs: Long): Boolean = opTerminateMonitorLatch.await(timeOutMs, TimeUnit.MILLISECONDS)
+
+  def isTimedOut(current: Long): Boolean = {
+    if (operationTimeout == 0) return false
+    if (operationTimeout > 0) { // check only when it's in terminal state
+      return state.terminal && lastAccessTime + operationTimeout <= current
+    }
+    lastAccessTime + -operationTimeout <= current
+  }
+
 }

@@ -85,6 +85,8 @@ class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] = Task.unit
 
-  override def getOperationStatus(opHandle: OperationHandle): Task[OperationState] =
-    Task.succeed(OperationState.FinishedState)
+  override def closeOperation(opHandle: OperationHandle): Task[Unit] = Task.unit
+
+  override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
+    Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
 }

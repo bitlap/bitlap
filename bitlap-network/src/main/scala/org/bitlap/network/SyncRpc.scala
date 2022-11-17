@@ -43,5 +43,5 @@ trait SyncRpc extends Rpc[Identity] { self =>
 
   def cancelOperation(opHandle: OperationHandle): Identity[Unit]
 
-  def getOperationStatus(opHandle: OperationHandle): Identity[OperationState]
+  def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus]
 }

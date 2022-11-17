@@ -41,12 +41,14 @@ class SqlLoadData(
         }
         // only support overwrite = true
         BitlapWriter(table, BitlapContext.hadoopConf).use {
-            if (path.startsWith("hdfs:", true)) {
+            if (path.startsWith("classpath:", true)) {
+                it.writeCsv(path)
+            }
+            // hadoop file system should support protocal
+            else {
                 val p = Path(path)
                 val fs = p.getFileSystem(BitlapContext.hadoopConf)
                 it.writeCsv(fs.open(p))
-            } else {
-                it.writeCsv(path)
             }
         }
         return listOf(arrayOf(true))

@@ -36,7 +36,7 @@ object ServerProvider {
    *  @return
    */
   def serverProviders(http: Boolean): List[ServerProvider] =
-    (if (http) List(new HttpServerProvider(8081)) else List()) ++ List(
+    (if (http) List(new HttpServerProvider(18081)) else List()) ++ List(
       new GrpcServerProvider(23333),
       new RaftServerProvider(RaftServerConfig.raftServerConfig)
     )

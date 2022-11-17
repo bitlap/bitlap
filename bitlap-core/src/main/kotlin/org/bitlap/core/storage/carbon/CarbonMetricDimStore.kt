@@ -1,7 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.storage.carbon
 
-import arrow.core.tail
 import org.apache.carbondata.core.metadata.datatype.DataTypes
 import org.apache.carbondata.core.metadata.datatype.Field
 import org.apache.carbondata.core.scan.expression.ColumnExpression
@@ -202,7 +201,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
             return TrueExpression(null)
         }
         var expr = this.convertToExpression(conditions.first())
-        conditions.tail().forEach {
+        conditions.drop(1).forEach {
             expr = AndExpression(
                 expr,
                 this.convertToExpression(it)

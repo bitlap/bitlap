@@ -35,7 +35,6 @@ final class MemorySession(
   }
 
   override def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
   ): OperationHandle =
@@ -46,12 +45,11 @@ final class MemorySession(
     ).opHandle
 
   override def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String],
     queryTimeout: Long
   ): OperationHandle =
-    executeStatement(sessionHandle, statement, confOverlay)
+    executeStatement(statement, confOverlay)
 
   override def fetchResults(
     operationHandle: OperationHandle

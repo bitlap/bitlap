@@ -32,13 +32,11 @@ trait Session {
   def open(): Unit
 
   def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String]
   ): OperationHandle
 
   def executeStatement(
-    sessionHandle: SessionHandle,
     statement: String,
     confOverlay: Map[String, String] = Map.empty,
     queryTimeout: Long

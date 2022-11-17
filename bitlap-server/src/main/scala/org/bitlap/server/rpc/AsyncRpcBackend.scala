@@ -56,7 +56,6 @@ class AsyncRpcBackend extends AsyncRpc {
     ZIO.effect {
       val session = sessionManager.getSession(sessionHandle)
       session.executeStatement(
-        sessionHandle,
         statement,
         confOverlay,
         queryTimeout

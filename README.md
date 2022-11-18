@@ -11,6 +11,10 @@
 
 ![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
 
+## 如何使用
+
+![bitlap sql](./bitlap_sql.png)
+
 ## 如何贡献
 
 [CONTRIBUTING](./CONTRIBUTING.md)

@@ -47,7 +47,7 @@ class BitlapResultSetMetaData(
   override def getScale(column: Int): Int =
     if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a scale limit?
 
-  override def getTableName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getTableName(column: Int): String = ""
 
   override def getCatalogName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 

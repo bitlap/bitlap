@@ -93,6 +93,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       try {
         val sqlList = parseInitFile(initFile)
         for (sql <- sqlList) {
+          println(s"Executing InitSql ... $sql")
           val hasResult = st.execute(sql)
           if (hasResult) try {
             val rs = st.getResultSet

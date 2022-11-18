@@ -61,10 +61,10 @@
         <frontend.project.name>bitlap-server-ui</frontend.project.name>
         <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <dokka.version>1.6.21</dokka.version>
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.6.21</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
         <kotest.version>5.5.2</kotest.version>
         <kotlin.logging.version>3.0.2</kotlin.logging.version>

@@ -23,8 +23,9 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
 
   private val listeners                          = new CopyOnWriteArrayList[LeaderStateListener]
   private var raftGroupService: RaftGroupService = _
-  private var node: Node                         = _
-  private var fsm: ElectionOnlyStateMachine      = _
+
+  var node: Node                    = _
+  var fsm: ElectionOnlyStateMachine = _
 
   private var started = false
 
@@ -80,15 +81,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     LOG.info("[ElectionNode] shutdown successfully: {}.", this)
   }
 
-  def getNode: Node = node
-
-  def getFsm: ElectionOnlyStateMachine = fsm
-
-  def isStarted: Boolean = started
-
-  def isLeader: Boolean = this.fsm.isLeader
-
-  def addLeaderStateListener(listener: LeaderStateListener): Unit =
+  def addLeaderStateListener(listener: => LeaderStateListener): Unit =
     this.listeners.add(listener)
 
 }

@@ -29,7 +29,7 @@
 1. 安装IDEA插件（可选） [IDEA Plugin Scala-Macro-Tools](https://github.com/bitlap/scala-macro-tools)
 2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
 3. `mvn package -Pwebapp`
-4. 运行 `org.bitlap.server.BitlapServer`，Java9以上需要参数 `--add-exports java.base/jdk.internal.ref=ALL-UNNAMED`
+4. 运行 `org.bitlap.server.BitlapServer` 在Java8+以上中需要添加虚拟机参数，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`
 5. 浏览器中访问首页 `http://localhost:18081`，会基于`bitlap-server/src/main/resources/simple_data.csv` 创建一个 `bitlap_test_table`
    1. 每次访问首页都会重新初始化数据！
 6. 以 `bitlap_test_table` 开始查询：
@@ -43,4 +43,4 @@ select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
 ## 打包
 
 1. 打包脚本：`dev/make-tarball.sh` （以Java11为准）
-2. 在Java11上使用 `/bin/bitlap` 运行bitlap，需要添加虚拟机参数：`--add-exports xx`、`--add-opens xx`，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`（在Java8上请删掉`JDK11`这个参数 ）。
+2. 运行：`/bin/bitlap server start`，默认Java11。（在Java8上请去掉`bin/bitlap-env.sh`中的`# JDK11="......"`这个参数）

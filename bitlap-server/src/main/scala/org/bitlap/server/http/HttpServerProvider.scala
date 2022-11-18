@@ -17,6 +17,7 @@ import java.sql.ResultSet
 
 import java.sql.DriverManager
 import scala.util.Try
+import java.sql.Connection
 
 /** bitlap http服务
  *
@@ -26,8 +27,6 @@ import scala.util.Try
  *  @param port
  */
 final class HttpServerProvider(val port: Int) extends ServerProvider {
-
-  import java.sql.Connection
 
   Class.forName(classOf[org.bitlap.Driver].getName)
 
@@ -47,28 +46,27 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
         try {
           stmt.execute(sql)
           rs = stmt.getResultSet
+
+          val table = DBTablePrinter.from(rs)
+          Response.json(s"""
+                           |{
+                           |  "success": true,
+                           |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}
+                           |}
+                           |""".stripMargin)
+
         } catch {
-          case e: Exception => e.printStackTrace()
+          case e: Exception =>
+            e.printStackTrace()
+            Response.json(s"""
+                             |{
+                             |  "success": true,
+                             |  "data": ${SqlData().asJson.noSpaces}
+                             |}
+                             |""".stripMargin)
         } finally {
           stmt.close()
           conn.close()
-        }
-
-        if (rs == null) {
-          Response.json(s"""
-               |{
-               |  "success": true,
-               |  "data": ${SqlData()}
-
-               |""".stripMargin)
-        } else {
-          val table = DBTablePrinter.from(rs)
-          Response.json(s"""
-               |{
-               |  "success": true,
-               |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}
-
-               |""".stripMargin)
         }
       }
     case Method.GET -> !! / "api" / "common" / "status" => ZIO.effect(Response.json(s"""{"status":"ok"}"""))

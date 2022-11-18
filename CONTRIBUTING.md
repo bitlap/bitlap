@@ -19,7 +19,7 @@
 - `bitlap-spark3`    与spark3集成。技术栈：spark3、scala
 - `bitlap-common`    公共模块。技术栈：kotlin
 - `bitlap-testkit`   测试工具和集成测试模块。技术栈：scala、javafaker
-- `bitlap-server-ui` 可视化SQL执行页面的UI。
+- `bitlap-server-ui` 可视化SQL执行页面的UI
 
 
 ## 快速开始

@@ -63,7 +63,7 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
-        <dokka.version>1.6.21</dokka.version>
+        <dokka.version>1.7.20</dokka.version>
         <kotlin.version>1.6.21</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
         <kotest.version>5.5.2</kotest.version>

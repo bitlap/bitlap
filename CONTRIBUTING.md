@@ -34,10 +34,10 @@
 6. 以 `bitlap_test_table` 开始查询：
 
 ```sql
-select _ time, sum (vv) as vv, sum (pv) as pv, count (distinct pv) as uv
+select _time, sum (vv) as vv, sum (pv) as pv, count (distinct pv) as uv
 from bitlap_test_table
-where _ time >= 0
-group by _ time
+where _time >= 0
+group by _time
 ```
 
 > 在IDEA中直接运行main方法时，使用的是`src/main/resources`中的配置，打包后运行时，使用的是`conf/`中的配置。

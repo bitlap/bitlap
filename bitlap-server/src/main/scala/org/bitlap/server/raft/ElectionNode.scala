@@ -1,5 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft
+
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory

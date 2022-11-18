@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.network
 
-import enumeratum.{ Enum, EnumEntry }
+import enumeratum._
 
 /** @author
  *    梦境迷离

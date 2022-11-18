@@ -3,7 +3,6 @@ package org.bitlap
 
 import org.apache.spark.sql._
 import zio._
-import org.bitlap.Driver
 
 /** @since 2022/10/14
  *  @author

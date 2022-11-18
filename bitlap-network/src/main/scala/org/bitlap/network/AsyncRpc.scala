@@ -26,7 +26,7 @@ trait AsyncRpc extends Rpc[Task] { self =>
   ): T =
     runtime.unsafeRun(action(this).asInstanceOf[ZIO[Any, E, T]])
 
-  def filter[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =
+  def when[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =
     if (predicate) {
       fa(this)
     } else { ZIO.fail(exception) }

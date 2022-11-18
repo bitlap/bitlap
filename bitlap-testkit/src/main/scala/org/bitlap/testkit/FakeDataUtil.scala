@@ -2,9 +2,8 @@
 package org.bitlap.testkit
 import com.github.javafaker.Faker
 
-import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.util.Random
+import java.util.{ List => _, _ }
 import java.text.SimpleDateFormat
 
 /** bitlap 假数据创建工具

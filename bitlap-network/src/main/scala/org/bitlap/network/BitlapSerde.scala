@@ -2,7 +2,7 @@
 package org.bitlap.network
 
 import org.bitlap.network.models.TypeId
-import org.bitlap.network.NetworkException.DataFormatException
+import org.bitlap.network.NetworkException._
 
 import java.io._
 import java.nio.ByteBuffer

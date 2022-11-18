@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap
 
-import java.sql.{ Connection, ResultSet }
+import java.sql._
 
 /** @since 2022/11/6
  *  @author

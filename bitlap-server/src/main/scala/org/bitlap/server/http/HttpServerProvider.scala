@@ -32,7 +32,8 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
 
   val properties = new Properties()
   properties.put("retries", "3")
-  properties.put("initFile", "bitlap-server/src/main/resources/initFileForTest.sql")
+  // 按需修改
+  properties.put("initFile", "conf/initFileForTest.sql")
 
   private var conn: Connection = null
 

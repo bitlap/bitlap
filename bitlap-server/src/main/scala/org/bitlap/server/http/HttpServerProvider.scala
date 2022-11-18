@@ -12,6 +12,8 @@ import zhttp.service._
 import zhttp.service.server.ServerChannelFactory
 import zio._
 import zio.console.putStrLn
+import java.util.Properties
+import java.sql.ResultSet
 
 import java.sql.DriverManager
 import scala.util.Try
@@ -25,42 +27,50 @@ import scala.util.Try
  */
 final class HttpServerProvider(val port: Int) extends ServerProvider {
 
-  private val table = "table_test"
+  import java.sql.Connection
 
   Class.forName(classOf[org.bitlap.Driver].getName)
 
-  // 测试数据
-  private def initTable(): Unit = {
-    val conn = getConn
-    val stmt = conn.createStatement()
-    stmt.execute(s"create table if not exists $table")
-    stmt.execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
-    stmt.close()
-    conn.close()
-  }
+  val properties = new Properties()
+  properties.put("retries", "3")
+  properties.put("initFile", "bitlap-server/src/main/resources/initFileForTest.sql")
 
-  private def getConn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+  private var conn: Connection = null
 
   // TODO: 全局的异常处理 和 全局的响应包装对象
   private val app = Http.collectZIO[Request] {
     case req @ Method.POST -> !! / "api" / "sql" / "run" =>
       req.data.toJson.map { body =>
-        val sql  = body.hcursor.get[String]("sql").getOrElse("")
-        val conn = getConn
-        val stmt = conn.createStatement()
-        stmt.execute(sql)
-        val rs    = stmt.getResultSet
-        val table = DBTablePrinter.from(rs)
-        stmt.close()
-        conn.close()
-        Response.json(s"""
-             |{
-             |  "success": true,
-             |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}
-             |}
-             |""".stripMargin)
+        val sql           = body.hcursor.get[String]("sql").getOrElse("")
+        val stmt          = conn.createStatement()
+        var rs: ResultSet = null
+        try {
+          stmt.execute(sql)
+          rs = stmt.getResultSet
+        } catch {
+          case e: Exception => e.printStackTrace()
+        } finally {
+          stmt.close()
+          conn.close()
+        }
+
+        if (rs == null) {
+          Response.json(s"""
+               |{
+               |  "success": true,
+               |  "data": ${SqlData()}
+
+               |""".stripMargin)
+        } else {
+          val table = DBTablePrinter.from(rs)
+          Response.json(s"""
+               |{
+               |  "success": true,
+               |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}
+
+               |""".stripMargin)
+        }
       }
-    case Method.GET -> !! / "api" / "sql" / "init"      => ZIO.effect(initTable()).as(Response.json("true"))
     case Method.GET -> !! / "api" / "common" / "status" => ZIO.effect(Response.json(s"""{"status":"ok"}"""))
   }
 
@@ -71,7 +81,9 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
           && req.path.startsWith(!! / "pages") =>
       indexHtml
     case Method.GET -> !! / path => Http.fromResource(s"static/$path")
-    case _                       => indexHtml
+    case _ =>
+      conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
+      indexHtml
   }
 
   private val server = Server.port(port) ++ Server.paranoidLeakDetection ++ Server.app(app ++ staticApp)

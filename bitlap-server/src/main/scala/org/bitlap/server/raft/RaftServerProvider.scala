@@ -35,10 +35,7 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
     val node = new ElectionNode
     node.addLeaderStateListener(new LeaderStateListener() {
       override def onLeaderStart(leaderTerm: Long): Unit = {
-        val serverId = node.getNode.getLeaderId
-        val ip       = serverId.getIp
-        val port     = serverId.getPort
-        LOG.info(s"[ElectionBootstrap] Leader's ip is: $ip, port: $port")
+        LOG.info(s"[ElectionBootstrap] Leader's address is: $serverIdStr")
         LOG.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
       }
 
@@ -50,9 +47,9 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
 
     node.init(electionOpts)
 
-    while (node.getNode == null)
+    while (node.node == null)
       Thread.sleep(1000)
-    node.getNode
+    node.node
   }
 
   override def serverType: ServerType = ServerType.Raft

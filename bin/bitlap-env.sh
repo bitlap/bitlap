@@ -10,7 +10,7 @@ export BITLAP_OPTS="-Djava.net.preferIPv4Stack=true $BITLAP_OPTS"
 
 # Command specific options appended to BITLAP_OPTS when specified
 JDK11="--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED"
-export BITLAP_SERVER_OPTS="-Xmx1024m $BITLAP_SERVER_OPTS $BITLAP_OPTS JDK11"
+export BITLAP_SERVER_OPTS="-Xmx1024m $BITLAP_SERVER_OPTS $BITLAP_OPTS $JDK11"
 
 # The following applies to multiple commands (sql, ...)
 export BITLAP_CLIENT_OPTS="-Xmx512m $BITLAP_CLIENT_OPTS $BITLAP_OPTS"

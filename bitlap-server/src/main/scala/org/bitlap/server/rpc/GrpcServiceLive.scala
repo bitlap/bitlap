@@ -2,27 +2,25 @@
 package org.bitlap.server.rpc
 
 import io.grpc._
-import org.bitlap.network.NetworkException._
 import org.bitlap.network._
-import org.bitlap.network.driver.proto.BCloseSession.{ BCloseSessionReq, BCloseSessionResp }
-import org.bitlap.network.driver.proto.BExecuteStatement.{ BExecuteStatementReq, BExecuteStatementResp }
-import org.bitlap.network.driver.proto.BFetchResults.{ BFetchResultsReq, BFetchResultsResp }
-import org.bitlap.network.driver.proto.BGetDatabases.BGetDatabasesResp
-import org.bitlap.network.driver.proto.BGetResultSetMetadata.{ BGetResultSetMetadataReq, BGetResultSetMetadataResp }
-import org.bitlap.network.driver.proto.BGetTables.{ BGetTablesReq, BGetTablesResp }
-import org.bitlap.network.driver.proto.BOpenSession.{ BOpenSessionReq, BOpenSessionResp }
+import org.bitlap.network.NetworkException._
 import org.bitlap.network.driver.proto._
+import org.bitlap.network.driver.proto.BCancelOperation._
+import org.bitlap.network.driver.proto.BCloseOperation._
+import org.bitlap.network.driver.proto.BCloseSession._
+import org.bitlap.network.driver.proto.BExecuteStatement._
+import org.bitlap.network.driver.proto.BFetchResults._
+import org.bitlap.network.driver.proto.BGetDatabases._
+import org.bitlap.network.driver.proto.BGetOperationStatus._
+import org.bitlap.network.driver.proto.BGetRaftMetadata._
+import org.bitlap.network.driver.proto.BGetResultSetMetadata._
+import org.bitlap.network.driver.proto.BGetTables._
+import org.bitlap.network.driver.proto.BOpenSession._
 import org.bitlap.network.driver.service.ZioService._
 import org.bitlap.network.handles._
 import org.bitlap.server._
 import org.bitlap.tools._
 import zio._
-import org.bitlap.network.OperationState.toBOperationState
-import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationResp
-
-import org.bitlap.network.driver.proto.BCancelOperation.{ BCancelOperationReq, BCancelOperationResp }
-import org.bitlap.network.driver.proto.BGetOperationStatus.{ BGetOperationStatusReq, BGetOperationStatusResp }
-import org.bitlap.network.driver.proto.BGetRaftMetadata.{ BGetLeaderReq, BGetLeaderResp }
 
 /** RPC的服务端API实现，基于 zio-grpc,zio 1.0
  *
@@ -36,7 +34,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.openSession(request.username, request.password, request.configuration)
@@ -52,7 +50,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.closeSession(new SessionHandle(request.getSessionHandle))
@@ -61,7 +59,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.executeStatement(
@@ -75,7 +73,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.fetchResults(new OperationHandle(request.getOperationHandle), request.maxRows.toInt, request.fetchType)
@@ -84,7 +82,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
@@ -95,7 +93,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
     request: BGetDatabases.BGetDatabasesReq
   ): ZIO[Any, Status, BGetDatabases.BGetDatabasesResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
@@ -104,7 +102,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
@@ -129,7 +127,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
     request: BCancelOperationReq
   ): ZIO[Any, Status, BCancelOperationResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.cancelOperation(new OperationHandle(request.getOperationHandle))
@@ -138,7 +136,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def getOperationStatus(request: BGetOperationStatusReq): ZIO[Any, Status, BGetOperationStatusResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.getOperationStatus(new OperationHandle(request.getOperationHandle))
@@ -147,7 +145,7 @@ final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriv
 
   override def closeOperation(request: BCloseOperation.BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
     asyncRpcBackend
-      .filter(
+      .when(
         BitlapServerContext.isLeader,
         OperationMustOnLeaderException(),
         _.closeOperation(new OperationHandle(request.getOperationHandle))

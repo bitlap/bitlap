@@ -4,8 +4,8 @@ package org.bitlap.network
 import com.google.protobuf.ByteString
 import enumeratum.values._
 import org.bitlap.network.driver.proto._
-import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsResp
-import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusResp
+import org.bitlap.network.driver.proto.BFetchResults._
+import org.bitlap.network.driver.proto.BGetOperationStatus._
 import org.bitlap.network.OperationState.toBOperationState
 import java.sql.Types
 
@@ -129,7 +129,7 @@ object models {
   }
 
   object OperationStatus {
-    def fromBOperationStatusResp(getOperationStatusResp: BGetOperationStatusResp): OperationStatus =
+    def fromBGetOperationStatusResp(getOperationStatusResp: BGetOperationStatusResp): OperationStatus =
       OperationStatus(
         getOperationStatusResp.hasResultSet,
         getOperationStatusResp.operationState.map(OperationState.toOperationState)

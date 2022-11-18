@@ -161,7 +161,7 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, t => OperationStatus.fromBOperationStatusResp(t))
+        .mapBoth(statusApplyFunc, t => OperationStatus.fromBGetOperationStatusResp(t))
         .provideLayer(l)
     )
 

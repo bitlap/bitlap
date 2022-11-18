@@ -1,5 +1,6 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.server.raft.rpc
+
 import com.alipay.sofa.jraft.rpc.RpcRequestProcessor
 
 import java.util.concurrent.Executor

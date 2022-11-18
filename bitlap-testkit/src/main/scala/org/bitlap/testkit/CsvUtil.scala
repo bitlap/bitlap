@@ -2,8 +2,7 @@
 package org.bitlap.testkit
 
 import org.bitlap.csv._
-import java.io.File
-import java.io.InputStream
+import java.io._
 
 /** csv 读写工具
  *  @author

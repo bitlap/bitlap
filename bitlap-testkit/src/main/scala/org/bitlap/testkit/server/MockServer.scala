@@ -1,7 +1,7 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.testkit.server
 
-import scalapb.zio_grpc.{ ServerMain, ServiceList }
+import scalapb.zio_grpc._
 import zio.console.putStrLn
 import zio.ZIO
 

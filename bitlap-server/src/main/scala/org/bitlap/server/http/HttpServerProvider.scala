@@ -33,7 +33,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
   val properties = new Properties()
   properties.put("retries", "3")
   // 按需修改
-  properties.put("initFile", "conf/initFileForTest.sql")
+  properties.put("initFile", "initFileForTest.sql")
 
   private var conn: Connection = null
 

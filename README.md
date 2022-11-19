@@ -15,6 +15,10 @@
 
 ![bitlap sql](./bitlap_sql.png)
 
+### 在线测试
+
+`http://im.dreamylost.cn:18081`
+
 ## 如何贡献
 
 [CONTRIBUTING](./CONTRIBUTING.md)

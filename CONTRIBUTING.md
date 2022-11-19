@@ -21,7 +21,6 @@
 - `bitlap-testkit`   测试工具和集成测试模块。技术栈：scala、javafaker
 - `bitlap-server-ui` 可视化SQL执行页面的UI
 
-
 ## 快速开始
 
 > windows上无法运行
@@ -31,14 +30,17 @@
 3. `mvn package -Pwebapp`
 4. 运行 `org.bitlap.server.BitlapServer` 在Java8+以上中需要添加虚拟机参数，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`
 5. 浏览器中访问首页 `http://localhost:18081`，会基于`bitlap-server/src/main/resources/simple_data.csv` 创建一个 `bitlap_test_table`
-   1. 每次访问首页都会重新初始化数据！
+   （每次访问首页都会重新初始化数据！）
 6. 以 `bitlap_test_table` 开始查询：
+
 ```sql
-select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
-       from bitlap_test_table
-       where _time >= 0
-       group by _time
+select _time, sum (vv) as vv, sum (pv) as pv, count (distinct pv) as uv
+from bitlap_test_table
+where _time >= 0
+group by _time
 ```
+
+> 在IDEA中直接运行main方法时，使用的是`src/main/resources`中的配置，打包后运行时，使用的是`conf/`中的配置。
 
 ## 打包
 

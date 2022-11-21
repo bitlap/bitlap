@@ -16,6 +16,7 @@ import javax.annotation.Nullable
 import org.bitlap.network.AsyncRpc
 import zio._
 import org.bitlap.network.NetworkException.InternalException
+import org.bitlap.client._
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
  *  @author
@@ -23,6 +24,8 @@ import org.bitlap.network.NetworkException.InternalException
  *  @version 1.0,2022/10/31
  */
 object BitlapServerContext {
+
+  lazy val globalConf = new BitlapConf()
 
   private val initNode = new AtomicBoolean(false)
   private val initRpc  = new AtomicBoolean(false)
@@ -107,9 +110,7 @@ object BitlapServerContext {
   }
 
   private def grpcServerPort: Int = {
-    lazy val conf = new BitlapConf()
-    val address   = conf.get(BitlapConf.NODE_BIND_HOST).trim
-    val ipPorts   = if (address.contains(":")) address.split(":").toList.map(_.trim) else List(address, "23333")
-    ipPorts(1).toIntOption.getOrElse(23333)
+    val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim
+    address.extractServerAddress.port
   }
 }

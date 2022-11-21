@@ -35,9 +35,9 @@ trait BitlapInterpreter {
     command = bitlap
   ) {
     case sql: Command.Sql =>
-      putStrLn(s"Executing `bitlap sql` with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
+      putStrLn(s"Executing 'bitlap sql' with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
     case Command.Server(operate) =>
-      putStrLn(s"Executing `bitlap server` with args: $operate")
+      putStrLn(s"Executing 'bitlap server' with operate: $operate")
   }
 
   private def handleSqlCli(sql: Sql): Int = {
@@ -95,9 +95,8 @@ object BitlapInterpreter {
 
   object CliCommands {
 
-    // sql -s localhost -u 123 -p 123 show tables
     val sql: ZioCliCommand[Sql] =
-      ZioCliCommand("sql", serverOpt ++ userOpt ++ passwordOpt, Args.text.*)
+      ZioCliCommand("sql", hostOpt ++ userOpt ++ passwordOpt, Args.text.*)
         .withHelp(sqlHelp)
         .map { input =>
           Command.Sql(input._1._1, input._1._2, input._1._3, input._2)
@@ -113,26 +112,24 @@ object BitlapInterpreter {
 
   object CliOptions {
 
-    val serverHelp: HelpDoc = HelpDoc.p("Server commands, such as: start, stop, restart, status.")
-    val sqlHelp: HelpDoc    = HelpDoc.p("A bitlap subcommand for sql.")
+    val serverHelp: HelpDoc = HelpDoc.p("bitlap server commands, such as: start, stop, restart.")
+    val sqlHelp: HelpDoc    = HelpDoc.p("bitlap sql command.")
     val help: HelpDoc       = HelpDoc.p("bitlap cli command.")
 
-    val serverOpt: Options[String] = Options
+    val hostOpt: Options[String] = Options
       .text("server")
-      .withDefault("127.0.0.1:23333", "Server Addresses, separated by comma.")
+      .withDefault("127.0.0.1:23333", "server address, separated by comma.")
       .alias("s")
 
     val userOpt: Options[String] = Options
       .text("user")
-      .withDefault("", "User name.")
+      .withDefault("", "user name.")
       .alias("u")
 
     val passwordOpt: Options[String] = Options
       .text("password")
-      .withDefault("", "User password.")
+      .withDefault("", "user password.")
       .alias("p")
-
-    val operationOpt: Options[String] = Options.text("operate")
   }
 
 }

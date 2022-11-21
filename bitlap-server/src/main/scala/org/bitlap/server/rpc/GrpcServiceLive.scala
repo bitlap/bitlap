@@ -32,7 +32,7 @@ import zio._
 final class GrpcServiceLive(private val asyncRpcBackend: AsyncRpc) extends ZDriverService[Any, Any] {
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
-  def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
+  override def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
     asyncRpcBackend
       .when(
         BitlapServerContext.isLeader,

@@ -172,5 +172,11 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
 
         @JvmField
         val RAFT_TIMEOUT = BitlapConfKey<String>("bitlap.node.raft.timeout", "10s").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val HTTP_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.http.host", "127.0.0.1:18081").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val SESSION_TIMEOUT = BitlapConfKey<String>("bitlap.node.session.timeout", "20m").validator(Validators.NOT_BLANK)
     }
 }

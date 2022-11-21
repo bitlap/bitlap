@@ -13,18 +13,18 @@ import org.bitlap.network.models._
  */
 class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
-  private lazy val rpcClient: SyncClient = new SyncClient(serverPeers, props)
+  private lazy val syncClient: SyncClient = new SyncClient(serverPeers, props)
 
   def openSession(
     username: String = "",
     password: String = "",
     config: Map[String, String] = Map.empty
   ): SessionHandle =
-    rpcClient
+    syncClient
       .openSession(username, password, config)
 
   def closeSession(sessionHandle: SessionHandle): Unit =
-    rpcClient.closeSession(sessionHandle)
+    syncClient.closeSession(sessionHandle)
 
   def executeStatement(
     sessionHandle: SessionHandle,
@@ -32,7 +32,7 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
     queryTimeout: Long,
     config: Map[String, String] = Map.empty
   ): OperationHandle =
-    rpcClient
+    syncClient
       .executeStatement(
         statement = statement,
         sessionHandle = sessionHandle,
@@ -41,29 +41,29 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
       )
 
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): RowSet =
-    rpcClient.fetchResults(operationHandle, maxRows, fetchType).results
+    syncClient.fetchResults(operationHandle, maxRows, fetchType).results
 
   def getTables(
     sessionHandle: SessionHandle,
     database: String,
     pattern: String
-  ): OperationHandle = rpcClient
+  ): OperationHandle = syncClient
     .getTables(sessionHandle, database, pattern)
 
   def getDatabases(
     sessionHandle: SessionHandle,
     pattern: String
-  ): OperationHandle = rpcClient.getDatabases(sessionHandle, pattern)
+  ): OperationHandle = syncClient.getDatabases(sessionHandle, pattern)
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
-    rpcClient.getResultSetMetadata(operationHandle)
+    syncClient.getResultSetMetadata(operationHandle)
 
   def cancelOperation(opHandle: OperationHandle): Unit =
-    rpcClient.cancelOperation(opHandle)
+    syncClient.cancelOperation(opHandle)
 
   def closeOperation(opHandle: OperationHandle): Unit =
-    rpcClient.closeOperation(opHandle)
+    syncClient.closeOperation(opHandle)
 
   def getOperationStatus(opHandle: OperationHandle): OperationStatus =
-    rpcClient.getOperationStatus(opHandle)
+    syncClient.getOperationStatus(opHandle)
 }

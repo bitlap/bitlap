@@ -5,22 +5,21 @@ import io.grpc._
 import org.bitlap.common.utils.UuidUtil
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network._
+import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
+import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationReq
 import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
 import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
 import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
 import org.bitlap.network.driver.proto.BGetDatabases.BGetDatabasesReq
+import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
 import org.bitlap.network.driver.proto.BGetRaftMetadata
 import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
 import org.bitlap.network.driver.proto.BGetTables.BGetTablesReq
 import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
 import org.bitlap.network.driver.service.ZioService.DriverServiceClient
 import org.bitlap.network.handles._
-import zio._
-import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
-import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
 import org.bitlap.network.models._
-import org.bitlap.jdbc.Constants
-import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationReq
+import zio._
 
 /** 异步RPC客户端，基于zio-grpc实现
  *
@@ -31,18 +30,8 @@ import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationReq
  */
 class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc {
 
-  // refactor
-  private lazy val serverAddresses =
-    serverPeers
-      .filter(_.nonEmpty)
-      .map { s =>
-        val as = if (s.contains(":")) s.split(":").toList else List(s, Constants.DEFAULT_PORT)
-        ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
-      }
-      .toList
-
-  private lazy val leaderAddress = ZIO
-    .foreach(serverAddresses) { address =>
+  private lazy val leaderClientLayer = ZIO
+    .foreach(serverAddresses(serverPeers)) { address =>
       getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
     }
     .map(f =>
@@ -50,9 +39,11 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
         value
       }
     )
-    .map(l => if (l.isDefined) l.get else throw BitlapSQLException("cannot find a leader"))
-
-  private lazy val leaderClientLayer = leaderAddress.map(f => clientLayer(f.ip, f.port))
+    .map(l =>
+      if (l.isDefined) l.get
+      else throw BitlapSQLException(s"cannot find a leader by hosts: ${serverPeers.mkString(",")}")
+    )
+    .map(f => clientLayer(f.ip, f.port))
 
   private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
     scalapb.zio_grpc.ZManagedChannel(builder =

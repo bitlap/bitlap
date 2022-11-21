@@ -16,6 +16,11 @@ import scala.collection._
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
+import org.bitlap.common.BitlapConf
+import org.bitlap.server.BitlapServerContext
+
+import scala.concurrent.duration.Duration
+
 /** bitlap 会话管理器
  *  @author
  *    梦境迷离
@@ -44,8 +49,7 @@ final class SessionManager extends LazyLogging {
 
     }
 
-  // TODO get from Session config
-  private final val sessionTimeout = 1000 * 60 * 20
+  private final val sessionTimeout = Duration(BitlapServerContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
   private final val interval       = 3000
 
   private lazy val sessionThread: Thread = new Thread {

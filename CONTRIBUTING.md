@@ -29,10 +29,9 @@
 2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
 3. `mvn package -Pwebapp`
 4. 运行 `org.bitlap.server.BitlapServer` 在Java8+以上中需要添加虚拟机参数，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`
-5. 浏览器中访问首页 `http://localhost:18081`，会基于`bitlap-server/src/main/resources/simple_data.csv` 创建一个 `bitlap_test_table`
-   （每次访问首页都会重新初始化数据！）
+5. 浏览器中访问首页 `http://localhost:18081`，首次访问时会基于 `bitlap-server/src/main/resources/simple_data.csv` 创建一个 `bitlap_test_table`
 6. 以 `bitlap_test_table` 开始查询：
-
+7. 数据说明：7天，1000用户（可能重复）每人至多有10条记录，每个记录至多2个维度（city和os）。
 ```sql
 select _time, sum (vv) as vv, sum (pv) as pv, count (distinct pv) as uv
 from bitlap_test_table

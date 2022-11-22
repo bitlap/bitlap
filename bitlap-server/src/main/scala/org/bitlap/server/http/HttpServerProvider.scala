@@ -86,6 +86,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
         properties.remove("initFile")
       }
       conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
+      first = false
       indexHtml
   }
 

@@ -51,7 +51,7 @@ object FakeDataUtil {
 
   def randBigNumber: Long = faker.number().numberBetween(0, 1000000000)
 
-  def randEntityNumber: Int = faker.number().numberBetween(0, 2000000)
+  def randEntityNumber: Int = faker.number().numberBetween(0, 1000000)
 
   def randCity: String = faker.address().city()
 
@@ -69,14 +69,17 @@ object FakeDataUtil {
   }
 
   def randMetrics(size: Long): List[Metric] =
-    (0L until size).map { _ =>
-      Metric(
-        randTimestamp,
-        randEntityNumber,
-        randDimensions,
-        randMetricName,
-        randBigNumber
-      )
+    (0L until size).flatMap { _ =>
+      val uid = randEntityNumber
+      (0 until faker.number().numberBetween(0, 10)).map { _ =>
+        Metric(
+          randTimestamp,
+          uid,
+          randDimensions,
+          randMetricName,
+          randBigNumber
+        )
+      }
 
     }.toList
 

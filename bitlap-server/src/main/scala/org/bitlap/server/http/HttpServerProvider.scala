@@ -36,6 +36,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
   properties.put("initFile", "initFileForTest.sql")
 
   private var conn: Connection = null
+  private var first            = true
 
   // TODO: 全局的异常处理 和 全局的响应包装对象
   private val app = Http.collectZIO[Request] {
@@ -81,7 +82,10 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
       indexHtml
     case Method.GET -> !! / path => Http.fromResource(s"static/$path")
     case _ =>
-      conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
+      if (first) {
+        conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
+        first = false
+      }
       indexHtml
   }
 

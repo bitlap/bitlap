@@ -64,7 +64,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
                 )
             )
         )
-        .sortBy(arrayOf("mk", "dk", "d", "t"))
+        // .sortBy(arrayOf("mk", "dk", "d", "t"))
         .withBlockletSize(16)
         .withPageSizeInMb(2)
         .writtenBy(this::class.java.simpleName)
@@ -94,19 +94,21 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
             fs.delete(output, true)
         }
         val writer = writerB().outputPath(output.toString()).build()
-        rows.forEach {
-            writer.write(
-                arrayOf(
-                    it.metricKey,
-                    it.dimensionKey,
-                    it.dimension,
-                    it.tm,
-                    it.metric.getBytes(),
-                    it.entity.getBytes(),
-                    JSONUtils.toJson(it.metadata)
+        rows
+            .sortedBy { "${it.metricKey}${it.dimensionKey}${it.dimension}${it.tm}" }
+            .forEach {
+                writer.write(
+                    arrayOf(
+                        it.metricKey,
+                        it.dimensionKey,
+                        it.dimension,
+                        it.tm,
+                        it.metric.getBytes(),
+                        it.entity.getBytes(),
+                        JSONUtils.toJson(it.metadata)
+                    )
                 )
-            )
-        }
+            }
         writer.close()
     }
 
@@ -224,6 +226,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
                         ListExpression(expr.values.map { LiteralExpression(it, DataTypes.STRING) })
                     )
                 }
+
             FilterOp.NOT_EQUALS ->
                 if (expr.values.size == 1) {
                     NotEqualsExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
@@ -233,19 +236,25 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
                         ListExpression(expr.values.map { LiteralExpression(it, DataTypes.STRING) })
                     )
                 }
+
             FilterOp.GREATER_THAN ->
                 GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+
             FilterOp.GREATER_EQUALS_THAN ->
                 GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+
             FilterOp.LESS_THAN ->
                 LessThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+
             FilterOp.LESS_EQUALS_THAN ->
                 LessThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING))
+
             FilterOp.OPEN ->
                 AndExpression(
                     GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
                     LessThanExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
                 )
+
             FilterOp.CLOSED ->
                 AndExpression(
                     GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
@@ -257,6 +266,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
                     GreaterThanEqualToExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),
                     LessThanExpression(columnExpr, LiteralExpression(expr.values.last(), DataTypes.STRING))
                 )
+
             FilterOp.OPEN_CLOSED ->
                 AndExpression(
                     GreaterThanExpression(columnExpr, LiteralExpression(expr.values.first(), DataTypes.STRING)),

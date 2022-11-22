@@ -85,14 +85,14 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
             value = value.trim()
             when (key.type) {
                 String::class.java -> value
-                Byte::class.java -> Convert.toByte(value)
-                Short::class.java -> Convert.toShort(value)
-                Int::class.java -> Convert.toInt(value)
+                Byte::class.java, java.lang.Byte::class.java -> Convert.toByte(value)
+                Short::class.java, java.lang.Short::class.java -> Convert.toShort(value)
+                Int::class.java, java.lang.Integer::class.java -> Convert.toInt(value)
                 Long::class.java, java.lang.Long::class.java -> Convert.toLong(value)
-                Float::class.java -> Convert.toFloat(value)
-                Double::class.java -> Convert.toDouble(value)
-                Char::class.java -> Convert.toChar(value)
-                Boolean::class.java -> {
+                Float::class.java, java.lang.Float::class.java -> Convert.toFloat(value)
+                Double::class.java, java.lang.Double::class.java -> Convert.toDouble(value)
+                Char::class.java, java.lang.Character::class.java -> Convert.toChar(value)
+                Boolean::class.java, java.lang.Boolean::class.java -> {
                     if (value.isBlank()) {
                         false
                     } else {
@@ -127,7 +127,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
          * Data dir FIXME 不加默认有问题
          */
         @JvmField
-        val ROOT_DIR_DATA = BitlapConfKey<String>("bitlap.root.dir.data", "/tmp/bitlap_data").validator(Validators.NOT_BLANK)
+        val ROOT_DIR_DATA = BitlapConfKey("bitlap.root.dir.data", "/tmp/bitlap_data").validator(Validators.NOT_BLANK)
 
         /**
          * Local dir
@@ -139,7 +139,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
          * Node address, Rpc configuration
          */
         @JvmField
-        val NODE_BIND_HOST = BitlapConfKey<String>("bitlap.node.bind.host", "127.0.0.1:23333").validator(Validators.NOT_BLANK)
+        val NODE_BIND_HOST = BitlapConfKey("bitlap.node.bind.host", "127.0.0.1:23333").validator(Validators.NOT_BLANK)
 
         @JvmField
         val NODE_BIND_PEERS = BitlapConfKey<String>("bitlap.node.bind.peers")
@@ -162,21 +162,22 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
             .validator { it != null && it >= 1000L }
 
         @JvmField
-        val RAFT_DATA_PATH = BitlapConfKey<String>("bitlap.node.raft.data", "/tmp/server/bitlap_raft").validator(Validators.NOT_BLANK)
+        val RAFT_DATA_PATH = BitlapConfKey("bitlap.node.raft.data", "/tmp/server/bitlap_raft").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.host", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
+        val RAFT_SERVER_ADDRESS = BitlapConfKey("bitlap.node.raft.host", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_INITIAL_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.raft.initialServerAddress", "127.0.0.1:12222").validator(Validators.NOT_BLANK)
+        val RAFT_INITIAL_SERVER_ADDRESS = BitlapConfKey("bitlap.node.raft.initialServerAddress", "127.0.0.1:12222")
+            .validator(Validators.NOT_BLANK)
 
         @JvmField
-        val RAFT_TIMEOUT = BitlapConfKey<String>("bitlap.node.raft.timeout", "10s").validator(Validators.NOT_BLANK)
+        val RAFT_TIMEOUT = BitlapConfKey("bitlap.node.raft.timeout", "10s").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val HTTP_SERVER_ADDRESS = BitlapConfKey<String>("bitlap.node.http.host", "127.0.0.1:18081").validator(Validators.NOT_BLANK)
+        val HTTP_SERVER_ADDRESS = BitlapConfKey("bitlap.node.http.host", "127.0.0.1:18081").validator(Validators.NOT_BLANK)
 
         @JvmField
-        val SESSION_TIMEOUT = BitlapConfKey<String>("bitlap.node.session.timeout", "20m").validator(Validators.NOT_BLANK)
+        val SESSION_TIMEOUT = BitlapConfKey("bitlap.node.session.timeout", "20m").validator(Validators.NOT_BLANK)
     }
 }

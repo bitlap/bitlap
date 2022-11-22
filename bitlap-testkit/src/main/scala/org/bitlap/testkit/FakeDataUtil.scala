@@ -59,6 +59,8 @@ object FakeDataUtil {
 
   def randMetricName: String = metrics(faker.number().numberBetween(0, metrics.size))
 
+  def randMetricValue: Long = faker.number().numberBetween(1, 10000)
+
   def randDimensions: List[Dimension] = {
     val dimensions = List(
       List(Dimension("city", randCity)),
@@ -77,7 +79,8 @@ object FakeDataUtil {
           uid,
           randDimensions,
           randMetricName,
-          randBigNumber
+          // randBigNumber
+          randMetricValue
         )
       }
 

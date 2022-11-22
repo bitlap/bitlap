@@ -48,7 +48,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
                 )
             )
         )
-        .sortBy(arrayOf("mk", "t"))
+        // .sortBy(arrayOf("mk", "t"))
         .withBlockletSize(8)
         .withPageSizeInMb(1)
         .writtenBy(this::class.java.simpleName)
@@ -78,17 +78,18 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
             fs.delete(output, true)
         }
         val writer = writerB().outputPath(output.toString()).build()
-        rows.forEach {
-            writer.write(
-                arrayOf(
-                    it.metricKey,
-                    it.tm,
-                    it.metric.getBytes(),
-                    it.entity.getBytes(),
-                    JSONUtils.toJson(it.metadata)
+        rows.sortedBy { "${it.metricKey}${it.tm}" }
+            .forEach {
+                writer.write(
+                    arrayOf(
+                        it.metricKey,
+                        it.tm,
+                        it.metric.getBytes(),
+                        it.entity.getBytes(),
+                        JSONUtils.toJson(it.metadata)
+                    )
                 )
-            )
-        }
+            }
         writer.close()
     }
 

@@ -82,10 +82,10 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
       indexHtml
     case Method.GET -> !! / path => Http.fromResource(s"static/$path")
     case _ =>
-      if (first) {
-        conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
-        first = false
+      if (!first) {
+        properties.remove("initFile")
       }
+      conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
       indexHtml
   }
 

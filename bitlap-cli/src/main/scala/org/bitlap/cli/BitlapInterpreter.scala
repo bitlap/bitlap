@@ -30,7 +30,7 @@ trait BitlapInterpreter {
 
   val bitlapApp: CliApp[Console, IOException, Command] = CliApp.make(
     name = "Bitlap",
-    version = "0.2.0",
+    version = "0.3.0-SNAPSHOT",
     summary = text("bitlap cli command."),
     command = bitlap
   ) {

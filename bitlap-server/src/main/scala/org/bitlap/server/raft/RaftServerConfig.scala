@@ -2,7 +2,7 @@
 package org.bitlap.server.raft
 
 import org.bitlap.common.BitlapConf
-
+import org.bitlap.server.BitlapServerContext
 import scala.concurrent.duration.Duration
 
 /** @author
@@ -22,13 +22,11 @@ final case class RaftServerConfig(
 )
 object RaftServerConfig {
 
-  private lazy val conf = new BitlapConf()
-
   lazy val raftServerConfig: RaftServerConfig = RaftServerConfig(
-    conf.get(BitlapConf.RAFT_DATA_PATH),
-    conf.get(BitlapConf.NODE_GROUP_ID),
-    conf.get(BitlapConf.RAFT_SERVER_ADDRESS),
-    conf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS),
-    Duration.apply(conf.get(BitlapConf.RAFT_TIMEOUT))
+    BitlapServerContext.globalConf.get(BitlapConf.RAFT_DATA_PATH),
+    BitlapServerContext.globalConf.get(BitlapConf.NODE_GROUP_ID),
+    BitlapServerContext.globalConf.get(BitlapConf.RAFT_SERVER_ADDRESS),
+    BitlapServerContext.globalConf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS),
+    Duration(BitlapServerContext.globalConf.get(BitlapConf.RAFT_TIMEOUT))
   )
 }

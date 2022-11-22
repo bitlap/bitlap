@@ -6,6 +6,8 @@ import org.bitlap.server.http.HttpServerProvider
 import org.bitlap.server.raft._
 import org.bitlap.server.rpc.GrpcServerProvider
 import zio._
+import org.bitlap.common.BitlapConf
+import org.bitlap.client._
 
 /** bitlap 抽象服务接口
  *  @author
@@ -30,14 +32,17 @@ trait ServerProvider {
 
 object ServerProvider {
 
+  private val httpPort   = BitlapServerContext.globalConf.get(BitlapConf.HTTP_SERVER_ADDRESS).extractServerAddress.port
+  private val serverPort = BitlapServerContext.globalConf.get(BitlapConf.NODE_BIND_HOST).extractServerAddress.port
+
   /** 所有bitlap 内部服务
    *  @param http
    *    是否启动 HTTP 服务
    *  @return
    */
   def serverProviders(http: Boolean): List[ServerProvider] =
-    (if (http) List(new HttpServerProvider(18081)) else List()) ++ List(
-      new GrpcServerProvider(23333),
+    (if (http) List(new HttpServerProvider(httpPort)) else List()) ++ List(
+      new GrpcServerProvider(serverPort),
       new RaftServerProvider(RaftServerConfig.raftServerConfig)
     )
 }

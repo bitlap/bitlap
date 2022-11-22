@@ -42,7 +42,10 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
   private val app = Http.collectZIO[Request] {
     case req @ Method.POST -> !! / "api" / "sql" / "run" =>
       req.data.toJson.map { body =>
-        val sql           = body.hcursor.get[String]("sql").getOrElse("")
+        val sql = body.hcursor.get[String]("sql").getOrElse("")
+        if (conn == null) {
+          conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+        }
         val stmt          = conn.createStatement()
         var rs: ResultSet = null
         try {

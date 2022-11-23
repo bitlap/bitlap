@@ -1,3 +1,4 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.test.utils
 
 import org.apache.ftpserver.FtpServer
@@ -9,13 +10,13 @@ import org.bitlap.common.logger
 import java.net.ServerSocket
 
 /**
- * Mail: k.chen@nio.com
+ * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2022/11/23
  */
 object FtpUtils {
 
-    private val log = logger {  }
+    private val log = logger { }
 
     fun start(home: String): Pair<FtpServer, Int> {
         val port = ServerSocket(0).use {
@@ -32,12 +33,14 @@ object FtpUtils {
             this.port = port
         }
         server.addListener("default", factory.createListener())
-        server.userManager.save(BaseUser().apply {
-            this.name = "bitlap"
-            this.password = "bitlap"
-            this.homeDirectory = home
-            this.authorities = listOf(WritePermission())
-        })
+        server.userManager.save(
+            BaseUser().apply {
+                this.name = "bitlap"
+                this.password = "bitlap"
+                this.homeDirectory = home
+                this.authorities = listOf(WritePermission())
+            }
+        )
         return server.createServer().apply { this.start() }
     }
 }

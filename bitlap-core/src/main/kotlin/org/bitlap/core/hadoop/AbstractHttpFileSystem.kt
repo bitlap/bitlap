@@ -1,7 +1,14 @@
+/* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.hadoop
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.*
+import org.apache.hadoop.fs.FSDataInputStream
+import org.apache.hadoop.fs.FSDataOutputStream
+import org.apache.hadoop.fs.FileStatus
+import org.apache.hadoop.fs.FileSystem
+import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.PositionedReadable
+import org.apache.hadoop.fs.Seekable
 import org.apache.hadoop.fs.permission.FsPermission
 import org.apache.hadoop.util.Progressable
 import java.io.FilterInputStream
@@ -11,7 +18,7 @@ import java.net.URI
 /**
  * Desc: refer to hadoop AbstractHttpFileSystem
  *
- * Mail: k.chen@nio.com
+ * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2022/11/23
  */

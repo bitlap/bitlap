@@ -3,21 +3,19 @@ package org.bitlap.server.http
 
 import io.circe.generic.auto.exportEncoder
 import io.circe.syntax.EncoderOps
-import org.bitlap.common.utils.internal.DBTablePrinter
-import org.bitlap.network.ServerType
-import org.bitlap.server.ServerProvider
-import org.bitlap.server.http.vo.SqlData
+import org.bitlap.common.utils.internal._
+import org.bitlap.network._
+import org.bitlap.server._
+import org.bitlap.server.http.vo._
 import zhttp.http._
 import zhttp.service._
 import zhttp.service.server.ServerChannelFactory
 import zio._
-import zio.console.putStrLn
-import java.util.Properties
-import java.sql.ResultSet
+import zio.console._
 
-import java.sql.DriverManager
-import scala.util.Try
-import java.sql.Connection
+import java.sql._
+import java.util.Properties
+import scala.util._
 
 /** bitlap http服务
  *
@@ -32,20 +30,13 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
 
   val properties = new Properties()
   properties.put("retries", "3")
-  // 按需修改
-  properties.put("initFile", "initFileForTest.sql")
-
-  private var conn: Connection = null
-  private var first            = true
 
   // TODO: 全局的异常处理 和 全局的响应包装对象
   private val app = Http.collectZIO[Request] {
     case req @ Method.POST -> !! / "api" / "sql" / "run" =>
       req.data.toJson.map { body =>
-        val sql = body.hcursor.get[String]("sql").getOrElse("")
-        if (conn == null) {
-          conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
-        }
+        val sql           = body.hcursor.get[String]("sql").getOrElse("")
+        val conn          = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
         val stmt          = conn.createStatement()
         var rs: ResultSet = null
         try {
@@ -85,11 +76,6 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
       indexHtml
     case Method.GET -> !! / path => Http.fromResource(s"static/$path")
     case _ =>
-      if (!first) {
-        properties.remove("initFile")
-      }
-      conn = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
-      first = false
       indexHtml
   }
 

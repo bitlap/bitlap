@@ -46,7 +46,7 @@ object FakeDataUtil {
   def randTimestamp: Long = {
     val date = faker.date().past(7, TimeUnit.DAYS)
     val s    = sdf.format(date)
-    sdf.parse(s).getTime / 1000
+    sdf.parse(s).getTime
   }
 
   def randBigNumber: Long = faker.number().numberBetween(0, 1000000000)

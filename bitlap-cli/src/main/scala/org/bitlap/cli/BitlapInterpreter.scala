@@ -41,6 +41,7 @@ trait BitlapInterpreter {
   }
 
   private def handleSqlCli(sql: Sql): Int = {
+    println(s"Connecting to bitlap with args: $sql")
     val conf        = new BitlapConf()
     val projectName = conf.get(BitlapConf.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(

@@ -12,7 +12,7 @@ import org.bitlap.core.sql.infer
  */
 class UdafBMSum : UDAF<Number, Any, Number> {
     companion object {
-        const val NAME = "bm_sum"
+        const val NAME = UdfNames.bm_sum
     }
 
     override val name: String = NAME

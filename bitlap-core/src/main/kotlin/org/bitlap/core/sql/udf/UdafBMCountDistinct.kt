@@ -13,7 +13,7 @@ import org.bitlap.core.sql.infer
  */
 class UdafBMCountDistinct : UDAF<Pair<Number, BM>, Any, Number> {
     companion object {
-        const val NAME = "bm_count_distinct"
+        const val NAME = UdfNames.bm_count_distinct
     }
 
     override val name: String = NAME

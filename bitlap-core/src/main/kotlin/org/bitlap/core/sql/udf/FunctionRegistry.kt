@@ -136,6 +136,15 @@ object FunctionRegistry {
     }
 
     fun sqlFunctions() = this.functions.values
+
+    fun sqlValidatorFunctions(): () -> List<UdfValidator> = {
+        this.functions.values.filter {
+            when (it) {
+                is UdfValidator -> true
+                else -> false
+            }
+        }.map { it as UdfValidator }
+    }
     fun getFunction(name: String) = this.functions[name]
     fun contains(name: String) = this.functions.containsKey(name)
 }

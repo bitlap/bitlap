@@ -149,7 +149,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                     select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
                     from $db.$table 
                     where _time >= 1669132800000 
-                    group by _time
+                    group by date_format(_time)
                 """.trimIndent(),
                 listOf(listOf("2022-11-23", 4.0, 12.0, 3L))
             )
@@ -165,10 +165,25 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                     select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
                     from $db.$table 
                     where _time >= 1669132800
-                    group by _time
+                    group by date_format(_time)
                 """.trimIndent(),
                 listOf(listOf("1970-01-20", 4.0, 12.0, 3L)) // format failed
             )
+        }
+
+        "time with date_format but not int groupby should error" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 1669046400)
+            prepareTestData(db, table, 1669132800)
+            shouldThrow<BitlapException> {
+                sql(
+                    """select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time >= 1669132800
+                    group by _time"""
+                ) // star is forbidden
+            }
         }
 
         "only metrics query with one dimension that is not time" {

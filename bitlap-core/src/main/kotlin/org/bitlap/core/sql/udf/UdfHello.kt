@@ -13,7 +13,7 @@ import org.bitlap.core.sql.infer
  */
 class UdfHello : UDF1<Any?, String?> {
     companion object {
-        const val NAME = "hello"
+        const val NAME = UdfNames.hello
     }
 
     override val name: String = NAME

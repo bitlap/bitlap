@@ -13,7 +13,7 @@ import org.apache.calcite.sql.type.SqlTypeName
  */
 class UdfIf : UDF3<Boolean, Any?, Any?, Any?> {
     companion object {
-        const val NAME = "if"
+        const val NAME = UdfNames.`if`
     }
 
     override val name: String = NAME

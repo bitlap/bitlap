@@ -11,5 +11,5 @@ import org.apache.calcite.sql.SqlSelect
  */
 interface UdfValidator {
 
-    fun validate(select: SqlSelect, targetRowType: RelDataType): Boolean
+    fun validate(select: SqlSelect, targetRowType: RelDataType)
 }

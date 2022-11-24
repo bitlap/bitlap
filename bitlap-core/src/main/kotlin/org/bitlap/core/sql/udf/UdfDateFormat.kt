@@ -8,6 +8,7 @@ import org.apache.calcite.sql.SqlSelect
 import org.apache.calcite.sql.type.SqlReturnTypeInference
 import org.apache.calcite.sql.type.SqlTypeName
 import org.apache.commons.lang3.time.FastDateFormat
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.sql.infer
 import java.util.Locale
 import java.util.TimeZone
@@ -34,7 +35,7 @@ class UdfDateFormat : UDF1<Long, String>, UdfValidator {
     }
 
     // TODO make parameter more generic
-    override fun validate(select: SqlSelect, targetRowType: RelDataType): Boolean {
+    override fun validate(select: SqlSelect, targetRowType: RelDataType) {
         val checkSelectGroup = select.selectList.map {
             when (it) {
                 is SqlBasicCall -> {
@@ -66,6 +67,6 @@ class UdfDateFormat : UDF1<Long, String>, UdfValidator {
                 else -> true
             }
         }
-        return checkSelectGroup.all { it }
+        if (!checkSelectGroup.all { it }) throw BitlapException("Incorrect syntax, ${UdfNames.date_format} should be also in group by.")
     }
 }

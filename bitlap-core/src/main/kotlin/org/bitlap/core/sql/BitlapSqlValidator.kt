@@ -9,9 +9,7 @@ import org.apache.calcite.sql.SqlOperatorTable
 import org.apache.calcite.sql.SqlSelect
 import org.apache.calcite.sql.validate.SqlValidator
 import org.apache.calcite.sql.validate.SqlValidatorImpl
-import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.sql.udf.FunctionRegistry
-import org.bitlap.core.sql.udf.UdfNames
 
 /**
  * Mail: chk19940609@gmail.com
@@ -33,10 +31,7 @@ class BitlapSqlValidator(
 
     override fun validateSelect(select: SqlSelect, targetRowType: RelDataType) {
         queryContext.currentSelectNode = select
-        val check = FunctionRegistry.sqlValidatorFunctions().invoke().map { it.validate(select, targetRowType) }
-        if (!check.all { it }) {
-            throw BitlapException("Incorrect syntax, ${UdfNames.date_format} should be also in group by.")
-        }
+        FunctionRegistry.sqlValidatorFunctions().invoke().map { it.validate(select, targetRowType) }
         super.validateSelect(select, targetRowType)
     }
 }

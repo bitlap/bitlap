@@ -22,12 +22,13 @@ package object network {
         Status.ABORTED.withDescription(e.getLocalizedMessage).withCause(e.cause.orNull)
       case e: SQLExecutedException =>
         Status.INVALID_ARGUMENT.withDescription(e.getLocalizedMessage).withCause(e.getCause)
-      case e: Exception =>
+      case e =>
         Status.UNKNOWN.withDescription(e.getLocalizedMessage).withCause(e.getCause)
     }
   }
 
-  lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
+  lazy val statusApplyFunc: Status => Throwable = (st: Status) => {
+    st.asException().printStackTrace()
     st.getCode match {
       case c if c.value() == Status.INTERNAL.getCode.value() =>
         RpcException(st.getCode.value(), st.getCode.toStatus.getDescription, Option(st.asException()))
@@ -37,6 +38,7 @@ package object network {
         new SQLExecutedException(Option(st.getCode.toStatus.getDescription).getOrElse(""), st.asException())
       case c if c.value() == Status.UNKNOWN.getCode.value() =>
         new Exception(st.getCode.toStatus.getDescription, st.asException())
+      case _ => new Exception(st.getCode.toStatus.getDescription, st.asException())
     }
-
+  }
 }

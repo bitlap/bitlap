@@ -29,6 +29,7 @@ object FunctionRegistry {
         register(
             UdfHello(),
             UdfIf(),
+            UdfDateFormat()
         )
         register(
             UdafBMSum(),

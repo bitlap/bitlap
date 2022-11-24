@@ -139,6 +139,38 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             )
         }
 
+        "time with date_format" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 1669046400000)
+            prepareTestData(db, table, 1669132800000)
+            checkRows(
+                """
+                    select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time >= 1669132800000 
+                    group by _time
+                """.trimIndent(),
+                listOf(listOf("2022-11-23", 4.0, 12.0, 3L))
+            )
+        }
+
+        "time with date_format but timestamp is seconds" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 1669046400)
+            prepareTestData(db, table, 1669132800)
+            checkRows(
+                """
+                    select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table 
+                    where _time >= 1669132800
+                    group by _time
+                """.trimIndent(),
+                listOf(listOf("1970-01-20", 4.0, 12.0, 3L)) // format failed
+            )
+        }
+
         "only metrics query with one dimension that is not time" {
             val (db, table) = randomDBTable()
             sql("create table $db.$table")

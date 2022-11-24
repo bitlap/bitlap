@@ -1,0 +1,2 @@
+org.bitlap.core.hadoop.HttpFileSystem
+org.bitlap.core.hadoop.HttpsFileSystem

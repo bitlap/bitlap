@@ -41,7 +41,7 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
     )
     .map(l =>
       if (l.isDefined) l.get
-      else throw BitlapSQLException(s"cannot find a leader by hosts: ${serverPeers.mkString(",")}")
+      else throw BitlapSQLException(s"Cannot find a leader by hosts: ${serverPeers.mkString(",")}")
     )
     .map(f => clientLayer(f.ip, f.port))
 

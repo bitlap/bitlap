@@ -83,7 +83,7 @@
         <scala.log.version>2.14.1</scala.log.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <sqlline.version>1.12.0</sqlline.version>
-        <smt.version>0.9.0</smt.version>
+        <smt.version>0.9.1</smt.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <zio.grpc.version>0.5.2</zio.grpc.version>
         <scalapb.version>0.11.11</scalapb.version>

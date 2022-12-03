@@ -46,7 +46,7 @@ jobs:
 
       # because there are some error tests      
       - name: Test
-        run: ./mvnw test -Dmaven.test.failure.ignore=true
+        run: ./mvnw -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' -Dmaven.test.failure.ignore=true test
 
       - name: Upload test coverage report
         run: bash <(curl -s https://codecov.io/bash)

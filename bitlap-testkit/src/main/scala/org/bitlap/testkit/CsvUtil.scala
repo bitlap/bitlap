@@ -22,7 +22,7 @@ trait CsvUtil {
   }
 
   def readCsvData(resource: InputStream): List[Metric] =
-    ScalableBuilder[Metric]
+    ReaderBuilder[Metric]
       .setField[List[Dimension]](
         _.dimensions,
         dims => StringUtils.extractJsonValues[Dimension](dims)((k, v) => Dimension(k, v))
@@ -31,7 +31,7 @@ trait CsvUtil {
       .collect { case Some(v) => v }
 
   def writeCsvData(file: File, metrics: List[Metric]): Boolean =
-    CsvableBuilder[Metric]
+    WriterBuilder[Metric]
       .setField[List[Dimension]](
         _.dimensions,
         (ds: List[Dimension]) =>

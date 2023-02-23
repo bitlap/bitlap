@@ -69,7 +69,7 @@
         <kotest.version>5.5.2</kotest.version>
         <kotlin.logging.version>3.0.2</kotlin.logging.version>
         <kotlin.logging.version>3.0.0</kotlin.logging.version>
-        <slf4j.version>2.0.3</slf4j.version>
+        <slf4j.version>2.0.6</slf4j.version>
         <!--   jraft need 2.17.1     -->
         <log4j.version>2.17.1</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>

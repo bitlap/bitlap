@@ -197,7 +197,7 @@
             <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>javacc</id>

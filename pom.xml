@@ -94,7 +94,7 @@
         <rocksdb.version>7.9.2</rocksdb.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
-        <netty.version>4.1.72.Final</netty.version>
+        <netty.version>4.1.89.Final</netty.version>
     </properties>
 
     <dependencies>

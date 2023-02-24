@@ -1,14 +1,12 @@
 /* Copyright (c) 2022 bitlap.org */
 package org.bitlap.core.sql.rel
 
-import com.google.common.collect.ImmutableSet
 import org.apache.calcite.plan.RelOptCluster
 import org.apache.calcite.plan.RelTraitSet
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.RelWriter
 import org.apache.calcite.rel.core.CorrelationId
 import org.apache.calcite.rel.core.Filter
-import org.apache.calcite.rel.logical.LogicalFilter
 import org.apache.calcite.rex.RexNode
 import java.util.Objects
 
@@ -20,25 +18,9 @@ class BitlapFilter(
     traitSet: RelTraitSet,
     child: RelNode,
     condition: RexNode,
-    private val variablesSet: ImmutableSet<CorrelationId> = ImmutableSet.of(),
+    private val variablesSet: Set<CorrelationId>,
     override var parent: RelNode? = null,
 ) : Filter(cluster, traitSet, child, condition), BitlapNode {
-
-    constructor(
-        cluster: RelOptCluster,
-        traitSet: RelTraitSet,
-        child: RelNode,
-        condition: RexNode,
-        variablesSet: Set<CorrelationId>,
-        parent: RelNode? = null,
-    ) : this(
-        cluster,
-        traitSet,
-        child,
-        condition,
-        if (variablesSet is ImmutableSet) variablesSet else ImmutableSet.copyOf(variablesSet),
-        parent,
-    )
 
     override fun copy(traitSet: RelTraitSet, input: RelNode, condition: RexNode): Filter {
         return BitlapFilter(cluster, traitSet, input, condition, variablesSet, parent)
@@ -46,17 +28,21 @@ class BitlapFilter(
 
     override fun explainTerms(pw: RelWriter?): RelWriter? {
         return super.explainTerms(pw)
-            .itemIf("variablesSet", variablesSet, !variablesSet.isEmpty())
+            .itemIf("variablesSet", variablesSet, variablesSet.isNotEmpty())
     }
 
     override fun deepEquals(obj: Any?): Boolean {
         return (
             deepEquals0(obj) &&
-                variablesSet == (obj as LogicalFilter?)!!.variablesSet
+                variablesSet == (obj as? BitlapFilter)?.variablesSet
             )
     }
 
     override fun deepHashCode(): Int {
         return Objects.hash(deepHashCode0(), variablesSet)
+    }
+
+    override fun getVariablesSet(): Set<CorrelationId> {
+        return variablesSet
     }
 }

@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>1.1.8.4</version>
+            <version>1.1.9.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -178,7 +178,7 @@
             <plugin> <!-- generate sources from fmpp -->
                 <groupId>org.apache.drill.tools</groupId>
                 <artifactId>drill-fmpp-maven-plugin</artifactId>
-                <version>1.20.0</version>
+                <version>1.21.0</version>
                 <executions>
                     <execution>
                         <id>generate-fmpp</id>

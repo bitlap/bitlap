@@ -63,20 +63,19 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
-        <dokka.version>1.6.21</dokka.version>
-        <kotlin.version>1.6.21</kotlin.version>
+        <dokka.version>1.7.20</dokka.version>
+        <kotlin.version>1.8.10</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
-        <kotest.version>5.5.2</kotest.version>
-        <kotlin.logging.version>3.0.2</kotlin.logging.version>
-        <kotlin.logging.version>3.0.0</kotlin.logging.version>
-        <slf4j.version>2.0.3</slf4j.version>
+        <kotest.version>5.5.5</kotest.version>
+        <kotlin.logging.version>3.0.5</kotlin.logging.version>
+        <slf4j.version>2.0.6</slf4j.version>
         <!--   jraft need 2.17.1     -->
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.20.0</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <hutool.version>5.8.9</hutool.version>
-        <joda.version>2.12.0</joda.version>
-        <gson.version>2.10</gson.version>
-        <calcite.version>1.32.0</calcite.version>
+        <hutool.version>5.8.12</hutool.version>
+        <joda.version>2.12.2</joda.version>
+        <gson.version>2.10.1</gson.version>
+        <calcite.version>1.33.0</calcite.version>
         <kotlin.cli.version>0.3.4</kotlin.cli.version>
         <sqlline.version>1.11.0</sqlline.version>
         <scala.version>2.13.10</scala.version>
@@ -87,12 +86,12 @@
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <zio.grpc.version>0.5.2</zio.grpc.version>
         <scalapb.version>0.11.11</scalapb.version>
-        <protobuf.version>3.21.8</protobuf.version>
-        <grpc.netty.version>1.46.0</grpc.netty.version>
+        <protobuf.version>3.22.0</protobuf.version>
+        <grpc.netty.version>1.53.0</grpc.netty.version>
         <zio.version>1.0.15</zio.version>
-        <jupiter.version>5.9.1</jupiter.version>
+        <jupiter.version>5.9.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
-        <rocksdb.version>7.7.3</rocksdb.version>
+        <rocksdb.version>7.9.2</rocksdb.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
         <netty.version>4.1.72.Final</netty.version>
@@ -106,7 +105,7 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
@@ -328,6 +327,7 @@
                     <version>${kotlin.version}</version>
                     <configuration>
                         <args>
+                            <arg>-Xuse-k2</arg>
                             <arg>-Xuse-ir</arg>
                             <arg>-Xskip-prerelease-check</arg>
                         </args>
@@ -518,7 +518,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -614,7 +614,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.8.2</version>
+                        <version>3.1.0</version>
                         <configuration>
                             <deployAtEnd>true</deployAtEnd>
                         </configuration>

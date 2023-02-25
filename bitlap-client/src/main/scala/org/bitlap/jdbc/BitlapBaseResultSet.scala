@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import org.bitlap.network.models._
@@ -30,9 +30,11 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
 
   private var _wasNull: Boolean = false
 
-  override def unwrap[T](iface: Class[T]): T = ???
+  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = ???
+  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def close(): Unit = ()
 
@@ -71,62 +73,98 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
   override def getDouble(columnLabel: String): Double = getDouble(findColumn(columnLabel))
 
   @deprecated
-  override def getBigDecimal(columnIndex: Int, scale: Int): BigDecimal = ???
+  override def getBigDecimal(columnIndex: Int, scale: Int): BigDecimal = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   @deprecated
-  override def getBigDecimal(columnLabel: String, scale: Int): BigDecimal = ???
+  override def getBigDecimal(columnLabel: String, scale: Int): BigDecimal = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBigDecimal(columnIndex: Int): BigDecimal = ???
+  override def getBigDecimal(columnIndex: Int): BigDecimal = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBigDecimal(columnLabel: String): BigDecimal = ???
+  override def getBigDecimal(columnLabel: String): BigDecimal = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBytes(columnIndex: Int): scala.Array[Byte] = ???
+  override def getBytes(columnIndex: Int): scala.Array[Byte] = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBytes(columnLabel: String): scala.Array[Byte] = ???
+  override def getBytes(columnLabel: String): scala.Array[Byte] = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def getDate(columnIndex: Int): Date = getColumnValue[Date](columnIndex)
 
   override def getDate(columnLabel: String): Date = getDate(findColumn(columnLabel))
 
-  override def getDate(columnIndex: Int, cal: Calendar): Date = ???
+  override def getDate(columnIndex: Int, cal: Calendar): Date = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getDate(columnLabel: String, cal: Calendar): Date = ???
+  override def getDate(columnLabel: String, cal: Calendar): Date = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def getTime(columnIndex: Int): Time = getColumnValue[Time](columnIndex)
 
   override def getTime(columnLabel: String): Time = getTime(findColumn(columnLabel))
 
-  override def getTime(columnIndex: Int, cal: Calendar): Time = ???
+  override def getTime(columnIndex: Int, cal: Calendar): Time = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getTime(columnLabel: String, cal: Calendar): Time = ???
+  override def getTime(columnLabel: String, cal: Calendar): Time = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def getTimestamp(columnIndex: Int): Timestamp = getColumnValue[Timestamp](columnIndex)
 
   override def getTimestamp(columnLabel: String): Timestamp = getTimestamp(findColumn(columnLabel))
 
-  override def getTimestamp(columnIndex: Int, cal: Calendar): Timestamp = ???
+  override def getTimestamp(columnIndex: Int, cal: Calendar): Timestamp = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getTimestamp(columnLabel: String, cal: Calendar): Timestamp = ???
+  override def getTimestamp(columnLabel: String, cal: Calendar): Timestamp = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getAsciiStream(columnIndex: Int): InputStream = ???
+  override def getAsciiStream(columnIndex: Int): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getAsciiStream(columnLabel: String): InputStream = ???
+  override def getAsciiStream(columnLabel: String): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   @deprecated
-  override def getUnicodeStream(columnIndex: Int): InputStream = ???
+  override def getUnicodeStream(columnIndex: Int): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   @deprecated
-  override def getUnicodeStream(columnLabel: String): InputStream = ???
+  override def getUnicodeStream(columnLabel: String): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBinaryStream(columnIndex: Int): InputStream = ???
+  override def getBinaryStream(columnIndex: Int): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getBinaryStream(columnLabel: String): InputStream = ???
+  override def getBinaryStream(columnLabel: String): InputStream = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def getWarnings(): SQLWarning = warningChain
 
   override def clearWarnings(): Unit = warningChain = null
 
-  override def getCursorName(): String = ???
+  override def getCursorName(): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getMetaData(): ResultSetMetaData = new BitlapResultSetMetaData(columnNames, columnTypes)
 
@@ -134,13 +172,19 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
 
   override def getObject(columnLabel: String): Any = getObject(findColumn(columnLabel))
 
-  override def getObject(columnIndex: Int, map: util.Map[String, Class[_]]): AnyRef = ???
+  override def getObject(columnIndex: Int, map: util.Map[String, Class[_]]): AnyRef =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getObject(columnLabel: String, map: util.Map[String, Class[_]]): AnyRef = ???
+  override def getObject(columnLabel: String, map: util.Map[String, Class[_]]): AnyRef =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getObject[T](columnIndex: Int, `type`: Class[T]): T = ???
+  override def getObject[T](columnIndex: Int, `type`: Class[T]): T = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getObject[T](columnLabel: String, `type`: Class[T]): T = ???
+  override def getObject[T](columnLabel: String, `type`: Class[T]): T = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def findColumn(columnLabel: String): Int = {
     val columnIndex = columnNames.indexOf(columnLabel)
@@ -150,275 +194,427 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
     columnIndex + 1
   }
 
-  override def getCharacterStream(columnIndex: Int): Reader = ???
+  override def getCharacterStream(columnIndex: Int): Reader = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getCharacterStream(columnLabel: String): Reader = ???
+  override def getCharacterStream(columnLabel: String): Reader = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def isBeforeFirst(): Boolean = ???
+  override def isBeforeFirst(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isAfterLast(): Boolean = ???
+  override def isAfterLast(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isFirst(): Boolean = ???
+  override def isFirst(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isLast(): Boolean = ???
+  override def isLast(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def beforeFirst(): Unit = ???
+  override def beforeFirst(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def afterLast(): Unit = ???
+  override def afterLast(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def first(): Boolean = ???
+  override def first(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def last(): Boolean = ???
+  override def last(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getRow(): Int = ???
+  override def getRow(): Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def absolute(row: Int): Boolean = ???
+  override def absolute(row: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def relative(rows: Int): Boolean = ???
+  override def relative(rows: Int): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def previous(): Boolean = ???
+  override def previous(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setFetchDirection(direction: Int): Unit = ???
+  override def setFetchDirection(direction: Int): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getFetchDirection(): Int = ???
+  override def getFetchDirection(): Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setFetchSize(rows: Int): Unit = ???
+  override def setFetchSize(rows: Int): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getFetchSize(): Int = ???
+  override def getFetchSize(): Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getType(): Int = ResultSet.TYPE_FORWARD_ONLY
 
-  override def getConcurrency(): Int = ???
+  override def getConcurrency(): Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def rowUpdated(): Boolean = ???
+  override def rowUpdated(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def rowInserted(): Boolean = ???
+  override def rowInserted(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def rowDeleted(): Boolean = ???
+  override def rowDeleted(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNull(columnIndex: Int): Unit = ???
+  override def updateNull(columnIndex: Int): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNull(columnLabel: String): Unit = ???
+  override def updateNull(columnLabel: String): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBoolean(columnIndex: Int, x: Boolean): Unit = ???
+  override def updateBoolean(columnIndex: Int, x: Boolean): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBoolean(columnLabel: String, x: Boolean): Unit = ???
+  override def updateBoolean(columnLabel: String, x: Boolean): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateByte(columnIndex: Int, x: Byte): Unit = ???
+  override def updateByte(columnIndex: Int, x: Byte): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateByte(columnLabel: String, x: Byte): Unit = ???
+  override def updateByte(columnLabel: String, x: Byte): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateShort(columnIndex: Int, x: Short): Unit = ???
+  override def updateShort(columnIndex: Int, x: Short): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateShort(columnLabel: String, x: Short): Unit = ???
+  override def updateShort(columnLabel: String, x: Short): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateInt(columnIndex: Int, x: Int): Unit = ???
+  override def updateInt(columnIndex: Int, x: Int): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateInt(columnLabel: String, x: Int): Unit = ???
+  override def updateInt(columnLabel: String, x: Int): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateLong(columnIndex: Int, x: Long): Unit = ???
+  override def updateLong(columnIndex: Int, x: Long): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateLong(columnLabel: String, x: Long): Unit = ???
+  override def updateLong(columnLabel: String, x: Long): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateFloat(columnIndex: Int, x: Float): Unit = ???
+  override def updateFloat(columnIndex: Int, x: Float): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateFloat(columnLabel: String, x: Float): Unit = ???
+  override def updateFloat(columnLabel: String, x: Float): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateDouble(columnIndex: Int, x: Double): Unit = ???
+  override def updateDouble(columnIndex: Int, x: Double): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateDouble(columnLabel: String, x: Double): Unit = ???
+  override def updateDouble(columnLabel: String, x: Double): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBigDecimal(columnIndex: Int, x: BigDecimal): Unit = ???
+  override def updateBigDecimal(columnIndex: Int, x: BigDecimal): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBigDecimal(columnLabel: String, x: BigDecimal): Unit = ???
+  override def updateBigDecimal(columnLabel: String, x: BigDecimal): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateString(columnIndex: Int, x: String): Unit = ???
+  override def updateString(columnIndex: Int, x: String): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateString(columnLabel: String, x: String): Unit = ???
+  override def updateString(columnLabel: String, x: String): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBytes(columnIndex: Int, x: scala.Array[Byte]): Unit = ???
+  override def updateBytes(columnIndex: Int, x: scala.Array[Byte]): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBytes(columnLabel: String, x: scala.Array[Byte]): Unit = ???
+  override def updateBytes(columnLabel: String, x: scala.Array[Byte]): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateDate(columnIndex: Int, x: Date): Unit = ???
+  override def updateDate(columnIndex: Int, x: Date): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateDate(columnLabel: String, x: Date): Unit = ???
+  override def updateDate(columnLabel: String, x: Date): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateTime(columnIndex: Int, x: Time): Unit = ???
+  override def updateTime(columnIndex: Int, x: Time): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateTime(columnLabel: String, x: Time): Unit = ???
+  override def updateTime(columnLabel: String, x: Time): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateTimestamp(columnIndex: Int, x: Timestamp): Unit = ???
+  override def updateTimestamp(columnIndex: Int, x: Timestamp): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateTimestamp(columnLabel: String, x: Timestamp): Unit = ???
+  override def updateTimestamp(columnLabel: String, x: Timestamp): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Int): Unit = ???
+  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Int): Unit = ???
+  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Long): Unit = ???
+  override def updateAsciiStream(columnIndex: Int, x: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Long): Unit = ???
+  override def updateAsciiStream(columnLabel: String, x: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateAsciiStream(columnIndex: Int, x: InputStream): Unit = ???
+  override def updateAsciiStream(columnIndex: Int, x: InputStream): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateAsciiStream(columnLabel: String, x: InputStream): Unit = ???
+  override def updateAsciiStream(columnLabel: String, x: InputStream): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Int): Unit = ???
+  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Int): Unit = ???
+  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Long): Unit = ???
+  override def updateBinaryStream(columnIndex: Int, x: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Long): Unit = ???
+  override def updateBinaryStream(columnLabel: String, x: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBinaryStream(columnIndex: Int, x: InputStream): Unit = ???
+  override def updateBinaryStream(columnIndex: Int, x: InputStream): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBinaryStream(columnLabel: String, x: InputStream): Unit = ???
+  override def updateBinaryStream(columnLabel: String, x: InputStream): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Int): Unit = ???
+  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Int): Unit = ???
+  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit = ???
+  override def updateCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit = ???
+  override def updateCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateCharacterStream(columnIndex: Int, x: Reader): Unit = ???
+  override def updateCharacterStream(columnIndex: Int, x: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateCharacterStream(columnLabel: String, reader: Reader): Unit = ???
+  override def updateCharacterStream(columnLabel: String, reader: Reader): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateObject(columnIndex: Int, x: Any, scaleOrLength: Int): Unit = ???
+  override def updateObject(columnIndex: Int, x: Any, scaleOrLength: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateObject(columnIndex: Int, x: Any): Unit = ???
+  override def updateObject(columnIndex: Int, x: Any): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateObject(columnLabel: String, x: Any, scaleOrLength: Int): Unit = ???
+  override def updateObject(columnLabel: String, x: Any, scaleOrLength: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateObject(columnLabel: String, x: Any): Unit = ???
+  override def updateObject(columnLabel: String, x: Any): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def insertRow(): Unit = ???
+  override def insertRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateRow(): Unit = ???
+  override def updateRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def deleteRow(): Unit = ???
+  override def deleteRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def refreshRow(): Unit = ???
+  override def refreshRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def cancelRowUpdates(): Unit = ???
+  override def cancelRowUpdates(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def moveToInsertRow(): Unit = ???
+  override def moveToInsertRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def moveToCurrentRow(): Unit = ???
+  override def moveToCurrentRow(): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getStatement(): Statement = ???
+  override def getStatement(): Statement = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getRef(columnIndex: Int): Ref = ???
+  override def getRef(columnIndex: Int): Ref = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getRef(columnLabel: String): Ref = ???
+  override def getRef(columnLabel: String): Ref = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getBlob(columnIndex: Int): Blob = ???
+  override def getBlob(columnIndex: Int): Blob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getBlob(columnLabel: String): Blob = ???
+  override def getBlob(columnLabel: String): Blob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getClob(columnIndex: Int): Clob = ???
+  override def getClob(columnIndex: Int): Clob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getClob(columnLabel: String): Clob = ???
+  override def getClob(columnLabel: String): Clob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getArray(columnIndex: Int): java.sql.Array = ???
+  override def getArray(columnIndex: Int): java.sql.Array = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getArray(columnLabel: String): java.sql.Array = ???
+  override def getArray(columnLabel: String): java.sql.Array = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getURL(columnIndex: Int): URL = ???
+  override def getURL(columnIndex: Int): URL = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getURL(columnLabel: String): URL = ???
+  override def getURL(columnLabel: String): URL = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateRef(columnIndex: Int, x: Ref): Unit = ???
+  override def updateRef(columnIndex: Int, x: Ref): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateRef(columnLabel: String, x: Ref): Unit = ???
+  override def updateRef(columnLabel: String, x: Ref): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBlob(columnIndex: Int, x: Blob): Unit = ???
+  override def updateBlob(columnIndex: Int, x: Blob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBlob(columnLabel: String, x: Blob): Unit = ???
+  override def updateBlob(columnLabel: String, x: Blob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBlob(columnIndex: Int, inputStream: InputStream, length: Long): Unit = ???
+  override def updateBlob(columnIndex: Int, inputStream: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBlob(columnLabel: String, inputStream: InputStream, length: Long): Unit = ???
+  override def updateBlob(columnLabel: String, inputStream: InputStream, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateBlob(columnIndex: Int, inputStream: InputStream): Unit = ???
+  override def updateBlob(columnIndex: Int, inputStream: InputStream): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateBlob(columnLabel: String, inputStream: InputStream): Unit = ???
+  override def updateBlob(columnLabel: String, inputStream: InputStream): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateClob(columnIndex: Int, x: Clob): Unit = ???
+  override def updateClob(columnIndex: Int, x: Clob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateClob(columnLabel: String, x: Clob): Unit = ???
+  override def updateClob(columnLabel: String, x: Clob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateClob(columnIndex: Int, reader: Reader, length: Long): Unit = ???
+  override def updateClob(columnIndex: Int, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateClob(columnLabel: String, reader: Reader, length: Long): Unit = ???
+  override def updateClob(columnLabel: String, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateClob(columnIndex: Int, reader: Reader): Unit = ???
+  override def updateClob(columnIndex: Int, reader: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateClob(columnLabel: String, reader: Reader): Unit = ???
+  override def updateClob(columnLabel: String, reader: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateArray(columnIndex: Int, x: java.sql.Array): Unit = ???
+  override def updateArray(columnIndex: Int, x: java.sql.Array): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateArray(columnLabel: String, x: java.sql.Array): Unit = ???
+  override def updateArray(columnLabel: String, x: java.sql.Array): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getRowId(columnIndex: Int): RowId = ???
+  override def getRowId(columnIndex: Int): RowId = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getRowId(columnLabel: String): RowId = ???
+  override def getRowId(columnLabel: String): RowId = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateRowId(columnIndex: Int, x: RowId): Unit = ???
+  override def updateRowId(columnIndex: Int, x: RowId): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateRowId(columnLabel: String, x: RowId): Unit = ???
+  override def updateRowId(columnLabel: String, x: RowId): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getHoldability(): Int = ???
+  override def getHoldability(): Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isClosed(): Boolean = ???
+  override def isClosed(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNString(columnIndex: Int, nString: String): Unit = ???
+  override def updateNString(columnIndex: Int, nString: String): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNString(columnLabel: String, nString: String): Unit = ???
+  override def updateNString(columnLabel: String, nString: String): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNClob(columnIndex: Int, nClob: NClob): Unit = ???
+  override def updateNClob(columnIndex: Int, nClob: NClob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNClob(columnLabel: String, nClob: NClob): Unit = ???
+  override def updateNClob(columnLabel: String, nClob: NClob): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNClob(columnIndex: Int, reader: Reader, length: Long): Unit = ???
+  override def updateNClob(columnIndex: Int, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNClob(columnLabel: String, reader: Reader, length: Long): Unit = ???
+  override def updateNClob(columnLabel: String, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNClob(columnIndex: Int, reader: Reader): Unit = ???
+  override def updateNClob(columnIndex: Int, reader: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNClob(columnLabel: String, reader: Reader): Unit = ???
+  override def updateNClob(columnLabel: String, reader: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getNClob(columnIndex: Int): NClob = ???
+  override def getNClob(columnIndex: Int): NClob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getNClob(columnLabel: String): NClob = ???
+  override def getNClob(columnLabel: String): NClob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSQLXML(columnIndex: Int): SQLXML = ???
+  override def getSQLXML(columnIndex: Int): SQLXML = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSQLXML(columnLabel: String): SQLXML = ???
+  override def getSQLXML(columnLabel: String): SQLXML = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateSQLXML(columnIndex: Int, xmlObject: SQLXML): Unit = ???
+  override def updateSQLXML(columnIndex: Int, xmlObject: SQLXML): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateSQLXML(columnLabel: String, xmlObject: SQLXML): Unit = ???
+  override def updateSQLXML(columnLabel: String, xmlObject: SQLXML): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getNString(columnIndex: Int): String = ???
+  override def getNString(columnIndex: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getNString(columnLabel: String): String = ???
+  override def getNString(columnLabel: String): String = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getNCharacterStream(columnIndex: Int): Reader = ???
+  override def getNCharacterStream(columnIndex: Int): Reader = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getNCharacterStream(columnLabel: String): Reader = ???
+  override def getNCharacterStream(columnLabel: String): Reader = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit = ???
+  override def updateNCharacterStream(columnIndex: Int, x: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit = ???
+  override def updateNCharacterStream(columnLabel: String, reader: Reader, length: Long): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def updateNCharacterStream(columnIndex: Int, x: Reader): Unit = ???
+  override def updateNCharacterStream(columnIndex: Int, x: Reader): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit = ???
+  override def updateNCharacterStream(columnLabel: String, reader: Reader): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
 //  @inline
   @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")

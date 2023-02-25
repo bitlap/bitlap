@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
@@ -18,250 +18,326 @@ class BitlapDatabaseMetaData(
   private val session: SessionHandle,
   private val client: BitlapClient
 ) extends DatabaseMetaData {
-  override def allProceduresAreCallable(): Boolean = ???
+  override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def allTablesAreSelectable(): Boolean = ???
+  override def allTablesAreSelectable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getURL: String = ???
+  override def getURL: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getUserName: String = ???
+  override def getUserName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isReadOnly: Boolean = ???
+  override def isReadOnly: Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nullsAreSortedHigh(): Boolean = ???
+  override def nullsAreSortedHigh(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nullsAreSortedLow(): Boolean = ???
+  override def nullsAreSortedLow(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nullsAreSortedAtStart(): Boolean = ???
+  override def nullsAreSortedAtStart(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nullsAreSortedAtEnd(): Boolean = ???
+  override def nullsAreSortedAtEnd(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseProductName: String = ???
+  override def getDatabaseProductName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseProductVersion: String = ???
+  override def getDatabaseProductVersion: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDriverName: String = ???
+  override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDriverVersion: String = ???
+  override def getDriverVersion: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDriverMajorVersion: Int = ???
+  override def getDriverMajorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDriverMinorVersion: Int = ???
+  override def getDriverMinorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def usesLocalFiles(): Boolean = ???
+  override def usesLocalFiles(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def usesLocalFilePerTable(): Boolean = ???
+  override def usesLocalFilePerTable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMixedCaseIdentifiers(): Boolean = ???
+  override def supportsMixedCaseIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def storesUpperCaseIdentifiers(): Boolean = ???
+  override def storesUpperCaseIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def storesLowerCaseIdentifiers(): Boolean = ???
+  override def storesLowerCaseIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def storesMixedCaseIdentifiers(): Boolean = ???
+  override def storesMixedCaseIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMixedCaseQuotedIdentifiers(): Boolean = ???
+  override def supportsMixedCaseQuotedIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def storesUpperCaseQuotedIdentifiers(): Boolean = ???
+  override def storesUpperCaseQuotedIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def storesLowerCaseQuotedIdentifiers(): Boolean = ???
+  override def storesLowerCaseQuotedIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def storesMixedCaseQuotedIdentifiers(): Boolean = ???
+  override def storesMixedCaseQuotedIdentifiers(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getIdentifierQuoteString: String = ???
+  override def getIdentifierQuoteString: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSQLKeywords: String = ???
+  override def getSQLKeywords: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getNumericFunctions: String = ???
+  override def getNumericFunctions: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getStringFunctions: String = ???
+  override def getStringFunctions: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSystemFunctions: String = ???
+  override def getSystemFunctions: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTimeDateFunctions: String = ???
+  override def getTimeDateFunctions: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSearchStringEscape: String = ???
+  override def getSearchStringEscape: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getExtraNameCharacters: String = ???
+  override def getExtraNameCharacters: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsAlterTableWithAddColumn(): Boolean = ???
+  override def supportsAlterTableWithAddColumn(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsAlterTableWithDropColumn(): Boolean = ???
+  override def supportsAlterTableWithDropColumn(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsColumnAliasing(): Boolean = ???
+  override def supportsColumnAliasing(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nullPlusNonNullIsNull(): Boolean = ???
+  override def nullPlusNonNullIsNull(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsConvert(): Boolean = ???
+  override def supportsConvert(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsConvert(fromType: Int, toType: Int): Boolean = ???
+  override def supportsConvert(fromType: Int, toType: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsTableCorrelationNames(): Boolean = ???
+  override def supportsTableCorrelationNames(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsDifferentTableCorrelationNames(): Boolean = ???
+  override def supportsDifferentTableCorrelationNames(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsExpressionsInOrderBy(): Boolean = ???
+  override def supportsExpressionsInOrderBy(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsOrderByUnrelated(): Boolean = ???
+  override def supportsOrderByUnrelated(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsGroupBy(): Boolean = ???
+  override def supportsGroupBy(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsGroupByUnrelated(): Boolean = ???
+  override def supportsGroupByUnrelated(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsGroupByBeyondSelect(): Boolean = ???
+  override def supportsGroupByBeyondSelect(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsLikeEscapeClause(): Boolean = ???
+  override def supportsLikeEscapeClause(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMultipleResultSets(): Boolean = ???
+  override def supportsMultipleResultSets(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMultipleTransactions(): Boolean = ???
+  override def supportsMultipleTransactions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsNonNullableColumns(): Boolean = ???
+  override def supportsNonNullableColumns(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMinimumSQLGrammar(): Boolean = ???
+  override def supportsMinimumSQLGrammar(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsCoreSQLGrammar(): Boolean = ???
+  override def supportsCoreSQLGrammar(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsExtendedSQLGrammar(): Boolean = ???
+  override def supportsExtendedSQLGrammar(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsANSI92EntryLevelSQL(): Boolean = ???
+  override def supportsANSI92EntryLevelSQL(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsANSI92IntermediateSQL(): Boolean = ???
+  override def supportsANSI92IntermediateSQL(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsANSI92FullSQL(): Boolean = ???
+  override def supportsANSI92FullSQL(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsIntegrityEnhancementFacility(): Boolean = ???
+  override def supportsIntegrityEnhancementFacility(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsOuterJoins(): Boolean = ???
+  override def supportsOuterJoins(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsFullOuterJoins(): Boolean = ???
+  override def supportsFullOuterJoins(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsLimitedOuterJoins(): Boolean = ???
+  override def supportsLimitedOuterJoins(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getSchemaTerm: String = "database"
 
-  override def getProcedureTerm: String = ???
+  override def getProcedureTerm: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getCatalogTerm: String = ???
+  override def getCatalogTerm: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isCatalogAtStart: Boolean = ???
+  override def isCatalogAtStart: Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getCatalogSeparator: String = ???
+  override def getCatalogSeparator: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsSchemasInDataManipulation(): Boolean = ???
+  override def supportsSchemasInDataManipulation(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsSchemasInProcedureCalls(): Boolean = ???
+  override def supportsSchemasInProcedureCalls(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsSchemasInTableDefinitions(): Boolean = ???
+  override def supportsSchemasInTableDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsSchemasInIndexDefinitions(): Boolean = ???
+  override def supportsSchemasInIndexDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsSchemasInPrivilegeDefinitions(): Boolean = ???
+  override def supportsSchemasInPrivilegeDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCatalogsInDataManipulation(): Boolean = ???
+  override def supportsCatalogsInDataManipulation(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCatalogsInProcedureCalls(): Boolean = ???
+  override def supportsCatalogsInProcedureCalls(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCatalogsInTableDefinitions(): Boolean = ???
+  override def supportsCatalogsInTableDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCatalogsInIndexDefinitions(): Boolean = ???
+  override def supportsCatalogsInIndexDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCatalogsInPrivilegeDefinitions(): Boolean = ???
+  override def supportsCatalogsInPrivilegeDefinitions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsPositionedDelete(): Boolean = ???
+  override def supportsPositionedDelete(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsPositionedUpdate(): Boolean = ???
+  override def supportsPositionedUpdate(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsSelectForUpdate(): Boolean = ???
+  override def supportsSelectForUpdate(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsStoredProcedures(): Boolean = ???
+  override def supportsStoredProcedures(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsSubqueriesInComparisons(): Boolean = ???
+  override def supportsSubqueriesInComparisons(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsSubqueriesInExists(): Boolean = ???
+  override def supportsSubqueriesInExists(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsSubqueriesInIns(): Boolean = ???
+  override def supportsSubqueriesInIns(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsSubqueriesInQuantifieds(): Boolean = ???
+  override def supportsSubqueriesInQuantifieds(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsCorrelatedSubqueries(): Boolean = ???
+  override def supportsCorrelatedSubqueries(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsUnion(): Boolean = ???
+  override def supportsUnion(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsUnionAll(): Boolean = ???
+  override def supportsUnionAll(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsOpenCursorsAcrossCommit(): Boolean = ???
+  override def supportsOpenCursorsAcrossCommit(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsOpenCursorsAcrossRollback(): Boolean = ???
+  override def supportsOpenCursorsAcrossRollback(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsOpenStatementsAcrossCommit(): Boolean = ???
+  override def supportsOpenStatementsAcrossCommit(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsOpenStatementsAcrossRollback(): Boolean = ???
+  override def supportsOpenStatementsAcrossRollback(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getMaxBinaryLiteralLength: Int = ???
+  override def getMaxBinaryLiteralLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxCharLiteralLength: Int = ???
+  override def getMaxCharLiteralLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnNameLength: Int = ???
+  override def getMaxColumnNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnsInGroupBy: Int = ???
+  override def getMaxColumnsInGroupBy: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnsInIndex: Int = ???
+  override def getMaxColumnsInIndex: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnsInOrderBy: Int = ???
+  override def getMaxColumnsInOrderBy: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnsInSelect: Int = ???
+  override def getMaxColumnsInSelect: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxColumnsInTable: Int = ???
+  override def getMaxColumnsInTable: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxConnections: Int = ???
+  override def getMaxConnections: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxCursorNameLength: Int = ???
+  override def getMaxCursorNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxIndexLength: Int = ???
+  override def getMaxIndexLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxSchemaNameLength: Int = ???
+  override def getMaxSchemaNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxProcedureNameLength: Int = ???
+  override def getMaxProcedureNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxCatalogNameLength: Int = ???
+  override def getMaxCatalogNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxRowSize: Int = ???
+  override def getMaxRowSize: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def doesMaxRowSizeIncludeBlobs(): Boolean = ???
+  override def doesMaxRowSizeIncludeBlobs(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxStatementLength: Int = ???
+  override def getMaxStatementLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxStatements: Int = ???
+  override def getMaxStatements: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxTableNameLength: Int = ???
+  override def getMaxTableNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxTablesInSelect: Int = ???
+  override def getMaxTablesInSelect: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMaxUserNameLength: Int = ???
+  override def getMaxUserNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDefaultTransactionIsolation: Int = ???
+  override def getDefaultTransactionIsolation: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsTransactions(): Boolean = ???
+  override def supportsTransactions(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsTransactionIsolationLevel(level: Int): Boolean = ???
+  override def supportsTransactionIsolationLevel(level: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsDataDefinitionAndDataManipulationTransactions(): Boolean = ???
+  override def supportsDataDefinitionAndDataManipulationTransactions(): Boolean =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsDataManipulationTransactionsOnly(): Boolean = ???
+  override def supportsDataManipulationTransactionsOnly(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def dataDefinitionCausesTransactionCommit(): Boolean = ???
+  override def dataDefinitionCausesTransactionCommit(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def dataDefinitionIgnoredInTransactions(): Boolean = ???
+  override def dataDefinitionIgnoredInTransactions(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getProcedures(catalog: String, schemaPattern: String, procedureNamePattern: String): ResultSet = ???
+  override def getProcedures(catalog: String, schemaPattern: String, procedureNamePattern: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getProcedureColumns(
     catalog: String,
     schemaPattern: String,
     procedureNamePattern: String,
     columnNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getTables(
     catalog: String,
@@ -276,25 +352,26 @@ class BitlapDatabaseMetaData(
   override def getSchemas: ResultSet =
     getSchemas(null, null)
 
-  override def getCatalogs: ResultSet = ???
+  override def getCatalogs: ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTableTypes: ResultSet = ???
+  override def getTableTypes: ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getColumns(
     catalog: String,
     schemaPattern: String,
     tableNamePattern: String,
     columnNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getColumnPrivileges(
     catalog: String,
     schema: String,
     table: String,
     columnNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTablePrivileges(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet = ???
+  override def getTablePrivileges(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getBestRowIdentifier(
     catalog: String,
@@ -302,15 +379,19 @@ class BitlapDatabaseMetaData(
     table: String,
     scope: Int,
     nullable: Boolean
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getVersionColumns(catalog: String, schema: String, table: String): ResultSet = ???
+  override def getVersionColumns(catalog: String, schema: String, table: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getPrimaryKeys(catalog: String, schema: String, table: String): ResultSet = ???
+  override def getPrimaryKeys(catalog: String, schema: String, table: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getImportedKeys(catalog: String, schema: String, table: String): ResultSet = ???
+  override def getImportedKeys(catalog: String, schema: String, table: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getExportedKeys(catalog: String, schema: String, table: String): ResultSet = ???
+  override def getExportedKeys(catalog: String, schema: String, table: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getCrossReference(
     parentCatalog: String,
@@ -319,9 +400,9 @@ class BitlapDatabaseMetaData(
     foreignCatalog: String,
     foreignSchema: String,
     foreignTable: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTypeInfo: ResultSet = ???
+  override def getTypeInfo: ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getIndexInfo(
     catalog: String,
@@ -329,106 +410,140 @@ class BitlapDatabaseMetaData(
     table: String,
     unique: Boolean,
     approximate: Boolean
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsResultSetType(`type`: Int): Boolean = ???
+  override def supportsResultSetType(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsResultSetConcurrency(`type`: Int, concurrency: Int): Boolean = ???
+  override def supportsResultSetConcurrency(`type`: Int, concurrency: Int): Boolean =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def ownUpdatesAreVisible(`type`: Int): Boolean = ???
+  override def ownUpdatesAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def ownDeletesAreVisible(`type`: Int): Boolean = ???
+  override def ownDeletesAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def ownInsertsAreVisible(`type`: Int): Boolean = ???
+  override def ownInsertsAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def othersUpdatesAreVisible(`type`: Int): Boolean = ???
+  override def othersUpdatesAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def othersDeletesAreVisible(`type`: Int): Boolean = ???
+  override def othersDeletesAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def othersInsertsAreVisible(`type`: Int): Boolean = ???
+  override def othersInsertsAreVisible(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def updatesAreDetected(`type`: Int): Boolean = ???
+  override def updatesAreDetected(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def deletesAreDetected(`type`: Int): Boolean = ???
+  override def deletesAreDetected(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def insertsAreDetected(`type`: Int): Boolean = ???
+  override def insertsAreDetected(`type`: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsBatchUpdates(): Boolean = ???
+  override def supportsBatchUpdates(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getUDTs(catalog: String, schemaPattern: String, typeNamePattern: String, types: Array[Int]): ResultSet =
-    ???
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getConnection: Connection = this.connection
 
-  override def supportsSavepoints(): Boolean = ???
+  override def supportsSavepoints(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsNamedParameters(): Boolean = ???
+  override def supportsNamedParameters(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsMultipleOpenResults(): Boolean = ???
+  override def supportsMultipleOpenResults(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def supportsGetGeneratedKeys(): Boolean = ???
+  override def supportsGetGeneratedKeys(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSuperTypes(catalog: String, schemaPattern: String, typeNamePattern: String): ResultSet = ???
+  override def getSuperTypes(catalog: String, schemaPattern: String, typeNamePattern: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSuperTables(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet = ???
+  override def getSuperTables(catalog: String, schemaPattern: String, tableNamePattern: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getAttributes(
     catalog: String,
     schemaPattern: String,
     typeNamePattern: String,
     attributeNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsResultSetHoldability(holdability: Int): Boolean = ???
+  override def supportsResultSetHoldability(holdability: Int): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getResultSetHoldability: Int = ???
+  override def getResultSetHoldability: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseMajorVersion: Int = ???
+  override def getDatabaseMajorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseMinorVersion: Int = ???
+  override def getDatabaseMinorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getJDBCMajorVersion: Int = ???
+  override def getJDBCMajorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getJDBCMinorVersion: Int = ???
+  override def getJDBCMinorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSQLStateType: Int = DatabaseMetaData.sqlStateSQL99;
+  override def getSQLStateType: Int = DatabaseMetaData.sqlStateSQL99
 
-  override def locatorsUpdateCopy(): Boolean = ???
+  override def locatorsUpdateCopy(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def supportsStatementPooling(): Boolean = ???
+  override def supportsStatementPooling(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getRowIdLifetime: RowIdLifetime = ???
+  override def getRowIdLifetime: RowIdLifetime = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getSchemas(catalog: String, schemaPattern: String): ResultSet = {
     val stmt = client.getDatabases(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"))
     BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
   }
 
-  override def supportsStoredFunctionsUsingCallSyntax(): Boolean = ???
+  override def supportsStoredFunctionsUsingCallSyntax(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def autoCommitFailureClosesAllResultSets(): Boolean = ???
+  override def autoCommitFailureClosesAllResultSets(): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getClientInfoProperties: ResultSet = ???
+  override def getClientInfoProperties: ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getFunctions(catalog: String, schemaPattern: String, functionNamePattern: String): ResultSet = ???
+  override def getFunctions(catalog: String, schemaPattern: String, functionNamePattern: String): ResultSet =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getFunctionColumns(
     catalog: String,
     schemaPattern: String,
     functionNamePattern: String,
     columnNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getPseudoColumns(
     catalog: String,
     schemaPattern: String,
     tableNamePattern: String,
     columnNamePattern: String
-  ): ResultSet = ???
+  ): ResultSet = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def generatedKeyAlwaysReturned(): Boolean = ???
+  override def generatedKeyAlwaysReturned(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def unwrap[T](iface: Class[T]): T = ???
+  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = ???
+  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 }

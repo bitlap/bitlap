@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.test.sql
 
 import org.bitlap.core.test.base.BaseLocalFsTest

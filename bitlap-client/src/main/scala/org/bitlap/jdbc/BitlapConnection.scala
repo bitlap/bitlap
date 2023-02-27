@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
@@ -87,6 +87,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     }
   }
 
+  private def checkConnection(action: String): Unit =
+    if (closed) throw BitlapSQLException(s"Cannot $action after connection has been closed")
+
   private def executeInitSql(): Unit =
     if (initFile != null) try {
       val st = createStatement()
@@ -157,9 +160,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     initSqlList.asScala.toList
   }
 
-  override def unwrap[T](iface: Class[T]): T = ???
+  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = ???
+  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def close(): Unit =
     try
@@ -168,105 +173,141 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       }
     finally closed = true
 
-  override def createStatement(): Statement =
-    if (session != null) {
-      new BitlapStatement(this, session, client)
-    } else {
-      throw BitlapSQLException("Can't create Statement, connection is closed");
-    }
+  override def createStatement(): Statement = {
+    checkConnection("createStatement")
+    new BitlapStatement(this, session, client)
+  }
 
   override def isClosed(): Boolean = closed
 
   override def clearWarnings(): Unit = warningChain = null
 
-  override def prepareStatement(sql: String): PreparedStatement = ???
+  override def prepareStatement(sql: String): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
-  override def prepareCall(sql: String): CallableStatement = ???
+  override def prepareCall(sql: String): CallableStatement = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def nativeSQL(sql: String): String = ???
+  override def nativeSQL(sql: String): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setAutoCommit(autoCommit: Boolean): Unit = ???
+  override def setAutoCommit(autoCommit: Boolean): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getAutoCommit: Boolean = ???
+  override def getAutoCommit: Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def commit(): Unit = ()
 
   override def rollback(): Unit = ()
 
   override def getMetaData: DatabaseMetaData = {
-    if (closed) throw new SQLException("Connection is closed")
+    checkConnection("getMetaData")
     new BitlapDatabaseMetaData(this, session, client)
   }
 
-  override def setReadOnly(readOnly: Boolean): Unit = ???
+  override def setReadOnly(readOnly: Boolean): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def isReadOnly: Boolean = false
 
-  override def setCatalog(catalog: String): Unit = ???
+  override def setCatalog(catalog: String): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getCatalog: String = ""
 
-  override def setTransactionIsolation(level: Int): Unit = ???
+  override def setTransactionIsolation(level: Int): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getTransactionIsolation: Int = ???
+  override def getTransactionIsolation: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getWarnings: SQLWarning = warningChain
 
-  override def createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement = ???
+  override def createStatement(resultSetType: Int, resultSetConcurrency: Int): Statement = {
+    checkConnection("createStatement")
+    new BitlapStatement(this, session, client)
+  }
 
-  override def prepareStatement(sql: String, resultSetType: Int, resultSetConcurrency: Int): PreparedStatement = ???
+  override def prepareStatement(sql: String, resultSetType: Int, resultSetConcurrency: Int): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
-  override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int): CallableStatement = ???
+  override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int): CallableStatement =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTypeMap: util.Map[String, Class[_]] = ???
+  override def getTypeMap: util.Map[String, Class[_]] = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def setTypeMap(map: util.Map[String, Class[_]]): Unit = ???
+  override def setTypeMap(map: util.Map[String, Class[_]]): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def setHoldability(holdability: Int): Unit = ???
+  override def setHoldability(holdability: Int): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getHoldability: Int = ???
+  override def getHoldability: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setSavepoint(): Savepoint = ???
+  override def setSavepoint(): Savepoint = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setSavepoint(name: String): Savepoint = ???
+  override def setSavepoint(name: String): Savepoint = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def rollback(savepoint: Savepoint): Unit = ???
+  override def rollback(savepoint: Savepoint): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def releaseSavepoint(savepoint: Savepoint): Unit = ???
+  override def releaseSavepoint(savepoint: Savepoint): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def createStatement(resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): Statement =
-    ???
+  override def createStatement(resultSetType: Int, resultSetConcurrency: Int, resultSetHoldability: Int): Statement = {
+    checkConnection("createStatement")
+    new BitlapStatement(this, session, client)
+  }
 
   override def prepareStatement(
     sql: String,
     resultSetType: Int,
     resultSetConcurrency: Int,
     resultSetHoldability: Int
-  ): PreparedStatement = ???
+  ): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
   override def prepareCall(
     sql: String,
     resultSetType: Int,
     resultSetConcurrency: Int,
     resultSetHoldability: Int
-  ): CallableStatement = ???
+  ): CallableStatement = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def prepareStatement(sql: String, autoGeneratedKeys: Int): PreparedStatement = ???
+  override def prepareStatement(sql: String, autoGeneratedKeys: Int): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
-  override def prepareStatement(sql: String, columnIndexes: scala.Array[Int]): PreparedStatement = ???
+  override def prepareStatement(sql: String, columnIndexes: scala.Array[Int]): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
-  override def prepareStatement(sql: String, columnNames: scala.Array[String]): PreparedStatement = ???
+  override def prepareStatement(sql: String, columnNames: scala.Array[String]): PreparedStatement = {
+    checkConnection("prepareStatement")
+    new BitlapPreparedStatement(this, session, client, sql)
+  }
 
-  override def createClob(): Clob = ???
+  override def createClob(): Clob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def createBlob(): Blob = ???
+  override def createBlob(): Blob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def createNClob(): NClob = ???
+  override def createNClob(): NClob = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def createSQLXML(): SQLXML = ???
+  override def createSQLXML(): SQLXML = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def isValid(timeout: Int): Boolean = {
-    if (timeout < 0) throw new SQLException("timeout value was negative")
+    if (timeout < 0) throw BitlapSQLException("timeout value was negative")
     if (closed) return false
     var rc = false
     try {
@@ -278,23 +319,29 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     rc
   }
 
-  override def setClientInfo(name: String, value: String): Unit = ???
+  override def setClientInfo(name: String, value: String): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def setClientInfo(properties: Properties): Unit = ???
+  override def setClientInfo(properties: Properties): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getClientInfo(name: String): String = ???
+  override def getClientInfo(name: String): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getClientInfo: Properties = ???
+  override def getClientInfo: Properties = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def createArrayOf(typeName: String, elements: scala.Array[AnyRef]): sql.Array = ???
+  override def createArrayOf(typeName: String, elements: scala.Array[AnyRef]): sql.Array =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def createStruct(typeName: String, attributes: scala.Array[AnyRef]): Struct = ???
+  override def createStruct(typeName: String, attributes: scala.Array[AnyRef]): Struct =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def setSchema(schema: String): Unit = {
     // JDK 1.7
-    if (closed) throw new SQLException("Connection is closed")
-    if (schema == null || schema.isEmpty) throw new SQLException("Schema name is null or empty")
-    if (schema.contains(";")) throw new SQLException("invalid schema name")
+    checkConnection("setSchema")
+    if (schema == null || schema.isEmpty) throw BitlapSQLException("Schema name is null or empty")
+    if (schema.contains(";")) throw BitlapSQLException("invalid schema name")
     var stmt: Statement = null
     try {
       stmt = createStatement()
@@ -303,7 +350,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   }
 
   override def getSchema: String = {
-    if (closed) throw BitlapSQLException("Connection is closed")
+    checkConnection("getSchema")
     var res: ResultSet  = null
     var stmt: Statement = null
     try {
@@ -317,11 +364,12 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     res.getString(1)
   }
 
-  override def abort(executor: Executor): Unit = ???
+  override def abort(executor: Executor): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setNetworkTimeout(executor: Executor, milliseconds: Int): Unit = ???
+  override def setNetworkTimeout(executor: Executor, milliseconds: Int): Unit =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getNetworkTimeout: Int = ???
+  override def getNetworkTimeout: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 }
 object BitlapConnection {
   private val URI_PREFIX = "jdbc:bitlap://"

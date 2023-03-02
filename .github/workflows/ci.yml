@@ -50,26 +50,9 @@ jobs:
 
       - name: Upload test coverage report
         run: bash <(curl -s https://codecov.io/bash)
-  
-  publish:
-    runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
-    steps:
-      - name: Release
-        uses: qcastel/github-actions-maven-release@master
-        with:
-          gpg-enabled: "true"
-          release-branch-name: "dev"
-          gpg-passphrase: ${{ secrets.PGP_PASSPHRASE }}
-          gpg-key-id: ${{ secrets.PGP_KEY_ID }}
-          gpg-key: ${{ secrets.PGP_SECRET }}
-          maven-args: "-Dmaven.javadoc.skip=true -DskipTests -DskipITs -Dmaven.deploy.skip=true"
-          version-minor: true
-        env:
-          JAVA_HOME: /usr/lib/jvm/java-11-openjdk/
   ci:
     runs-on: ubuntu-latest
-    needs: [ build, test, publish]
+    needs: [ build, test]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

@@ -40,7 +40,7 @@
         <developer>
             <id>jxnu-liguobin</id>
             <name>梦境迷离</name>
-            <url>https://dreamylost.cn</url>
+            <url>https://blog.dreamylost.cn</url>
             <email>dreamylost@outlook.com</email>
         </developer>
     </developers>
@@ -481,7 +481,7 @@
                             <file>.scalafmt.conf</file>
                         </scalafmt>
                         <licenseHeader>
-                            <content>/* Copyright (c) 2022 bitlap.org */</content>
+                            <content>/* Copyright (c) 2023 bitlap.org */</content>
                             <delimiter>package</delimiter>
                         </licenseHeader>
                     </scala>
@@ -498,7 +498,7 @@
                         </ktlint>
 
                         <licenseHeader>
-                            <content>/* Copyright (c) 2022 bitlap.org */</content>
+                            <content>/* Copyright (c) 2023 bitlap.org */</content>
                         </licenseHeader>
                     </kotlin>
                 </configuration>

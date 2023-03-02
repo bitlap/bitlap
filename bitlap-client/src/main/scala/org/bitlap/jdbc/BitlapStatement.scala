@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
@@ -103,7 +103,10 @@ class BitlapStatement(
     resultSet
   }
 
-  override def executeUpdate(sql: String): Int = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def executeUpdate(sql: String): Int = {
+    execute(sql)
+    0
+  }
 
   override def getMaxFieldSize: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 

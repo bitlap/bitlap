@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
@@ -56,11 +56,19 @@ class BitlapQueryResultSet(
     }
   }
 
+  private def checkResultSet(action: String): Unit =
+    if (closed || client == null || stmtHandle == null) {
+      throw BitlapSQLException(s"Cannot $action after Resultset has been closed")
+    }
+
+  private def checkClose(action: String): Unit =
+    if (closed) {
+      throw BitlapSQLException(s"Cannot $action after Resultset has been closed")
+    }
+
   private def retrieveSchema(): Unit =
     try {
-      if (client == null || stmtHandle == null) {
-        throw BitlapSQLException("Resultset is closed")
-      }
+      checkResultSet("<init>")
       // debug
       val namesSb = new mutable.StringBuilder()
       val typesSb = new mutable.StringBuilder()
@@ -89,9 +97,7 @@ class BitlapQueryResultSet(
     }
 
   override def next(): Boolean = {
-    if (closed || client == null || stmtHandle == null) {
-      throw BitlapSQLException("Resultset is closed")
-    }
+    checkResultSet("next")
     if (emptyResultSet || (1 to rowsFetched).contains(maxRows)) {
       return false
     }
@@ -135,23 +141,17 @@ class BitlapQueryResultSet(
     this.closed
 
   override def getMetaData(): ResultSetMetaData = {
-    if (closed) {
-      throw BitlapSQLException("Resultset is closed")
-    }
+    checkClose("getMetaData")
     super.getMetaData()
   }
 
   override def getFetchSize(): Int = {
-    if (closed) {
-      throw BitlapSQLException("Resultset is closed")
-    }
+    checkClose("getFetchSize")
     this.fetchSize
   }
 
   override def setFetchSize(rows: Int): Unit = {
-    if (closed) {
-      throw BitlapSQLException("Resultset is closed")
-    }
+    checkClose("setFetchSize")
     this.fetchSize = rows
   }
 
@@ -179,17 +179,18 @@ class BitlapQueryResultSet(
   }
 
   override def beforeFirst(): Unit = {
-    if (closed) throw new SQLException("Resultset is closed")
+    checkClose("beforeFirst")
     fetchFirst = true
     rowsFetched = 0
   }
 
-  override def getType: Int =
-    if (closed) throw new SQLException("Resultset is closed")
-    else ResultSet.TYPE_FORWARD_ONLY
+  override def getType: Int = {
+    checkClose("getType")
+    ResultSet.TYPE_FORWARD_ONLY
+  }
 
   override def isBeforeFirst: Boolean = {
-    if (closed) throw new SQLException("Resultset is closed")
+    checkClose("isBeforeFirst")
     rowsFetched == 0
   }
 
@@ -202,7 +203,7 @@ object BitlapQueryResultSet {
 
   def builder(statement: Statement): Builder = new Builder(statement)
 
-  class Builder(_statement: Statement) {
+  final class Builder(_statement: Statement) {
     val statement: Statement        = _statement
     var client: BitlapClient        = _
     var stmtHandle: OperationHandle = _

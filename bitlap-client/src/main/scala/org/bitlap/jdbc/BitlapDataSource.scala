@@ -1,8 +1,8 @@
-/* Copyright (c) 2022 bitlap.org */
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
 import java.io.PrintWriter
-import java.sql.Connection
+import java.sql.{ Connection, SQLFeatureNotSupportedException }
 import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
@@ -15,19 +15,21 @@ import javax.sql.DataSource
  */
 class BitlapDataSource extends DataSource {
 
-  override def unwrap[T](iface: Class[T]): T = ???
+  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = ???
+  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def getLogWriter: PrintWriter = ???
+  override def getLogWriter: PrintWriter = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setLogWriter(out: PrintWriter): Unit = ???
+  override def setLogWriter(out: PrintWriter): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setLoginTimeout(seconds: Int): Unit = ???
+  override def setLoginTimeout(seconds: Int): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getLoginTimeout: Int = ???
+  override def getLoginTimeout: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getParentLogger: Logger = ???
+  override def getParentLogger: Logger = throw new SQLFeatureNotSupportedException("Method not supported")
 
   // TODO connect pool
   override def getConnection(): Connection = getConnection("", "")

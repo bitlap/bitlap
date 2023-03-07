@@ -89,7 +89,7 @@
         <scalapb.version>0.11.11</scalapb.version>
         <protobuf.version>3.22.0</protobuf.version>
         <grpc.netty.version>1.53.0</grpc.netty.version>
-        <zio.version>1.0.15</zio.version>
+        <zio.version>2.0.10</zio.version>
         <jupiter.version>5.9.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
         <rocksdb.version>7.9.2</rocksdb.version>

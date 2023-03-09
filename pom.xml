@@ -92,7 +92,7 @@
         <zio.version>1.0.15</zio.version>
         <jupiter.version>5.9.2</jupiter.version>
         <surefire.version>2.22.2</surefire.version>
-        <rocksdb.version>7.9.2</rocksdb.version>
+        <rocksdb.version>7.10.2</rocksdb.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
         <netty.version>4.1.72.Final</netty.version>

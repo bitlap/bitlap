@@ -64,54 +64,26 @@
             <artifactId>rocksdbjni</artifactId>
             <version>${rocksdb.version}</version>
         </dependency>
-        <!--      已经交给zio维护，但是zio维护的稳定版尚未发布      -->
+
         <dependency>
             <groupId>io.d11</groupId>
-            <artifactId>zhttp_2.13</artifactId>
+            <artifactId>zhttp_${scala.binary.version}</artifactId>
             <version>1.0.0.0-RC29</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>netty-codec-http</artifactId>
                     <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty-transport</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-common</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-buffer</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport-native-epoll</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport-classes-epoll</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport-native-kqueue</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport-classes-kqueue</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-incubator-transport-classes-io_uring</artifactId>
                     <groupId>io.netty.incubator</groupId>
+                    <artifactId>netty-incubator-transport-classes-io_uring</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.alipay.sofa</groupId>
             <artifactId>jraft-core</artifactId>
-            <version>1.3.12</version>
+            <version>${jraft.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -120,9 +92,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
         </dependency>
     </dependencies>
 
@@ -165,7 +137,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>${maven-assembly-plugin.version}</version>
                         <configuration>
                             <finalName>bitlap-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -196,7 +168,7 @@
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.12.1</version>
+                        <version>${frontend-maven-plugin.version}</version>
                         <configuration>
                             <workingDirectory>${project.basedir}/../${frontend.project.name}</workingDirectory>
                         </configuration>

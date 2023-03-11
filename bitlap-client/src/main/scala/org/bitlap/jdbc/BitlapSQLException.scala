@@ -1,6 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
+import org.bitlap.common.exception.BitlapException
+
 import java.sql.SQLException
 
 /** bitlap 客户端的SQL异常
@@ -15,3 +17,8 @@ final case class BitlapSQLException(
   code: Int = -1,
   cause: Throwable = null
 ) extends SQLException(msg, state, code, cause)
+
+final case class BitlapJdbcUriParseException(
+  msg: String,
+  cause: Option[Throwable] = None
+) extends BitlapException(msg, cause.orNull)

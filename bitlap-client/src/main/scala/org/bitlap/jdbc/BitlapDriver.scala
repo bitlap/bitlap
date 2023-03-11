@@ -12,7 +12,7 @@ import java.util.logging.Logger
 private[jdbc] abstract class BitlapDriver extends Driver {
 
   override def connect(url: String, info: Properties): Connection =
-    try BitlapConnection(url, info)
+    try new BitlapConnection(url, info)
     catch {
       case ex: Exception => throw BitlapSQLException(ex.toString)
     }

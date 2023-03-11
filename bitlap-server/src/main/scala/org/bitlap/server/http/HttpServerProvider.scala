@@ -29,7 +29,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
   Class.forName(classOf[org.bitlap.Driver].getName)
 
   val properties = new Properties()
-  properties.put("retries", "3")
+  properties.put("bitlapconf:retries", "3")
 
   // TODO: 全局的异常处理 和 全局的响应包装对象
   private val app = Http.collectZIO[Request] {

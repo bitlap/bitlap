@@ -1,21 +1,20 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.http
+package org.bitlap.server.endpoint
 
 import io.circe.generic.auto.exportEncoder
 import io.circe.syntax.EncoderOps
 import org.bitlap.common.utils.internal._
-import org.bitlap.network._
-import org.bitlap.server._
+import org.bitlap.server.config.BitlapHttpConfig
+import org.bitlap.server.http.implicits
 import org.bitlap.server.http.vo._
 import zhttp.http._
 import zhttp.service._
-import zhttp.service.server.ServerChannelFactory
 import zio._
+import zio.blocking.Blocking
 import zio.console._
 
 import java.sql._
 import java.util.Properties
-import scala.util._
 
 /** bitlap http服务
  *
@@ -24,9 +23,24 @@ import scala.util._
  *  查询数据接口：http://localhost:8080/sql
  *  @param port
  */
-final class HttpServerProvider(val port: Int) extends ServerProvider {
+object HttpServerEndpoint {
+  lazy val live: ZLayer[Has[BitlapHttpConfig], Nothing, Has[HttpServerEndpoint]] =
+    ZLayer.fromService((config: BitlapHttpConfig) => new HttpServerEndpoint(config))
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
+  def service(args: List[String]): ZIO[
+    Console with Blocking with EventLoopGroup with ServerChannelFactory with Has[HttpServerEndpoint],
+    Throwable,
+    Unit
+  ] =
+    (for {
+      server <- ZIO
+        .serviceWith[HttpServerEndpoint](_.httpServer)
+      _ <- server.make.use(_ => putStrLn(s"HTTP Server started"))
+      _ <- ZIO.never
+    } yield ())
+      .onExit(_ => putStrLn(s"HTTP Server stopped").ignore)
+}
+final class HttpServerEndpoint(val config: BitlapHttpConfig) {
 
   val properties = new Properties()
   properties.put("bitlapconf:retries", "3")
@@ -79,16 +93,7 @@ final class HttpServerProvider(val port: Int) extends ServerProvider {
       indexHtml
   }
 
-  private val server = Server.port(port) ++ Server.paranoidLeakDetection ++ Server.app(app ++ staticApp)
+  def httpServer: UIO[Server[Blocking, Throwable]] =
+    ZIO.succeed(Server.port(config.port) ++ Server.paranoidLeakDetection ++ Server.app(app ++ staticApp))
 
-  override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] = {
-    val nThreads: Int = args.headOption.flatMap(x => Try(x.toInt).toOption).getOrElse(0)
-    (server.make
-      .use(_ => putStrLn(s"$serverType: Server is listening to port: $port")) *> ZIO.never)
-      .onInterrupt(putStrLn(s"$serverType: Server stopped").ignore)
-      .provideCustomLayer(ServerChannelFactory.auto ++ EventLoopGroup.auto(nThreads))
-      .exitCode
-  }
-
-  override def serverType: ServerType = ServerType.Http
 }

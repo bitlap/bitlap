@@ -79,7 +79,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
           case e: Exception =>
             numRetries += 1
             val errMsg: String = null
-            val warnMsg        = s"Could not open client transport "
+            val warnMsg        = s"Could not open client transport."
             try close()
             catch {
               case _: Exception =>

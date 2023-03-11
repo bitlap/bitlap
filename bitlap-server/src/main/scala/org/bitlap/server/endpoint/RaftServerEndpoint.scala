@@ -1,29 +1,43 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.raft
+package org.bitlap.server.endpoint
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
-import org.bitlap.network.ServerType
-import org.bitlap.server.ServerProvider
-import zio.console.putStrLn
-import zio.{ Runtime => _, _ }
 import org.bitlap.server.BitlapServerContext
+import org.bitlap.server.config.BitlapRaftConfig
+import org.bitlap.server.raft._
 import org.slf4j.LoggerFactory
+import zio.blocking.Blocking
+import zio.console.{ putStrLn, Console }
+import zio.{ Runtime => _, _ }
 
 /** bitlap raft cluster和rpc服务
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends ServerProvider {
+object RaftServerEndpoint {
+
+  lazy val live: ZLayer[Has[BitlapRaftConfig], Nothing, Has[RaftServerEndpoint]] =
+    ZLayer.fromService((conf: BitlapRaftConfig) => new RaftServerEndpoint(conf))
+
+  def service(args: List[String]): ZIO[Console with Blocking with Has[RaftServerEndpoint], Throwable, Unit] =
+    (for {
+      node <- ZIO.serviceWith[RaftServerEndpoint](_.runRaft())
+      _    <- BitlapServerContext.fillNode(node)
+      _    <- putStrLn(s"Raft Server started")
+      _    <- ZIO.never
+    } yield ()).onExit(_ => putStrLn(s"Raft Server stopped").ignore)
+}
+final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
-  private def runRaft(): Task[Node] = ZIO.effect {
-    val dataPath       = raftServerConfig.dataPath
-    val groupId        = raftServerConfig.groupId
-    val serverIdStr    = raftServerConfig.serverAddress
-    val initialConfStr = raftServerConfig.initialServerAddressList
+  def runRaft(): Task[Node] = ZIO.effect {
+    val dataPath       = raftConfig.dataPath
+    val groupId        = raftConfig.groupId
+    val serverIdStr    = raftConfig.serverAddress
+    val initialConfStr = raftConfig.initialServerAddressList
 
     val electionOpts = ElectionNodeOptions(
       dataPath = dataPath,
@@ -51,14 +65,4 @@ final class RaftServerProvider(raftServerConfig: RaftServerConfig) extends Serve
       Thread.sleep(1000)
     node.node
   }
-
-  override def serverType: ServerType = ServerType.Raft
-
-  override def service(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    ((runRaft().flatMap(fr => BitlapServerContext.fillNode(fr)) *> putStrLn(
-      s"$serverType: Raft Server started"
-    )) *> ZIO.never)
-      .onInterrupt(putStrLn(s"$serverType: Raft Server stopped").ignore)
-      .exitCode
-
 }

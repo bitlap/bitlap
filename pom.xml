@@ -71,7 +71,7 @@
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
         <slf4j.version>2.0.6</slf4j.version>
         <!--   jraft need 2.17.1     -->
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <disruptor.version>3.4.4</disruptor.version>
         <hutool.version>5.8.12</hutool.version>
         <joda.version>2.12.2</joda.version>
@@ -96,6 +96,7 @@
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
         <netty.version>4.1.72.Final</netty.version>
+        <zio-magic>0.3.12</zio-magic>
     </properties>
 
     <dependencies>
@@ -260,6 +261,11 @@
             <groupId>io.circe</groupId>
             <artifactId>circe-core_2.13</artifactId>
             <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.kitlangton</groupId>
+            <artifactId>zio-magic_2.13</artifactId>
+            <version>${zio-magic}</version>
         </dependency>
     </dependencies>
 

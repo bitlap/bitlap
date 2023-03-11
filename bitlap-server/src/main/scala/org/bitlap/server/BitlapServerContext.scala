@@ -9,7 +9,6 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.GetServerMetadata
 import org.bitlap.network.ServerAddress
 import org.bitlap.network.NetworkException.LeaderNotFoundException
-import org.bitlap.server.raft.RaftServerConfig
 
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
@@ -17,6 +16,8 @@ import org.bitlap.network.AsyncRpc
 import zio._
 import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.client._
+import org.bitlap.server.config.BitlapRaftConfig
+import zio.blocking.Blocking
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
  *  @author
@@ -52,7 +53,7 @@ object BitlapServerContext {
     }
   }
 
-  def fillNode(node: Node): Task[Unit] =
+  def fillNode(node: Node): ZIO[Blocking, Throwable, Unit] =
     zio.blocking.blocking {
       ZIO.effect {
         if (initNode.compareAndSet(false, true)) {
@@ -62,7 +63,7 @@ object BitlapServerContext {
         }
         ()
       }
-    }.provideLayer(zio.blocking.Blocking.live)
+    }
 
   def isLeader: Boolean = {
     while (_node == null)
@@ -71,43 +72,46 @@ object BitlapServerContext {
   }
 
   @Nullable
-  def getLeaderAddress(): Task[ServerAddress] = Task.effect {
-    if (isLeader) {
-      if (_node == null) {
-        throw LeaderNotFoundException("cannot find a raft node instance")
-      }
-      Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
-    } else {
-      if (cliClientService == null) {
-        throw LeaderNotFoundException("cannot find a raft CliClientService instance")
-      }
-      val rt      = RouteTable.getInstance
-      val conf    = JRaftUtils.getConfiguration(RaftServerConfig.raftServerConfig.initialServerAddressList)
-      val groupId = RaftServerConfig.raftServerConfig.groupId
-      val timeout = RaftServerConfig.raftServerConfig.timeout
-      rt.updateConfiguration(groupId, conf)
-      val success: Boolean = rt.refreshLeader(cliClientService, groupId, timeout.toMillis.toInt).isOk
-      val leader = if (success) {
-        rt.selectLeader(groupId)
-      } else null
-      if (leader == null) {
-        throw LeaderNotFoundException("cannot select a leader")
-      }
-      val result = cliClientService.getRpcClient.invokeSync(
-        leader.getEndpoint,
-        GetServerMetadata.GetServerAddressReq
-          .newBuilder()
-          .setRequestId(UuidUtil.uuid())
-          .build(),
-        timeout.toMillis
-      )
-      val re = result.asInstanceOf[GetServerMetadata.GetServerAddressResp]
+  def getLeaderAddress(): ZIO[Any, Throwable, ServerAddress] =
+    (for {
+      conf    <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.initialServerAddressList))
+      groupId <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.groupId))
+      timeout <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.timeout))
+      server <- Task.effect {
+        if (isLeader) {
+          if (_node == null) {
+            throw LeaderNotFoundException("cannot find a raft node instance")
+          }
+          Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
+        } else {
+          if (cliClientService == null) {
+            throw LeaderNotFoundException("cannot find a raft CliClientService instance")
+          }
+          val rt = RouteTable.getInstance
+          rt.updateConfiguration(groupId, conf)
+          val success: Boolean = rt.refreshLeader(cliClientService, groupId, timeout.toMillis.toInt).isOk
+          val leader = if (success) {
+            rt.selectLeader(groupId)
+          } else null
+          if (leader == null) {
+            throw LeaderNotFoundException("cannot select a leader")
+          }
+          val result = cliClientService.getRpcClient.invokeSync(
+            leader.getEndpoint,
+            GetServerMetadata.GetServerAddressReq
+              .newBuilder()
+              .setRequestId(UuidUtil.uuid())
+              .build(),
+            timeout.toMillis
+          )
+          val re = result.asInstanceOf[GetServerMetadata.GetServerAddressResp]
 
-      if (re == null || re.getIp.isEmpty || re.getPort <= 0)
-        throw LeaderNotFoundException("cannot find a leader address")
-      else ServerAddress(re.getIp, re.getPort)
-    }
-  }
+          if (re == null || re.getIp.isEmpty || re.getPort <= 0)
+            throw LeaderNotFoundException("cannot find a leader address")
+          else ServerAddress(re.getIp, re.getPort)
+        }
+      }
+    } yield server).provideLayer(BitlapRaftConfig.live)
 
   private def grpcServerPort: Int = {
     val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim

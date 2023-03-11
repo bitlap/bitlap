@@ -9,7 +9,7 @@
 
 ## 架构
 
-![](http://ice-img.flutterdart.cn/2021-08-01-165808.png)
+![](http://ice-img.dreamylost.cn/2021-08-01-165808.png)
 
 ## 如何使用
 

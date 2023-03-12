@@ -35,7 +35,7 @@ class BitlapDataSource extends DataSource {
   override def getConnection(): Connection = getConnection("", "")
 
   override def getConnection(username: String, password: String): Connection =
-    try BitlapConnection("", new Properties())
+    try new BitlapConnection("", new Properties())
     catch {
       case ex: Exception => throw BitlapSQLException(msg = "Error in getting BitlapConnection", cause = ex)
     }

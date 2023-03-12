@@ -5,7 +5,7 @@ import com.alipay.sofa.jraft.rpc.{ RpcProcessor => _, _ }
 import com.google.protobuf.Message
 import org.bitlap.common.schema.GetServerMetadata
 import org.bitlap.common.BitlapConf
-import org.bitlap.server.BitlapServerContext
+import org.bitlap.server.BitlapContext
 import java.util.concurrent.Executor
 import org.bitlap.client._
 
@@ -21,7 +21,7 @@ class GetServerMetadataProcessor(
     ) {
 
   override def processRequest(request: GetServerMetadata.GetServerAddressReq, done: RpcRequestClosure): Message = {
-    val host    = BitlapServerContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
+    val host    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
     val address = host.extractServerAddress
     val port    = address.port
     val ip      = address.ip

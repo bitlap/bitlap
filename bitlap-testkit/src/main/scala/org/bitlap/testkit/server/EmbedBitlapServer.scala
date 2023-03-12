@@ -1,9 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server.ServerProvider
+import org.bitlap.server.config._
+import org.bitlap.server.endpoint._
 import zio.console.putStrLn
 import zio._
+import zio.magic._
 
 /** bitlap 嵌入式服务 包含http,grpc,raft
  *  @author
@@ -15,7 +17,8 @@ object EmbedBitlapServer extends zio.App {
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {
-      r <- ZIO.foreach(ServerProvider.serverProviders(false))(_.service(args).fork)
+      _ <- RaftServerEndpoint.service(args)
+      _ <- GrpcServerEndpoint.service(args)
       _ <- putStrLn("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____
@@ -24,10 +27,17 @@ object EmbedBitlapServer extends zio.App {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
-      _ <- ZIO.foreach_(r)(_.join)
-    } yield ()).foldM(
-      e => ZIO.fail(e).exitCode,
-      _ => ZIO.effectTotal(ExitCode.success)
-    )
+    } yield ())
+      .inject(
+        RaftServerEndpoint.live,
+        GrpcServerEndpoint.live,
+        zio.ZEnv.live,
+        BitlapGrpcConfig.live,
+        BitlapRaftConfig.live
+      )
+      .foldM(
+        e => ZIO.fail(e).exitCode,
+        _ => ZIO.effectTotal(ExitCode.success)
+      )
 
 }

@@ -30,7 +30,7 @@ object BitlapServer extends zio.App {
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- t1.join *> t2.join *> t3.join
+      _ <- ZIO.collectAll_(Seq(t1.join, t2.join, t3.join))
     } yield ())
       .inject(
         RaftServerEndpoint.live,
@@ -47,4 +47,7 @@ object BitlapServer extends zio.App {
         e => ZIO.fail(e).exitCode,
         _ => ZIO.effectTotal(ExitCode.success)
       )
+      .onTermination(_ => putStrLn(s"Bitlap Server shutdown now").ignore)
+      .onExit(_ => putStrLn(s"Bitlap Server stopped").ignore)
+      .onInterrupt(_ => putStrLn(s"Bitlap Server was interrupted").ignore)
 }

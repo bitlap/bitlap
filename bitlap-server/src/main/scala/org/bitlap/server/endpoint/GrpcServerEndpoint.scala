@@ -1,14 +1,17 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.endpoint
 
-import org.bitlap.server.BitlapServerContext
+import io.grpc.ServerBuilder
+import io.grpc.protobuf.services.ProtoReflectionService
+import org.bitlap.network.AsyncRpc
+import org.bitlap.network.driver.service.ZioService.ZDriverService.genericBindable
+import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapGrpcConfig
-import org.bitlap.server.rpc.{ AsyncRpcBackend, GrpcServiceLive }
+import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
 import scalapb.zio_grpc._
 import zio._
 import zio.console.{ putStrLn, Console }
-
-import java.io.IOException
+import zio.magic._
 
 /** bitlap grpc服务
  *
@@ -20,28 +23,27 @@ object GrpcServerEndpoint {
   lazy val live: ZLayer[Has[BitlapGrpcConfig], Nothing, Has[GrpcServerEndpoint]] =
     ZLayer.fromService((config: BitlapGrpcConfig) => new GrpcServerEndpoint(config))
 
-  def service(args: List[String]): ZIO[Console with Has[GrpcServerEndpoint], IOException, Unit] =
+  def service(args: List[String]): ZIO[Has[GrpcServerEndpoint] with Console, Throwable, Unit] =
     (for {
-      backend <- ZIO.serviceWith[GrpcServerEndpoint](_.liveBackend)
-      _       <- BitlapServerContext.fillRpc(backend)
-      _       <- putStrLn(s"Grpc Server started")
-      _       <- ZIO.never
+      _ <- putStrLn(s"Grpc Server started")
+      _ <- BitlapContext.fillRpc(GrpcBackendLive.liveInstance)
+      _ <- ZIO.serviceWith[GrpcServerEndpoint](_.runGrpc())
     } yield ())
-      .onExit(_ => putStrLn(s"Grpc Server stopped").ignore)
+      .onInterrupt(_ => putStrLn(s"Grpc Server was interrupted").ignore)
 }
-final class GrpcServerEndpoint(val config: BitlapGrpcConfig) extends ServerMain {
+final class GrpcServerEndpoint(val config: BitlapGrpcConfig) {
 
-  override def port: Int = config.port
+  private def builder =
+    ServerBuilder.forPort(config.port).addService(ProtoReflectionService.newInstance())
 
-  private final lazy val backend = AsyncRpcBackend()
-  private final lazy val live    = GrpcServiceLive(backend)
+  def runGrpc(): ZIO[Any, Throwable, Nothing] =
+    ServerLayer
+      .fromServiceList(
+        builder.asInstanceOf[ServerBuilder[_]],
+        ServiceList.accessEnv[Has[AsyncRpc], GrpcServiceLive]
+      )
+      .build
+      .useForever
+      .inject(GrpcBackendLive.live, GrpcServiceLive.live)
 
-  def liveBackend: ZIO[Has[GrpcServerEndpoint], Nothing, AsyncRpcBackend] =
-    ZIO.serviceWith[GrpcServerEndpoint](_ => ZIO.succeed(backend))
-
-  override def welcome: ZIO[zio.ZEnv, Throwable, Unit] =
-    putStrLn(s"Grpc Server is listening to port: $port")
-
-  def services: ServiceList[zio.ZEnv] =
-    ServiceList.addM(ZIO.succeed(live)) // 可以随意更换实现
 }

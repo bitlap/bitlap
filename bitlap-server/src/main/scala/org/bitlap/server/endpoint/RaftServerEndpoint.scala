@@ -3,7 +3,7 @@ package org.bitlap.server.endpoint
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
-import org.bitlap.server.BitlapServerContext
+import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapRaftConfig
 import org.bitlap.server.raft._
 import org.slf4j.LoggerFactory
@@ -24,10 +24,11 @@ object RaftServerEndpoint {
   def service(args: List[String]): ZIO[Console with Blocking with Has[RaftServerEndpoint], Throwable, Unit] =
     (for {
       node <- ZIO.serviceWith[RaftServerEndpoint](_.runRaft())
-      _    <- BitlapServerContext.fillNode(node)
+      _    <- BitlapContext.fillNode(node)
       _    <- putStrLn(s"Raft Server started")
       _    <- ZIO.never
-    } yield ()).onExit(_ => putStrLn(s"Raft Server stopped").ignore)
+    } yield ())
+      .onInterrupt(_ => putStrLn(s"Raft Server was interrupted").ignore)
 }
 final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
 

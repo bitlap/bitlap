@@ -4,6 +4,7 @@ package org.bitlap.server.session
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
+import zio.Task
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,13 +43,13 @@ trait Session {
     queryTimeout: Long
   ): OperationHandle
 
-  def fetchResults(operationHandle: OperationHandle): RowSet
+  def fetchResults(operationHandle: OperationHandle): Task[RowSet]
 
-  def getResultSetMetadata(operationHandle: OperationHandle): TableSchema
+  def getResultSetMetadata(operationHandle: OperationHandle): Task[TableSchema]
 
-  def closeOperation(operationHandle: OperationHandle)
+  def closeOperation(operationHandle: OperationHandle): Unit
 
-  def cancelOperation(operationHandle: OperationHandle)
+  def cancelOperation(operationHandle: OperationHandle): Unit
 
   def removeExpiredOperations(handles: List[OperationHandle]): List[Operation]
 

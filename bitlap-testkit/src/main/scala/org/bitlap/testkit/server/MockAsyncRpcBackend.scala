@@ -16,6 +16,9 @@ import zio._
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
+object MockAsyncRpcBackend {
+  lazy val live: ULayer[Has[AsyncRpc]] = ZLayer.succeed(MockAsyncRpcBackend())
+}
 @apply
 class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
 

@@ -17,6 +17,7 @@ import zio._
 import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.client._
 import org.bitlap.server.config.BitlapRaftConfig
+import org.bitlap.server.rpc.GrpcBackendLive
 import zio.blocking.Blocking
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
@@ -24,7 +25,7 @@ import zio.blocking.Blocking
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */
-object BitlapServerContext {
+object BitlapContext {
 
   lazy val globalConf = new BitlapConf()
 
@@ -47,11 +48,12 @@ object BitlapServerContext {
       _asyncRpc
     }
 
-  def fillRpc(asyncRpc: AsyncRpc): UIO[Unit] = ZIO.succeed {
-    if (initRpc.compareAndSet(false, true)) {
-      _asyncRpc = asyncRpc
+  def fillRpc(asyncRpc: AsyncRpc): UIO[Unit] =
+    ZIO.succeed {
+      if (initRpc.compareAndSet(false, true)) {
+        _asyncRpc = asyncRpc
+      }
     }
-  }
 
   def fillNode(node: Node): ZIO[Blocking, Throwable, Unit] =
     zio.blocking.blocking {
@@ -81,6 +83,11 @@ object BitlapServerContext {
         if (isLeader) {
           if (_node == null) {
             throw LeaderNotFoundException("cannot find a raft node instance")
+          }
+
+          def grpcServerPort: Int = {
+            val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim
+            address.extractServerAddress.port
           }
           Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
         } else {
@@ -113,8 +120,4 @@ object BitlapServerContext {
       }
     } yield server).provideLayer(BitlapRaftConfig.live)
 
-  private def grpcServerPort: Int = {
-    val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim
-    address.extractServerAddress.port
-  }
 }

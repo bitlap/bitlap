@@ -2,7 +2,7 @@
 package org.bitlap.server.config
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.server.BitlapServerContext
+import org.bitlap.server.BitlapContext
 import zio._
 
 import scala.concurrent.duration.Duration
@@ -26,11 +26,11 @@ object BitlapRaftConfig {
 
   lazy val live: ULayer[Has[BitlapRaftConfig]] = ZLayer.succeed(
     BitlapRaftConfig(
-      BitlapServerContext.globalConf.get(BitlapConf.RAFT_DATA_PATH),
-      BitlapServerContext.globalConf.get(BitlapConf.NODE_GROUP_ID),
-      BitlapServerContext.globalConf.get(BitlapConf.RAFT_SERVER_ADDRESS),
-      BitlapServerContext.globalConf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS),
-      Duration(BitlapServerContext.globalConf.get(BitlapConf.RAFT_TIMEOUT))
+      BitlapContext.globalConf.get(BitlapConf.RAFT_DATA_PATH),
+      BitlapContext.globalConf.get(BitlapConf.NODE_GROUP_ID),
+      BitlapContext.globalConf.get(BitlapConf.RAFT_SERVER_ADDRESS),
+      BitlapContext.globalConf.get(BitlapConf.RAFT_INITIAL_SERVER_ADDRESS),
+      Duration(BitlapContext.globalConf.get(BitlapConf.RAFT_TIMEOUT))
     )
   )
 }

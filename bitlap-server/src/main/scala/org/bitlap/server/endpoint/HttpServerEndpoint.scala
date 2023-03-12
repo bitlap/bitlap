@@ -38,9 +38,11 @@ object HttpServerEndpoint {
       _ <- server.make.use(_ => putStrLn(s"HTTP Server started"))
       _ <- ZIO.never
     } yield ())
-      .onExit(_ => putStrLn(s"HTTP Server stopped").ignore)
+      .onInterrupt(_ => putStrLn(s"HTTP Server was interrupted").ignore)
 }
 final class HttpServerEndpoint(val config: BitlapHttpConfig) {
+
+  Class.forName(classOf[org.bitlap.Driver].getName)
 
   val properties = new Properties()
   properties.put("bitlapconf:retries", "3")

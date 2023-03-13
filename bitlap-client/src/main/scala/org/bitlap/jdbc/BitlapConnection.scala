@@ -2,16 +2,13 @@
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
-import org.bitlap.jdbc.BitlapConnection.URI_PREFIX
 import org.bitlap.network.handles._
-import org.bitlap.tools.apply
 
-import java._
-import java.io._
 import java.sql._
-import java.util.{ ArrayList => JArrayList, List => _, Properties }
 import java.util.concurrent.Executor
-import scala.collection.mutable
+import java.util.{ List => _, Properties }
+import java.{ util, _ }
+import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters._
 import scala.util.control.Breaks._
 
@@ -22,43 +19,58 @@ import scala.util.control.Breaks._
  *  @since 2021/6/6
  *  @version 1.0
  */
-@apply
 class BitlapConnection(uri: String, info: Properties) extends Connection {
-  // apply not support default args
+  import Constants._
 
-  private var session: SessionHandle   = _
-  private var closed                   = true
-  private var warningChain: SQLWarning = _
-  private var client: BitlapClient     = _
-  private var initFile: String         = _
-  private var maxRetries               = 1
+  private var session: SessionHandle               = _
+  private var closed                               = true
+  private var warningChain: SQLWarning             = _
+  private var client: BitlapClient                 = _
+  private var initFile: String                     = _
+  private var maxRetries                           = BITLAP_DEFAULT_RETRIES
+  private var connParams: JdbcConnectionParams     = _
+  private var bitlapConfs: ListMap[String, String] = ListMap[String, String]()
+  private var sessionVars: ListMap[String, String] = ListMap[String, String]()
 
   {
-    if (!uri.startsWith(URI_PREFIX)) {
-      throw BitlapSQLException(s"Invalid URL: $uri")
-    }
-    // remove prefix
-    val uriWithoutPrefix = uri.substring(URI_PREFIX.length)
-    val hosts            = uriWithoutPrefix.split(",")
-    // parse uri
-    val serverPeers = hosts.map(f => f.split("/")(0))
-    val db          = hosts.filter(_.contains("/")).map(_.split("/")(1)).headOption.getOrElse(Constants.DEFAULT_DB)
-    info.put(Constants.DBNAME_PROPERTY_KEY, db)
 
-    // TODO get args from url query parameters
-    if (info.containsKey("initFile")) {
-      initFile = info.getProperty("initFile")
-    }
+    connParams = Utils.parseUri(uri)
+    sessionVars = connParams.sessionVars
+    bitlapConfs = connParams.bitlapConfs
+    sessionVars = sessionVars ++ ListMap(Constants.DBNAME_PROPERTY_KEY -> connParams.dbName)
 
-    if (info.containsKey("retries")) {
-      maxRetries = info.getProperty("retries").toInt
+    for (kv <- info.entrySet.asScala)
+      kv.getKey match {
+        case key: String =>
+          if (key.startsWith(BITLAP_CONF_PREFIX))
+            bitlapConfs = bitlapConfs ++ ListMap(key.substring(BITLAP_CONF_PREFIX.length) -> info.getProperty(key))
+        case _ =>
+      }
+
+    if (info.containsKey(JdbcConnectionParams.AUTH_USER)) {
+      sessionVars =
+        sessionVars ++ ListMap(JdbcConnectionParams.AUTH_USER -> info.getProperty(JdbcConnectionParams.AUTH_USER))
+      if (info.containsKey(JdbcConnectionParams.AUTH_PASSWD))
+        sessionVars =
+          sessionVars ++ ListMap(JdbcConnectionParams.AUTH_PASSWD -> info.getProperty(JdbcConnectionParams.AUTH_PASSWD))
     }
+    if (info.containsKey(JdbcConnectionParams.AUTH_TYPE))
+      sessionVars =
+        sessionVars ++ ListMap(JdbcConnectionParams.AUTH_TYPE -> info.getProperty(JdbcConnectionParams.AUTH_TYPE))
+
+    maxRetries = bitlapConfs
+      .get(BITLAP_RETRIES)
+      .map(_.toIntOption)
+      .map(_.getOrElse(BITLAP_DEFAULT_RETRIES))
+      .getOrElse(BITLAP_DEFAULT_RETRIES)
+    initFile = bitlapConfs.get(BITLAP_INIT_SQL).orNull
+
     var numRetries    = 0
     val retryInterval = 1000L
     breakable {
       while (numRetries < maxRetries)
         try {
-          client = new BitlapClient(serverPeers, info.asScala.toMap)
+          client = new BitlapClient(connParams.authorityList, bitlapConfs ++ sessionVars)
           session = client.openSession()
           executeInitSql()
           closed = false
@@ -67,7 +79,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
           case e: Exception =>
             numRetries += 1
             val errMsg: String = null
-            val warnMsg        = s"Could not open client transport with JDBC Uri: $uriWithoutPrefix: "
+            val warnMsg        = s"Could not open client transport."
             try close()
             catch {
               case _: Exception =>
@@ -94,71 +106,22 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if (initFile != null) try {
       val st = createStatement()
       try {
-        val sqlList = parseInitFile(initFile)
+        val sqlList = Utils.parseInitFile(initFile)
         for (sql <- sqlList) {
           println(s"Executing InitSql ... $sql")
           val hasResult = st.execute(sql)
           if (hasResult) try {
             val rs = st.getResultSet
             try while (rs.next) println(rs.getString(1))
+            catch { case ignore: Exception => }
             finally if (rs != null) rs.close()
-          }
+          } catch { case ignore: Exception => }
         }
       } catch {
         case e: Exception =>
           throw BitlapSQLException(e.getMessage)
       } finally if (st != null) st.close()
     }
-
-  // TODO functional style
-  private def parseInitFile(initFile: String): List[String] = {
-    val file                      = new File(initFile)
-    var br: BufferedReader        = null
-    var initSqlList: List[String] = Nil
-    try {
-      val input = new FileInputStream(file)
-      br = new BufferedReader(new InputStreamReader(input, "UTF-8"))
-      var line: String = null
-      val sb           = new mutable.StringBuilder("")
-      while ({
-        line = br.readLine
-        line != null
-      }) {
-        line = line.trim
-        if (line.nonEmpty) {
-          if (line.startsWith("#") || line.startsWith("--")) {
-            // todo: continue is not supported
-          } else {
-            line = line.concat(" ")
-            sb.append(line)
-          }
-        }
-      }
-      initSqlList = getInitSql(sb.toString)
-    } catch {
-      case e: IOException =>
-        throw new IOException(e)
-    } finally if (br != null) br.close()
-    initSqlList
-  }
-
-  // TODO functional style
-  private def getInitSql(sbLine: String): List[String] = {
-    val sqlArray    = sbLine.toCharArray
-    val initSqlList = new JArrayList[String]
-    var index       = 0
-    var beginIndex  = 0
-    while (index < sqlArray.length) {
-      if (sqlArray(index) == ';') {
-        val sql = sbLine.substring(beginIndex, index).trim
-        initSqlList.add(sql)
-        beginIndex = index + 1
-      }
-
-      index += 1
-    }
-    initSqlList.asScala.toList
-  }
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -370,7 +333,4 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getNetworkTimeout: Int = throw new SQLFeatureNotSupportedException("Method not supported")
-}
-object BitlapConnection {
-  private val URI_PREFIX = "jdbc:bitlap://"
 }

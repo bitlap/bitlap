@@ -64,7 +64,7 @@
 
         <!-- common libs -->
         <slf4j.version>2.0.6</slf4j.version>
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <hutool.version>5.8.12</hutool.version>
         <gson.version>2.10.1</gson.version>
@@ -91,6 +91,7 @@
         <zio.version>1.0.15</zio.version>
         <zio.grpc.version>0.5.2</zio.grpc.version>
         <zio-cli.version>0.1.0</zio-cli.version>
+        <zio-magic>0.3.12</zio-magic>
         <scalapb.version>0.11.13</scalapb.version>
         <jupiter.version>5.9.2</jupiter.version>
 
@@ -276,6 +277,11 @@
             <groupId>io.circe</groupId>
             <artifactId>circe-core_2.13</artifactId>
             <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.kitlangton</groupId>
+            <artifactId>zio-magic_2.13</artifactId>
+            <version>${zio-magic}</version>
         </dependency>
     </dependencies>
 

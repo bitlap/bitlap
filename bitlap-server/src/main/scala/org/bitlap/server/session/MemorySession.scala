@@ -5,6 +5,7 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.network._
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
+import zio.Task
 
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters._
@@ -53,17 +54,17 @@ final class MemorySession(
 
   override def fetchResults(
     operationHandle: OperationHandle
-  ): RowSet = {
-    val op   = sessionManager.getOperation(operationHandle)
-    val rows = op.getNextResultSet()
-    op.remove(operationHandle) // TODO: work with fetch offset & size
-    rows
-  }
+  ): Task[RowSet] =
+    sessionManager.getOperation(operationHandle).map { op =>
+      val rows = op.getNextResultSet()
+      op.remove(operationHandle) // TODO: work with fetch offset & size
+      rows
+    }
 
   override def getResultSetMetadata(
     operationHandle: OperationHandle
-  ): TableSchema =
-    sessionManager.getOperation(operationHandle).getResultSetSchema()
+  ): Task[TableSchema] =
+    sessionManager.getOperation(operationHandle).map(_.getResultSetSchema())
 
   override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {

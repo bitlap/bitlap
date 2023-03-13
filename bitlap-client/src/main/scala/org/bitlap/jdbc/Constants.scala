@@ -42,4 +42,13 @@ object Constants {
   val PORT_PROPERTY_KEY = "PORT"
 
   val DEFAULT_DB = "default"
+
+  val URI_JDBC_PREFIX = "jdbc:"
+
+  // ===========================================================================================
+  // for properties, bitlapconf:key -> value
+  final val BITLAP_CONF_PREFIX     = "bitlapconf:"
+  final val BITLAP_INIT_SQL        = "initFile"
+  final val BITLAP_RETRIES         = "retries"
+  final val BITLAP_DEFAULT_RETRIES = 1
 }

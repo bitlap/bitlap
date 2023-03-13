@@ -14,10 +14,11 @@ object MockDriverGrpcServiceLive {
 
   /** 固定的测试数据
    */
-  val mockLive: UIO[GrpcServiceLive] = ZIO.succeed(GrpcServiceLive(MockAsyncRpcBackend()))
+  val mockLive: ZLayer[Any, Nothing, Has[GrpcServiceLive]] = MockAsyncRpcBackend.live >>> GrpcServiceLive.live
 
   /** 真实数据
    */
-  val embedLive: UIO[GrpcServiceLive] = ZIO.succeed(GrpcServiceLive(AsyncRpcBackend()))
+  val embedLive: ZLayer[Any, Nothing, Has[GrpcServiceLive]] =
+    GrpcBackendLive.live >>> GrpcServiceLive.live
 
 }

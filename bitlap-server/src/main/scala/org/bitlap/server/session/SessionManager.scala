@@ -2,33 +2,58 @@
 package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
+import org.bitlap.common.BitlapConf
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.OperationState
 import org.bitlap.network.handles._
+import org.bitlap.server.BitlapContext
 import org.bitlap.server.session.SessionManager._
-import org.bitlap.tools.apply
+import zio.blocking.Blocking
+import zio.{ Has, Task, ZIO, ZLayer }
 
+import java.util.Date
 import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.Date
 import scala.collection._
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters.CollectionHasAsScala
-
-import org.bitlap.common.BitlapConf
-import org.bitlap.server.BitlapServerContext
-
 import scala.concurrent.duration.Duration
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 /** bitlap 会话管理器
  *  @author
  *    梦境迷离
  *  @since 2021/11/20
- *  @version 1.0
+ *  @version 2.0
  */
-@apply
-final class SessionManager extends LazyLogging {
+object SessionManager {
+
+  private val timeoutCheckerLock     = new Object
+  private val sessionAddLock: Object = new Object
+  lazy val live: ZLayer[Blocking, Nothing, Has[SessionManager]] =
+    ZLayer.fromService((block: Blocking.Service) => new SessionManager(block))
+
+  def openSession(
+    username: String,
+    password: String,
+    sessionConf: Map[String, String]
+  ): ZIO[Has[SessionManager], Throwable, Session] =
+    ZIO.serviceWith[SessionManager](sm => sm.openSession(username, password, sessionConf))
+
+  def closeSession(sessionHandle: SessionHandle): ZIO[Has[SessionManager], Throwable, Unit] =
+    ZIO.serviceWith[SessionManager](sm => sm.closeSession(sessionHandle))
+
+  def getSession(sessionHandle: SessionHandle): ZIO[Has[SessionManager], Throwable, Session] =
+    ZIO.serviceWith[SessionManager](sm => sm.getSession(sessionHandle))
+
+  def getOperation(operationHandle: OperationHandle): ZIO[Has[SessionManager], Throwable, Operation] =
+    ZIO.serviceWith[SessionManager](sm => sm.getOperation(operationHandle))
+
+  def startListener(): ZIO[Has[SessionManager], Throwable, Unit] =
+    ZIO.serviceWith[SessionManager](sm => sm.startListener())
+
+}
+final class SessionManager(block: Blocking.Service) extends LazyLogging {
 
   private val start = new AtomicBoolean(false)
 
@@ -49,7 +74,7 @@ final class SessionManager extends LazyLogging {
 
     }
 
-  private final val sessionTimeout = Duration(BitlapServerContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
+  private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
   private final val interval       = 3000
 
   private lazy val sessionThread: Thread = new Thread {
@@ -64,7 +89,7 @@ final class SessionManager extends LazyLogging {
             logger.warn(
               s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
             )
-            try closeSession(handle)
+            try zio.Runtime.default.unsafeRun(closeSession(handle))
             catch {
               case e: Exception =>
                 logger.warn("Exception is thrown closing session " + handle, e)
@@ -75,31 +100,34 @@ final class SessionManager extends LazyLogging {
     }
   }
 
-  def startListener(): Unit =
+  def startListener(): Task[Unit] = Task.effect {
     if (start.compareAndSet(false, true)) {
       sessionThread.setDaemon(true)
       sessionThread.start()
     }
+  }
 
   def openSession(
     username: String,
     password: String,
     sessionConf: Map[String, String]
-  ): Session =
-    SessionManager.sessionAddLock.synchronized {
-      val session = new MemorySession(
-        username,
-        password,
-        sessionConf,
-        this
-      )
-      session.open()
-      sessionStore.put(session.sessionHandle, session)
-      logger.info(s"Create session [${session.sessionHandle}]")
-      return session
+  ): Task[Session] =
+    block.effectBlocking {
+      SessionManager.sessionAddLock.synchronized {
+        val session = new MemorySession(
+          username,
+          password,
+          sessionConf,
+          this
+        )
+        session.open()
+        sessionStore.put(session.sessionHandle, session)
+        logger.info(s"Create session [${session.sessionHandle}]")
+        session
+      }
     }
 
-  def closeSession(sessionHandle: SessionHandle): Unit = {
+  def closeSession(sessionHandle: SessionHandle): Task[Unit] = block.effectBlocking {
     SessionManager.sessionAddLock.synchronized {
       sessionStore.remove(sessionHandle)
     }
@@ -120,18 +148,20 @@ final class SessionManager extends LazyLogging {
     )
   }
 
-  def getSession(sessionHandle: SessionHandle): Session = this.synchronized {
-    val session: Session = SessionManager.sessionAddLock.synchronized {
-      sessionStore.get(sessionHandle)
+  def getSession(sessionHandle: SessionHandle): Task[Session] = block.effectBlocking {
+    this.synchronized {
+      val session: Session = SessionManager.sessionAddLock.synchronized {
+        sessionStore.get(sessionHandle)
+      }
+      if (session == null) {
+        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
+      }
+      refreshSession(sessionHandle, session)
+      session
     }
-    if (session == null) {
-      throw InternalException(s"Invalid SessionHandle: $sessionHandle")
-    }
-    refreshSession(sessionHandle, session)
-    session
   }
 
-  def getOperation(operationHandle: OperationHandle): Operation =
+  def getOperation(operationHandle: OperationHandle): Task[Operation] = block.effectBlocking {
     this.synchronized {
       val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {
@@ -145,6 +175,7 @@ final class SessionManager extends LazyLogging {
         }
       }
     }
+  }
 
   private def getOpenSessionCount(): Int =
     sessionStore.size
@@ -158,8 +189,4 @@ final class SessionManager extends LazyLogging {
         throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
-}
-object SessionManager {
-  private val timeoutCheckerLock     = new Object
-  private val sessionAddLock: Object = new Object
 }

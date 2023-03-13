@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
+import org.bitlap.server.rpc.GrpcServiceLive
 import scalapb.zio_grpc._
 import zio.console.putStrLn
 import zio.ZIO
@@ -15,6 +16,7 @@ trait MockServer extends ServerMain {
   override def welcome: ZIO[zio.ZEnv, Throwable, Unit] =
     putStrLn(s"Mock Server is listening to port: $port")
 
-  def services: ServiceList[zio.ZEnv] = ServiceList.addM(MockDriverGrpcServiceLive.mockLive)
+  def services: ServiceList[zio.ZEnv] =
+    ServiceList.access[GrpcServiceLive].provideLayer(MockDriverGrpcServiceLive.mockLive)
 
 }

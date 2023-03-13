@@ -7,10 +7,10 @@ import org.bitlap.network.AsyncRpc
 import org.bitlap.network.driver.service.ZioService.ZDriverService.genericBindable
 import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapGrpcConfig
-import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
+import org.bitlap.server.rpc._
 import scalapb.zio_grpc._
 import zio._
-import zio.console.{ putStrLn, Console }
+import zio.console._
 import zio.magic._
 
 /** bitlap grpc服务

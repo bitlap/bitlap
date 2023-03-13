@@ -4,21 +4,18 @@ package org.bitlap.server
 import com.alipay.sofa.jraft._
 import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
-import org.bitlap.common.utils.UuidUtil
+import org.bitlap.client._
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.GetServerMetadata
-import org.bitlap.network.ServerAddress
-import org.bitlap.network.NetworkException.LeaderNotFoundException
+import org.bitlap.common.utils.UuidUtil
+import org.bitlap.network.NetworkException.{ InternalException, LeaderNotFoundException }
+import org.bitlap.network.{ AsyncRpc, ServerAddress }
+import org.bitlap.server.config.BitlapRaftConfig
+import zio._
+import zio.blocking.Blocking
 
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
-import org.bitlap.network.AsyncRpc
-import zio._
-import org.bitlap.network.NetworkException.InternalException
-import org.bitlap.client._
-import org.bitlap.server.config.BitlapRaftConfig
-import org.bitlap.server.rpc.GrpcBackendLive
-import zio.blocking.Blocking
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
  *  @author

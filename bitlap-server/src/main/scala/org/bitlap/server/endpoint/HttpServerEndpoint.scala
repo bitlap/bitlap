@@ -1,20 +1,13 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.endpoint
 
-import io.circe.generic.auto.exportEncoder
-import io.circe.syntax.EncoderOps
-import org.bitlap.common.utils.internal._
 import org.bitlap.server.config.BitlapHttpConfig
-import org.bitlap.server.http.implicits
-import org.bitlap.server.http.vo._
+import org.bitlap.server.http._
 import zhttp.http._
 import zhttp.service._
 import zio._
 import zio.blocking.Blocking
 import zio.console._
-
-import java.sql._
-import java.util.Properties
 
 /** bitlap http服务
  *
@@ -24,8 +17,10 @@ import java.util.Properties
  *  @param port
  */
 object HttpServerEndpoint {
-  lazy val live: ZLayer[Has[BitlapHttpConfig], Nothing, Has[HttpServerEndpoint]] =
-    ZLayer.fromService((config: BitlapHttpConfig) => new HttpServerEndpoint(config))
+  lazy val live: ZLayer[Has[BitlapHttpConfig] with Has[HttpServiceLive], Nothing, Has[HttpServerEndpoint]] =
+    ZLayer.fromServices[BitlapHttpConfig, HttpServiceLive, HttpServerEndpoint]((config, httpServiceLive) =>
+      new HttpServerEndpoint(config, httpServiceLive)
+    )
 
   def service(args: List[String]): ZIO[
     Console with Blocking with EventLoopGroup with ServerChannelFactory with Has[HttpServerEndpoint],
@@ -40,46 +35,13 @@ object HttpServerEndpoint {
     } yield ())
       .onInterrupt(_ => putStrLn(s"HTTP Server was interrupted").ignore)
 }
-final class HttpServerEndpoint(val config: BitlapHttpConfig) {
+final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) {
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
-
-  val properties = new Properties()
-  properties.put("bitlapconf:retries", "3")
-
-  // TODO: 全局的异常处理 和 全局的响应包装对象
   private val app = Http.collectZIO[Request] {
     case req @ Method.POST -> !! / "api" / "sql" / "run" =>
       req.data.toJson.map { body =>
-        val sql           = body.hcursor.get[String]("sql").getOrElse("")
-        val conn          = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
-        val stmt          = conn.createStatement()
-        var rs: ResultSet = null
-        try {
-          stmt.execute(sql)
-          rs = stmt.getResultSet
-
-          val table = DBTablePrinter.from(rs)
-          Response.json(s"""
-                           |{
-                           |  "success": true,
-                           |  "data": ${SqlData.fromDBTable(table).asJson.noSpaces}
-                           |}
-                           |""".stripMargin)
-
-        } catch {
-          case e: Exception =>
-            e.printStackTrace()
-            Response.json(s"""
-                             |{
-                             |  "success": true,
-                             |  "data": ${SqlData().asJson.noSpaces}
-                             |}
-                             |""".stripMargin)
-        } finally {
-          stmt.close()
-          conn.close()
-        }
+        val sql = body.hcursor.get[String]("sql").getOrElse("")
+        httpServiceLive.execute(sql)
       }
     case Method.GET -> !! / "api" / "common" / "status" => ZIO.effect(Response.json(s"""{"status":"ok"}"""))
   }

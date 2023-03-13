@@ -1,8 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import org.bitlap.server.config.{ BitlapGrpcConfig, BitlapHttpConfig, BitlapRaftConfig }
+import org.bitlap.server.config._
 import org.bitlap.server.endpoint._
+import org.bitlap.server.http.HttpServiceLive
 import zhttp.service.EventLoopGroup
 import zhttp.service.server.ServerChannelFactory
 import zio._
@@ -41,7 +42,8 @@ object BitlapServer extends zio.App {
         EventLoopGroup.auto(16),
         BitlapGrpcConfig.live,
         BitlapHttpConfig.live,
-        BitlapRaftConfig.live
+        BitlapRaftConfig.live,
+        HttpServiceLive.live
       )
       .foldM(
         e => ZIO.fail(e).exitCode,

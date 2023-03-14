@@ -91,7 +91,7 @@
         <grpc.netty.version>1.53.0</grpc.netty.version>
         <zio.version>1.0.15</zio.version>
         <jupiter.version>5.9.2</jupiter.version>
-        <surefire.version>2.22.2</surefire.version>
+        <surefire.version>3.0.0</surefire.version>
         <rocksdb.version>7.9.2</rocksdb.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>

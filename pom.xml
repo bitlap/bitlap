@@ -95,7 +95,7 @@
         <rocksdb.version>7.9.2</rocksdb.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.0</enumeratum.version>
-        <netty.version>4.1.72.Final</netty.version>
+        <netty.version>4.1.90.Final</netty.version>
         <zio-magic>0.3.12</zio-magic>
     </properties>
 

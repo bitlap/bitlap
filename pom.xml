@@ -34,7 +34,7 @@
         <developer>
             <id>IceMimosa</id>
             <name>ChenKai</name>
-            <url>http://patamon.me</url>
+            <url>https://patamon.me</url>
             <email>chk19940609@gmail.com</email>
         </developer>
         <developer>
@@ -57,54 +57,64 @@
     </modules>
 
     <properties>
-        <!-- common -->
+        <!-- project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>11</maven.compiler.target>
         <frontend.project.name>bitlap-server-ui</frontend.project.name>
+
+        <!-- common libs -->
+        <slf4j.version>2.0.6</slf4j.version>
+        <log4j.version>2.17.1</log4j.version>
+        <bitmap.version>0.9.27-bitlap</bitmap.version>
+        <hutool.version>5.8.12</hutool.version>
+        <gson.version>2.10.1</gson.version>
+        <joda.version>2.12.2</joda.version>
+        <disruptor.version>3.4.4</disruptor.version>
+        <netty.version>4.1.90.Final</netty.version>
+        <protobuf.version>3.22.2</protobuf.version>
+        <grpc.netty.version>1.53.0</grpc.netty.version>
+
         <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-        <bitmap.version>0.9.27-bitlap</bitmap.version>
-        <dokka.version>1.7.20</dokka.version>
         <kotlin.version>1.8.10</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
-        <kotest.version>5.5.5</kotest.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
-        <slf4j.version>2.0.6</slf4j.version>
-        <!--   jraft need 2.17.1     -->
-        <log4j.version>2.17.1</log4j.version>
-        <disruptor.version>3.4.4</disruptor.version>
-        <hutool.version>5.8.12</hutool.version>
-        <joda.version>2.12.2</joda.version>
-        <gson.version>2.10.1</gson.version>
-        <calcite.version>1.33.0</calcite.version>
-        <kotlin.cli.version>0.3.4</kotlin.cli.version>
-        <sqlline.version>1.11.0</sqlline.version>
+        <kotest.version>5.5.5</kotest.version>
+
+        <!-- scala -->
         <scala.version>2.13.10</scala.version>
-        <scala.log.version>2.14.1</scala.log.version>
-        <scala.logging.version>3.9.5</scala.logging.version>
-        <sqlline.version>1.12.0</sqlline.version>
+        <scala.binary.version>2.13</scala.binary.version>
         <smt.version>0.9.1</smt.version>
-        <maven.compiler.version>3.10.1</maven.compiler.version>
-        <zio.grpc.version>0.5.2</zio.grpc.version>
-        <scalapb.version>0.11.11</scalapb.version>
-        <protobuf.version>3.22.0</protobuf.version>
-        <grpc.netty.version>1.53.0</grpc.netty.version>
-        <zio.version>1.0.15</zio.version>
-        <jupiter.version>5.9.2</jupiter.version>
-        <surefire.version>2.22.2</surefire.version>
-        <rocksdb.version>7.9.2</rocksdb.version>
+        <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.3</circe.version>
-        <enumeratum.version>1.7.0</enumeratum.version>
-        <netty.version>4.1.72.Final</netty.version>
+        <enumeratum.version>1.7.2</enumeratum.version>
+        <zio.version>1.0.15</zio.version>
+        <zio.grpc.version>0.5.2</zio.grpc.version>
+        <zio-cli.version>0.1.0</zio-cli.version>
         <zio-magic>0.3.12</zio-magic>
+        <scalapb.version>0.11.13</scalapb.version>
+        <jupiter.version>5.9.2</jupiter.version>
+
+        <!-- others -->
+        <carbondata.version>2.3.0</carbondata.version>
+        <calcite.version>1.34.0</calcite.version>
+        <sqlline.version>1.12.0</sqlline.version>
+        <jraft.version>1.3.12</jraft.version>
+        <rocksdb.version>7.9.2</rocksdb.version>
+        <spark.version>3.3.2</spark.version>
+
+        <!-- plugins -->
+        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <dokka.version>1.7.20</dokka.version>
+        <drill-fmpp-maven-plugin.version>1.21.0</drill-fmpp-maven-plugin.version>
+        <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>
+        <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
+        <surefire.version>3.0.0</surefire.version>
+        <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.beachape</groupId>
-            <artifactId>enumeratum_2.13</artifactId>
-            <version>${enumeratum.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
@@ -206,6 +216,7 @@
             <version>${jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+
         <!-- scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -224,47 +235,52 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging_2.13</artifactId>
+            <artifactId>scala-logging_${scala.binary.version}</artifactId>
             <version>${scala.logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-annotations_2.13</artifactId>
+            <artifactId>smt-annotations_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-common_2.13</artifactId>
+            <artifactId>smt-common_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-csv_2.13</artifactId>
+            <artifactId>smt-csv_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.beachape</groupId>
+            <artifactId>enumeratum_${scala.binary.version}</artifactId>
+            <version>${enumeratum.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-generic-extras_2.13</artifactId>
+            <artifactId>circe-generic-extras_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-parser_2.13</artifactId>
+            <artifactId>circe-parser_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-generic_2.13</artifactId>
+            <artifactId>circe-generic_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-core_2.13</artifactId>
+            <artifactId>circe-core_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.kitlangton</groupId>
-            <artifactId>zio-magic_2.13</artifactId>
+            <artifactId>zio-magic_${scala.binary.version}</artifactId>
             <version>${zio-magic}</version>
         </dependency>
     </dependencies>
@@ -396,8 +412,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.version}</version>
                     <configuration>
-                        <source>${kotlin.compiler.jvmTarget}</source>
-                        <target>${kotlin.compiler.jvmTarget}</target>
+                        <source>${maven.compiler.target}</source>
+                        <target>${maven.compiler.target}</target>
                     </configuration>
                     <executions>
                         <execution>

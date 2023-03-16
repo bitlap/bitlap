@@ -13,37 +13,33 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
         <dependency>
             <groupId>com.thesamet.scalapb</groupId>
-            <artifactId>scalapb-runtime-grpc_2.13</artifactId>
+            <artifactId>scalapb-runtime-grpc_${scala.binary.version}</artifactId>
             <version>${scalapb.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.thesamet.scalapb.zio-grpc</groupId>
-            <artifactId>zio-grpc-core_2.13</artifactId>
+            <artifactId>zio-grpc-core_${scala.binary.version}</artifactId>
             <version>${zio.grpc.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.grpc</groupId>
-                    <artifactId>grpc-services</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-core</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>dev.zio</groupId>
-            <artifactId>zio_2.13</artifactId>
+            <artifactId>zio_${scala.binary.version}</artifactId>
             <version>${zio.version}</version>
         </dependency>
         <dependency>
@@ -80,9 +76,9 @@
             <plugin>
                 <groupId>com.github.os72</groupId>
                 <artifactId>protoc-jar-maven-plugin</artifactId>
-                <version>3.11.4</version>
+                <version>${protoc-jar-maven-plugin.version}</version>
                 <configuration>
-                    <!--   Trigger download for Mac M1                 -->
+                    <!-- Trigger download for Mac M1 -->
                     <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
                     <includeMavenTypes>transitive</includeMavenTypes>
                     <outputTargets>

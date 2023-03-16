@@ -13,11 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-network</artifactId>
         </dependency>
@@ -35,7 +30,7 @@
         <dependency>
             <groupId>org.apache.carbondata</groupId>
             <artifactId>carbondata-sdk</artifactId>
-            <version>2.3.0</version>
+            <version>${carbondata.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.hadoop</groupId>
@@ -79,7 +74,6 @@
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>1.1.9.1</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -89,7 +83,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.2</version>
+            <version>5.2.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -178,7 +172,7 @@
             <plugin> <!-- generate sources from fmpp -->
                 <groupId>org.apache.drill.tools</groupId>
                 <artifactId>drill-fmpp-maven-plugin</artifactId>
-                <version>1.21.0</version>
+                <version>${drill-fmpp-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>generate-fmpp</id>
@@ -197,7 +191,7 @@
             <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
-                <version>2.6</version>
+                <version>${javacc-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>javacc</id>

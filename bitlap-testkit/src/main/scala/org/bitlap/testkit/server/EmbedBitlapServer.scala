@@ -17,8 +17,8 @@ object EmbedBitlapServer extends zio.App {
 
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
     (for {
-      _ <- RaftServerEndpoint.service(args)
-      _ <- GrpcServerEndpoint.service(args)
+      _ <- RaftServerEndpoint.service(args).fork
+      _ <- GrpcServerEndpoint.service(args).fork
       _ <- putStrLn("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____

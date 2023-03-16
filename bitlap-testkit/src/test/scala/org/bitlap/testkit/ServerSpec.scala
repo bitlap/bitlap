@@ -12,6 +12,7 @@ class ServerSpec extends CsvUtil {
   private lazy val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
   private lazy val database = s"test_database_${FakeDataUtil.randEntityNumber}"
 
+  Class.forName(classOf[org.bitlap.Driver].getName)
   implicit lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
   // 每个测试都会执行一次，需要修改！

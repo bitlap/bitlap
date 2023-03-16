@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+tag=$1
+
 cd $(dirname $0)/../
 
 mkdir -p dist/
@@ -27,9 +29,11 @@ pwd
 cp ./conf/initFileForTest.sql ./docker/initFileForTest.sql
 
 # 构建镜像
-docker build . -t bitlap:0.3.0-SNAPSHOT -f ./Dockerfile
+docker build --build-arg bitlap_server=bitlap-$tag . -t bitlap:$tag -f ./Dockerfile
 
 echo "===============  🎉 build image successfully !!!  ======================="
 
-# 运行server，运行交互式sql（组织容器退出）
-docker run -dit -p 18081:18081 -p 23333:23333 -p 12222:12222 bitlap:0.3.0-SNAPSHOT
+# 运行server，运行交互式sql（阻止容器退出）
+#docker run --name bitlap:$tag -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:$tag
+
+#echo "===============  🎉 bitlap_server running successfully !!!  ======================="

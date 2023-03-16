@@ -23,7 +23,7 @@
 
 ## 快速开始
 
-> windows上无法运行
+> windows上无法运行，必须使用docker
 
 1. 安装IDEA插件（可选） [IDEA Plugin Scala-Macro-Tools](https://github.com/bitlap/scala-macro-tools)
 2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
@@ -35,3 +35,13 @@
 
 1. 打包脚本：`dev/make-tarball.sh` （以Java11为准）
 2. 运行：`/bin/bitlap server start`，默认Java11。（在Java8上请去掉`bin/bitlap-env.sh`中的`# JDK11="......"`这个参数）
+
+## docker打包&运行
+> tag就是版本号，如：0.3.0-SNAPSHOT
+```
+# 打包
+sh docker/docker.sh 0.3.0-SNAPSHOT
+# 运行 
+docker run --name bitlap:0.3.0-SNAPSHOT -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:0.3.0-SNAPSHOT
+```
+- 访问 `http://localhost:18081`

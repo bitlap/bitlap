@@ -2,9 +2,9 @@
 
 > 龟速开发中，感兴趣的可以star一下
 
-| Project Stage | CI              | Codecov                                   |
-|---------------|-----------------|-------------------------------------------|
-| ![Stage]      | ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
+| CI              | Codecov                                   |
+|-----------------|-------------------------------------------|
+| ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
 
 
 ## 架构
@@ -28,7 +28,7 @@
 ```
 MIT License
 
-Copyright (c) 2022 bitlap.org
+Copyright (c) 2023 bitlap.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

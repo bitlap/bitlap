@@ -14,7 +14,7 @@
 - `bitlap-cli`       交互式命令行实现。技术栈：scala、zio-cli
 - `bitlap-client`    JDBC和RPC client实现。技术栈：scala、zio-grpc
 - `bitlap-network`   RPC client和server的抽象定义。技术栈：scala、zio
-- `bitlap-server`    RPC server实现、raft server实现、HTTP server实现。技术栈：scala、zio-raft、zio-grpc、zio-http(zhttp)
+- `bitlap-server`    RPC server实现、raft server实现、HTTP server实现。技术栈：scala、jraft、zio-grpc、zio-http(zhttp)
 - `bitlap-core`      SQL解析、优化、任务、存储。技术栈：kotlin
 - `bitlap-spark3`    与spark3集成。技术栈：spark3、scala
 - `bitlap-common`    公共模块。技术栈：kotlin
@@ -29,7 +29,7 @@
 2. 下载源码 `git clone https://github.com/bitlap/bitlap.git`
 3. `mvn package -Pwebapp`
 4. 运行 `org.bitlap.server.BitlapServer` 在Java8+以上中需要添加虚拟机参数，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`
-5. 浏览器中访问首页 `http://localhost:18081`
+5. 访问 `http://localhost:18081`
 
 ## 打包
 
@@ -37,6 +37,7 @@
 2. 运行：`/bin/bitlap server start`，默认Java11。（在Java8上请去掉`bin/bitlap-env.sh`中的`# JDK11="......"`这个参数）
 
 ## docker打包&运行
+
 > tag就是版本号，如：0.3.0-SNAPSHOT
 ```
 # 打包

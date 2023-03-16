@@ -235,22 +235,22 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging_2.13</artifactId>
+            <artifactId>scala-logging_${scala.binary.version}</artifactId>
             <version>${scala.logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-annotations_2.13</artifactId>
+            <artifactId>smt-annotations_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-common_2.13</artifactId>
+            <artifactId>smt-common_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-csv_2.13</artifactId>
+            <artifactId>smt-csv_${scala.binary.version}</artifactId>
             <version>${smt.version}</version>
         </dependency>
         <dependency>
@@ -260,27 +260,27 @@
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-generic-extras_2.13</artifactId>
+            <artifactId>circe-generic-extras_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-parser_2.13</artifactId>
+            <artifactId>circe-parser_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-generic_2.13</artifactId>
+            <artifactId>circe-generic_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-core_2.13</artifactId>
+            <artifactId>circe-core_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.kitlangton</groupId>
-            <artifactId>zio-magic_2.13</artifactId>
+            <artifactId>zio-magic_${scala.binary.version}</artifactId>
             <version>${zio-magic}</version>
         </dependency>
     </dependencies>

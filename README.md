@@ -2,9 +2,7 @@
 
 > 龟速开发中，感兴趣的可以star一下
 
-| CI              | Codecov                                   |
-|-----------------|-------------------------------------------|
-| ![CI][Badge-CI] | [![codecov][Badge-Codecov]][Link-Codecov] |
+![CI][Badge-CI]  [![codecov][Badge-Codecov]][Link-Codecov]  [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/liguobin/bitlap)](https://hub.docker.com/r/liguobin/bitlap/tags)
 
 
 ## 架构

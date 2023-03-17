@@ -29,7 +29,7 @@ pwd
 cp ./conf/initFileForTest.sql ./docker/initFileForTest.sql
 
 # 构建镜像
-docker buildx build --build-arg bitlap_server=bitlap-$tag . -t bitlap:$tag --cache-to type=inline \
+docker buildx build --build-arg bitlap_server=bitlap-$tag . -t liguobin/bitlap:$tag --cache-to type=inline \
 --cache-from type=registry,ref=liguobin/bitlap:$1 -f ./Dockerfile
 
 echo "===============  🎉 build image successfully !!!  ======================="

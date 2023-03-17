@@ -34,6 +34,7 @@ jobs:
       - name: Docker Build
         run: sh docker/docker.sh ${{ vars.VERSION }}    
       - name: Docker Push
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
         run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ vars.VERSION }}
         
   

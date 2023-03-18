@@ -6,6 +6,8 @@ import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network._
 import org.bitlap.network.models._
 import org.bitlap.network.NetworkException.DataFormatException
+import org.bitlap.network.enumeration.{ OperationState, OperationType }
+import org.bitlap.network.serde.BitlapSerde
 
 import java.sql._
 import scala.collection.mutable.ListBuffer

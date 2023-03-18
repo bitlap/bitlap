@@ -5,8 +5,9 @@ import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.BitlapConf
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
-import org.bitlap.network.OperationState
+import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles._
+import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
 import org.bitlap.server.session.SessionManager._
 import zio.blocking.Blocking
@@ -51,6 +52,12 @@ object SessionManager {
 
   def startListener(): ZIO[Has[SessionManager], Throwable, Unit] =
     ZIO.serviceWith[SessionManager](sm => sm.startListener())
+
+  def getInfo(
+    sessionHandle: SessionHandle,
+    getInfoType: GetInfoType
+  ): ZIO[Has[SessionManager], Throwable, GetInfoValue] =
+    ZIO.serviceWith[SessionManager](sm => sm.getInfo(sessionHandle, getInfoType))
 
 }
 final class SessionManager(block: Blocking.Service) extends LazyLogging {
@@ -158,6 +165,19 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
       }
       refreshSession(sessionHandle, session)
       session
+    }
+  }
+
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = block.effectBlocking {
+    this.synchronized {
+      val session: Session = SessionManager.sessionAddLock.synchronized {
+        sessionStore.get(sessionHandle)
+      }
+      if (session == null) {
+        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
+      }
+      refreshSession(sessionHandle, session)
+      session.getInfo(getInfoType)
     }
   }
 

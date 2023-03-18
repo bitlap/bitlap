@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+option java_package = "org.bitlap.network";
+option java_multiple_files = true;
+
+message BOpenSessionReq {
+  string username = 1;
+  string password = 2;
+  map<string, string> configuration = 3;
+}
+message BOpenSessionResp {
+  map<string, string>  configuration = 1;
+  BSessionHandle session_handle = 2;
+}
+
+message BCloseSessionReq {
+  BSessionHandle session_handle = 1;
+}
+message BCloseSessionResp {
+}
+
+message BExecuteStatementReq {
+  string statement = 1;
+  BSessionHandle session_handle = 2;
+  map<string, string> conf_overlay = 3;
+  int64 query_timeout = 4;// default 0
+}
+message BExecuteStatementResp {
+  BOperationHandle operation_handle = 1;
+}
+
+message BFetchResultsReq {
+  BOperationHandle operation_handle = 1;
+  int64 max_rows = 2;
+  int32 fetch_type = 3;
+}
+message BFetchResultsResp {
+  bool has_more_rows = 1;
+  BRowSet results = 2;
+}
+
+message BHandleIdentifier {
+  bytes guid = 1;
+  bytes secret = 2;
+}
+
+message BSessionHandle {
+  BHandleIdentifier session_id = 1;
+}
+
+message BOperationHandle {
+  BHandleIdentifier operation_id = 1;
+  BOperationType operation_type = 2;
+  bool has_result_set = 3;
+  double modified_row_count = 4;
+}
+
+enum BOperationType {
+  OPERATION_TYPE_UNSPECIFIED = 0;
+  OPERATION_TYPE_EXECUTE_STATEMENT = 1;
+  OPERATION_TYPE_GET_SCHEMAS = 2;
+  OPERATION_TYPE_GET_TABLES = 3;
+}
+
+message BTableSchema {
+  repeated BColumnDesc columns = 1;
+}
+
+message BColumnDesc {
+  string column_name = 1;
+  BTypeId type_desc = 2; //TODO
+}
+
+message BRow {
+  repeated bytes col_vals = 1;
+}
+
+message BRowSet {
+  int64 start_row_offset = 1;
+  repeated BRow rows = 2;
+  repeated BColumn columns = 3;
+}
+
+message BColumn {
+  // TODO pb does not support inheritance?
+  repeated string string_column = 1;
+}
+message BGetTablesReq {
+  BSessionHandle session_handle = 1;
+  string  database = 2;
+  string  pattern = 3;
+}
+
+message BGetTablesResp {
+  BOperationHandle operation_handle = 1;
+}
+message BGetDatabasesReq {
+  BSessionHandle session_handle = 1;
+  string  pattern = 2;
+}
+
+message BGetDatabasesResp {
+  BOperationHandle operation_handle = 1;
+}
+
+message BGetResultSetMetadataReq {
+  BOperationHandle operation_handle = 1;
+}
+
+message BGetResultSetMetadataResp {
+  BTableSchema schema = 1;
+}
+
+enum BTypeId {
+  TYPE_ID_UNSPECIFIED = 0;
+  TYPE_ID_STRING_TYPE = 1;
+  TYPE_ID_INT_TYPE = 2;
+  TYPE_ID_DOUBLE_TYPE = 3;
+  TYPE_ID_LONG_TYPE = 4;
+  TYPE_ID_BOOLEAN_TYPE = 5;
+  TYPE_ID_TIMESTAMP_TYPE = 6;
+  TYPE_ID_SHORT_TYPE = 7;
+  TYPE_ID_BYTE_TYPE = 8;
+  TYPE_ID_FLOAT_TYPE = 9;
+  TYPE_ID_TIME_TYPE = 10;
+  TYPE_ID_DATE_TYPE = 11;
+}
+
+enum BOperationState {
+  UNKNOWN_STATE = 0;
+  INITIALIZED_STATE = 1;
+  RUNNING_STATE = 2;
+  FINISHED_STATE = 3;
+  CANCELED_STATE = 4;
+  CLOSED_STATE = 5;
+  ERROR_STATE = 6;
+  PENDING_STATE = 7;
+  TIMEOUT_STATE = 8;
+}
+
+message BCancelOperationReq {
+  BOperationHandle operationHandle = 1;
+}
+
+message BCancelOperationResp {
+}
+
+message BCloseOperationReq {
+  BOperationHandle operationHandle = 1;
+}
+
+message BCloseOperationResp {
+}
+
+message BGetOperationStatusReq {
+  BOperationHandle operationHandle = 1;
+}
+
+message BGetOperationStatusResp {
+  optional BOperationState operation_state = 1;
+  optional bool has_result_set = 2;
+}
+
+message BGetLeaderReq {
+  string request_id = 1;
+}
+message BGetLeaderResp {
+  optional string ip = 1;
+  uint32 port = 2;
+}
+
+message BGetInfoReq {
+  BSessionHandle sessionHandle = 1;
+  BGetInfoType info_type = 2;
+}
+
+message BGetInfoResp {
+  BGetInfoValue info_value = 1;
+}
+enum BGetInfoType {
+  MAX_DRIVER_CONNECTIONS = 0;
+  MAX_CONCURRENT_ACTIVITIES = 10;
+  DATA_SOURCE_NAME = 20;
+  SERVER_NAME = 30;
+  DBMS_NAME = 40;
+  DBMS_VER = 50;
+}
+message BGetInfoValue {
+  bytes value = 1;
+}

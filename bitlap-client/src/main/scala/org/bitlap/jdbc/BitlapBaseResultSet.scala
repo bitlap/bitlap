@@ -2,7 +2,7 @@
 package org.bitlap.jdbc
 
 import org.bitlap.network.models._
-import org.bitlap.network.BitlapSerde
+import org.bitlap.network.serde.BitlapSerde
 
 import java.io._
 import java.math.BigDecimal

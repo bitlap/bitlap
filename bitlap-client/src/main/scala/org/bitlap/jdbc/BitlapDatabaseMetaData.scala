@@ -2,7 +2,9 @@
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
+import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
+import org.bitlap.network.serde.BitlapSerde
 
 import java.sql.{ Array => _, _ }
 
@@ -17,7 +19,8 @@ class BitlapDatabaseMetaData(
   private val connection: Connection,
   private val session: SessionHandle,
   private val client: BitlapClient
-) extends DatabaseMetaData {
+) extends DatabaseMetaData
+    with BitlapSerde {
   override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def allTablesAreSelectable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
@@ -36,9 +39,15 @@ class BitlapDatabaseMetaData(
 
   override def nullsAreSortedAtEnd(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseProductName: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDatabaseProductName: String = {
+    val result = client.getInfo(session, GetInfoType.DbmsName).value
+    deserialize[String](TypeId.StringType, result)
+  }
 
-  override def getDatabaseProductVersion: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDatabaseProductVersion: String = {
+    val result = client.getInfo(session, GetInfoType.DbmsVer).value
+    deserialize[String](TypeId.StringType, result)
+  }
 
   override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 

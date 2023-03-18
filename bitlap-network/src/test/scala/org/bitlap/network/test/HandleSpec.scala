@@ -3,8 +3,9 @@ package org.bitlap.network.test
 
 import junit.framework.TestCase
 import junit.framework.TestCase.assertTrue
+import org.bitlap.network.enumeration.OperationType
 import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
-import org.bitlap.network.{ handles, OperationType }
+import org.bitlap.network.handles
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertFalse
 
@@ -42,7 +43,7 @@ class HandleSpec extends TestCase("HandleTests") {
     )
 
     assertTrue(
-      OperationType.getOperationType(
+      OperationType.toOperationType(
         op.toBOperationHandle().operationType
       ) == OperationType.ExecuteStatement
     )

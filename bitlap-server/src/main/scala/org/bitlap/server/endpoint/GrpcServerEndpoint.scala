@@ -3,8 +3,7 @@ package org.bitlap.server.endpoint
 
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
-import org.bitlap.network.AsyncRpc
-import org.bitlap.network.driver.service.ZioService.ZDriverService.genericBindable
+import org.bitlap.network.DriverAsyncRpc
 import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapGrpcConfig
 import org.bitlap.server.rpc._
@@ -40,7 +39,7 @@ final class GrpcServerEndpoint(val config: BitlapGrpcConfig) {
     ServerLayer
       .fromServiceList(
         builder.asInstanceOf[ServerBuilder[_]],
-        ServiceList.accessEnv[Has[AsyncRpc], GrpcServiceLive]
+        ServiceList.accessEnv[Has[DriverAsyncRpc], GrpcServiceLive]
       )
       .build
       .useForever

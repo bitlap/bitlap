@@ -2,6 +2,7 @@
 package org.bitlap.network
 
 import org.bitlap.network.NetworkException.RpcException
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import zio._
@@ -17,7 +18,7 @@ import scala.concurrent.duration.Duration
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait AsyncRpc extends Rpc[Task] { self =>
+trait DriverAsyncRpc extends DriverRpc[Task] { self =>
 
   private lazy val runtime = zio.Runtime.default
   private lazy val timeout = Duration("30s")
@@ -74,5 +75,7 @@ trait AsyncRpc extends Rpc[Task] { self =>
   def closeOperation(opHandle: OperationHandle): Task[Unit]
 
   def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus]
+
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue]
 
 }

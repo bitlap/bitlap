@@ -3,6 +3,7 @@ package org.bitlap.testkit.server
 
 import com.google.protobuf.ByteString
 import org.bitlap.network._
+import org.bitlap.network.enumeration.{ GetInfoType, OperationState, OperationType }
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import org.bitlap.testkit._
@@ -17,10 +18,10 @@ import zio._
  *  @version 1.0,2022/4/27
  */
 object MockAsyncRpcBackend {
-  lazy val live: ULayer[Has[AsyncRpc]] = ZLayer.succeed(MockAsyncRpcBackend())
+  lazy val live: ULayer[Has[DriverAsyncRpc]] = ZLayer.succeed(MockAsyncRpcBackend())
 }
 @apply
-class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
+class MockAsyncRpcBackend extends DriverAsyncRpc with CsvUtil {
 
   val metrics: Seq[Metric] = readCsvData("simple_data.csv")
 
@@ -92,4 +93,6 @@ class MockAsyncRpcBackend extends AsyncRpc with CsvUtil {
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[ByteString] = ???
 }

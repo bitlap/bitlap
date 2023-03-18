@@ -10,6 +10,7 @@ import org.bitlap.server.session.SessionManager
 import org.bitlap.tools._
 import zio._
 import org.bitlap.common.exception.SQLExecutedException
+import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import zio.blocking.Blocking
 import zio.magic.ZioProvideMagicOps
 
@@ -21,10 +22,10 @@ import zio.magic.ZioProvideMagicOps
  */
 object GrpcBackendLive {
   private[server] lazy val liveInstance: GrpcBackendLive = GrpcBackendLive.apply()
-  lazy val live: ULayer[Has[AsyncRpc]]                   = ZLayer.succeed(liveInstance)
+  lazy val live: ULayer[Has[DriverAsyncRpc]]             = ZLayer.succeed(liveInstance)
 }
 @apply
-class GrpcBackendLive extends AsyncRpc {
+class GrpcBackendLive extends DriverAsyncRpc {
 
   zio.Runtime.global.unsafeRun(SessionManager.startListener().provideLayer(SessionManager.live))
 
@@ -116,5 +117,10 @@ class GrpcBackendLive extends AsyncRpc {
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
+    SessionManager
+      .getInfo(sessionHandle, getInfoType)
+      .inject(SessionManager.live, Blocking.live)
 
 }

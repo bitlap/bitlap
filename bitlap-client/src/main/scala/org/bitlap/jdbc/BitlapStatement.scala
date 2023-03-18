@@ -3,7 +3,7 @@ package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles._
-import org.bitlap.network.OperationState._
+import org.bitlap.network.enumeration.OperationState._
 import org.bitlap.network.models._
 
 import java.sql._

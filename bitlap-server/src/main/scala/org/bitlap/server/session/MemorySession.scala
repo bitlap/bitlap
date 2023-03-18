@@ -1,8 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import org.bitlap.common.BitlapConf
-import org.bitlap.network._
+import com.google.protobuf.ByteString
+import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
+import org.bitlap.jdbc.BitlapSQLException
+import org.bitlap.network.enumeration.GetInfoType._
+import org.bitlap.network.enumeration._
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import zio.Task
@@ -147,4 +150,16 @@ final class MemorySession(
     if (noMoreOpHandle) System.currentTimeMillis - lastAccessTime
     else 0
   }
+
+  override def getInfo(getInfoType: GetInfoType): GetInfoValue =
+    getInfoType match {
+      case ServerName =>
+        GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+      case DbmsName =>
+        GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+      case DbmsVer =>
+        GetInfoValue(ByteString.copyFromUtf8(BitlapVersionInfo.getVersion))
+      case _ =>
+        throw BitlapSQLException("Unrecognized GetInfoType value: " + getInfoType.toString)
+    }
 }

@@ -3,7 +3,7 @@ package org.bitlap.server.raft.rpc
 
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor => _, _ }
 import com.google.protobuf.Message
-import org.bitlap.common.schema.GetServerMetadata
+import org.bitlap.common.schema._
 import org.bitlap.common.BitlapConf
 import org.bitlap.server.BitlapContext
 import java.util.concurrent.Executor
@@ -15,21 +15,21 @@ import org.bitlap.client._
  */
 class GetServerMetadataProcessor(
   executor: Executor = null
-) extends RpcProcessor[GetServerMetadata.GetServerAddressReq](
+) extends RpcProcessor[GetServerAddressReq](
       executor,
-      GetServerMetadata.GetServerAddressResp.getDefaultInstance
+      GetServerAddressResp.getDefaultInstance
     ) {
 
-  override def processRequest(request: GetServerMetadata.GetServerAddressReq, done: RpcRequestClosure): Message = {
+  override def processRequest(request: GetServerAddressReq, done: RpcRequestClosure): Message = {
     val host    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
     val address = host.extractServerAddress
     val port    = address.port
     val ip      = address.ip
-    GetServerMetadata.GetServerAddressResp.newBuilder().setIp(ip).setPort(port).build()
+    GetServerAddressResp.newBuilder().setIp(ip).setPort(port).build()
   }
 
   override def processError(rpcCtx: RpcContext, exception: Exception): Message =
-    GetServerMetadata.GetServerAddressResp.newBuilder().setIp("").setPort(0).build()
+    GetServerAddressResp.newBuilder().setIp("").setPort(0).build()
 
-  override def interest(): String = classOf[GetServerMetadata.GetServerAddressReq].getName
+  override def interest(): String = classOf[GetServerAddressReq].getName
 }

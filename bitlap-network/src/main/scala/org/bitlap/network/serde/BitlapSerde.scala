@@ -1,18 +1,18 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.network
+package org.bitlap.network.serde
 
-import org.bitlap.network.models.TypeId
+import com.google.protobuf.ByteString
 import org.bitlap.network.NetworkException._
+import org.bitlap.network.enumeration.TypeId
+import org.bitlap.network.serde.BitlapDeserializer.parser
 
 import java.io._
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 import java.sql._
 import scala.annotation.implicitNotFound
 import scala.reflect._
 import scala.util.Using
-import com.google.protobuf.ByteString
-import org.bitlap.network.BitlapDeserializer.parser
-import java.nio.charset.Charset
 
 /** @author
  *    梦境迷离

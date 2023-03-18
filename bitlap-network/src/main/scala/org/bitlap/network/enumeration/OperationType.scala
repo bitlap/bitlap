@@ -1,8 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.network
+package org.bitlap.network.enumeration
 
 import enumeratum.values._
-import org.bitlap.network.driver.proto.BOperationType
+import org.bitlap.network.driver_proto._
 
 /** bitlap客户端操作类型
  *  @author
@@ -21,7 +21,7 @@ object OperationType extends IntEnum[OperationType] {
 
   val values: IndexedSeq[OperationType] = findValues
 
-  def getOperationType(bOperationType: BOperationType): OperationType =
+  def toOperationType(bOperationType: BOperationType): OperationType =
     OperationType.withValueOpt(bOperationType.value).getOrElse(UnknownOperation)
 
 }

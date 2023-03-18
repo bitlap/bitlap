@@ -5,18 +5,10 @@ import io.grpc._
 import org.bitlap.common.utils.UuidUtil
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network._
-import org.bitlap.network.driver.proto.BCancelOperation.BCancelOperationReq
-import org.bitlap.network.driver.proto.BCloseOperation.BCloseOperationReq
-import org.bitlap.network.driver.proto.BCloseSession.BCloseSessionReq
-import org.bitlap.network.driver.proto.BExecuteStatement.BExecuteStatementReq
-import org.bitlap.network.driver.proto.BFetchResults.BFetchResultsReq
-import org.bitlap.network.driver.proto.BGetDatabases.BGetDatabasesReq
-import org.bitlap.network.driver.proto.BGetOperationStatus.BGetOperationStatusReq
-import org.bitlap.network.driver.proto.BGetRaftMetadata
-import org.bitlap.network.driver.proto.BGetResultSetMetadata.BGetResultSetMetadataReq
-import org.bitlap.network.driver.proto.BGetTables.BGetTablesReq
-import org.bitlap.network.driver.proto.BOpenSession.BOpenSessionReq
-import org.bitlap.network.driver.service.ZioService.DriverServiceClient
+import org.bitlap.network.driver_proto._
+import org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient
+import org.bitlap.network.enumeration.GetInfoType
+import org.bitlap.network.enumeration.GetInfoType.toBGetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import zio._
@@ -28,7 +20,7 @@ import zio._
  *  @since 2021/11/21
  *  @version 1.0, zio 1.0
  */
-class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncRpc {
+class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc {
 
   private lazy val leaderClientLayer = ZIO
     .foreach(serverAddresses(serverPeers)) { address =>
@@ -131,7 +123,7 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
 
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient
-      .getLeader(BGetRaftMetadata.BGetLeaderReq.of(requestId))
+      .getLeader(BGetLeaderReq.of(requestId))
       .map { f =>
         if (f == null || f.ip.isEmpty) None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port))
       }
@@ -161,6 +153,14 @@ class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extend
       DriverServiceClient
         .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
         .mapBoth(statusApplyFunc, _ => ())
+        .provideLayer(l)
+    )
+
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
+    leaderClientLayer.flatMap(l =>
+      DriverServiceClient
+        .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
+        .mapBoth(statusApplyFunc, t => GetInfoValue.fromBGetInfoResp(t))
         .provideLayer(l)
     )
 }

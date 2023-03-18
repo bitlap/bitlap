@@ -51,8 +51,8 @@ final class HttpServiceLive {
              |}
              |""".stripMargin)
     } finally {
-//      stmt.close()
-//      conn.close()
+      stmt.close()
+      conn.close()
     }
   }
 

@@ -10,17 +10,13 @@ import org.bitlap.network.handles._
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
 import zio.blocking.Blocking
-import zio._
-import zio.clock.Clock
-
+import zio.{ ZIO, _ }
 import java.util.Date
 import java.util.concurrent._
-import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection._
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
-import zio.duration.{ Duration => ZDuration }
 
 /** bitlap 会话管理器
  *  @author
@@ -34,8 +30,6 @@ object SessionManager extends LazyLogging {
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
 
-  private val start = new AtomicBoolean(false)
-
   private[session] lazy val opHandleSet = ListBuffer[OperationHandle]()
 
   private[session] lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
@@ -43,29 +37,22 @@ object SessionManager extends LazyLogging {
 
   private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
 
-  def startListener(): ZIO[Has[SessionManager] with Clock, Nothing, Unit] =
+  def startListener(): ZIO[Has[SessionManager], Nothing, Unit] = {
+    logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
+    val current = System.currentTimeMillis
     ZIO
-      .when(start.compareAndSet(false, true)) {
-        logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
-        val current = System.currentTimeMillis
-        val collect = ZIO
-          .foreach(sessionStore.values().asScala) { session =>
-            logger.info(s"Bitlap server has [${sessionStore.size}] sessions")
-            if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
-              val handle = session.sessionHandle
-              logger.warn(
-                s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
-              )
-              closeSession(handle)
-            } else ZIO.effect(session.removeExpiredOperations(opHandleSet.toList))
-          }
-          .ignore
-          .repeat(Schedule.fixed(ZDuration.fromScala(Duration(3000, TimeUnit.MILLISECONDS))))
-          .forkDaemon
-
-        collect
-
+      .foreach(sessionStore.values().asScala) { session =>
+        if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
+          val handle = session.sessionHandle
+          logger.warn(
+            s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
+          )
+          closeSession(handle)
+        } else ZIO.effect(session.removeExpiredOperations(opHandleSet.toList))
       }
+      .ignore <*
+      ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
+  }
 
   lazy val live: ZLayer[Blocking, Nothing, Has[SessionManager]] =
     ZLayer.fromService((block: Blocking.Service) => new SessionManager(block))

@@ -10,6 +10,10 @@ import zio._
 import zio.console.putStrLn
 import zio.magic._
 
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.Duration
+import zio.duration.{ Duration => ZDuration }
+
 /** bitlap 聚合服务
  *  @author
  *    梦境迷离
@@ -23,7 +27,10 @@ object BitlapServer extends zio.App {
       t1 <- RaftServerEndpoint.service(args).fork
       t2 <- GrpcServerEndpoint.service(args).fork
       t3 <- HttpServerEndpoint.service(args).fork
-      _  <- SessionManager.startListener()
+      _ <- SessionManager
+        .startListener()
+        .repeat(Schedule.fixed(ZDuration.fromScala(Duration(3000, TimeUnit.MILLISECONDS))))
+        .forkDaemon
       _ <- putStrLn("""
                       |    __    _ __  __
                       |   / /_  (_) /_/ /___ _____

@@ -10,7 +10,7 @@ import org.bitlap.network.models._
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait SyncRpc extends Rpc[Identity] { self =>
+trait DriverSyncRpc extends DriverRpc[Identity] { self =>
 
   def pure[A](a: A): Identity[A] = a
 

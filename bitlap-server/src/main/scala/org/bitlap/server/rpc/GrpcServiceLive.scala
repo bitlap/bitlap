@@ -4,19 +4,9 @@ package org.bitlap.server.rpc
 import io.grpc._
 import org.bitlap.network._
 import org.bitlap.network.NetworkException._
-import org.bitlap.network.driver.proto._
-import org.bitlap.network.driver.proto.BCancelOperation._
-import org.bitlap.network.driver.proto.BCloseOperation._
-import org.bitlap.network.driver.proto.BCloseSession._
-import org.bitlap.network.driver.proto.BExecuteStatement._
-import org.bitlap.network.driver.proto.BFetchResults._
-import org.bitlap.network.driver.proto.BGetDatabases._
-import org.bitlap.network.driver.proto.BGetOperationStatus._
-import org.bitlap.network.driver.proto.BGetRaftMetadata._
-import org.bitlap.network.driver.proto.BGetResultSetMetadata._
-import org.bitlap.network.driver.proto.BGetTables._
-import org.bitlap.network.driver.proto.BOpenSession._
-import org.bitlap.network.driver.service.ZioService._
+import org.bitlap.network.driver_proto._
+import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.server._
 import org.bitlap.tools._
@@ -29,11 +19,11 @@ import zio._
  *  @version 1.0,2022/4/21
  */
 object GrpcServiceLive {
-  lazy val live: ZLayer[Has[AsyncRpc], Nothing, Has[GrpcServiceLive]] =
-    ZLayer.fromService((rpc: AsyncRpc) => GrpcServiceLive(rpc))
+  lazy val live: ZLayer[Has[DriverAsyncRpc], Nothing, Has[GrpcServiceLive]] =
+    ZLayer.fromService((rpc: DriverAsyncRpc) => GrpcServiceLive(rpc))
 }
 @apply
-final class GrpcServiceLive(private val rpc: AsyncRpc) extends ZDriverService[Any, Any] {
+final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any] {
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   override def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
@@ -94,8 +84,8 @@ final class GrpcServiceLive(private val rpc: AsyncRpc) extends ZDriverService[An
       .mapBoth(errorApplyFunc, t => BGetResultSetMetadataResp(Some(t.toBTableSchema)))
 
   override def getDatabases(
-    request: BGetDatabases.BGetDatabasesReq
-  ): ZIO[Any, Status, BGetDatabases.BGetDatabasesResp] =
+    request: BGetDatabasesReq
+  ): ZIO[Any, Status, BGetDatabasesResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -147,7 +137,7 @@ final class GrpcServiceLive(private val rpc: AsyncRpc) extends ZDriverService[An
       )
       .mapBoth(errorApplyFunc, t => t.toBGetOperationStatusResp)
 
-  override def closeOperation(request: BCloseOperation.BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
+  override def closeOperation(request: BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -155,4 +145,13 @@ final class GrpcServiceLive(private val rpc: AsyncRpc) extends ZDriverService[An
         _.closeOperation(new OperationHandle(request.getOperationHandle))
       )
       .mapBoth(errorApplyFunc, _ => BCloseOperationResp())
+
+  override def getInfo(request: BGetInfoReq): ZIO[Any, Status, BGetInfoResp] =
+    rpc
+      .when(
+        BitlapContext.isLeader,
+        OperationMustOnLeaderException(),
+        _.getInfo(new SessionHandle(request.getSessionHandle), GetInfoType.toGetInfoType(request.infoType))
+      )
+      .mapBoth(errorApplyFunc, _.toBGetInfoResp)
 }

@@ -6,10 +6,10 @@ import com.alipay.sofa.jraft.option.CliOptions
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 import org.bitlap.client._
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.schema.GetServerMetadata
+import org.bitlap.common.schema._
 import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.NetworkException.{ InternalException, LeaderNotFoundException }
-import org.bitlap.network.{ AsyncRpc, ServerAddress }
+import org.bitlap.network.NetworkException._
+import org.bitlap.network.{ DriverAsyncRpc, ServerAddress }
 import org.bitlap.server.config.BitlapRaftConfig
 import zio._
 import zio.blocking.Blocking
@@ -33,19 +33,19 @@ object BitlapContext {
   private var cliClientService: CliClientServiceImpl = _
 
   @volatile
-  private var _asyncRpc: AsyncRpc = _
+  private var _asyncRpc: DriverAsyncRpc = _
 
   @volatile
   private var _node: Node = _
 
-  def asyncRpc: AsyncRpc =
+  def asyncRpc: DriverAsyncRpc =
     if (_asyncRpc == null) {
       throw InternalException("cannot find an AsyncRpc instance")
     } else {
       _asyncRpc
     }
 
-  def fillRpc(asyncRpc: AsyncRpc): UIO[Unit] =
+  def fillRpc(asyncRpc: DriverAsyncRpc): UIO[Unit] =
     ZIO.succeed {
       if (initRpc.compareAndSet(false, true)) {
         _asyncRpc = asyncRpc
@@ -102,13 +102,13 @@ object BitlapContext {
           }
           val result = cliClientService.getRpcClient.invokeSync(
             leader.getEndpoint,
-            GetServerMetadata.GetServerAddressReq
+            GetServerAddressReq
               .newBuilder()
               .setRequestId(UuidUtil.uuid())
               .build(),
             timeout.toMillis
           )
-          val re = result.asInstanceOf[GetServerMetadata.GetServerAddressResp]
+          val re = result.asInstanceOf[GetServerAddressResp]
 
           if (re == null || re.getIp.isEmpty || re.getPort <= 0)
             throw LeaderNotFoundException("cannot find a leader address")

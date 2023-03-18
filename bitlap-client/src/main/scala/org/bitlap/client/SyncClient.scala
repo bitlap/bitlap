@@ -2,6 +2,7 @@
 package org.bitlap.client
 
 import org.bitlap.network._
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
@@ -12,7 +13,7 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncRpc {
+class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverSyncRpc {
 
   private lazy val delegateClient = new AsyncClient(serverPeers, props)
 
@@ -73,4 +74,6 @@ class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends
     delegateClient.sync {
       _.closeOperation(opHandle)
     }
+
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Identity[GetInfoValue] = ???
 }

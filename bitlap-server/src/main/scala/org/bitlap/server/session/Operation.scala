@@ -4,16 +4,16 @@ package org.bitlap.server.session
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models._
-import org.bitlap.network.OperationType
 import java.util.concurrent.TimeUnit
 
 import scala.collection.mutable
-import org.bitlap.network.OperationState
-import org.bitlap.network.OperationState._
+import org.bitlap.network.enumeration.OperationState._
 import java.util.concurrent.CountDownLatch
 import org.bitlap.common.BitlapConf
+import org.bitlap.network.enumeration.{ OperationState, OperationType }
 
 /** bitlap 操作
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/11/20

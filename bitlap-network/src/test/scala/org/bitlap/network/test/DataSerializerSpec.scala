@@ -1,8 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.test
 
-import org.bitlap.network.BitlapSerde
-import org.bitlap.network.models.TypeId
+import org.bitlap.network.enumeration.TypeId
+import org.bitlap.network.serde.BitlapSerde
 import org.junit.Test
 
 import java.sql.{ Date, Time, Timestamp }

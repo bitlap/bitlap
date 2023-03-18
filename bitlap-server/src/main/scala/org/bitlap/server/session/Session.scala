@@ -2,6 +2,7 @@
 package org.bitlap.server.session
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import zio.Task
@@ -54,4 +55,6 @@ trait Session {
   def removeExpiredOperations(handles: List[OperationHandle]): List[Operation]
 
   def getNoOperationTime: Long
+
+  def getInfo(getInfoType: GetInfoType): GetInfoValue
 }

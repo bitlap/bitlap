@@ -2,7 +2,6 @@
 package org.bitlap.server
 
 import org.bitlap.server.config._
-import org.bitlap.server.endpoint._
 import org.bitlap.server.http.HttpServiceLive
 import zhttp.service.EventLoopGroup
 import zhttp.service.server.ServerChannelFactory

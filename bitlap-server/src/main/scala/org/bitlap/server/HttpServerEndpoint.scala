@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.endpoint
+package org.bitlap.server
 
 import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http._

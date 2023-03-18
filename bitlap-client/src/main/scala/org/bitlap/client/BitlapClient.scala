@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.client
 
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
@@ -66,4 +67,7 @@ class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
   def getOperationStatus(opHandle: OperationHandle): OperationStatus =
     syncClient.getOperationStatus(opHandle)
+
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
+    syncClient.getInfo(sessionHandle, getInfoType)
 }

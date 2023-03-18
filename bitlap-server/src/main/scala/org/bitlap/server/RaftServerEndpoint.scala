@@ -1,9 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.endpoint
+package org.bitlap.server
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
-import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapRaftConfig
 import org.bitlap.server.raft._
 import org.slf4j.LoggerFactory

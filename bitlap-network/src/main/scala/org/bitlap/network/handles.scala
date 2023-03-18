@@ -2,7 +2,8 @@
 package org.bitlap.network
 
 import com.google.protobuf.ByteString
-import org.bitlap.network.driver.proto._
+import org.bitlap.network.driver_proto._
+import org.bitlap.network.enumeration.OperationType
 import org.bitlap.tools._
 
 import java.nio.ByteBuffer
@@ -159,7 +160,7 @@ object handles {
 
     def this(bOperationHandle: BOperationHandle) =
       this(
-        OperationType.getOperationType(bOperationHandle.operationType),
+        OperationType.toOperationType(bOperationHandle.operationType),
         bOperationHandle.hasResultSet,
         new HandleIdentifier(bOperationHandle.getOperationId)
       )

@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.models.TypeId
+import org.bitlap.network.enumeration.TypeId
 
 import java.sql._
 

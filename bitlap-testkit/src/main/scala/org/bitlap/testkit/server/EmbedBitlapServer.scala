@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
+import org.bitlap.server.{ GrpcServerEndpoint, RaftServerEndpoint }
 import org.bitlap.server.config._
 import org.bitlap.server.endpoint._
 import zio.console.putStrLn

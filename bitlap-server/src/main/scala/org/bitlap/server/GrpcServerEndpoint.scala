@@ -1,10 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.endpoint
+package org.bitlap.server
 
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
 import org.bitlap.network.DriverAsyncRpc
-import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapGrpcConfig
 import org.bitlap.server.rpc._
 import scalapb.zio_grpc._

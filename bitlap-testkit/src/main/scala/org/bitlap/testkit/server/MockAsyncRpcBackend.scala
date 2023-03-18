@@ -3,7 +3,7 @@ package org.bitlap.testkit.server
 
 import com.google.protobuf.ByteString
 import org.bitlap.network._
-import org.bitlap.network.enumeration.{ GetInfoType, OperationState, OperationType }
+import org.bitlap.network.enumeration.{ GetInfoType, OperationState, OperationType, TypeId }
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import org.bitlap.testkit._

@@ -22,7 +22,7 @@ class GetServerMetadataProcessor(
 
   override def processRequest(request: GetServerAddressReq, done: RpcRequestClosure): Message = {
     val host    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
-    val address = host.extractServerAddress
+    val address = host.asServerAddress
     val port    = address.port
     val ip      = address.ip
     GetServerAddressResp.newBuilder().setIp(ip).setPort(port).build()

@@ -9,9 +9,9 @@ import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles._
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
-import org.bitlap.server.session.SessionManager._
 import zio.blocking.Blocking
 import zio._
+import zio.clock.Clock
 
 import java.util.Date
 import java.util.concurrent._
@@ -20,6 +20,7 @@ import scala.collection._
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
+import zio.duration.{ Duration => ZDuration }
 
 /** bitlap 会话管理器
  *  @author
@@ -27,10 +28,45 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
  *  @since 2021/11/20
  *  @version 2.0
  */
-object SessionManager {
+object SessionManager extends LazyLogging {
 
-  private val timeoutCheckerLock     = new Object
   private val sessionAddLock: Object = new Object
+  private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
+    new ConcurrentHashMap[SessionHandle, Session]()
+
+  private val start = new AtomicBoolean(false)
+
+  private[session] lazy val opHandleSet = ListBuffer[OperationHandle]()
+
+  private[session] lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
+    mutable.HashMap[OperationHandle, Operation]()
+
+  private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
+
+  def startListener(): ZIO[Has[SessionManager] with Clock, Nothing, Unit] =
+    ZIO
+      .when(start.compareAndSet(false, true)) {
+        logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
+        val current = System.currentTimeMillis
+        val collect = ZIO
+          .foreach(sessionStore.values().asScala) { session =>
+            logger.info(s"Bitlap server has [${sessionStore.size}] sessions")
+            if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
+              val handle = session.sessionHandle
+              logger.warn(
+                s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
+              )
+              closeSession(handle)
+            } else ZIO.effect(session.removeExpiredOperations(opHandleSet.toList))
+          }
+          .ignore
+          .repeat(Schedule.fixed(ZDuration.fromScala(Duration(3000, TimeUnit.MILLISECONDS))))
+          .forkDaemon
+
+        collect
+
+      }
+
   lazy val live: ZLayer[Blocking, Nothing, Has[SessionManager]] =
     ZLayer.fromService((block: Blocking.Service) => new SessionManager(block))
 
@@ -50,9 +86,6 @@ object SessionManager {
   def getOperation(operationHandle: OperationHandle): ZIO[Has[SessionManager], Throwable, Operation] =
     ZIO.serviceWith[SessionManager](sm => sm.getOperation(operationHandle))
 
-  def startListener(): ZIO[Has[SessionManager], Throwable, Unit] =
-    ZIO.serviceWith[SessionManager](sm => sm.startListener())
-
   def getInfo(
     sessionHandle: SessionHandle,
     getInfoType: GetInfoType
@@ -61,58 +94,7 @@ object SessionManager {
 
 }
 final class SessionManager(block: Blocking.Service) extends LazyLogging {
-
-  private val start = new AtomicBoolean(false)
-
-  private[session] lazy val opHandleSet = ListBuffer[OperationHandle]()
-
-  private[session] lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
-    mutable.HashMap[OperationHandle, Operation]()
-
-  private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
-    new ConcurrentHashMap[SessionHandle, Session]()
-
-  private def sleepFor(interval: Long): Unit =
-    timeoutCheckerLock.synchronized {
-      try timeoutCheckerLock.wait(interval)
-      catch {
-        case _: InterruptedException =>
-      }
-
-    }
-
-  private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
-  private final val interval       = 3000
-
-  private lazy val sessionThread: Thread = new Thread {
-    override def run(): Unit = {
-      sleepFor(interval)
-      while (!Thread.currentThread().isInterrupted) {
-        logger.info(s"[${sessionStore.size}] sessions exists")
-        val current = System.currentTimeMillis
-        for (session <- sessionStore.values().asScala)
-          if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
-            val handle = session.sessionHandle
-            logger.warn(
-              s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
-            )
-            try zio.Runtime.default.unsafeRun(closeSession(handle))
-            catch {
-              case e: Exception =>
-                logger.warn("Exception is thrown closing session " + handle, e)
-            }
-          } else session.removeExpiredOperations(opHandleSet.toList)
-        sleepFor(interval)
-      }
-    }
-  }
-
-  def startListener(): Task[Unit] = Task.effect {
-    if (start.compareAndSet(false, true)) {
-      sessionThread.setDaemon(true)
-      sessionThread.start()
-    }
-  }
+  import SessionManager._
 
   def openSession(
     username: String,
@@ -151,7 +133,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
       opHandleSet.remove(i)
     }
     logger.info(
-      s"Close session [$sessionHandle], [${getOpenSessionCount()}] sessions exists"
+      s"Close session [$sessionHandle], [${getOpenSessionCount}] sessions exists"
     )
   }
 
@@ -197,7 +179,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
     }
   }
 
-  private def getOpenSessionCount(): Int =
+  private def getOpenSessionCount: Int =
     sessionStore.size
 
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =

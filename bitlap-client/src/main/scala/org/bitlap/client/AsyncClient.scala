@@ -20,10 +20,10 @@ import zio._
  *  @since 2021/11/21
  *  @version 1.0, zio 1.0
  */
-class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc {
+final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc {
 
   private lazy val leaderClientLayer = ZIO
-    .foreach(serverAddresses(serverPeers)) { address =>
+    .foreach(toServerAddresses(serverPeers)) { address =>
       getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
     }
     .map(f =>

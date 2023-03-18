@@ -13,7 +13,7 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverSyncRpc {
+final class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverSyncRpc {
 
   private lazy val delegateClient = new AsyncClient(serverPeers, props)
 

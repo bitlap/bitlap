@@ -9,6 +9,9 @@ import zio._
 import zio.blocking.Blocking
 import zio.console._
 
+import java.sql.DriverManager
+import java.util.Properties
+
 /** bitlap http服务
  *
  *  初始化数据接口： http://localhost:8080/init
@@ -53,7 +56,12 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
           && req.path.startsWith(!! / "pages") =>
       indexHtml
     case Method.GET -> !! / path => Http.fromResource(s"static/$path")
-    case _ =>
+    case _                       =>
+      // 使用初始化时，开启这个
+      val properties = new Properties()
+      properties.put("bitlapconf:retries", "1")
+      properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")
+      DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
       indexHtml
   }
 

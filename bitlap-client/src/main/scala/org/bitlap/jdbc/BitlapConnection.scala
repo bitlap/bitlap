@@ -103,15 +103,15 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if (closed) throw BitlapSQLException(s"Cannot $action after connection has been closed")
 
   private def executeInitSql(): Unit =
-    if (initFile != null) try {
-      val st = createStatement()
+    if (initFile != null && session != null) try {
+      val st = new BitlapStatement(this, session, client)
       try {
         val sqlList = Utils.parseInitFile(initFile)
         for (sql <- sqlList) {
           println(s"Executing InitSql ... $sql")
           val hasResult = st.execute(sql)
           if (hasResult) try {
-            val rs = st.getResultSet
+            val rs = st.getResultSet()
             try while (rs.next) println(rs.getString(1))
             catch { case ignore: Exception => }
             finally if (rs != null) rs.close()

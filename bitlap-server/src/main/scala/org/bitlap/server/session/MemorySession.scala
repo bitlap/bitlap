@@ -71,7 +71,7 @@ final class MemorySession(
 
   override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+      val op = SessionManager.operationStore.getOrElse(operationHandle, null)
       if (op != null) {
         op.setState(OperationState.ClosedState)
         removeOperation(operationHandle)
@@ -80,7 +80,7 @@ final class MemorySession(
 
   override def cancelOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = sessionManager.operationStore.getOrElse(operationHandle, null)
+      val op = SessionManager.operationStore.getOrElse(operationHandle, null)
       if (op != null) {
         if (op.state.terminal) {
           println(s"$operationHandle Operation is already aborted in state - ${op.state}")
@@ -122,23 +122,23 @@ final class MemorySession(
 
   private def addOperation(operation: Operation) {
     this.synchronized {
-      sessionManager.opHandleSet.append(operation.opHandle)
-      sessionManager.operationStore.put(operation.opHandle, operation)
+      SessionManager.opHandleSet.append(operation.opHandle)
+      SessionManager.operationStore.put(operation.opHandle, operation)
     }
   }
 
   private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
     this.synchronized {
-      val r   = sessionManager.operationStore.remove(operationHandle)
-      val idx = sessionManager.opHandleSet.indexOf(operationHandle)
+      val r   = SessionManager.operationStore.remove(operationHandle)
+      val idx = SessionManager.opHandleSet.indexOf(operationHandle)
       if (idx != -1) {
-        sessionManager.opHandleSet.remove(idx)
+        SessionManager.opHandleSet.remove(idx)
       }
       r
     }
 
   private def removeTimedOutOperation(operationHandle: OperationHandle): Option[Operation] = {
-    val operation = sessionManager.operationStore.get(operationHandle)
+    val operation = SessionManager.operationStore.get(operationHandle)
     if (operation != null && operation.get.isTimedOut(System.currentTimeMillis)) {
       return removeOperation(operationHandle)
     }
@@ -146,7 +146,7 @@ final class MemorySession(
   }
 
   override def getNoOperationTime: Long = {
-    val noMoreOpHandle = sessionManager.opHandleSet.isEmpty
+    val noMoreOpHandle = SessionManager.opHandleSet.isEmpty
     if (noMoreOpHandle) System.currentTimeMillis - lastAccessTime
     else 0
   }

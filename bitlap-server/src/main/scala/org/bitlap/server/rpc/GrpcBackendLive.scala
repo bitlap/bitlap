@@ -27,8 +27,6 @@ object GrpcBackendLive {
 @apply
 class GrpcBackendLive extends DriverAsyncRpc {
 
-  zio.Runtime.global.unsafeRun(SessionManager.startListener().provideLayer(SessionManager.live))
-
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
     username: String,
@@ -62,7 +60,7 @@ class GrpcBackendLive extends DriverAsyncRpc {
     SessionManager
       .getSession(sessionHandle)
       .mapBoth(
-        f => new SQLExecutedException(s"Unsupported SQL: $statement", f.getCause),
+        f => new SQLExecutedException(s"Unsupported SQL: $statement cause by ${f.getLocalizedMessage}", f),
         session =>
           session.executeStatement(
             statement,

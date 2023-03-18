@@ -3,6 +3,7 @@ package org.bitlap.server
 
 import org.bitlap.server.config._
 import org.bitlap.server.http.HttpServiceLive
+import org.bitlap.server.session.SessionManager
 import zhttp.service.EventLoopGroup
 import zhttp.service.server.ServerChannelFactory
 import zio._
@@ -22,6 +23,7 @@ object BitlapServer extends zio.App {
       t1 <- RaftServerEndpoint.service(args).fork
       t2 <- GrpcServerEndpoint.service(args).fork
       t3 <- HttpServerEndpoint.service(args).fork
+      _  <- SessionManager.startListener()
       _ <- putStrLn("""
                       |    __    _ __  __
                       |   / /_  (_) /_/ /___ _____
@@ -42,7 +44,8 @@ object BitlapServer extends zio.App {
         BitlapGrpcConfig.live,
         BitlapHttpConfig.live,
         BitlapRaftConfig.live,
-        HttpServiceLive.live
+        HttpServiceLive.live,
+        SessionManager.live
       )
       .foldM(
         e => ZIO.fail(e).exitCode,

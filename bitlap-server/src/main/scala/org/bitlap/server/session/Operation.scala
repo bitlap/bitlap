@@ -89,9 +89,7 @@ abstract class Operation(
    *    \- timeout in milli-seconds
    *  @return
    *    true if operation is terminated or false if timed-out
-   *  @throws InterruptedException
    */
-  @throws[InterruptedException]
   def waitToTerminate(timeOutMs: Long): Boolean = opTerminateMonitorLatch.await(timeOutMs, TimeUnit.MILLISECONDS)
 
   def isTimedOut(current: Long): Boolean = {

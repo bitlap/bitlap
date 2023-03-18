@@ -15,7 +15,7 @@ final case class BitlapHttpConfig(
 )
 
 object BitlapHttpConfig {
-  private val httpPort = BitlapContext.globalConf.get(BitlapConf.HTTP_SERVER_ADDRESS).extractServerAddress.port
+  private val httpPort = BitlapContext.globalConf.get(BitlapConf.HTTP_SERVER_ADDRESS).asServerAddress.port
   lazy val live: ULayer[Has[BitlapHttpConfig]] = ZLayer.succeed(BitlapHttpConfig(httpPort))
 
 }

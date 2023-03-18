@@ -3,7 +3,7 @@ package org.bitlap.testkit.server
 
 import com.google.protobuf.ByteString
 import org.bitlap.network._
-import org.bitlap.network.enumeration.{ GetInfoType, OperationState, OperationType, TypeId }
+import org.bitlap.network.enumeration._
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 import org.bitlap.testkit._
@@ -94,5 +94,5 @@ class MockAsyncRpcBackend extends DriverAsyncRpc with CsvUtil {
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
 
-  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[ByteString] = ???
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ???
 }

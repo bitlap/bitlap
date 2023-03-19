@@ -12,8 +12,6 @@ import scala.concurrent.duration.Duration
 
 /** 函数式异步RPC API，客户端和服务端通用，基于 zio 1.0
  *
- *  TODO 区分leader和非leader的操作校验 基于filter
- *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/21

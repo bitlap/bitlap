@@ -84,7 +84,7 @@ object BitlapContext {
 
           def grpcServerPort: Int = {
             val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim
-            address.extractServerAddress.port
+            address.asServerAddress.port
           }
           Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
         } else {

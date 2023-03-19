@@ -12,7 +12,7 @@ import org.bitlap.network.models._
  *  @since 2021/11/21
  *  @version 1.0
  */
-class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
+final class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
 
   private lazy val syncClient: SyncClient = new SyncClient(serverPeers, props)
 

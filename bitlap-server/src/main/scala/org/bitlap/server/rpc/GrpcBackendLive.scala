@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
+import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.core._
 import org.bitlap.jdbc.Constants
 import org.bitlap.network._
@@ -25,7 +26,7 @@ object GrpcBackendLive {
   lazy val live: ULayer[Has[DriverAsyncRpc]]             = ZLayer.succeed(liveInstance)
 }
 @apply
-class GrpcBackendLive extends DriverAsyncRpc {
+class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
@@ -68,6 +69,7 @@ class GrpcBackendLive extends DriverAsyncRpc {
           )
         catch {
           case e: Throwable =>
+            logger.error("Unsupported SQL", e)
             throw SQLExecutedException(s"Unsupported SQL: $statement cause by ${e.getLocalizedMessage}", Option(e))
         }
       }

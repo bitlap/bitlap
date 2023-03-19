@@ -16,7 +16,8 @@
     "@codemirror/language": "^6.3.1",
     "@uiw/react-codemirror": "^4.13.2",
     "@umijs/max": "^4.0.29",
-    "antd": "^4.20.7"
+    "antd": "^4.20.7",
+    "umi-request": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

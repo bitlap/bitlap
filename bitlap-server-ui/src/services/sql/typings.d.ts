@@ -1,6 +1,6 @@
 declare namespace API {
   interface Result_UserInfo_ {
-    success?: boolean;
+    resultCode?: number;
     errorMessage?: string;
     data?: { list: [UserInfo] };
   }

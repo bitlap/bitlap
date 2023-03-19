@@ -93,7 +93,7 @@ class BitlapQueryResultSet(
         typesSb.append(columnTypeName)
       }
     } catch {
-      case e: Exception => throw BitlapSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = e)
+      case e: Exception => throw BitlapSQLException(s"Could not create ResultSet: ${e.getMessage}", cause = Option(e))
     }
 
   override def next(): Boolean = {
@@ -131,7 +131,7 @@ class BitlapQueryResultSet(
 
       rowsFetched = rowsFetched + 1
     } catch {
-      case e: Exception => throw BitlapSQLException(msg = "Error retrieving next row", cause = e)
+      case e: Exception => throw BitlapSQLException(msg = "Error retrieving next row", cause = Option(e))
     }
 
     true
@@ -162,7 +162,7 @@ class BitlapQueryResultSet(
       }
     catch {
       case e: Exception =>
-        throw BitlapSQLException(e.toString, "08S01", cause = e)
+        throw BitlapSQLException(e.toString, "08S01", cause = Option(e))
     }
   override def close(): Unit = {
     if (this.statement != null && this.statement.isInstanceOf[BitlapStatement]) {

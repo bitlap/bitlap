@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.NetworkException.RpcException
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
@@ -29,15 +28,12 @@ trait DriverAsyncRpc extends DriverRpc[Task] { self =>
 
   def sync[T, E <: Throwable, Z <: ZIO[_, _, _]](
     action: self.type => Z
-  )(implicit runtime: zio.Runtime[Any] = runtime): T =
+  ): T =
     try {
-      val cancelableFuture = runtime.unsafeRunToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
-      Await.result(cancelableFuture.future, timeout)
+      val future = this.runtime.unsafeRunToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
+      Await.result(future, timeout)
     } catch {
-      case e: Exception =>
-        e.printStackTrace()
-        throw RpcException(msg = "Sync future exception", cause = Option(e))
-        null.asInstanceOf[T]
+      case e: Throwable => throw e
     }
 
   def when[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =

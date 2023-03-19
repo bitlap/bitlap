@@ -1,6 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
+import com.typesafe.scalalogging.LazyLogging
+import org.apache.calcite.sql.validate.SqlValidatorException
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core._
 import org.bitlap.jdbc.Constants
 import org.bitlap.network._
@@ -9,7 +12,7 @@ import org.bitlap.network.models._
 import org.bitlap.server.session.SessionManager
 import org.bitlap.tools._
 import zio._
-import org.bitlap.common.exception.SQLExecutedException
+import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import zio.blocking.Blocking
 import zio.magic.ZioProvideMagicOps
@@ -25,7 +28,7 @@ object GrpcBackendLive {
   lazy val live: ULayer[Has[DriverAsyncRpc]]             = ZLayer.succeed(liveInstance)
 }
 @apply
-class GrpcBackendLive extends DriverAsyncRpc {
+class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
@@ -59,15 +62,25 @@ class GrpcBackendLive extends DriverAsyncRpc {
   ): ZIO[Any, Throwable, OperationHandle] =
     SessionManager
       .getSession(sessionHandle)
-      .mapBoth(
-        f => new SQLExecutedException(s"Unsupported SQL: $statement cause by ${f.getLocalizedMessage}", f),
-        session =>
+      .mapEffect { session =>
+        try
           session.executeStatement(
             statement,
             confOverlay,
             queryTimeout
           )
-      )
+        catch {
+          case bitlapException: BitlapException =>
+            logger.error(s"Invalid SQL syntax: $statement", bitlapException)
+            throw SQLExecutedException(
+              s"Invalid SQL syntax: ${bitlapException.getCause.getLocalizedMessage}",
+              Option(bitlapException)
+            )
+          case e: Throwable =>
+            logger.error(s"Invalid SQL: $statement", e)
+            throw SQLExecutedException(s"Invalid SQL: ${e.getLocalizedMessage}", Option(e))
+        }
+      }
       .inject(SessionManager.live, Blocking.live)
 
   override def fetchResults(

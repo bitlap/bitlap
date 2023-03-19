@@ -80,9 +80,9 @@ class BitlapStatement(
       }
     catch {
       case e: SQLException =>
-        throw BitlapSQLException(msg = e.getLocalizedMessage, cause = e.getCause)
+        throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
       case e: Exception =>
-        throw BitlapSQLException(msg = "Failed to close statement", "08S01", cause = e)
+        throw BitlapSQLException(msg = "Failed to close statement", "08S01", cause = Option(e))
     } finally stmtHandle = null
 
   override def close(): Unit = {
@@ -189,7 +189,8 @@ class BitlapStatement(
         return false
       }
     } catch {
-      case ex: Exception => throw BitlapSQLException(ex.toString, cause = ex)
+      case ex: Throwable =>
+        throw BitlapSQLException(s"${ex.getLocalizedMessage}")
     }
 
     val status = waitForOperationToComplete()
@@ -227,7 +228,7 @@ class BitlapStatement(
       } catch {
         case e: SQLException => throw e
         case e: Exception =>
-          throw BitlapSQLException("Failed to wait for operation to complete", "08S01", cause = e)
+          throw BitlapSQLException("Failed to wait for operation to complete", "08S01", cause = Option(e))
       }
     status
   }

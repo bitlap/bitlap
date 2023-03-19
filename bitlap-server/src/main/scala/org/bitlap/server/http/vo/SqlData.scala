@@ -11,8 +11,15 @@ final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] 
 
 final case class SqlColumn(name: String)
 final case class SqlRow(cells: Map[String, String] = Map.empty)
-
+final case class SqlResult(
+  data: SqlData,
+  resultCode: Int,
+  errorMessage: String = "Unknown Error"
+)
 object SqlData {
+
+  def empty: SqlData = SqlData(Seq.empty, Seq.empty)
+
   def fromDBTable(table: DBTable): SqlData = {
     if (table == null) return SqlData()
     val columns = table.getColumns.asScala.map(_.getLabel).map(SqlColumn).toSeq

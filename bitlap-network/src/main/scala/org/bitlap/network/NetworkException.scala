@@ -25,12 +25,6 @@ object NetworkException {
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)
 
-  final case class RpcException(
-    override val code: Int = -1,
-    override val msg: String,
-    override val cause: Option[Throwable] = None
-  ) extends NetworkException(msg = msg, cause = cause)
-
   final case class InternalException(
     override val msg: String,
     override val cause: Option[Throwable] = None
@@ -47,6 +41,11 @@ object NetworkException {
   ) extends NetworkException(msg = msg, cause = cause)
 
   final case class IllegalStateException(
+    override val msg: String,
+    override val cause: Option[Throwable] = None
+  ) extends NetworkException(msg = msg, cause = cause)
+
+  final case class SQLExecutedException(
     override val msg: String,
     override val cause: Option[Throwable] = None
   ) extends NetworkException(msg = msg, cause = cause)

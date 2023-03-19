@@ -2,6 +2,7 @@
 
 tag=$1
 
+origin=`pwd`
 cd $(dirname $0)/../
 
 mkdir -p dist/
@@ -32,13 +33,21 @@ if [[ $? -eq 0 ]]; then
 fi
 pwd
 
+cd origin
 # 构建镜像
-docker buildx build --build-arg bitlap_server=bitlap-$tag . -t liguobin/bitlap:$tag --cache-to type=inline \
---cache-from type=registry,ref=liguobin/bitlap:$1 -f ./Dockerfile
+cmd2="docker buildx build --build-arg bitlap_server=bitlap-${tag} . -t liguobin/bitlap:${tag} --cache-to type=inline --cache-from type=registry,ref=liguobin/bitlap:${tag} -f ./Dockerfile"
+echo "========================================================================================================================================"
+echo "==================  🔥 build image start: ${cmd2}  ============================"
+echo "========================================================================================================================================"
+eval ${cmd2}
 
-echo "===============  🎉 build image successfully !!!  ======================="
-
-# 运行server，运行交互式sql（阻止容器退出）
-#docker run --name bitlap:$tag -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:$tag
-
-#echo "===============  🎉 bitlap_server running successfully !!!  ======================="
+if [[ $? -eq 0 ]]; then
+  echo "=============================================================================="
+  echo "===============  🎉 build image successfully !!!  ======================="
+  echo "=============================================================================="
+  
+  # 运行server，运行交互式sql（阻止容器退出）
+  #docker run --name bitlap:$tag -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:$tag
+  #echo "===============  🎉 bitlap_server running successfully !!!  ======================="
+fi
+pwd

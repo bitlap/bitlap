@@ -6,6 +6,10 @@ cd $(dirname $0)/../
 
 mkdir -p dist/
 find dist/ -name 'bitlap*.tar.gz' | xargs rm -f
+find docker/ -name 'bitlap*.tar.gz' | xargs rm -f
+find docker/ -name 'static' | xargs rm -rf
+find docker/ -name 'initFileForTest.sql' | xargs rm -f
+
 
 # make tar
 TAR_FILE="bitlap-server/target/bitlap*.tar.gz"
@@ -19,14 +23,14 @@ eval ${cmd}
 if [[ $? -eq 0 ]]; then
   mv ${TAR_FILE} docker/
   # 拷贝静态文件
-  mv bitlap-server/target/classes/static docker/static
+  mv bitlap-server/target/classes/static docker/
+  # 拷贝初始化SQL
+  cp ./conf/initFileForTest.sql ./docker/initFileForTest.sql
   echo "=============================================================================="
   echo "===============  🎉 package end in docker directory !!!  ======================="
   echo "=============================================================================="
 fi
 pwd
-# 拷贝初始化SQL
-cp ./conf/initFileForTest.sql ./docker/initFileForTest.sql
 
 # 构建镜像
 docker buildx build --build-arg bitlap_server=bitlap-$tag . -t liguobin/bitlap:$tag --cache-to type=inline \

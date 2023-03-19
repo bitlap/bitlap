@@ -9,7 +9,7 @@
 
 ***核心模块依赖关系***
 
-![](./bitlap-structure-2.png)
+![](./bitlap-structure.png)
 
 - `bitlap-cli`       交互式命令行实现。技术栈：scala、zio-cli
 - `bitlap-client`    JDBC和RPC client实现。技术栈：scala、zio-grpc
@@ -41,7 +41,7 @@
 > tag就是版本号，如：0.3.0-SNAPSHOT
 ```
 # 打包
-sh docker/docker.sh 0.3.0-SNAPSHOT
+cd docker;sh docker.sh 0.3.0-SNAPSHOT
 # 运行 
 docker run --name bitlap:0.3.0-SNAPSHOT -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:0.3.0-SNAPSHOT
 ```

@@ -2,6 +2,8 @@
 package org.bitlap.server.rpc
 
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.calcite.sql.validate.SqlValidatorException
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.core._
 import org.bitlap.jdbc.Constants
 import org.bitlap.network._
@@ -68,9 +70,15 @@ class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
             queryTimeout
           )
         catch {
+          case bitlapException: BitlapException =>
+            logger.error(s"Invalid SQL syntax: $statement", bitlapException)
+            throw SQLExecutedException(
+              s"Invalid SQL syntax: ${bitlapException.getCause.getLocalizedMessage}",
+              Option(bitlapException)
+            )
           case e: Throwable =>
-            logger.error("Unsupported SQL", e)
-            throw SQLExecutedException(s"Unsupported SQL: $statement cause by ${e.getLocalizedMessage}", Option(e))
+            logger.error(s"Invalid SQL: $statement", e)
+            throw SQLExecutedException(s"Invalid SQL: ${e.getLocalizedMessage}", Option(e))
         }
       }
       .inject(SessionManager.live, Blocking.live)

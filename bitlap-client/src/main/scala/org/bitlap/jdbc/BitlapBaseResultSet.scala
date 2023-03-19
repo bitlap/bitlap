@@ -637,7 +637,7 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
       deserialize[T](columnType, bColumnValue)
     } catch {
-      case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = e.getCause)
+      case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
     }
   }
 

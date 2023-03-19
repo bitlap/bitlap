@@ -74,7 +74,7 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     try java.sql.DriverManager.registerDriver(this)
     catch {
       case e: Exception =>
-        throw BitlapSQLException("Error occurred while registering JDBC driver", cause = e)
+        throw BitlapSQLException("Error occurred while registering JDBC driver", cause = Option(e))
     }
 
   /** Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.

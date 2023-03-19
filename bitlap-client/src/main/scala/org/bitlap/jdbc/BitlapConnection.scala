@@ -85,7 +85,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
               case _: Exception =>
             }
             if (numRetries >= maxRetries)
-              throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = e)
+              throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = Option(e))
             else {
               System.err.println(
                 s"$warnMsg${e.getMessage} Retrying $numRetries of $maxRetries with retry interval $retryInterval ms"

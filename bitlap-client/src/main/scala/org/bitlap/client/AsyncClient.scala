@@ -97,7 +97,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, t => TableSchema.fromBTableSchema(t.getSchema))
+        .mapBoth(statusApplyFunc, t => TableSchema.fromBGetResultSetMetadataResp(t))
         .provideLayer(l)
     )
 

@@ -11,7 +11,7 @@
 
 ## 如何使用
 
-![bitlap sql](./bitlap_sql.png)
+![bitlap sql](./bitlap_sql.jpg)
 
 ### 在线测试
 

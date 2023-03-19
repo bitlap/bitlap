@@ -81,7 +81,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
         OperationMustOnLeaderException(),
         _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
       )
-      .mapBoth(errorApplyFunc, t => BGetResultSetMetadataResp(Some(t.toBTableSchema)))
+      .mapBoth(errorApplyFunc, _.toBGetResultSetMetadataResp)
 
   override def getDatabases(
     request: BGetDatabasesReq
@@ -135,7 +135,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
         OperationMustOnLeaderException(),
         _.getOperationStatus(new OperationHandle(request.getOperationHandle))
       )
-      .mapBoth(errorApplyFunc, t => t.toBGetOperationStatusResp)
+      .mapBoth(errorApplyFunc, _.toBGetOperationStatusResp)
 
   override def closeOperation(request: BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
     rpc

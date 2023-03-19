@@ -49,14 +49,14 @@ object models {
   }
 
   final case class TableSchema(columns: List[ColumnDesc] = Nil) extends Model {
-
-    def toBTableSchema: BTableSchema = BTableSchema(columns = columns.map(_.toBColumnDesc))
+    def toBGetResultSetMetadataResp: BGetResultSetMetadataResp =
+      BGetResultSetMetadataResp(Option(BTableSchema(columns = columns.map(_.toBColumnDesc))))
   }
 
   object TableSchema {
-    def fromBTableSchema(bTableSchema: BTableSchema): TableSchema =
+    def fromBGetResultSetMetadataResp(getResultSetMetadataResp: BGetResultSetMetadataResp): TableSchema =
       TableSchema(
-        bTableSchema.columns.map(b => ColumnDesc.fromBColumnDesc(b)).toList
+        getResultSetMetadataResp.getSchema.columns.map(b => ColumnDesc.fromBColumnDesc(b)).toList
       )
   }
 

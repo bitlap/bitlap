@@ -33,7 +33,7 @@ if [[ $? -eq 0 ]]; then
 fi
 pwd
 
-cd origin
+cd $origin
 # 构建镜像
 cmd2="docker buildx build --build-arg bitlap_server=bitlap-${tag} . -t liguobin/bitlap:${tag} --cache-to type=inline --cache-from type=registry,ref=liguobin/bitlap:${tag} -f ./Dockerfile"
 echo "========================================================================================================================================"

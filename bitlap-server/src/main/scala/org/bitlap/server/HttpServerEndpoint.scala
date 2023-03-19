@@ -55,13 +55,15 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
         if req.method == Method.GET
           && req.path.startsWith(!! / "pages") =>
       indexHtml
-    case Method.GET -> !! / path => Http.fromResource(s"static/$path")
-    case _                       =>
+    case Method.GET -> !! / path   => Http.fromResource(s"static/$path")
+    case Method.GET -> !! / "init" =>
       // 使用初始化时，开启这个
       val properties = new Properties()
       properties.put("bitlapconf:retries", "1")
       properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")
       DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
+      indexHtml
+    case _ =>
       indexHtml
   }
 

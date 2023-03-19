@@ -189,7 +189,7 @@ class BitlapStatement(
         return false
       }
     } catch {
-      case ex: Exception => throw BitlapSQLException(ex.toString, cause = ex)
+      case ex: Throwable => throw BitlapSQLException("Statement execute exception", cause = ex)
     }
 
     val status = waitForOperationToComplete()

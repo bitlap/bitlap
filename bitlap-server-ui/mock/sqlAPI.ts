@@ -18,9 +18,8 @@ const rows = {
 export default {
   'POST /api/sql/run': (req: any, res: any) => {
     res.json({
-      success: true,
-      data: rows,
-      errorCode: 0,
+      resultCode: 0,
+      data: rows
     });
   },
 };

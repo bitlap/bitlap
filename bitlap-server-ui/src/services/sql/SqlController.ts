@@ -1,4 +1,5 @@
-import { request } from '@umijs/max';
+// @ts-ignore
+import request from '@/utils/request'
 
 export async function runSql(sql: string) {
   return request<API.Result_UserInfo_>('/api/sql/run', {

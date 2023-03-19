@@ -12,13 +12,10 @@ package object network extends LazyLogging {
 
   type Identity[T] = T
 
-  lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) => {
-    logger.error("Grpc server exception", ex)
-    Status.fromThrowable(ex)
-  }
+  lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) =>
+    Status.INTERNAL.withCause(ex).withDescription("Grpc server exception")
 
-  lazy val statusApplyFunc: Status => Throwable = (st: Status) => {
-    logger.error("Grpc client exception: {}", st)
-    st.asException()
-  }
+  // TODO grpc cause 丢失
+  lazy val statusApplyFunc: Status => Throwable = (st: Status) =>
+    st.withDescription("Grpc client exception").asException()
 }

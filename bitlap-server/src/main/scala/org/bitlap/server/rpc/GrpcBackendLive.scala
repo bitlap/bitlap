@@ -9,7 +9,7 @@ import org.bitlap.network.models._
 import org.bitlap.server.session.SessionManager
 import org.bitlap.tools._
 import zio._
-import org.bitlap.common.exception.SQLExecutedException
+import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import zio.blocking.Blocking
 import zio.magic.ZioProvideMagicOps
@@ -59,15 +59,18 @@ class GrpcBackendLive extends DriverAsyncRpc {
   ): ZIO[Any, Throwable, OperationHandle] =
     SessionManager
       .getSession(sessionHandle)
-      .mapBoth(
-        f => new SQLExecutedException(s"Unsupported SQL: $statement cause by ${f.getLocalizedMessage}", f),
-        session =>
+      .mapEffect { session =>
+        try
           session.executeStatement(
             statement,
             confOverlay,
             queryTimeout
           )
-      )
+        catch {
+          case e: Throwable =>
+            throw SQLExecutedException(s"Unsupported SQL: $statement cause by ${e.getLocalizedMessage}", Option(e))
+        }
+      }
       .inject(SessionManager.live, Blocking.live)
 
   override def fetchResults(

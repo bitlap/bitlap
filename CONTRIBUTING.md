@@ -2,7 +2,7 @@
 
 1. Scala 2.13.x
 2. Kotlin 1.7.x
-3. Java 11+
+3. Java 11+ （Amazon Corretto JDK 11 或 Open JDK 17）
 4. Mac、Linux、Windows（需要使用profile）
 
 ## 模块概述
@@ -38,11 +38,11 @@
 
 ## docker打包&运行
 
-> tag就是版本号，如：0.3.0-SNAPSHOT
+> tag就是版本号，如：0.4.0-SNAPSHOT
 ```
 # 打包
-cd docker;sh docker.sh 0.3.0-SNAPSHOT
+cd docker;sh docker.sh 0.4.0-SNAPSHOT
 # 运行 
-docker run --name bitlap:0.3.0-SNAPSHOT -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:0.3.0-SNAPSHOT
+docker run --name bitlap:0.4.0-SNAPSHOT -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:0.4.0-SNAPSHOT
 ```
 - 访问 `http://localhost:18081`

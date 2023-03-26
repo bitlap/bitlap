@@ -55,7 +55,7 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, val type: C
     }
 
     var desc = ""
-    var version = "0.3.0-SNAPSHOT"
+    var version = "0.4.0-SNAPSHOT"
     var validator: Validator<T>? = null
     var overWritable: Boolean = false
 

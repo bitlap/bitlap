@@ -2,7 +2,7 @@ FROM openjdk:11-jdk
  
 LABEL version="1.0" author="dreamylost" email="dreamylost@outlook.com" 
  
-ARG bitlap_server=bitlap-0.3.0-SNAPSHOT 
+ARG bitlap_server=bitlap-0.4.0-SNAPSHOT 
 ENV folder=/tmp/bitlap
 
 RUN mkdir $folder

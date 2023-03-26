@@ -18,53 +18,16 @@
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-network</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>netty-codec-socks</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-handler-proxy</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-codec-http2</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport-native-unix-common</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>grpc-protobuf</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>grpc-stub</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-services</artifactId>
-            <version>${grpc.netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>${grpc.netty.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
             <version>${rocksdb.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.d11</groupId>
             <artifactId>zhttp_${scala.binary.version}</artifactId>

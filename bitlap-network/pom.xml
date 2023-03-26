@@ -25,6 +25,12 @@
             <groupId>com.thesamet.scalapb</groupId>
             <artifactId>scalapb-runtime-grpc_${scala.binary.version}</artifactId>
             <version>${scalapb.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.grpc</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.thesamet.scalapb.zio-grpc</groupId>
@@ -46,6 +52,16 @@
             <artifactId>netty-all</artifactId>
             <groupId>io.netty</groupId>
             <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+            <version>${grpc.netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.netty.version}</version>
         </dependency>
     </dependencies>
 

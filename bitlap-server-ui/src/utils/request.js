@@ -3,7 +3,7 @@ import {notification} from 'antd';
 
 function errorHandler(error) {
     notification.error({
-        message: '请求错误', description: error.message,
+        message: '请求失败', description: error.message,
     });
 }
 

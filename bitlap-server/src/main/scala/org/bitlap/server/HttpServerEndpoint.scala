@@ -51,11 +51,6 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
 
   private val indexHtml = Http.fromResource(s"static/index.html")
   private val staticApp = Http.collectHttp[Request] {
-    case req
-        if req.method == Method.GET
-          && req.path.startsWith(!! / "pages") =>
-      indexHtml
-    case Method.GET -> !! / path   => Http.fromResource(s"static/$path")
     case Method.GET -> !! / "init" =>
       // 使用初始化时，开启这个
       val properties = new Properties()
@@ -63,6 +58,11 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
       properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")
       DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
       indexHtml
+    case req
+        if req.method == Method.GET
+          && req.path.startsWith(!! / "pages") =>
+      indexHtml
+    case Method.GET -> !! / path => Http.fromResource(s"static/$path")
     case _ =>
       indexHtml
   }

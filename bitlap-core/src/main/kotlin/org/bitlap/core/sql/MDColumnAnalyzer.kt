@@ -116,13 +116,6 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     fun getDimensionColNamesWithoutTime() = this.getDimensionColNames().filter { it != Keyword.TIME }
 
     /**
-     * none or one other dimension
-     */
-    fun hasNoOrOneOtherDim() = this.mdColumns
-        .filter { it.type is DimensionCol && it.name != Keyword.TIME }
-        .size <= 1
-
-    /**
      * check if one metric should materialize
      */
     fun shouldMaterialize(metricName: String): Boolean {
@@ -169,7 +162,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     /**
      * get metric materialize type
      */
-    fun materializeType(metricName: String, dimension: Int = 0): DataType {
+    fun materializeType(metricName: String, cartesianBase: Boolean): DataType {
         val metric = this.mdColumnMap[metricName]!!
         val materialize = this.shouldMaterialize(metricName)
 
@@ -181,10 +174,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
         //  materialize & Cartesian Product
         if (this.shouldCartesian()) {
             if (metric.isSum()) {
-                return when (dimension) {
-                    0 -> DataTypeCBM(metricName, -1)
-                    else -> DataTypeBBM(metricName, -1)
-                }
+                return if (cartesianBase) DataTypeCBM(metricName, -1) else DataTypeBBM(metricName, -1)
             }
             if (metric.isDistinct()) {
                 return DataTypeRBM(metricName, -1)

@@ -37,11 +37,11 @@ object BMUtils {
         if (bms.size == 2) {
             return or(bms.first(), bms.last())
         }
-        return when (T::class.java) {
+        return when (bms.first().javaClass) {
             RBM::class.java -> RBM.or(*bms.map { it as RBM }.toTypedArray())
             BBM::class.java -> BBM.or(*bms.map { it as BBM }.toTypedArray())
             CBM::class.java -> CBM.or(*bms.map { it as CBM }.toTypedArray())
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T
     }
 
@@ -61,10 +61,10 @@ object BMUtils {
         if (bms.size == 2) {
             return and(bms.first(), bms.last())
         }
-        return when (T::class.java) {
+        return when (bms.first().javaClass) {
             RBM::class.java -> RBM.and(*bms.map { it as RBM }.toTypedArray())
             BBM::class.java -> BBM.and(*bms.map { it as BBM }.toTypedArray())
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T
     }
 
@@ -72,11 +72,11 @@ object BMUtils {
      * Two Bitmap [or] function, [T1] can be different implement
      */
     inline fun <reified T1, reified T2> or(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
-        return when (T1::class.java) {
+        return when (bm1.javaClass) {
             RBM::class.java -> (bm1 as RBM).clone().or(bm2)
             BBM::class.java -> (bm1 as BBM).clone().or(bm2)
             CBM::class.java -> (bm1 as CBM).clone().or(bm2)
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T1
     }
 
@@ -84,11 +84,11 @@ object BMUtils {
      * Two Bitmap [and] function, [T1] can be different implement
      */
     inline fun <reified T1, reified T2> and(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
-        return when (T1::class.java) {
+        return when (bm1.javaClass) {
             RBM::class.java -> (bm1 as RBM).clone().and(bm2)
             BBM::class.java -> (bm1 as BBM).clone().and(bm2)
             CBM::class.java -> (bm1 as CBM).clone().and(bm2)
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T1
     }
 
@@ -96,11 +96,11 @@ object BMUtils {
      * Two Bitmap [andNot] function, [T1] can be different implement
      */
     inline fun <reified T1, reified T2> andNot(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
-        return when (T1::class.java) {
+        return when (bm1.javaClass) {
             RBM::class.java -> (bm1 as RBM).clone().andNot(bm2)
             BBM::class.java -> (bm1 as BBM).clone().andNot(bm2)
             CBM::class.java -> (bm1 as CBM).clone().andNot(bm2)
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T1
     }
 
@@ -108,11 +108,11 @@ object BMUtils {
      * Two Bitmap [xor] function, [T1] can be different implement
      */
     inline fun <reified T1, reified T2> xor(bm1: T1, bm2: T2): T1 where T1 : BM, T2 : BM {
-        return when (T1::class.java) {
+        return when (bm1.javaClass) {
             RBM::class.java -> (bm1 as RBM).clone().xor(bm2)
             BBM::class.java -> (bm1 as BBM).clone().xor(bm2)
             CBM::class.java -> (bm1 as CBM).clone().xor(bm2)
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Illegal input bm class")
         } as T1
     }
 

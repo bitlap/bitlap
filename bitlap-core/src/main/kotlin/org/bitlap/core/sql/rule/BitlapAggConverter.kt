@@ -13,9 +13,7 @@ import org.apache.calcite.sql.`fun`.SqlSumEmptyIsZeroAggFunction
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.udf.FunctionRegistry
-import org.bitlap.core.sql.udf.UdafBMCount
-import org.bitlap.core.sql.udf.UdafBMCountDistinct
-import org.bitlap.core.sql.udf.UdafBMSum
+import org.bitlap.core.sql.udf.UDFNames
 
 /**
  * convert sum, count, count_distinct to internal agg type.
@@ -55,16 +53,16 @@ class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggCon
                 is SqlSumAggFunction,
                 is SqlSumEmptyIsZeroAggFunction -> {
                     type = typeFactory.createSqlType(SqlTypeName.DOUBLE)
-                    FunctionRegistry.getFunction(UdafBMSum.NAME) as SqlAggFunction
+                    FunctionRegistry.getFunction(UDFNames.bm_sum_aggr) as SqlAggFunction
                 }
                 is SqlCountAggFunction -> {
                     if (it.isDistinct) {
                         type = typeFactory.createSqlType(SqlTypeName.BIGINT)
                         distinct = false
-                        FunctionRegistry.getFunction(UdafBMCountDistinct.NAME) as SqlAggFunction
+                        FunctionRegistry.getFunction(UDFNames.bm_count_distinct) as SqlAggFunction
                     } else {
                         type = typeFactory.createSqlType(SqlTypeName.BIGINT)
-                        FunctionRegistry.getFunction(UdafBMCount.NAME) as SqlAggFunction
+                        FunctionRegistry.getFunction(UDFNames.bm_count_aggr) as SqlAggFunction
                     }
                 }
                 is SqlMinMaxAggFunction,

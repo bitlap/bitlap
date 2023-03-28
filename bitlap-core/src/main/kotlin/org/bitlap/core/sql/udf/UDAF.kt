@@ -11,22 +11,22 @@ import org.apache.calcite.sql.type.SqlTypeName
  * [V]: input value type
  * [R]: result type
  */
-interface UDAF<A, V, R> {
+interface UDAF<A, V, R> : UDF {
 
     /**
      * agg function name
      */
-    val name: String
+    override val name: String
 
     /**
      * input types
      */
-    val inputTypes: List<SqlTypeName>
+    override val inputTypes: List<SqlTypeName>
 
     /**
      * agg result type
      */
-    val resultType: SqlReturnTypeInference
+    override val resultType: SqlReturnTypeInference
 
     /**
      * agg init value

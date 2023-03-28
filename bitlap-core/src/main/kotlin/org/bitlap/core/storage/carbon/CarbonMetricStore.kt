@@ -126,7 +126,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         val timeFunc = timeFilter.mergeCondition()
         return this.query(timeFunc, metrics, arrayOf("mk", "t", "e")) { row ->
             val (mk, t, e) = row
-            if (timeFunc(t as Long)) {
+            if (t != null && timeFunc(t as Long)) {
                 MetricRow(t, mk.toString(), CBM(), BBM(e as? ByteArray))
             } else {
                 null
@@ -138,7 +138,7 @@ class CarbonMetricStore(val table: Table, val hadoopConf: Configuration) : Metri
         val timeFunc = timeFilter.mergeCondition()
         return this.query(timeFunc, metrics, arrayOf("mk", "t", "m")) { row ->
             val (mk, t, m) = row
-            if (timeFunc(t as Long)) {
+            if (t != null && timeFunc(t as Long)) {
                 MetricRow(t, mk.toString(), CBM(m as? ByteArray), BBM())
             } else {
                 null

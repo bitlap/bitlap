@@ -49,5 +49,19 @@ class UdfTest : BaseLocalFsTest(), SqlChecker {
                 listOf(listOf("a", "b", "a", "b"))
             )
         }
+
+
+        "test date_format udf" {
+            checkRows(
+                """
+                    select 
+                      date_format(1672502400000, 'yyyyMMdd') d1
+                     ,date_format(1672502400000, 'yyyy-MM-dd HH:mm:ss') d2
+                     ,date_format('2023-01-01', 'yyyyMMdd') d3
+                     ,date_format('2023-01-01T00:00:00.000+08:00', 'yyyy-MM-dd HH:mm:ss') d3
+                """.trimIndent(),
+                listOf(listOf("20230101", "2023-01-01 00:00:00", "20230101", "2023-01-01 00:00:00"))
+            )
+        }
     }
 }

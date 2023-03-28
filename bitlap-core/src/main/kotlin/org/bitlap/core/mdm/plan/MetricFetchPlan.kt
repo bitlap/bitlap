@@ -11,7 +11,7 @@ import org.bitlap.core.sql.PruneTimeFilter
 /**
  * plan to fetch metrics
  */
-class MetricsPlan(
+class MetricFetchPlan(
     private val timeFilter: PruneTimeFilter,
     private val metrics: List<DataType>,
     private val metricType: Class<out DataType>,
@@ -22,7 +22,7 @@ class MetricsPlan(
     override fun execute(context: FetchContext): RowIterator {
         PreConditions.checkExpression(
             metrics.all { it::class.java == metricType },
-            msg = "MetricsPlan's metrics $metrics must have only one metric type ${metricType.name}"
+            msg = "MetricFetchPlan's metrics $metrics must have only one metric type ${metricType.name}"
         )
         return withFetcher(context) { fetcher ->
             when (dimension) {
@@ -39,5 +39,9 @@ class MetricsPlan(
                     )
             }
         }
+    }
+
+    override fun explain(depth: Int): String {
+        return "${" ".repeat(depth)}+- MetricFetchPlan (metrics: $metrics, metricType: ${metricType.simpleName}, dimension: $dimension, timeFilter: $timeFilter, pushedFilter: $pushedFilter)"
     }
 }

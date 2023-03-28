@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.sql.udf
+package org.bitlap.core.sql.udf.aggr
 
 import org.apache.calcite.sql.type.SqlReturnTypeInference
 import org.apache.calcite.sql.type.SqlTypeName
@@ -7,16 +7,15 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.BM
 import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.infer
+import org.bitlap.core.sql.udf.UDAF
+import org.bitlap.core.sql.udf.UDFNames
 
 /**
  * compute count metric from bitmap or metadata.
  */
-class UdafBMCount : UDAF<Pair<Number, BM>, Any, Number> {
-    companion object {
-        const val NAME = UdfNames.bm_count
-    }
+class BMCountAggr : UDAF<Pair<Number, BM>, Any, Number> {
 
-    override val name: String = NAME
+    override val name: String = UDFNames.bm_count_aggr
     override val inputTypes: List<SqlTypeName> = listOf(SqlTypeName.ANY)
     override val resultType: SqlReturnTypeInference = SqlTypeName.BIGINT.infer()
 

@@ -273,7 +273,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             checkRows(
                 """
                     select _time, city, os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
-                    from $db.$table 
+                    from $db.$table
                     where _time >= 100
                     group by _time, city, os
                     order by _time, city, os
@@ -288,7 +288,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             checkRows(
                 """
                     select city, os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
-                    from $db.$table 
+                    from $db.$table
                     where _time >= 100
                     group by city, os
                     order by city, os
@@ -296,6 +296,18 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 listOf(
                     listOf("北京", "Mac", 6, 18, 3),
                     listOf("北京", "Windows", 2, 6, 1)
+                )
+            )
+            checkRows(
+                """
+                    select city, oo, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table 
+                    where _time >= 100
+                    group by city, oo
+                    order by city, oo
+                """.trimIndent(),
+                listOf(
+                    listOf("北京", null, 8, 24, 3)
                 )
             )
         }

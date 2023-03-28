@@ -41,7 +41,7 @@ open class BitlapSqlQueryTable(open val table: Table) : AbstractTable(), Project
             if (it == Keyword.TIME) {
                 builder.add(it, SqlTypeName.BIGINT)
             } else {
-                builder.add(it, SqlTypeName.VARCHAR)
+                builder.add(it, SqlTypeName.VARCHAR).nullable(true)
             }
         }
         return builder.build()

@@ -35,7 +35,10 @@ class BitlapSqlQueryMetricTable(
         val fetchContext = FetchContext(table, PendingFetchPlan(table, analyzer, timeFilter, pushedFilter))
 
         // find best plan to execute
-        val rows = fetchContext.findBestPlan().execute(fetchContext)
+        val bestPlan = fetchContext.findBestPlan()
+
+        // execute the plan
+        val rows = bestPlan.execute(fetchContext)
 
         return Linq4j.asEnumerable(rows.toRows(projections))
     }

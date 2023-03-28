@@ -33,8 +33,8 @@ class MetricMergeDimFetchPlan(override val subPlans: List<FetchPlan>) : AbsFetch
 
     private fun merge0(rs1: RowIterator, rs2: RowIterator): RowIterator {
         // check key types should be different
-        val keyTypes1 = rs1.keyTypes.map { it.name }.filter { it != Keyword.TIME}
-        val keyTypes2 = rs2.keyTypes.map { it.name }.filter { it != Keyword.TIME}
+        val keyTypes1 = rs1.keyTypes.map { it.name }.filter { it != Keyword.TIME }
+        val keyTypes2 = rs2.keyTypes.map { it.name }.filter { it != Keyword.TIME }
         PreConditions.checkExpression(
             keyTypes1.intersect(keyTypes2.toSet()).isEmpty(),
             msg = "Row iterators key types need to be different, one is $keyTypes1, the other is $keyTypes2"
@@ -54,8 +54,8 @@ class MetricMergeDimFetchPlan(override val subPlans: List<FetchPlan>) : AbsFetch
             DataTypes.resetIndex(dt, resultKeyTypes.size + idx)
         }
 
+        // let rows1 as cartesian or not
         val results = LinkedHashMap<List<Any?>, Row>()
-
         var rows1 = rs1
         var rows2 = rs2
         if (rs2.valueTypes.any { it is DataTypeCBM }) {
@@ -63,12 +63,14 @@ class MetricMergeDimFetchPlan(override val subPlans: List<FetchPlan>) : AbsFetch
             rows2 = rs1
         }
 
+        // let rows2 as Join Build Table
+        // TODO: consider sort merge join
         val buffer = rows2.rows.asSequence().toList().groupBy { it[0] }
-        rows1.forEach { r1 ->
+        for (r1 in rows1) {
             val keys1 = r1.getByTypes(rows1.keyTypes)
-
-            if (buffer.containsKey(keys1[0])) {
-                for (r2 in buffer[keys1[0]]!!) {
+            val tmValue = keys1[0]
+            if (buffer.containsKey(tmValue)) {
+                for (r2 in buffer[tmValue]!!) {
                     val keys2 = r2.getByTypes(rows2.keyTypes)
                     val rKeys = keys1 + keys2.drop(1)
                     if (results.containsKey(rKeys)) {

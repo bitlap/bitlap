@@ -50,7 +50,6 @@ class UdfTest : BaseLocalFsTest(), SqlChecker {
             )
         }
 
-
         "test date_format udf" {
             checkRows(
                 """

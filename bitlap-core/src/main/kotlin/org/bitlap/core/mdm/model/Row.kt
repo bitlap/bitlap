@@ -9,7 +9,7 @@ import java.io.Serializable
  */
 class Row(val data: Array<Any?>) : Serializable {
 
-    constructor(size: Int): this(arrayOfNulls(size))
+    constructor(size: Int) : this(arrayOfNulls(size))
 
     operator fun set(idx: Int, value: Any?) {
         this.data[idx] = value

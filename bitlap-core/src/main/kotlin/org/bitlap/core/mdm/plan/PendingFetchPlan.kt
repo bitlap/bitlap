@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.mdm.plan
 
 import org.bitlap.core.data.metadata.Table

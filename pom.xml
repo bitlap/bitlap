@@ -76,7 +76,7 @@
 
         <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlin.version>1.8.10</kotlin.version>
+        <kotlin.version>1.8.20</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
         <kotest.version>5.5.5</kotest.version>

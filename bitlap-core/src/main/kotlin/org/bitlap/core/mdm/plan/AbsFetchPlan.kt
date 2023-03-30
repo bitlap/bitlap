@@ -12,6 +12,8 @@ abstract class AbsFetchPlan : FetchPlan {
 
     override val subPlans: List<FetchPlan> = mutableListOf()
 
+    override var optimized: Boolean = false
+
     /**
      * fetch data with computed fetcher.
      */

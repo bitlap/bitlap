@@ -9,6 +9,6 @@ abstract class DataType : Serializable {
     abstract val idx: Int
 
     override fun toString(): String {
-        return "DataType(name='$name', idx=$idx)"
+        return "$name#$idx"
     }
 }

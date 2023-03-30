@@ -15,6 +15,12 @@ import org.apache.calcite.sql.validate.SqlUserDefinedAggFunction
 import org.apache.calcite.sql.validate.SqlUserDefinedFunction
 import org.apache.calcite.util.Optionality
 import org.bitlap.common.utils.PreConditions
+import org.bitlap.core.sql.udf.aggr.BMCountAggr
+import org.bitlap.core.sql.udf.aggr.BMCountDistinctAggr
+import org.bitlap.core.sql.udf.aggr.BMSumAggr
+import org.bitlap.core.sql.udf.date.DateFormat
+import org.bitlap.core.sql.udf.expr.Hello
+import org.bitlap.core.sql.udf.expr.If
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -26,90 +32,81 @@ object FunctionRegistry {
     private val functions: ConcurrentHashMap<String, SqlFunction> = ConcurrentHashMap()
 
     init {
-        register(
-            UdfHello(),
-            UdfIf(),
-            UdfDateFormat()
-        )
-        register(
-            UdafBMSum(),
-            UdafBMCount(),
-            UdafBMCountDistinct(),
-        )
+        // UDF
+        register(Hello())
+        register(If())
+        register(DateFormat())
+
+        // udaf
+        register(BMSumAggr())
+        register(BMCountAggr())
+        register(BMCountDistinctAggr())
     }
 
     /**
-     * register user defined aggregate functions
+     * register user defined functions and aggregate functions
      */
-    fun register(vararg func: UDAF<*, *, *>): FunctionRegistry {
-        func.forEach { register(it) }
-        return this
-    }
-
-    fun register(func: UDAF<*, *, *>): FunctionRegistry {
-        val name = PreConditions.checkNotBlank(func.name).trim()
-        if (functions.containsKey(name)) {
-            throw IllegalArgumentException("$name function already exists.")
-        }
-        functions[name] = SqlUserDefinedAggFunction(
-            SqlIdentifier(func.name, SqlParserPos.ZERO),
-            SqlKind.OTHER_FUNCTION,
-            func.resultType,
-            InferTypes.FIRST_KNOWN,
-            OperandTypes.operandMetadata(
-                func.inputTypes.map { it.family },
-                { t -> func.inputTypes.map { t.createSqlType(it) } },
-                { i -> "$i" },
-                { true }
-            ),
-            AggregateFunctionImpl.create(func::class.java),
-            false, false, Optionality.FORBIDDEN
-        )
-        return this
-    }
-
-    /**
-     * register user defined functions
-     */
+    @JvmStatic
     fun register(vararg func: UDF): FunctionRegistry {
-        func.forEach { register(it) }
+        func.forEach { register(it.name, it) }
         return this
     }
 
-    fun register(func: UDF): FunctionRegistry {
-        val name = PreConditions.checkNotBlank(func.name)
-        if (functions.containsKey(name)) {
-            throw IllegalArgumentException("$name function already exists.")
+    @JvmStatic
+    fun register(name: String, func: UDF): FunctionRegistry {
+        val cleanName = PreConditions.checkNotBlank(name).trim()
+        if (functions.containsKey(cleanName)) {
+            throw IllegalArgumentException("$cleanName function already exists.")
         }
-        functions[name] = SqlUserDefinedFunction(
-            SqlIdentifier(func.name, SqlParserPos.ZERO),
-            SqlKind.OTHER_FUNCTION,
-            func.resultType,
-            InferTypes.FIRST_KNOWN,
-            OperandTypes.operandMetadata(
-                func.inputTypes.map { it.family },
-                { t -> func.inputTypes.map { t.createSqlType(it) } },
-                { i -> "$i" },
-                { true }
-            ),
-            ScalarFunctionImpl.create(func::class.java, "eval")
-        )
+        when (func) {
+            is UDAF<*, *, *> ->
+                functions[cleanName] = SqlUserDefinedAggFunction(
+                    SqlIdentifier(cleanName, SqlParserPos.ZERO),
+                    SqlKind.OTHER_FUNCTION,
+                    func.resultType,
+                    InferTypes.FIRST_KNOWN,
+                    OperandTypes.operandMetadata(
+                        func.inputTypes.map { it.family },
+                        { t -> func.inputTypes.map { t.createSqlType(it) } },
+                        { i -> "$i" },
+                        { true }
+                    ),
+                    AggregateFunctionImpl.create(func::class.java),
+                    false, false, Optionality.FORBIDDEN
+                )
+
+            else ->
+                functions[cleanName] = SqlUserDefinedFunction(
+                    SqlIdentifier(cleanName, SqlParserPos.ZERO),
+                    SqlKind.OTHER_FUNCTION,
+                    func.resultType,
+                    InferTypes.FIRST_KNOWN,
+                    OperandTypes.operandMetadata(
+                        func.inputTypes.map { it.family },
+                        { t -> func.inputTypes.map { t.createSqlType(it) } },
+                        { i -> "$i" },
+                        { true }
+                    ),
+                    ScalarFunctionImpl.create(func::class.java, "eval")
+                )
+        }
         return this
     }
 
     /**
      * register function from lambda
      */
-    fun <R> register(_name: String, func: Function0<R>) = this.register0(_name, func)
-    fun <P1, R> register(_name: String, func: Function1<P1, R>) = this.register0(_name, func)
-    fun <P1, P2, R> register(_name: String, func: Function2<P1, P2, R>) = this.register0(_name, func)
-    fun <P1, P2, P3, R> register(_name: String, func: Function3<P1, P2, P3, R>) = this.register0(_name, func)
-    fun <P1, P2, P3, P4, R> register(_name: String, func: Function4<P1, P2, P3, P4, R>) = this.register0(_name, func)
-    fun <P1, P2, P3, P4, P5, R> register(_name: String, func: Function5<P1, P2, P3, P4, P5, R>) = this.register0(_name, func)
-    fun <R> register0(_name: String, func: Function<R>): FunctionRegistry {
-        val name = PreConditions.checkNotBlank(_name).trim()
-        if (functions.containsKey(name)) {
-            throw IllegalArgumentException("$name function already exists.")
+    fun <R> register(name: String, func: Function0<R>) = this.register0(name, func)
+    fun <P1, R> register(name: String, func: Function1<P1, R>) = this.register0(name, func)
+    fun <P1, P2, R> register(name: String, func: Function2<P1, P2, R>) = this.register0(name, func)
+    fun <P1, P2, P3, R> register(name: String, func: Function3<P1, P2, P3, R>) = this.register0(name, func)
+    fun <P1, P2, P3, P4, R> register(name: String, func: Function4<P1, P2, P3, P4, R>) = this.register0(name, func)
+    fun <P1, P2, P3, P4, P5, R> register(name: String, func: Function5<P1, P2, P3, P4, P5, R>) = this.register0(name, func)
+
+    fun <R> register0(name: String, func: Function<R>): FunctionRegistry {
+        val cleanName = PreConditions.checkNotBlank(name).trim()
+        if (functions.containsKey(cleanName)) {
+            throw IllegalArgumentException("$cleanName function already exists.")
         }
         val methods = func::class.java.methods.filter { it.name == "invoke" }
         val method = if (methods.size == 1) {
@@ -118,8 +115,8 @@ object FunctionRegistry {
             methods.firstOrNull { it.returnType != Object::class.java } ?: methods.first()
         }
         val inputTypes = method.parameterTypes.map { typeFactory.createJavaType(it)!! }
-        functions[name] = SqlUserDefinedFunction(
-            SqlIdentifier(name, SqlParserPos.ZERO),
+        functions[cleanName] = SqlUserDefinedFunction(
+            SqlIdentifier(cleanName, SqlParserPos.ZERO),
             SqlKind.OTHER_FUNCTION,
             ReturnTypes.explicit(typeFactory.createJavaType(method.returnType)),
             InferTypes.FIRST_KNOWN,
@@ -136,15 +133,6 @@ object FunctionRegistry {
     }
 
     fun sqlFunctions() = this.functions.values
-
-    fun sqlValidatorFunctions(): () -> List<UdfValidator> = {
-        this.functions.values.filter {
-            when (it) {
-                is UdfValidator -> true
-                else -> false
-            }
-        }.map { it as UdfValidator }
-    }
     fun getFunction(name: String) = this.functions[name]
     fun contains(name: String) = this.functions.containsKey(name)
 }

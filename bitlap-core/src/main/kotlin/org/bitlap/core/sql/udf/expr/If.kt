@@ -1,9 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.sql.udf
+package org.bitlap.core.sql.udf.expr
 
 import org.apache.calcite.sql.type.ReturnTypes
 import org.apache.calcite.sql.type.SqlReturnTypeInference
 import org.apache.calcite.sql.type.SqlTypeName
+import org.bitlap.core.sql.udf.UDF3
+import org.bitlap.core.sql.udf.UDFNames
 
 /**
  * IF UDF
@@ -11,12 +13,9 @@ import org.apache.calcite.sql.type.SqlTypeName
  * expression: if(condition, expr1, expr2)
  * return: if condition is true then $expr1, else $expr2
  */
-class UdfIf : UDF3<Boolean, Any?, Any?, Any?> {
-    companion object {
-        const val NAME = UdfNames.`if`
-    }
+class If : UDF3<Boolean, Any?, Any?, Any?> {
 
-    override val name: String = NAME
+    override val name: String = UDFNames.`if`
     override val inputTypes: List<SqlTypeName> = listOf(SqlTypeName.BOOLEAN, SqlTypeName.ANY, SqlTypeName.ANY)
     override val resultType: SqlReturnTypeInference = ReturnTypes.ARG1_NULLABLE
 

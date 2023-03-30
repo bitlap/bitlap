@@ -94,8 +94,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
             fs.delete(output, true)
         }
         val writer = writerB().outputPath(output.toString()).build()
-        rows
-            .sortedBy { "${it.metricKey}${it.dimensionKey}${it.dimension}${it.tm}" }
+        rows.sortedBy { "${it.metricKey}${it.dimensionKey}${it.dimension}${it.tm}" }
             .forEach {
                 writer.write(
                     arrayOf(
@@ -139,7 +138,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
         val timeFunc = timeFilter.mergeCondition()
         return this.query(timeFunc, metrics, dimension, dimensionFilter, arrayOf("mk", "dk", "d", "t", "e")) { row ->
             val (mk, dk, d, t, e) = row
-            if (timeFunc(t as Long)) {
+            if (t != null && timeFunc(t as Long)) {
                 MetricDimRow(t, "$mk", "$dk", "$d", CBM(), BBM(e as? ByteArray))
             } else {
                 null
@@ -156,7 +155,7 @@ class CarbonMetricDimStore(val table: Table, val hadoopConf: Configuration) : Me
         val timeFunc = timeFilter.mergeCondition()
         return this.query(timeFunc, metrics, dimension, dimensionFilter, arrayOf("mk", "dk", "d", "t", "m")) { row ->
             val (mk, dk, d, t, m) = row
-            if (timeFunc(t as Long)) {
+            if (t != null && timeFunc(t as Long)) {
                 MetricDimRow(t, "$mk", "$dk", "$d", CBM(m as? ByteArray), BBM())
             } else {
                 null

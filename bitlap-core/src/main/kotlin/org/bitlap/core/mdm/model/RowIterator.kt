@@ -31,8 +31,8 @@ class RowIterator(
         return names.map { this.dtNameMap[it]!! }
     }
 
-    fun fixTypes(types: List<DataType>): List<DataType> {
-        return types.map { this.dtNameMap[it.name]!! }
+    fun getType(name: String): DataType {
+        return this.dtNameMap[name]!!
     }
 
     /**

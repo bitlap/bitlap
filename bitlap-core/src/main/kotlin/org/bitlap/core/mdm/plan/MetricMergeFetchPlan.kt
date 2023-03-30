@@ -16,7 +16,7 @@ import kotlin.streams.toList
 /**
  * Merge metrics with same dimensions into a single row
  */
-class MetricsMergePlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() {
+class MetricMergeFetchPlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() {
 
     override fun execute(context: FetchContext): RowIterator {
         if (this.subPlans.isEmpty()) {
@@ -26,16 +26,21 @@ class MetricsMergePlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() 
             return this.subPlans.first().execute(context)
         }
         val rowsSet = this.subPlans.parallelStream().map { it.execute(context) }.toList()
+
+        // reset key and value types from 0, 1, 2, ...
         val resultKeyTypes = this.getKeyTypes(rowsSet).mapIndexed { idx, dt ->
             DataTypes.resetIndex(dt, idx)
         }
         val resultValueTypes = this.getValueTypes(rowsSet).mapIndexed { idx, dt ->
             DataTypes.resetIndex(dt, resultKeyTypes.size + idx)
         }
+
+        // merge values with same the keys
         val results = LinkedHashMap<List<Any?>, Row>()
         var offset = 0
         for (rs in rowsSet) {
-            val keyTypes = rs.fixTypes(resultKeyTypes) // fix key types
+            // get actual types from inputs
+            val keyTypes = rs.getTypes(resultKeyTypes.map { it.name })
             val valueTypes = rs.valueTypes
             rs.rows.forEach { row ->
                 val keys = keyTypes.map { row[it] }
@@ -59,14 +64,13 @@ class MetricsMergePlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() 
                         }
                     }
                 } else {
-                    results[keys] = arrayOfNulls<Any>(resultKeyTypes.size + resultValueTypes.size).let {
+                    results[keys] = Row(resultKeyTypes.size + resultValueTypes.size).also {
                         keys.forEachIndexed { idx, key ->
                             it[idx] = key
                         }
                         valueTypes.forEachIndexed { idx, vt ->
                             it[idx + offset + keys.size] = row[vt.idx]
                         }
-                        Row(it)
                     }
                 }
             }
@@ -82,7 +86,7 @@ class MetricsMergePlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() 
             .reduce { a, b ->
                 PreConditions.checkExpression(
                     a == b,
-                    msg = "Row iterators key types need to be the same, one is $a, the other is $b."
+                    msg = "Row iterators key types need to be the same, one is $a, the other is $b"
                 )
                 a
             }
@@ -94,5 +98,9 @@ class MetricsMergePlan(override val subPlans: List<FetchPlan>) : AbsFetchPlan() 
         return rowsSet
             .map { r -> r.valueTypes }
             .reduce { a, b -> a + b }
+    }
+
+    override fun explain(depth: Int): String {
+        return "${" ".repeat(depth)}+- MetricMergeFetchPlan\n${this.subPlans.joinToString("\n") { it.explain(depth + 2) }}"
     }
 }

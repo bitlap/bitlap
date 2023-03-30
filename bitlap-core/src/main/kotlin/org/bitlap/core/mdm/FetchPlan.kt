@@ -14,7 +14,17 @@ interface FetchPlan {
     val subPlans: List<FetchPlan>
 
     /**
+     * if optimized for current plan
+     */
+    var optimized: Boolean
+
+    /**
      * execute current plan
      */
     fun execute(context: FetchContext): RowIterator
+
+    /**
+     * execute plan graph
+     */
+    fun explain(depth: Int = 0): String
 }

@@ -29,7 +29,7 @@ object DataTypes {
      * get data type default value
      */
     fun defaultValue(type: Class<*>): Any {
-        return this.from0(type, "", 0).second
+        return this.from0(type, "", 0).second()
     }
 
     /**
@@ -39,19 +39,19 @@ object DataTypes {
         return this.from0(dataType::class.java, dataType.name, idx).first
     }
 
-    private fun from0(type: Class<*>, name: String, idx: Int): Pair<DataType, Any> {
+    private fun from0(type: Class<*>, name: String, idx: Int): Pair<DataType, () -> Any> {
         return when (type) {
             DataTypeLong::class.java,
             Long::class.java,
-            java.lang.Long::class.java -> DataTypeLong(name, idx) to 0L
+            java.lang.Long::class.java -> DataTypeLong(name, idx) to { 0L }
             DataTypeString::class.java,
             String::class.java,
-            java.lang.String::class.java -> DataTypeString(name, idx) to ""
+            java.lang.String::class.java -> DataTypeString(name, idx) to { "" }
             DataTypeRowValueMeta::class.java,
-            RowValueMeta::class.java -> DataTypeRowValueMeta(name, idx) to RowValueMeta.empty()
-            DataTypeRBM::class.java, RBM::class.java -> DataTypeRBM(name, idx) to RBM()
-            DataTypeBBM::class.java, BBM::class.java -> DataTypeBBM(name, idx) to BBM()
-            DataTypeCBM::class.java, CBM::class.java -> DataTypeCBM(name, idx) to CBM()
+            RowValueMeta::class.java -> DataTypeRowValueMeta(name, idx) to { RowValueMeta.empty() }
+            DataTypeRBM::class.java, RBM::class.java -> DataTypeRBM(name, idx) to { RBM() }
+            DataTypeBBM::class.java, BBM::class.java -> DataTypeBBM(name, idx) to { BBM() }
+            DataTypeCBM::class.java, CBM::class.java -> DataTypeCBM(name, idx) to { CBM() }
             else -> throw IllegalArgumentException("Invalid data type: ${type.name}")
         }
     }

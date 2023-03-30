@@ -137,53 +137,24 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                 """.trimIndent(),
                 listOf(listOf("ALL", 8, 24, 3))
             )
-        }
-
-        "time with date_format" {
-            val (db, table) = randomDBTable()
-            sql("create table $db.$table")
-            prepareTestData(db, table, 1669046400000)
-            prepareTestData(db, table, 1669132800000)
             checkRows(
                 """
-                    select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
-                    where _time >= 1669132800000 
-                    group by date_format(_time)
+                    select date_format(_time, 'yyyy-MM-dd') dt, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+                    from $db.$table
+                    where _time >= 100
+                    group by date_format(_time, 'yyyy-MM-dd')
                 """.trimIndent(),
-                listOf(listOf("2022-11-23", 4.0, 12.0, 3L))
+                listOf(listOf("1970-01-01", 8, 24, 3))
             )
-        }
-
-        "time with date_format but timestamp is seconds" {
-            val (db, table) = randomDBTable()
-            sql("create table $db.$table")
-            prepareTestData(db, table, 1669046400)
-            prepareTestData(db, table, 1669132800)
             checkRows(
                 """
-                    select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
-                    where _time >= 1669132800
-                    group by date_format(_time)
+                    select date_format(_time, 'yyyy-MM-dd') dt, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
+                    from $db.$table
+                    where _time >= 100 
+                    group by _time
                 """.trimIndent(),
-                listOf(listOf("1970-01-20", 4.0, 12.0, 3L)) // format failed
+                listOf(listOf("1970-01-01", 4, 12, 3), listOf("1970-01-01", 4, 12, 3))
             )
-        }
-
-        "time with date_format but not int groupby should error" {
-            val (db, table) = randomDBTable()
-            sql("create table $db.$table")
-            prepareTestData(db, table, 1669046400)
-            prepareTestData(db, table, 1669132800)
-            shouldThrow<BitlapException> {
-                sql(
-                    """select date_format(_time), sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv 
-                    from $db.$table 
-                    where _time >= 1669132800
-                    group by _time"""
-                ) // star is forbidden
-            }
         }
 
         "only metrics query with one dimension that is not time" {
@@ -254,6 +225,90 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                     group by os
                 """.trimIndent(),
                 listOf(listOf("Mac", 3, 9, 3))
+            )
+        }
+
+        "only metrics query with one dimension with time" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 100L)
+            prepareTestData(db, table, 200L)
+            checkRows(
+                """
+                    select _time, os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table 
+                    where _time >= 100
+                    group by _time, os
+                    order by _time, os
+                """.trimIndent(),
+                listOf(
+                    listOf(100, "Mac", 3, 9, 3),
+                    listOf(100, "Windows", 1, 3, 1),
+                    listOf(200, "Mac", 3, 9, 3),
+                    listOf(200, "Windows", 1, 3, 1)
+                )
+            )
+            checkRows(
+                """
+                    select _time, lower(os) os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table 
+                    where _time >= 100
+                    group by _time, lower(os)
+                    order by _time, os
+                """.trimIndent(),
+                listOf(
+                    listOf(100, "mac", 3, 9, 3),
+                    listOf(100, "windows", 1, 3, 1),
+                    listOf(200, "mac", 3, 9, 3),
+                    listOf(200, "windows", 1, 3, 1)
+                )
+            )
+        }
+
+        "metrics query with more dimensions" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            prepareTestData(db, table, 100L)
+            prepareTestData(db, table, 200L)
+            checkRows(
+                """
+                    select _time, city, os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table
+                    where _time >= 100
+                    group by _time, city, os
+                    order by _time, city, os
+                """.trimIndent(),
+                listOf(
+                    listOf(100, "北京", "Mac", 3, 9, 3),
+                    listOf(100, "北京", "Windows", 1, 3, 1),
+                    listOf(200, "北京", "Mac", 3, 9, 3),
+                    listOf(200, "北京", "Windows", 1, 3, 1)
+                )
+            )
+            checkRows(
+                """
+                    select city, os, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table
+                    where _time >= 100
+                    group by city, os
+                    order by city, os
+                """.trimIndent(),
+                listOf(
+                    listOf("北京", "Mac", 6, 18, 3),
+                    listOf("北京", "Windows", 2, 6, 1)
+                )
+            )
+            checkRows(
+                """
+                    select city, oo, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table 
+                    where _time >= 100
+                    group by city, oo
+                    order by city, oo
+                """.trimIndent(),
+                listOf(
+                    listOf("北京", null, 8, 24, 3)
+                )
             )
         }
     }

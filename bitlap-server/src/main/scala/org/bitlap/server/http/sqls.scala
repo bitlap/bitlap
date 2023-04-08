@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.http.vo
+package org.bitlap.server.http
 
 import org.bitlap.common.utils.internal.DBTable
 
@@ -7,6 +7,8 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 /** Desc: sql 查询的数据封装
  */
+final case class SqlInput(sql: String)
+
 final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
 
 final case class SqlColumn(name: String)

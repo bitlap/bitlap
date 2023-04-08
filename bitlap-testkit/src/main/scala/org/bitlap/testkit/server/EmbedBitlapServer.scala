@@ -1,11 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server.{ GrpcServerEndpoint, RaftServerEndpoint }
+import org.bitlap.server._
 import org.bitlap.server.config._
-import zio.console.putStrLn
+import org.bitlap.server.rpc.GrpcServiceLive
+import zio.ZIOAppArgs.getArgs
 import zio._
-import zio.magic._
 
 /** bitlap 嵌入式服务 包含http,grpc,raft
  *  @author
@@ -13,13 +13,14 @@ import zio.magic._
  *  @version 1.0,2022/4/27
  */
 
-object EmbedBitlapServer extends zio.App {
+object EmbedBitlapServer extends zio.ZIOAppDefault {
 
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
+  override def run =
     (for {
-      _ <- RaftServerEndpoint.service(args).fork
-      _ <- GrpcServerEndpoint.service(args).fork
-      _ <- putStrLn("""
+      args <- getArgs
+      _    <- RaftServerEndpoint.service(args.toList).fork
+      _    <- GrpcServerEndpoint.service(args.toList).fork
+      _ <- Console.printLine("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____
                         |  / __ \/ / __/ / __ `/ __ \
@@ -28,16 +29,18 @@ object EmbedBitlapServer extends zio.App {
                         |                   /_/
                         |""".stripMargin)
     } yield ())
-      .inject(
+      .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
-        zio.ZEnv.live,
         BitlapGrpcConfig.live,
-        BitlapRaftConfig.live
+        BitlapRaftConfig.live,
+        Scope.default,
+        MockAsyncRpcBackend.live,
+        ZIOAppArgs.empty,
+        GrpcServiceLive.live
       )
-      .foldM(
+      .fold(
         e => ZIO.fail(e).exitCode,
-        _ => ZIO.effectTotal(ExitCode.success)
+        _ => ZIO.succeed(ExitCode.success)
       )
-
 }

@@ -20,7 +20,7 @@ object SparkSpec extends App {
     .getOrCreate()
 
   val ret = for {
-    df <- ZIO.effect(
+    df <- ZIO.attempt(
       session.read
         .format("csv")
         .option("header", true)
@@ -29,7 +29,7 @@ object SparkSpec extends App {
         .option("escape", "\"")
         .load("./bitlap-testkit/src/main/resources/simple_data.csv")
     )
-    _ <- ZIO.effect(df.show())
+    _ <- ZIO.attempt(df.show())
     _ <- df.liftDataFrameWriter.map(_.mode("append").options(Map("url" -> url, "table" -> "tb_dimension")).save())
     _ <- session.liftDataFrameReader.map(
       _.options(
@@ -42,6 +42,8 @@ object SparkSpec extends App {
     )
   } yield {}
 
-  println(zio.Runtime.default.unsafeRun(ret))
+  zio.Unsafe.unsafe { implicit rt =>
+    zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()
+  }
 
 }

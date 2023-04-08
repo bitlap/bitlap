@@ -1,14 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
+import io.circe.generic.auto._
+import io.circe.syntax.EncoderOps
+import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http._
-import zhttp.http._
-import zhttp.service._
+import sttp.tapir.server.ziohttp.ZioHttpInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+import sttp.tapir.ztapir._
 import zio._
-import zio.blocking.Blocking
-import zio.console._
+import zio.http._
+import zio.http.model._
 
+import java.io.IOException
 import java.sql.DriverManager
 import java.util.Properties
 
@@ -20,37 +25,42 @@ import java.util.Properties
  *  @param port
  */
 object HttpServerEndpoint {
-  lazy val live: ZLayer[Has[BitlapHttpConfig] with Has[HttpServiceLive], Nothing, Has[HttpServerEndpoint]] =
-    ZLayer.fromServices[BitlapHttpConfig, HttpServiceLive, HttpServerEndpoint]((config, httpServiceLive) =>
+  lazy val live: ZLayer[BitlapHttpConfig with HttpServiceLive, Nothing, HttpServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
 
-  def service(args: List[String]): ZIO[
-    Console with Blocking with EventLoopGroup with ServerChannelFactory with Has[HttpServerEndpoint],
-    Throwable,
-    Unit
-  ] =
+  def service(args: List[String]): ZIO[HttpServerEndpoint, IOException, Unit] =
     (for {
-      server <- ZIO
-        .serviceWith[HttpServerEndpoint](_.httpServer)
-      _ <- server.make.use(_ => putStrLn(s"HTTP Server started"))
+      _ <- ZIO.serviceWithZIO[HttpServerEndpoint](_.httpServer())
+      _ <- Console.printLine(s"HTTP Server started")
       _ <- ZIO.never
     } yield ())
-      .onInterrupt(_ => putStrLn(s"HTTP Server was interrupted").ignore)
+      .onInterrupt(_ => Console.printLine(s"HTTP Server was interrupted").ignore)
 }
-final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) {
+final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) extends HttpEndpoint {
 
-  private val app = Http.collectZIO[Request] {
-    case req @ Method.POST -> !! / "api" / "sql" / "run" =>
-      req.data.toJson.map { body =>
-        val sql = body.hcursor.get[String]("sql").getOrElse("")
-        httpServiceLive.execute(sql)
-      }
-    case Method.GET -> !! / "api" / "common" / "status" => ZIO.effect(Response.json(s"""{"status":"ok"}"""))
+  private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
+    val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
+    ZIO
+      .attempt(httpServiceLive.execute(sqlInput.sql))
+      .mapError(f => SQLExecutedException(msg = "Unknown Error", cause = Option(f)))
   }
 
-  private val indexHtml = Http.fromResource(s"static/index.html")
-  private val staticApp = Http.collectHttp[Request] {
+  private lazy val statusServerEndpoint: ZServerEndpoint[Any, Any] =
+    statusEndpoint.zServerLogic { _ =>
+      ZIO.succeed("""{"status":"ok"}""")
+    }
+
+  private val swaggerEndpoints: List[ZServerEndpoint[Any, Any]] =
+    SwaggerInterpreter()
+      .fromEndpoints[Task](List(runEndpoint, statusEndpoint), "Bitlap API", "1.0")
+
+  private lazy val routes: http.HttpApp[Any, Throwable] =
+    ZioHttpInterpreter().toHttp(List(runServerEndpoint, statusServerEndpoint) ++ swaggerEndpoints)
+
+  private val indexHtml: http.HttpApp[Any, Throwable] = Http.fromResource(s"static/index.html")
+  private val staticApp: http.HttpApp[Any, Throwable] = Http.collectRoute[Request] {
     case Method.GET -> !! / "init" =>
       // 使用初始化时，开启这个
       val properties = new Properties()
@@ -67,7 +77,13 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
       indexHtml
   }
 
-  def httpServer: UIO[Server[Blocking, Throwable]] =
-    ZIO.succeed(Server.port(config.port) ++ Server.paranoidLeakDetection ++ Server.app(app ++ staticApp))
+  def httpServer(): URIO[Any, ExitCode] =
+    Server
+      .serve(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
+      .provide(
+        ServerConfig.live(ServerConfig.default.port(config.port)),
+        Server.live
+      )
+      .exitCode
 
 }

@@ -16,11 +16,11 @@ package object spark {
 
   implicit final class DataFrameOps(val dataFrame: DataFrame) extends AnyVal {
     def liftDataFrameWriter: Task[DataFrameWriter[Row]] =
-      ZIO.effect(dataFrame.write.format(FORMAT))
+      ZIO.attempt(dataFrame.write.format(FORMAT))
   }
 
   implicit final class SparkSessionOps(val sparkSession: SparkSession) extends AnyVal {
     def liftDataFrameReader: Task[DataFrameReader] =
-      ZIO.effect(sparkSession.read.format(FORMAT))
+      ZIO.attempt(sparkSession.read.format(FORMAT))
   }
 }

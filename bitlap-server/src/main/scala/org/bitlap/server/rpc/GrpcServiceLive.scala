@@ -19,8 +19,8 @@ import zio._
  *  @version 1.0,2022/4/21
  */
 object GrpcServiceLive {
-  lazy val live: ZLayer[Has[DriverAsyncRpc], Nothing, Has[GrpcServiceLive]] =
-    ZLayer.fromService((rpc: DriverAsyncRpc) => GrpcServiceLive(rpc))
+  lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
+    ZLayer.fromFunction((rpc: DriverAsyncRpc) => GrpcServiceLive(rpc))
 }
 @apply
 final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any] {
@@ -107,9 +107,9 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
     val leaderAddress = BitlapContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if (ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty) {
-        Task.fail(LeaderNotFoundException(s"requestId: ${request.requestId}"))
+        ZIO.fail(LeaderNotFoundException(s"requestId: ${request.requestId}"))
       } else {
-        Task.succeed(ld)
+        ZIO.succeed(ld)
       }
     }.mapBoth(
       errorApplyFunc,

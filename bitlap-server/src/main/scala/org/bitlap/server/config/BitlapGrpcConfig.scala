@@ -15,7 +15,7 @@ final case class BitlapGrpcConfig(
 )
 
 object BitlapGrpcConfig {
-  private val grpcPort = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).asServerAddress.port
-  lazy val live: ULayer[Has[BitlapGrpcConfig]] = ZLayer.succeed(BitlapGrpcConfig(grpcPort))
+  private val grpcPort                    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).asServerAddress.port
+  lazy val live: ULayer[BitlapGrpcConfig] = ZLayer.succeed(BitlapGrpcConfig(grpcPort))
 
 }

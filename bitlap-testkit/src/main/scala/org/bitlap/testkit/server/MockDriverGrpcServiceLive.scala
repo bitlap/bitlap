@@ -2,7 +2,6 @@
 package org.bitlap.testkit.server
 
 import org.bitlap.server.rpc._
-import zio._
 
 /** 用于测试的 bitlap rpc 服务端API实现
  *  @author
@@ -14,11 +13,11 @@ object MockDriverGrpcServiceLive {
 
   /** 固定的测试数据
    */
-  val mockLive: ZLayer[Any, Nothing, Has[GrpcServiceLive]] = MockAsyncRpcBackend.live >>> GrpcServiceLive.live
+  val mockLive = MockAsyncRpcBackend.live >>> GrpcServiceLive.live
 
   /** 真实数据
    */
-  val embedLive: ZLayer[Any, Nothing, Has[GrpcServiceLive]] =
+  val embedLive =
     GrpcBackendLive.live >>> GrpcServiceLive.live
 
 }

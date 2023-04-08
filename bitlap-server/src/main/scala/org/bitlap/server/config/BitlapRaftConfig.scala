@@ -24,7 +24,7 @@ final case class BitlapRaftConfig(
 )
 object BitlapRaftConfig {
 
-  lazy val live: ULayer[Has[BitlapRaftConfig]] = ZLayer.succeed(
+  lazy val live: ULayer[BitlapRaftConfig] = ZLayer.succeed(
     BitlapRaftConfig(
       BitlapContext.globalConf.get(BitlapConf.RAFT_DATA_PATH),
       BitlapContext.globalConf.get(BitlapConf.NODE_GROUP_ID),

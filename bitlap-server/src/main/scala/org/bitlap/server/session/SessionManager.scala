@@ -9,8 +9,7 @@ import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles._
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
-import zio.blocking.Blocking
-import zio.{ ZIO, _ }
+import zio.{ System => _, ZIO, _ }
 import java.util.Date
 import java.util.concurrent._
 import scala.collection._
@@ -37,7 +36,7 @@ object SessionManager extends LazyLogging {
 
   private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
 
-  def startListener(): ZIO[Has[SessionManager], Nothing, Unit] = {
+  def startListener(): ZIO[SessionManager, Nothing, Unit] = {
     logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
     val current = System.currentTimeMillis
     ZIO
@@ -48,39 +47,38 @@ object SessionManager extends LazyLogging {
             s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
           )
           closeSession(handle)
-        } else ZIO.effect(session.removeExpiredOperations(opHandleSet.toList))
+        } else ZIO.attempt(session.removeExpiredOperations(opHandleSet.toList))
       }
       .ignore <*
       ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
   }
 
-  lazy val live: ZLayer[Blocking, Nothing, Has[SessionManager]] =
-    ZLayer.fromService((block: Blocking.Service) => new SessionManager(block))
+  lazy val live: ULayer[SessionManager] = ZLayer.succeed(new SessionManager())
 
   def openSession(
     username: String,
     password: String,
     sessionConf: Map[String, String]
-  ): ZIO[Has[SessionManager], Throwable, Session] =
-    ZIO.serviceWith[SessionManager](sm => sm.openSession(username, password, sessionConf))
+  ): ZIO[SessionManager, Throwable, Session] =
+    ZIO.serviceWithZIO[SessionManager](sm => sm.openSession(username, password, sessionConf))
 
-  def closeSession(sessionHandle: SessionHandle): ZIO[Has[SessionManager], Throwable, Unit] =
-    ZIO.serviceWith[SessionManager](sm => sm.closeSession(sessionHandle))
+  def closeSession(sessionHandle: SessionHandle): ZIO[SessionManager, Throwable, Unit] =
+    ZIO.serviceWithZIO[SessionManager](sm => sm.closeSession(sessionHandle))
 
-  def getSession(sessionHandle: SessionHandle): ZIO[Has[SessionManager], Throwable, Session] =
-    ZIO.serviceWith[SessionManager](sm => sm.getSession(sessionHandle))
+  def getSession(sessionHandle: SessionHandle): ZIO[SessionManager, Throwable, Session] =
+    ZIO.serviceWithZIO[SessionManager](sm => sm.getSession(sessionHandle))
 
-  def getOperation(operationHandle: OperationHandle): ZIO[Has[SessionManager], Throwable, Operation] =
-    ZIO.serviceWith[SessionManager](sm => sm.getOperation(operationHandle))
+  def getOperation(operationHandle: OperationHandle): ZIO[SessionManager, Throwable, Operation] =
+    ZIO.serviceWithZIO[SessionManager](sm => sm.getOperation(operationHandle))
 
   def getInfo(
     sessionHandle: SessionHandle,
     getInfoType: GetInfoType
-  ): ZIO[Has[SessionManager], Throwable, GetInfoValue] =
-    ZIO.serviceWith[SessionManager](sm => sm.getInfo(sessionHandle, getInfoType))
+  ): ZIO[SessionManager, Throwable, GetInfoValue] =
+    ZIO.serviceWithZIO[SessionManager](sm => sm.getInfo(sessionHandle, getInfoType))
 
 }
-final class SessionManager(block: Blocking.Service) extends LazyLogging {
+final class SessionManager extends LazyLogging {
   import SessionManager._
 
   def openSession(
@@ -88,7 +86,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
     password: String,
     sessionConf: Map[String, String]
   ): Task[Session] =
-    block.effectBlocking {
+    ZIO.attemptBlocking {
       SessionManager.sessionAddLock.synchronized {
         val session = new MemorySession(
           username,
@@ -103,7 +101,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
       }
     }
 
-  def closeSession(sessionHandle: SessionHandle): Task[Unit] = block.effectBlocking {
+  def closeSession(sessionHandle: SessionHandle): Task[Unit] = ZIO.attemptBlocking {
     SessionManager.sessionAddLock.synchronized {
       sessionStore.remove(sessionHandle)
     }
@@ -124,7 +122,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
     )
   }
 
-  def getSession(sessionHandle: SessionHandle): Task[Session] = block.effectBlocking {
+  def getSession(sessionHandle: SessionHandle): Task[Session] = ZIO.attemptBlocking {
     this.synchronized {
       val session: Session = SessionManager.sessionAddLock.synchronized {
         sessionStore.get(sessionHandle)
@@ -137,7 +135,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
     }
   }
 
-  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = block.effectBlocking {
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ZIO.attemptBlocking {
     this.synchronized {
       val session: Session = SessionManager.sessionAddLock.synchronized {
         sessionStore.get(sessionHandle)
@@ -150,7 +148,7 @@ final class SessionManager(block: Blocking.Service) extends LazyLogging {
     }
   }
 
-  def getOperation(operationHandle: OperationHandle): Task[Operation] = block.effectBlocking {
+  def getOperation(operationHandle: OperationHandle): Task[Operation] = ZIO.attemptBlocking {
     this.synchronized {
       val op = operationStore.getOrElse(operationHandle, null)
       if (op == null) {

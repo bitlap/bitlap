@@ -29,9 +29,9 @@
             <version>${rocksdb.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.d11</groupId>
-            <artifactId>zhttp_${scala.binary.version}</artifactId>
-            <version>1.0.0.0-RC29</version>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio-http_${scala.binary.version}</artifactId>
+            <version>0.0.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -53,6 +53,26 @@
                     <artifactId>netty-all</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.softwaremill.sttp.tapir</groupId>
+            <artifactId>tapir-zio-http-server_2.13</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.softwaremill.sttp.tapir</groupId>
+            <artifactId>tapir-json-circe_2.13</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.softwaremill.sttp.tapir</groupId>
+            <artifactId>tapir-swagger-ui-bundle_2.13</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic_2.13</artifactId>
+            <version>0.14.5</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

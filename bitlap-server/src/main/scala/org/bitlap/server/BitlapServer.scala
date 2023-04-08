@@ -3,35 +3,33 @@ package org.bitlap.server
 
 import org.bitlap.server.config._
 import org.bitlap.server.http.HttpServiceLive
+import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
 import org.bitlap.server.session.SessionManager
-import zhttp.service.EventLoopGroup
-import zhttp.service.server.ServerChannelFactory
 import zio._
-import zio.console.putStrLn
-import zio.magic._
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
-import zio.duration.{ Duration => ZDuration }
+import zio.{ Duration => ZDuration }
 
 /** bitlap 聚合服务
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
  */
-object BitlapServer extends zio.App {
+object BitlapServer extends zio.ZIOAppDefault {
 
   // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
+  override def run =
     (for {
-      t1 <- RaftServerEndpoint.service(args).fork
-      t2 <- GrpcServerEndpoint.service(args).fork
-      t3 <- HttpServerEndpoint.service(args).fork
+      args <- getArgs
+      t1   <- RaftServerEndpoint.service(args.toList).fork
+      t2   <- GrpcServerEndpoint.service(args.toList).fork
+      t3   <- HttpServerEndpoint.service(args.toList).fork
       _ <- SessionManager
         .startListener()
         .repeat(Schedule.fixed(ZDuration.fromScala(Duration(3000, TimeUnit.MILLISECONDS))))
         .forkDaemon
-      _ <- putStrLn("""
+      _ <- Console.printLine("""
                       |    __    _ __  __
                       |   / /_  (_) /_/ /___ _____
                       |  / __ \/ / __/ / __ `/ __ \
@@ -39,26 +37,27 @@ object BitlapServer extends zio.App {
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.collectAll_(Seq(t1.join, t2.join, t3.join))
+      _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
     } yield ())
-      .inject(
+      .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
         HttpServerEndpoint.live,
-        zio.ZEnv.live,
-        ServerChannelFactory.auto,
-        EventLoopGroup.auto(16),
         BitlapGrpcConfig.live,
         BitlapHttpConfig.live,
         BitlapRaftConfig.live,
         HttpServiceLive.live,
-        SessionManager.live
+        SessionManager.live,
+        GrpcBackendLive.live,
+        Scope.default,
+        ZIOAppArgs.empty,
+        GrpcServiceLive.live
       )
-      .foldM(
+      .fold(
         e => ZIO.fail(e).exitCode,
-        _ => ZIO.effectTotal(ExitCode.success)
+        _ => ZIO.attempt(ExitCode.success)
       )
-      .onTermination(_ => putStrLn(s"Bitlap Server shutdown now").ignore)
-      .onExit(_ => putStrLn(s"Bitlap Server stopped").ignore)
-      .onInterrupt(_ => putStrLn(s"Bitlap Server was interrupted").ignore)
+      .onTermination(_ => Console.printLine(s"Bitlap Server shutdown now").ignore)
+      .onExit(_ => Console.printLine(s"Bitlap Server stopped").ignore)
+      .onInterrupt(_ => Console.printLine(s"Bitlap Server was interrupted").ignore)
 }

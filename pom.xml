@@ -88,10 +88,9 @@
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
-        <zio.version>1.0.15</zio.version>
-        <zio.grpc.version>0.5.2</zio.grpc.version>
-        <zio-cli.version>0.1.0</zio-cli.version>
-        <zio-magic>0.3.12</zio-magic>
+        <zio.version>2.0.11</zio.version>
+        <zio.grpc.version>0.6.0-test4</zio.grpc.version>
+        <zio-cli.version>0.4.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>
         <jupiter.version>5.9.2</jupiter.version>
 
@@ -277,11 +276,6 @@
             <groupId>io.circe</groupId>
             <artifactId>circe-core_${scala.binary.version}</artifactId>
             <version>${circe.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.kitlangton</groupId>
-            <artifactId>zio-magic_${scala.binary.version}</artifactId>
-            <version>${zio-magic}</version>
         </dependency>
     </dependencies>
 

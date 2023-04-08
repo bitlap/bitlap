@@ -8,10 +8,9 @@ import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import sqlline._
-import zio._
 import zio.cli.HelpDoc.Span.text
 import zio.cli.{ Command => ZioCliCommand, _ }
-import zio.console.{ putStrLn, Console }
+import zio.{ Console, System => ZSystem, _ }
 
 import java.io._
 import scala.collection.mutable.ArrayBuffer
@@ -35,9 +34,9 @@ trait BitlapInterpreter {
     command = bitlap
   ) {
     case sql: Command.Sql =>
-      putStrLn(s"Executing 'bitlap sql' with args: ${sqlBuild(sql.args)}") andThen ZIO.succeed(handleSqlCli(sql))
+      Console.printLine(s"Executing 'bitlap sql' with args: ${sqlBuild(sql.args)}") *> ZIO.succeed(handleSqlCli(sql))
     case Command.Server(operate) =>
-      putStrLn(s"Executing 'bitlap server' with operate: $operate")
+      Console.printLine(s"Executing 'bitlap server' with operate: $operate")
   }
 
   private def handleSqlCli(sql: Sql): Int = {
@@ -117,19 +116,19 @@ object BitlapInterpreter {
     val sqlHelp: HelpDoc    = HelpDoc.p("bitlap sql command.")
     val help: HelpDoc       = HelpDoc.p("bitlap cli command.")
 
-    val hostOpt: Options[String] = Options
+    val hostOpt = Options
       .text("server")
-      .withDefault("127.0.0.1:23333", "server address, separated by comma.")
+      .withDefault("127.0.0.1:23333")
       .alias("s")
 
     val userOpt: Options[String] = Options
       .text("user")
-      .withDefault("", "user name.")
+      .withDefault("")
       .alias("u")
 
     val passwordOpt: Options[String] = Options
       .text("password")
-      .withDefault("", "user password.")
+      .withDefault("")
       .alias("p")
   }
 

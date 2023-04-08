@@ -4,11 +4,12 @@ package org.bitlap.cli
 import zio._
 
 /** 基于zio-cli实现的命令行程序，内部基于sqlline。
+ *
  *  @version zio 1.0
  */
-object BitlapCli extends zio.App with BitlapInterpreter {
+object BitlapCli extends zio.ZIOAppDefault with BitlapInterpreter {
 
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    bitlapApp.run(args).exitCode
+  override def run =
+    bitlapApp.run(Nil).provideLayer(ZLayer.succeed(Console.ConsoleLive)).exitCode
 
 }

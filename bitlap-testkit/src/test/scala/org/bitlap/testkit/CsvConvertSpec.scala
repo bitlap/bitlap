@@ -36,7 +36,9 @@ class CsvConvertSpec extends CsvUtil {
   def testMockZioRpcBackend1 {
     val backend = MockAsyncRpcBackend()
     val ret     = backend.fetchResults(new OperationHandle(OperationType.ExecuteStatement), 50, 1)
-    val syncRet = zio.Runtime.default.unsafeRun(ret)
+    val syncRet = zio.Unsafe.unsafe { implicit rt =>
+      zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()
+    }
     println(syncRet)
     assertEquals(
       syncRet.results.rows.head.values.map(v => v.toStringUtf8),

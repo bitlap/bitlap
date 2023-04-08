@@ -20,7 +20,7 @@ trait DriverAsyncRpc extends DriverRpc[Task] { self =>
   private lazy val runtime = zio.Runtime.default
   private lazy val timeout = Duration("30s")
 
-  override def pure[A](a: A): Task[A] = Task.succeed(a)
+  override def pure[A](a: A): Task[A] = ZIO.succeed(a)
 
   override def map[A, B](fa: self.type => Task[A])(f: A => B): Task[B] = fa(this).map(f)
 
@@ -30,7 +30,9 @@ trait DriverAsyncRpc extends DriverRpc[Task] { self =>
     action: self.type => Z
   ): T =
     try {
-      val future = this.runtime.unsafeRunToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
+      val future = zio.Unsafe.unsafe { implicit rt =>
+        zio.Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
+      }
       Await.result(future, timeout)
     } catch {
       case e: Throwable => throw e

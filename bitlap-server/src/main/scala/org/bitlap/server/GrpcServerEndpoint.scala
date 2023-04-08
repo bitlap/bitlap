@@ -6,10 +6,9 @@ import io.grpc.protobuf.services.ProtoReflectionService
 import org.bitlap.network.DriverAsyncRpc
 import org.bitlap.server.config.BitlapGrpcConfig
 import org.bitlap.server.rpc._
+import scalapb.zio_grpc
 import scalapb.zio_grpc._
 import zio._
-import zio.console._
-import zio.magic._
 
 /** bitlap grpc服务
  *
@@ -18,30 +17,31 @@ import zio.magic._
  *  @version 1.0,2021/12/3
  */
 object GrpcServerEndpoint {
-  lazy val live: ZLayer[Has[BitlapGrpcConfig], Nothing, Has[GrpcServerEndpoint]] =
-    ZLayer.fromService((config: BitlapGrpcConfig) => new GrpcServerEndpoint(config))
+  lazy val live: ZLayer[BitlapGrpcConfig, Nothing, GrpcServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapGrpcConfig) => new GrpcServerEndpoint(config))
 
-  def service(args: List[String]): ZIO[Has[GrpcServerEndpoint] with Console, Throwable, Unit] =
+  def service(
+    args: List[String]
+  ): ZIO[DriverAsyncRpc with GrpcServiceLive with Scope with GrpcServerEndpoint, Throwable, Unit] =
     (for {
-      _ <- putStrLn(s"Grpc Server started")
+      _ <- Console.printLine(s"Grpc Server started")
       _ <- BitlapContext.fillRpc(GrpcBackendLive.liveInstance)
-      _ <- ZIO.serviceWith[GrpcServerEndpoint](_.runGrpc())
+      _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpc())
+      _ <- ZIO.never
     } yield ())
-      .onInterrupt(_ => putStrLn(s"Grpc Server was interrupted").ignore)
+      .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
 }
 final class GrpcServerEndpoint(val config: BitlapGrpcConfig) {
 
   private def builder =
     ServerBuilder.forPort(config.port).addService(ProtoReflectionService.newInstance())
 
-  def runGrpc(): ZIO[Any, Throwable, Nothing] =
+  def runGrpc(): ZIO[DriverAsyncRpc with GrpcServiceLive with Scope, Throwable, ZEnvironment[zio_grpc.Server]] =
     ServerLayer
       .fromServiceList(
         builder.asInstanceOf[ServerBuilder[_]],
-        ServiceList.accessEnv[Has[DriverAsyncRpc], GrpcServiceLive]
+        ServiceList.accessEnv[DriverAsyncRpc, GrpcServiceLive]
       )
       .build
-      .useForever
-      .inject(GrpcBackendLive.live, GrpcServiceLive.live)
 
 }

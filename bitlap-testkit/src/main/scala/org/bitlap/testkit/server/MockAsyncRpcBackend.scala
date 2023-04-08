@@ -18,7 +18,7 @@ import zio._
  *  @version 1.0,2022/4/27
  */
 object MockAsyncRpcBackend {
-  lazy val live: ULayer[Has[DriverAsyncRpc]] = ZLayer.succeed(MockAsyncRpcBackend())
+  lazy val live: ULayer[DriverAsyncRpc] = ZLayer.succeed(MockAsyncRpcBackend())
 }
 @apply
 class MockAsyncRpcBackend extends DriverAsyncRpc with CsvUtil {
@@ -87,12 +87,12 @@ class MockAsyncRpcBackend extends DriverAsyncRpc with CsvUtil {
   ): ZIO[Any, Throwable, OperationHandle] =
     ZIO.succeed(new OperationHandle(OperationType.GetTables))
 
-  override def cancelOperation(opHandle: OperationHandle): Task[Unit] = Task.unit
+  override def cancelOperation(opHandle: OperationHandle): Task[Unit] = ZIO.unit
 
-  override def closeOperation(opHandle: OperationHandle): Task[Unit] = Task.unit
+  override def closeOperation(opHandle: OperationHandle): Task[Unit] = ZIO.unit
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
-    Task.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+    ZIO.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ???
 }

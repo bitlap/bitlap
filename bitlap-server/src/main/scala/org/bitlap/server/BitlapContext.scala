@@ -12,7 +12,6 @@ import org.bitlap.network.NetworkException._
 import org.bitlap.network.{ DriverAsyncRpc, ServerAddress }
 import org.bitlap.server.config.BitlapRaftConfig
 import zio._
-import zio.blocking.Blocking
 
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
@@ -52,16 +51,14 @@ object BitlapContext {
       }
     }
 
-  def fillNode(node: Node): ZIO[Blocking, Throwable, Unit] =
-    zio.blocking.blocking {
-      ZIO.effect {
-        if (initNode.compareAndSet(false, true)) {
-          _node = node
-          cliClientService = new CliClientServiceImpl
-          cliClientService.init(new CliOptions)
-        }
-        ()
+  def fillNode(node: Node): Task[Unit] =
+    ZIO.attemptBlocking {
+      if (initNode.compareAndSet(false, true)) {
+        _node = node
+        cliClientService = new CliClientServiceImpl
+        cliClientService.init(new CliOptions)
       }
+      ()
     }
 
   def isLeader: Boolean = {
@@ -73,10 +70,10 @@ object BitlapContext {
   @Nullable
   def getLeaderAddress(): ZIO[Any, Throwable, ServerAddress] =
     (for {
-      conf    <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.initialServerAddressList))
-      groupId <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.groupId))
-      timeout <- ZIO.serviceWith[BitlapRaftConfig](c => ZIO.succeed(c.timeout))
-      server <- Task.effect {
+      conf    <- ZIO.serviceWith[BitlapRaftConfig](c => c.initialServerAddressList)
+      groupId <- ZIO.serviceWith[BitlapRaftConfig](c => c.groupId)
+      timeout <- ZIO.serviceWith[BitlapRaftConfig](c => c.timeout)
+      server <- ZIO.attempt {
         if (isLeader) {
           if (_node == null) {
             throw LeaderNotFoundException("cannot find a raft node instance")

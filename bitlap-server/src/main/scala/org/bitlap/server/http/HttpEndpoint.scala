@@ -18,10 +18,10 @@ import org.bitlap.network.NetworkException.SQLExecutedException
  */
 trait HttpEndpoint {
 
-  implicit val schemaForZimErrorInfo: Schema[NetworkException] =
+  implicit val exceptionSchema: Schema[NetworkException] =
     Schema[NetworkException](SchemaType.SProduct(Nil), Some(Schema.SName("NetworkException")))
 
-  implicit def zimErrorCodec[A <: NetworkException]: JsonCodec[A] =
+  implicit def exceptionCodec[A <: NetworkException]: JsonCodec[A] =
     implicitly[JsonCodec[io.circe.Json]].map(json =>
       json.as[A] match {
         case Left(_)      => throw new RuntimeException("MessageParsingError")
@@ -29,9 +29,9 @@ trait HttpEndpoint {
       }
     )(error => error.asJson)
 
-  implicit def encodeZimError[A <: NetworkException]: Encoder[A] = (_: A) => Json.Null
+  implicit def encodeException[A <: NetworkException]: Encoder[A] = (_: A) => Json.Null
 
-  implicit def decodeZimError[A <: NetworkException]: Decoder[A] =
+  implicit def decodeException[A <: NetworkException]: Decoder[A] =
     (c: HCursor) =>
       for {
         msg <- c.get[String]("msg")

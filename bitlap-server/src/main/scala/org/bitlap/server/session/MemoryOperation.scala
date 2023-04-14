@@ -11,7 +11,7 @@ import org.bitlap.network.serde.BitlapSerde
 import java.sql._
 import scala.collection.mutable.ListBuffer
 
-/** bitlap 客户端操作
+/** bitlap 单机操作实现
  *
  *  @author
  *    梦境迷离

@@ -2,12 +2,10 @@
 package org.bitlap.cli.interactive
 
 import org.bitlap.common.utils.StringEx
-import org.bitlap.tools.apply
 import sqlline._
 import scala.collection.mutable
 
-@apply
-class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends PromptHandler(line) {
+final class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends PromptHandler(line) {
 
   override def getDefaultPrompt(
     connectionIndex: Int,

@@ -5,7 +5,7 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
-/** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端。但可以为其添加JDBC专属逻辑。
+/** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端[[org.bitlap.client.AsyncClient]]，但可以为其添加JDBC专属逻辑
  *
  *  @author
  *    梦境迷离

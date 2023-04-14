@@ -9,7 +9,7 @@ import java.io._
  *    梦境迷离
  *  @version 1.0,2022/5/2
  */
-trait CsvUtil {
+trait CSVUtils {
 
   implicit val format = new DefaultCsvFormat {
     override def prependHeader: List[String] = List("time", "entity", "dimensions", "metric_name", "metric_value")

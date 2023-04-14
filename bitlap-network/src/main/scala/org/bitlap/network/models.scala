@@ -13,7 +13,8 @@ import org.bitlap.network.enumeration._
  */
 object models {
 
-  // client and server should use those models instead of using protobuf models
+  /** ADTs，所有类必须继承自此接口，继承类还必须提供toXX和fromXX方法
+   */
   sealed trait Model
 
   final case class QueryResult(tableSchema: TableSchema, rows: RowSet) extends Model
@@ -42,7 +43,7 @@ object models {
       )
   }
 
-  /** The wrapper class of the Proto buffer `BRow`.
+  /** The wrapper class of the Proto buffer [[org.bitlap.network.driver_proto.BRow]].
    */
   final case class Row(values: List[ByteString] = Nil) extends Model {
     def toBRow: BRow = BRow(values)
@@ -60,7 +61,7 @@ object models {
       )
   }
 
-  /** The wrapper class of the Proto buffer `BColumnDesc`.
+  /** The wrapper class of the Proto buffer [[org.bitlap.network.driver_proto.BColumnDesc]]
    */
   final case class ColumnDesc(
     columnName: String,

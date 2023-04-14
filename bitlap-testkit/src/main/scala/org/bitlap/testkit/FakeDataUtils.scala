@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
  *    梦境迷离
  *  @version 1.0,2022/10/20
  */
-object FakeDataUtil {
+object FakeDataUtils {
 
   private lazy val random: Random = new Random(System.nanoTime())
 

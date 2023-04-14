@@ -6,7 +6,8 @@ import org.bitlap.network.enumeration.TypeId
 import java.nio.ByteBuffer
 import java.sql._
 
-/** @author
+/** 字节数组反序列，尽可能兼容不同类型
+ *  @author
  *    梦境迷离
  *  @version 1.0,11/15/22
  */

@@ -19,9 +19,9 @@ import java.util.Properties
 
 /** bitlap http服务
  *
- *  初始化数据接口： http://localhost:8080/init
+ *  初始化数据接口: http://localhost:8080/init
  *
- *  查询数据接口：http://localhost:8080/sql
+ *  查询数据接口: http://localhost:8080/sql
  *  @param port
  */
 object HttpServerEndpoint {

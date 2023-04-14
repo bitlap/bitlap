@@ -36,6 +36,10 @@ object SessionManager extends LazyLogging {
 
   private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
 
+  lazy val live: ULayer[SessionManager] = ZLayer.succeed(new SessionManager())
+
+  /** 启动会话监听，超时时清空会话，清空会话相关的操作缓存
+   */
   def startListener(): ZIO[SessionManager, Nothing, Unit] = {
     logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
     val current = System.currentTimeMillis
@@ -52,8 +56,6 @@ object SessionManager extends LazyLogging {
       .ignore <*
       ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
   }
-
-  lazy val live: ULayer[SessionManager] = ZLayer.succeed(new SessionManager())
 
   def openSession(
     username: String,

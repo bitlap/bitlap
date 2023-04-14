@@ -1,7 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft
 
-/** @author
+/** 监听状态机，暂未使用
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */

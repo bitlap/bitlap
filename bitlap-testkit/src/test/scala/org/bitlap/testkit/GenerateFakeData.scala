@@ -7,10 +7,10 @@ import java.io.File
  *    梦境迷离
  *  @version 1.0,2022/10/20
  */
-object GenerateFakeData extends CsvUtil with App {
+object GenerateFakeData extends CSVUtils with App {
 
   def generateFakeData(): Boolean = {
-    val s: List[Metric] = FakeDataUtil.randMetrics(50)
+    val s: List[Metric] = FakeDataUtils.randMetrics(50)
     val file            = new File("./bitlap-testkit/src/main/resources/simple_data.csv")
     writeCsvData(file, s)
   }

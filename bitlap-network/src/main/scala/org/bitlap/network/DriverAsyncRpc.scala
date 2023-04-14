@@ -9,7 +9,7 @@ import zio._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-/** 函数式异步RPC API，客户端和服务端通用，基于 zio 1.0
+/** 函数式异步RPC API，客户端和服务端通用，基于 zio 2.0
  *
  *  @author
  *    梦境迷离
@@ -17,7 +17,6 @@ import scala.concurrent.duration.Duration
  */
 trait DriverAsyncRpc extends DriverRpc[Task] { self =>
 
-  private lazy val runtime = zio.Runtime.default
   private lazy val timeout = Duration("30s")
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)

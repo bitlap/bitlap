@@ -3,7 +3,8 @@ package org.bitlap.server.raft
 
 import com.alipay.sofa.jraft.option.NodeOptions
 
-/** @author
+/** raft配置，配置: {{ conf/bitlap.setting }}
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */

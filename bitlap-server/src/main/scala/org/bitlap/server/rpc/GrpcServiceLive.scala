@@ -9,10 +9,9 @@ import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.server._
-import org.bitlap.tools._
 import zio._
 
-/** RPC的服务端API实现，基于 zio-grpc,zio 1.0
+/** RPC的服务端API实现，基于 zio-grpc,zio 2.0
  *
  *  @author
  *    梦境迷离
@@ -20,9 +19,8 @@ import zio._
  */
 object GrpcServiceLive {
   lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
-    ZLayer.fromFunction((rpc: DriverAsyncRpc) => GrpcServiceLive(rpc))
+    ZLayer.fromFunction((rpc: DriverAsyncRpc) => new GrpcServiceLive(rpc))
 }
-@apply
 final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any] {
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误

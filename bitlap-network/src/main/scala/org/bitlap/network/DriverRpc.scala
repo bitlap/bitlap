@@ -5,7 +5,7 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
-/** 函数式RPC API，客户端和服务端通用。
+/** 函数式RPC API，客户端和服务端通用
  *
  *  @author
  *    梦境迷离

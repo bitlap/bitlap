@@ -15,7 +15,7 @@ import java.io.File
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-class CsvConvertSpec extends CsvUtil {
+class CsvConvertSpec extends CSVUtils {
 
   @Test
   def testCsvConvert1 {
@@ -34,7 +34,7 @@ class CsvConvertSpec extends CsvUtil {
 
   @Test
   def testMockZioRpcBackend1 {
-    val backend = MockAsyncRpcBackend()
+    val backend = new MockAsyncRpcBackend()
     val ret     = backend.fetchResults(new OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>
       zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()

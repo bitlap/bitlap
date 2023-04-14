@@ -56,8 +56,6 @@ object handles {
       }
       true
     }
-
-    def toString: String
   }
 
   /** 统一标识符定义
@@ -66,7 +64,7 @@ object handles {
    *  @param secretId
    */
   @toString(includeFieldNames = true)
-  class HandleIdentifier(
+  final class HandleIdentifier(
     var publicId: UUID = UUID.randomUUID(),
     var secretId: UUID = UUID.randomUUID()
   ) {
@@ -91,7 +89,6 @@ object handles {
       BHandleIdentifier(guid = ByteString.copyFrom(guid), secret = ByteString.copyFrom(secret))
     }
 
-    // 理论上hashCode和equals也可以用，@equalsAndHashCode
     override def hashCode(): Int = {
       val prime  = 31
       var result = 1
@@ -126,8 +123,7 @@ object handles {
    *  @param handleId
    */
   @toString(includeFieldNames = true)
-  @apply
-  class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId) {
+  final class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId) {
 
     def this(bSessionHandle: BSessionHandle) =
       this(new HandleIdentifier(bSessionHandle.getSessionId))
@@ -152,7 +148,7 @@ object handles {
   }
 
   @toString(includeFieldNames = true)
-  class OperationHandle(
+  final class OperationHandle(
     private val opType: OperationType,
     val hasResultSet: Boolean = false,
     override val handleId: HandleIdentifier = new HandleIdentifier()

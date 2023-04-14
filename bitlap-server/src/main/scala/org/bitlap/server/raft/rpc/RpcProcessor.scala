@@ -8,7 +8,8 @@ import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcRequestClosure
 import com.google.protobuf.Message
 
-/** @author
+/** 编写raft rpc所需继承的抽象基类
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */

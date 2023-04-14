@@ -8,7 +8,8 @@ import zio._
 import java.sql._
 import java.util.Properties
 
-/** @author
+/** HTTP 具体逻辑实现
+ *  @author
  *    梦境迷离
  *  @version 1.0,2023/3/13
  */

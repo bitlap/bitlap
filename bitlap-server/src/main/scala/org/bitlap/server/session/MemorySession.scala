@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
 
-/** bitlap 会话
+/** bitlap 单机会话实现
  *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3

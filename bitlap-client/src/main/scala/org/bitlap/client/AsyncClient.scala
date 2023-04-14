@@ -18,25 +18,29 @@ import zio._
  *  @author
  *    梦境迷离
  *  @since 2021/11/21
- *  @version 1.0, zio 1.0
+ *  @version 1.0, zio 2.0
  */
 final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc {
 
-  private lazy val leaderClientLayer = ZIO
-    .foreach(toServerAddresses(serverPeers)) { address =>
-      getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
-    }
-    .map(f =>
-      f.collectFirst { case Some(value) =>
-        value
+  /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]
+   *
+   *  客户端使用[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]操作SQL，目前所有操作必须读基于leader。
+   *
+   *  TODO: 当leader不存在时，client无法做任何操作
+   */
+  private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
+    ZIO
+      .foreach(serverPeers.asServerAddresses) { address =>
+        getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
       }
-    )
-    .map(l =>
-      if (l.isDefined) l.get
-      else throw BitlapSQLException(s"Cannot find a leader by hosts: ${serverPeers.mkString(",")}")
-    )
-    .map(f => clientLayer(f.ip, f.port))
+      .map(_.find(_.isDefined).flatten)
+      .map { f =>
+        if (f.isEmpty) throw BitlapSQLException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}")
+        clientLayer(f.get.ip, f.get.port)
+      }
 
+  /** 根据 IP:PORT 获取grpc channel，考虑leader转移，所以每次都将创建Layer
+   */
   private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
     scalapb.zio_grpc.ZManagedChannel(builder =
       ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[_]]

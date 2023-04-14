@@ -18,7 +18,7 @@ import zio.{ Duration => ZDuration }
  */
 object BitlapServer extends zio.ZIOAppDefault {
 
-  // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+  // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
     (for {
       args <- getArgs

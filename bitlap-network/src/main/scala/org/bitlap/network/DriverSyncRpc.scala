@@ -4,7 +4,7 @@ package org.bitlap.network
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
-/** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC，不应自己实现。
+/** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC[[org.bitlap.network.DriverAsyncRpc]]，不应自己实现
  *
  *  @author
  *    梦境迷离

@@ -9,7 +9,9 @@ import org.bitlap.server.BitlapContext
 import java.util.concurrent.Executor
 import org.bitlap.client._
 
-/** @author
+/** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.rpc.GrpcServiceLive.getLeader()]]使用
+ *
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */

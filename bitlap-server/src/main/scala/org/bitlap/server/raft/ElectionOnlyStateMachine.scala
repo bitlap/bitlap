@@ -9,7 +9,8 @@ import java.util.concurrent.atomic._
 import java.util.{ ArrayList => JArrayList, List => JList }
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-/** @author
+/** raft状态机，暂未使用
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */

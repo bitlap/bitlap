@@ -14,7 +14,8 @@ import java.io._
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
 
-/** @author
+/** raft 选主
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */

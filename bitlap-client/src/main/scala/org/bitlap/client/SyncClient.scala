@@ -6,7 +6,7 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
 
-/** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端。
+/** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端 [[org.bitlap.client.AsyncClient]]
  *
  *  @author
  *    梦境迷离

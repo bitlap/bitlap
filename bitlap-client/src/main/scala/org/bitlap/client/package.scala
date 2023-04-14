@@ -12,13 +12,21 @@ package object client {
 
   private val Separator = ":"
 
-  implicit final class StringOpsForClient(val s: String) extends AnyVal {
+  /** 从字符串解析IP:PORT，返回[[org.bitlap.network.ServerAddress]]
+   */
+  implicit final class StringOpsForClient(val serverUri: String) extends AnyVal {
     def asServerAddress: ServerAddress = {
-      val as = if (s.contains(Separator)) s.split(Separator).toList else List(s, Constants.DEFAULT_PORT)
+      val as =
+        if (serverUri.contains(Separator)) serverUri.split(Separator).toList
+        else List(serverUri, Constants.DEFAULT_PORT)
       ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
     }
   }
 
-  def toServerAddresses(serverPeers: Array[String]): List[ServerAddress] =
-    serverPeers.filter(_.nonEmpty).map(_.asServerAddress).toList
+  /** 从字符串解析Array(IP:PORT,IP:PORT,IP:PORT,...)，返回[[org.bitlap.network.ServerAddress]]的列表
+   */
+  implicit final class ArrayStringOpsForClient(val serverPeers: Array[String]) extends AnyVal {
+    def asServerAddresses: List[ServerAddress] =
+      serverPeers.filter(_.nonEmpty).map(_.asServerAddress).toList
+  }
 }

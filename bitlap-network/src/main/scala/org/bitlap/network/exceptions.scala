@@ -5,6 +5,7 @@ import org.bitlap.common.exception.BitlapException
 
 /** 网络层和服务层所有通用异常
  *
+ *  异常必须继承自[[org.bitlap.common.exception.BitlapException]]
  *  @author
  *    梦境迷离
  *  @since 2021/11/20

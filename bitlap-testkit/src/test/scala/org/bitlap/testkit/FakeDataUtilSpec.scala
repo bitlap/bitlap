@@ -9,11 +9,11 @@ import java.io.FileInputStream
  *    梦境迷离
  *  @version 1.0,2022/10/24
  */
-class FakeDataUtilSpec extends CsvUtil {
+class FakeDataUtilSpec extends CSVUtils {
 
   @Test
   def testFakeData(): Unit = {
-    val s: List[Metric] = FakeDataUtil.randMetrics(50)
+    val s: List[Metric] = FakeDataUtils.randMetrics(50)
     val file            = new File("./simple_data.csv")
     writeCsvData(file, s)
 

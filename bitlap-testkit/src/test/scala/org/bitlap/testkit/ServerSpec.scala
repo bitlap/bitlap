@@ -7,10 +7,10 @@ import org.junit._
 
 import java.sql._
 
-class ServerSpec extends CsvUtil {
+class ServerSpec extends CSVUtils {
 
-  private lazy val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
-  private lazy val database = s"test_database_${FakeDataUtil.randEntityNumber}"
+  private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
+  private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
   implicit lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
@@ -38,7 +38,7 @@ class ServerSpec extends CsvUtil {
     sql"drop table $table cascade"
 
   // 执行FakeDataUtilSpec 生成新的mock数据
-  // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+  // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
   def query_test1(): Unit = {
     val rs = sql"""

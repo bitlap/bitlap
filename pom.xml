@@ -79,7 +79,7 @@
         <kotlin.version>1.8.20</kotlin.version>
         <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
-        <kotest.version>5.5.5</kotest.version>
+        <kotest.version>5.6.0</kotest.version>
 
         <!-- scala -->
         <scala.version>2.13.10</scala.version>

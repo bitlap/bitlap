@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
             <artifactId>tapir-zio-http-server_2.13</artifactId>
-            <version>1.2.12</version>
+            <version>1.2.13</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>

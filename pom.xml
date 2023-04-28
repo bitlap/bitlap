@@ -92,7 +92,7 @@
         <zio.grpc.version>0.6.0-test4</zio.grpc.version>
         <zio-cli.version>0.4.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>
-        <jupiter.version>5.9.2</jupiter.version>
+        <jupiter.version>5.9.3</jupiter.version>
 
         <!-- others -->
         <carbondata.version>2.3.0</carbondata.version>

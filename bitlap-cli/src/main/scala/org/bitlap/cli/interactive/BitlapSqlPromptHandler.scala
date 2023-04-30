@@ -2,7 +2,7 @@
 package org.bitlap.cli.interactive
 
 import org.bitlap.common.utils.StringEx
-import sqlline._
+import sqlline.*
 import scala.collection.mutable
 
 final class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends PromptHandler(line) {
@@ -14,7 +14,7 @@ final class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extend
   ): String = {
     val sb     = new mutable.StringBuilder(this.prompt)
     val schema = sqlLine.getConnectionMetadata.getCurrentSchema
-    if (!StringEx.nullOrBlank(schema)) {
+    if !StringEx.nullOrBlank(schema) then {
       sb.append(s" ($schema)")
     }
     sb.append("> ").toString

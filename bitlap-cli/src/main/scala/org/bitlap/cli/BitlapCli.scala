@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli
 
-import zio._
+import zio.*
 
 /** 基于zio-cli实现的命令行程序，内部基于sqlline。
  *

@@ -1,17 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.models._
+import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 
-import java.io._
+import java.io.*
 import java.math.BigDecimal
-import java.net._
-import java.sql._
+import java.net.*
+import java.sql.*
 import java.util
 import java.util.Calendar
-import scala.annotation._
-import scala.reflect._
+import scala.annotation.*
+import scala.collection.mutable
+import scala.collection.mutable.Seq
+import scala.reflect.*
 
 /** bitlap 抽象结果集
  *  @author
@@ -19,12 +21,11 @@ import scala.reflect._
  *  @since 2021/8/23
  *  @version 1.0
  */
-abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
+abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde:
 
-  protected var warningChain: SQLWarning
-  protected var row: Row
-  protected var columnNames: List[String]
-  protected var columnTypes: List[String]
+  protected val columnNames: mutable.ListBuffer[String] = mutable.ListBuffer.empty
+  protected val columnTypes: mutable.ListBuffer[String] = mutable.ListBuffer.empty
+  protected def curRow: Row                             = null
 
   private var schema: TableSchema = _
 
@@ -32,7 +33,7 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+  override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
 
@@ -160,22 +161,27 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
     "Method not supported"
   )
 
-  override def getWarnings(): SQLWarning = warningChain
+  override def getWarnings(): SQLWarning = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
-  override def clearWarnings(): Unit = warningChain = null
+  override def clearWarnings(): Unit = throw new SQLFeatureNotSupportedException(
+    "Method not supported"
+  )
 
   override def getCursorName(): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getMetaData(): ResultSetMetaData = new BitlapResultSetMetaData(columnNames, columnTypes)
+  override def getMetaData(): ResultSetMetaData =
+    new BitlapResultSetMetaData(columnNames.result(), columnTypes.result())
 
   override def getObject(columnIndex: Int): Any = getColumnValue[Any](columnIndex)
 
   override def getObject(columnLabel: String): Any = getObject(findColumn(columnLabel))
 
-  override def getObject(columnIndex: Int, map: util.Map[String, Class[_]]): AnyRef =
+  override def getObject(columnIndex: Int, map: util.Map[String, Class[?]]): AnyRef =
     throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getObject(columnLabel: String, map: util.Map[String, Class[_]]): AnyRef =
+  override def getObject(columnLabel: String, map: util.Map[String, Class[?]]): AnyRef =
     throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getObject[T](columnIndex: Int, `type`: Class[T]): T = throw new SQLFeatureNotSupportedException(
@@ -186,13 +192,10 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
     "Method not supported"
   )
 
-  override def findColumn(columnLabel: String): Int = {
+  override def findColumn(columnLabel: String): Int =
     val columnIndex = columnNames.indexOf(columnLabel)
-    if (columnIndex == -1) {
-      throw BitlapSQLException("Bitlap SQL Exception")
-    }
+    if columnIndex == -1 then throw BitlapSQLException("Bitlap SQL Exception")
     columnIndex + 1
-  }
 
   override def getCharacterStream(columnIndex: Int): Reader = throw new SQLFeatureNotSupportedException(
     "Method not supported"
@@ -618,30 +621,20 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde {
 
 //  @inline
   @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
-  private def getColumnValue[T: ClassTag](columnIndex: Int): T = {
-    if (row == null) {
-      throw BitlapSQLException("No row found.")
-    }
-    val colVals = row.values
-    if (colVals == null) throw BitlapSQLException("RowSet does not contain any columns!")
-    if (columnIndex > colVals.size) {
-      throw BitlapSQLException(s"Invalid columnIndex: $columnIndex")
-    }
+  private def getColumnValue[T: ClassTag](columnIndex: Int): T =
+    if curRow == null then throw BitlapSQLException("No row found.")
+    val colVals = curRow.values
+    if colVals == null then throw BitlapSQLException("RowSet does not contain any columns!")
+    if columnIndex > colVals.size then throw BitlapSQLException(s"Invalid columnIndex: $columnIndex")
 
     val bColumnValue = colVals(columnIndex - 1)
-    try {
-      if (bColumnValue.isEmpty) {
-        _wasNull = true
-      }
+    try
+      if bColumnValue.isEmpty then _wasNull = true
 
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
       deserialize[T](columnType, bColumnValue)
-    } catch {
-      case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
-    }
-  }
+    catch case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
 
   def setSchema(schema: TableSchema): Unit = this.schema = schema
 
   def getSchema: TableSchema = this.schema
-}

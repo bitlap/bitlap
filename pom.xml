@@ -82,13 +82,13 @@
         <kotest.version>5.6.1</kotest.version>
 
         <!-- scala -->
-        <scala.version>2.13.10</scala.version>
-        <scala.binary.version>2.13</scala.binary.version>
-        <smt.version>0.9.1</smt.version>
+        <scala.version>3.2.2</scala.version>
+        <scala.binary.version>3</scala.binary.version>
+        <rolls.version>0.2.7</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.3</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
-        <zio.version>2.0.13</zio.version>
+        <zio.version>2.0.6</zio.version>
         <zio.grpc.version>0.6.0-test4</zio.grpc.version>
         <zio-cli.version>0.4.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>
@@ -219,17 +219,12 @@
         <!-- scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
+            <artifactId>scala3-library_${scala.binary.version}</artifactId>
             <version>${scala.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
+            <artifactId>scala3-compiler_${scala.binary.version}</artifactId>
             <version>${scala.version}</version>
         </dependency>
         <dependency>
@@ -239,28 +234,13 @@
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>smt-annotations_${scala.binary.version}</artifactId>
-            <version>${smt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>smt-common_${scala.binary.version}</artifactId>
-            <version>${smt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>smt-csv_${scala.binary.version}</artifactId>
-            <version>${smt.version}</version>
+            <artifactId>rolls-csv_${scala.binary.version}</artifactId>
+            <version>${rolls.version}</version>
         </dependency>
         <dependency>
             <groupId>com.beachape</groupId>
             <artifactId>enumeratum_${scala.binary.version}</artifactId>
             <version>${enumeratum.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-generic-extras_${scala.binary.version}</artifactId>
-            <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
@@ -382,9 +362,9 @@
                 </plugin>
                 <!-- scala -->
                 <plugin>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
-                    <version>2.15.2</version>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>4.8.1</version>
                     <executions>
                         <execution>
                             <goals>
@@ -395,8 +375,9 @@
                     </executions>
                     <configuration>
                         <args>
-                            <arg>-Ywarn-unused</arg> 
-                            <arg>-Ymacro-annotations</arg>
+                            <arg>-Ywarn-unused</arg>
+                            <arg>-Ytasty-reader</arg>
+                            <arg>-Yretain-trees</arg>
                         </args>
                     </configuration>
                 </plugin>
@@ -493,7 +474,7 @@
 
                         <!--   为了统一格式化，仅能在root模块执行spotless命令，否则找不到文件  -->
                         <scalafmt>
-                            <version>3.5.3</version>
+                            <version>3.7.3</version>
                             <file>.scalafmt.conf</file>
                         </scalafmt>
                         <licenseHeader>

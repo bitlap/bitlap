@@ -1,15 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import org.bitlap.server.config._
+import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
 import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
 import org.bitlap.server.session.SessionManager
-import zio._
+import zio.*
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
-import zio.{ Duration => ZDuration }
+import zio.Duration as ZDuration
 
 /** bitlap 聚合服务
  *  @author

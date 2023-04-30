@@ -4,9 +4,9 @@ package org.bitlap.server
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
 import org.bitlap.server.config.BitlapRaftConfig
-import org.bitlap.server.raft._
+import org.bitlap.server.raft.*
 import org.slf4j.LoggerFactory
-import zio.{ Runtime => _, _ }
+import zio.{ Runtime as _, * }
 
 /** bitlap raft cluster和rpc服务
  *  @author
@@ -59,8 +59,7 @@ final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
 
     node.init(electionOpts)
 
-    while (node.node == null)
-      Thread.sleep(1000)
+    while node.node == null do Thread.sleep(1000)
     node.node
   }
 }

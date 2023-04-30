@@ -1,13 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft.rpc
 
-import com.alipay.sofa.jraft.rpc.{ RpcProcessor => _, _ }
+import org.bitlap.client.*
+
+import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message
-import org.bitlap.common.schema._
+import org.bitlap.common.schema.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.server.BitlapContext
 import java.util.concurrent.Executor
-import org.bitlap.client._
 
 /** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.rpc.GrpcServiceLive.getLeader()]]使用
  *
@@ -15,9 +16,8 @@ import org.bitlap.client._
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */
-class GetServerMetadataProcessor(
-  executor: Executor = null
-) extends RpcProcessor[GetServerAddressReq](
+class GetServerMetadataProcessor(executor: Executor = null)
+    extends RpcProcessor[GetServerAddressReq](
       executor,
       GetServerAddressResp.getDefaultInstance
     ) {

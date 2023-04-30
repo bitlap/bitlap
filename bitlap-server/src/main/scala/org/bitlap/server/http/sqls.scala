@@ -13,21 +13,17 @@ final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] 
 
 final case class SqlColumn(name: String)
 final case class SqlRow(cells: Map[String, String] = Map.empty)
-final case class SqlResult(
-  data: SqlData,
-  resultCode: Int,
-  errorMessage: String = "Unknown Error"
-)
+final case class SqlResult(data: SqlData, resultCode: Int, errorMessage: String = "Unknown Error")
 object SqlData {
 
   def empty: SqlData = SqlData(Seq.empty, Seq.empty)
 
   def fromDBTable(table: DBTable): SqlData = {
-    if (table == null) return SqlData()
+    if table == null then return SqlData()
     val columns = table.getColumns.asScala.map(_.getLabel).map(SqlColumn).toSeq
     val rows    = table.getColumns.asScala.map(_.getValues)
     val headRow = rows.head.asScala
-    if (headRow == null || headRow.isEmpty) {
+    if headRow == null || headRow.isEmpty then {
       return SqlData(columns)
     }
     val sqlRows = headRow.indices.map { i =>

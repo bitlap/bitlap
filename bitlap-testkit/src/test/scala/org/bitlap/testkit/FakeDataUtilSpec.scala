@@ -1,9 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import java.io.File
 import org.junit.Test
-import java.io.FileInputStream
+import java.io.*
 
 /** @author
  *    梦境迷离
@@ -17,13 +16,11 @@ class FakeDataUtilSpec extends CSVUtils {
     val file            = new File("./simple_data.csv")
     writeCsvData(file, s)
 
-    val fileInputStream1 = new FileInputStream(new File("./simple_data.csv"))
-    val ms               = readCsvData(fileInputStream1)
+    val ms = readCsvData("./simple_data.csv")
     assert(s == ms)
 
     writeCsvData(file, ms)
-    val fileInputStream2 = new FileInputStream(new File("./simple_data.csv"))
-    val newMs            = readCsvData(fileInputStream2)
+    val newMs = readCsvData("./simple_data.csv")
     assert(newMs == s)
 
     file.delete()

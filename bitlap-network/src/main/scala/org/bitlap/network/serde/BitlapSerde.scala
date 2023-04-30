@@ -2,55 +2,53 @@
 package org.bitlap.network.serde
 
 import com.google.protobuf.ByteString
-import org.bitlap.network.NetworkException._
+import org.bitlap.network.NetworkException.*
 import org.bitlap.network.enumeration.TypeId
 import org.bitlap.network.serde.BitlapDeserializer.parser
 
-import java.io._
+import java.io.*
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-import java.sql._
+import java.sql.*
 import scala.annotation.implicitNotFound
-import scala.reflect._
+import scala.reflect.*
 import scala.util.Using
+import izumi.reflect.dottyreflection.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/11/15
  */
-trait BitlapSerde {
+trait BitlapSerde:
 
   @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteArray: scala.Array[Byte]): T =
     deserialize[T](realType, ByteString.copyFrom(ByteBuffer.wrap(byteArray)))
 
   @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
-  def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T = {
+  def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T =
     val readOnlyByteBuffer = byteString.asReadOnlyByteBuffer()
     val typeName           = classTag[T].runtimeClass.getSimpleName
     val targetType = TypeId.values.find(_.name.toLowerCase == typeName.toLowerCase).getOrElse(TypeId.Unspecified)
-    try {
-      val r = realType match {
+    try
+      val r = realType match
         case TypeId.StringType =>
           new String(byteString.toByteArray, Charset.forName("utf8"))
         case TypeId.Unspecified =>
           throw DataFormatException(msg = s"Incompatible type for realType:$realType, targetType:$targetType")
         case _ => parser(realType).parse[T](readOnlyByteBuffer, targetType, realType)
-      }
 
       r.asInstanceOf[T]
 
-    } catch {
+    catch
       case e: Exception =>
         e.printStackTrace()
         null.asInstanceOf[T]
-    }
-  }
 
-  def serialize(any: Any): ByteString = {
+  def serialize(any: Any): ByteString =
     val buffer = new ByteArrayOutputStream()
     Using.resources(buffer, new DataOutputStream(buffer)) { (_, d) =>
-      any match {
+      any match
         case i: Boolean             => d.writeBoolean(i)
         case i: Short               => d.writeShort(i)
         case i: Int                 => d.writeInt(i)
@@ -74,9 +72,6 @@ trait BitlapSerde {
           val chs = i.getBytes(Charset.forName("utf8"))
           d.write(chs)
         case i => throw DataFormatException(msg = s"Unsupported data:$i")
-      }
       d.flush()
     }
     ByteString.copyFrom(buffer.toByteArray)
-  }
-}

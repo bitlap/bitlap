@@ -13,11 +13,11 @@ import javax.sql.DataSource
  *  @since 2021/6/12
  *  @version 1.0
  */
-class BitlapDataSource extends DataSource {
+class BitlapDataSource extends DataSource:
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+  override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
 
@@ -36,7 +36,4 @@ class BitlapDataSource extends DataSource {
 
   override def getConnection(username: String, password: String): Connection =
     try new BitlapConnection("", new Properties())
-    catch {
-      case ex: Exception => throw BitlapSQLException(msg = "Error in getting BitlapConnection", cause = Option(ex))
-    }
-}
+    catch case ex: Exception => throw BitlapSQLException(msg = "Error in getting BitlapConnection", cause = Option(ex))

@@ -3,9 +3,9 @@ package org.bitlap.server.http
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.utils.internal.DBTablePrinter
-import zio._
+import zio.*
 
-import java.sql._
+import java.sql.*
 import java.util.Properties
 
 /** HTTP 具体逻辑实现

@@ -3,7 +3,7 @@ package org.bitlap.jdbc
 
 import org.bitlap.network.enumeration.TypeId
 
-import java.sql._
+import java.sql.*
 
 /** bitlap 结果集的元数据
  *  @author
@@ -11,10 +11,8 @@ import java.sql._
  *  @since 2021/6/12
  *  @version 1.0
  */
-class BitlapResultSetMetaData(
-  private val columnNames: List[String],
-  private val columnTypes: List[String]
-) extends ResultSetMetaData {
+class BitlapResultSetMetaData(private val columnNames: List[String], private val columnTypes: List[String])
+    extends ResultSetMetaData {
 
   override def getColumnCount(): Int = columnNames.size
 
@@ -42,10 +40,10 @@ class BitlapResultSetMetaData(
   override def getSchemaName(column: Int): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getPrecision(column: Int): Int =
-    if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a precision limit?
+    if Types.DOUBLE == getColumnType(column) then -1 else 0 // Do we have a precision limit?
 
   override def getScale(column: Int): Int =
-    if (Types.DOUBLE == getColumnType(column)) -1 else 0 // Do we have a scale limit?
+    if Types.DOUBLE == getColumnType(column) then -1 else 0 // Do we have a scale limit?
 
   override def getTableName(column: Int): String = ""
 
@@ -54,7 +52,7 @@ class BitlapResultSetMetaData(
   override def getColumnType(column: Int): Int = {
     val typ        = columnTypes(toZeroIndex(column))
     val bitlapType = TypeId.values.find(_.name == typ)
-    if (bitlapType.isEmpty || !TypeId.bitlap2Jdbc.contains(bitlapType.getOrElse(TypeId.Unspecified)))
+    if bitlapType.isEmpty || !TypeId.bitlap2Jdbc.contains(bitlapType.getOrElse(TypeId.Unspecified)) then
       throw BitlapSQLException("Could not determine column type name for ResultSet")
     TypeId.bitlap2Jdbc(TypeId.values.find(_.name == typ).getOrElse(TypeId.Unspecified))
   }
@@ -81,12 +79,12 @@ class BitlapResultSetMetaData(
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean =
+  override def isWrapperFor(iface: Class[?]): Boolean =
     throw new SQLFeatureNotSupportedException("Method not supported")
 
   protected def toZeroIndex(column: Int): Int = {
-    if (columnTypes == null) throw BitlapSQLException("Could not determine column type name for ResultSet")
-    if (column < 1 || column > columnTypes.size) throw BitlapSQLException("Invalid column value: " + column)
+    if columnTypes == null then throw BitlapSQLException("Could not determine column type name for ResultSet")
+    if column < 1 || column > columnTypes.size then throw BitlapSQLException("Invalid column value: " + column)
     column - 1
   }
 }

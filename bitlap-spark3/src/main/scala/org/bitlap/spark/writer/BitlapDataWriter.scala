@@ -2,17 +2,17 @@
 package org.bitlap.spark.writer
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.connector.write._
+import org.apache.spark.sql.connector.write.*
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.analysis.SimpleAnalyzer
-import org.apache.spark.sql.catalyst.encoders._
+import org.apache.spark.sql.catalyst.encoders.*
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.bitlap.spark.jdbc.BitlapJdbcDialect
-import org.bitlap.spark.util._
+import org.bitlap.spark.util.*
 
 import java.io.IOException
-import java.sql._
+import java.sql.*
 
 /** @author
  *    梦境迷离
@@ -36,10 +36,9 @@ class BitlapDataWriter(private val schema: StructType, private val options: Bitl
   try {
     conn = DriverManager.getConnection(options.url, null)
     var colNames = options.schema.names
-    if (!options.skipNormalizingIdentifier)
-      colNames = colNames.map(SchemaUtil.normalizeIdentifier)
+    if !options.skipNormalizingIdentifier then colNames = colNames.map(SchemaUtil.normalizeIdentifier)
 
-    val upsertSql = QueryUtil.constructUpsertStatement(options.tableName, List(colNames: _*))
+    val upsertSql = QueryUtil.constructUpsertStatement(options.tableName, List(colNames*))
     statement = conn.prepareStatement(upsertSql)
 
   } catch {
@@ -55,9 +54,9 @@ class BitlapDataWriter(private val schema: StructType, private val options: Bitl
     try {
       var i   = 0
       val row = SparkJdbcUtil.toRow(encoder, internalRow)
-      for (field <- _schema.fields) {
+      for field <- _schema.fields do {
         val dataType = field.dataType
-        if (internalRow.isNullAt(i))
+        if internalRow.isNullAt(i) then
           statement.setNull(i + 1, SparkJdbcUtil.getJdbcType(dataType, BitlapJdbcDialect).jdbcNullType)
         else SparkJdbcUtil.makeSetter(conn, BitlapJdbcDialect, dataType).apply(statement, row, i)
         i += 1
@@ -66,7 +65,7 @@ class BitlapDataWriter(private val schema: StructType, private val options: Bitl
       statement.execute
       // Run batch wise commits only when the batch size is positive value.
       // Otherwise commit gets called at the end of task
-      if (batchSize > 0 && (numRecords % batchSize == 0)) {
+      if batchSize > 0 && (numRecords % batchSize == 0) then {
         commitBatchUpdates()
       }
     } catch {

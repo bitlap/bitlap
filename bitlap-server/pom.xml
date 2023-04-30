@@ -56,22 +56,22 @@
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
-            <artifactId>tapir-zio-http-server_2.13</artifactId>
+            <artifactId>tapir-zio-http-server_${scala.binary.version}</artifactId>
             <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
-            <artifactId>tapir-json-circe_2.13</artifactId>
+            <artifactId>tapir-json-circe_${scala.binary.version}</artifactId>
             <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
-            <artifactId>tapir-swagger-ui-bundle_2.13</artifactId>
+            <artifactId>tapir-swagger-ui-bundle_${scala.binary.version}</artifactId>
             <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
-            <artifactId>circe-generic_2.13</artifactId>
+            <artifactId>circe-generic_${scala.binary.version}</artifactId>
             <version>0.14.5</version>
         </dependency>
         <dependency>
@@ -82,16 +82,10 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

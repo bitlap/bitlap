@@ -1,14 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import org.bitlap.core._
+import org.bitlap.core.*
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.NetworkException.DataFormatException
-import org.bitlap.network.enumeration._
-import org.bitlap.network.models._
+import org.bitlap.network.enumeration.*
+import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 
-import java.sql._
+import java.sql.*
 import scala.collection.mutable.ListBuffer
 
 /** bitlap 单机操作实现
@@ -17,11 +17,8 @@ import scala.collection.mutable.ListBuffer
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-final class MemoryOperation(
-  parentSession: Session,
-  opType: OperationType,
-  hasResultSet: Boolean = false
-) extends Operation(parentSession, opType, hasResultSet)
+final class MemoryOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
+    extends Operation(parentSession, opType, hasResultSet)
     with BitlapSerde {
 
   def mapTo(rs: ResultSet): QueryResult = {
@@ -37,7 +34,7 @@ final class MemoryOperation(
     }
     // get row set
     val rows = ListBuffer[Row]()
-    while (rs.next()) {
+    while rs.next() do {
       val cl = (1 to metaData.getColumnCount).map { it =>
         metaData.getColumnType(it) match {
           case Types.VARCHAR                => serialize(rs.getString(it))

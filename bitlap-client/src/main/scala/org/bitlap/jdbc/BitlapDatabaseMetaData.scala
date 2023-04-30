@@ -6,7 +6,7 @@ import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
 
-import java.sql.{ Array => _, _ }
+import java.sql.{ Array as _, * }
 
 /** bitlap 数据库元数据
  *
@@ -18,9 +18,9 @@ import java.sql.{ Array => _, _ }
 class BitlapDatabaseMetaData(
   private val connection: Connection,
   private val session: SessionHandle,
-  private val client: BitlapClient
-) extends DatabaseMetaData
-    with BitlapSerde {
+  private val client: BitlapClient)
+    extends DatabaseMetaData
+    with BitlapSerde:
   override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def allTablesAreSelectable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
@@ -39,15 +39,13 @@ class BitlapDatabaseMetaData(
 
   override def nullsAreSortedAtEnd(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDatabaseProductName: String = {
+  override def getDatabaseProductName: String =
     val result = client.getInfo(session, GetInfoType.DbmsName).value
     deserialize[String](TypeId.StringType, result)
-  }
 
-  override def getDatabaseProductVersion: String = {
+  override def getDatabaseProductVersion: String =
     val result = client.getInfo(session, GetInfoType.DbmsVer).value
     deserialize[String](TypeId.StringType, result)
-  }
 
   override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -353,10 +351,9 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet = {
+  ): ResultSet =
     val stmt = client.getTables(session, Option(schemaPattern).getOrElse("%"), tableNamePattern)
     BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
-  }
 
   override def getSchemas: ResultSet =
     getSchemas(null, null)
@@ -466,7 +463,12 @@ class BitlapDatabaseMetaData(
 
   override def supportsBatchUpdates(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getUDTs(catalog: String, schemaPattern: String, typeNamePattern: String, types: Array[Int]): ResultSet =
+  override def getUDTs(
+    catalog: String,
+    schemaPattern: String,
+    typeNamePattern: String,
+    types: Array[Int]
+  ): ResultSet =
     throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getConnection: Connection = this.connection
@@ -516,10 +518,9 @@ class BitlapDatabaseMetaData(
 
   override def getRowIdLifetime: RowIdLifetime = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSchemas(catalog: String, schemaPattern: String): ResultSet = {
+  override def getSchemas(catalog: String, schemaPattern: String): ResultSet =
     val stmt = client.getDatabases(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"))
     BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
-  }
 
   override def supportsStoredFunctionsUsingCallSyntax(): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
@@ -552,7 +553,6 @@ class BitlapDatabaseMetaData(
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+  override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
-}

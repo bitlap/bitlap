@@ -1,15 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
-import io.grpc._
-import org.bitlap.network._
-import org.bitlap.network.NetworkException._
-import org.bitlap.network.driver_proto._
+import io.grpc.*
+import org.bitlap.network.*
+import org.bitlap.network.NetworkException.*
+import org.bitlap.network.driver_proto.*
 import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.server._
-import zio._
+import org.bitlap.network.handles.*
+import org.bitlap.server.*
+import zio.*
 
 /** RPC的服务端API实现，基于 zio-grpc,zio 2.0
  *
@@ -104,7 +104,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
   override def getLeader(request: BGetLeaderReq): ZIO[Any, Status, BGetLeaderResp] = {
     val leaderAddress = BitlapContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
-      if (ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty) {
+      if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
         ZIO.fail(LeaderNotFoundException(s"requestId: ${request.requestId}"))
       } else {
         ZIO.succeed(ld)

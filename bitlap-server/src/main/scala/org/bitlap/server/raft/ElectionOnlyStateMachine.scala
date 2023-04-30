@@ -1,12 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft
 
-import com.alipay.sofa.jraft.core._
-import com.alipay.sofa.jraft.{ Iterator => JRIterator, Status }
-import org.slf4j._
+import com.alipay.sofa.jraft.core.*
+import com.alipay.sofa.jraft.{ Iterator as JRIterator, Status }
+import org.slf4j.*
 
-import java.util.concurrent.atomic._
-import java.util.{ ArrayList => JArrayList, List => JList }
+import java.util.concurrent.atomic.*
+import java.util.{ ArrayList as JArrayList, List as JList }
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 /** raft状态机，暂未使用
@@ -21,13 +21,13 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter {
   private val leaderTerm                            = new AtomicLong(-1L)
   private var listeners: JList[LeaderStateListener] = new JArrayList[LeaderStateListener]
 
-  def this(listeners: JList[LeaderStateListener]) {
+  def this(listeners: JList[LeaderStateListener]) = {
     this()
     this.listeners = listeners
   }
 
   override def onApply(it: JRIterator): Unit =
-    while (it.hasNext) {
+    while it.hasNext do {
       LOG.info("On apply with term: {} and index: {}. ", it.getTerm, it.getIndex)
       it.next
     }
@@ -35,7 +35,7 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter {
   override def onLeaderStart(term: Long): Unit = {
     super.onLeaderStart(term)
     this.leaderTerm.set(term)
-    for (listener <- this.listeners.asScala) // iterator the snapshot
+    for listener <- this.listeners.asScala do // iterator the snapshot
       listener.onLeaderStart(term)
   }
 
@@ -43,8 +43,7 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter {
     super.onLeaderStop(status)
     val oldTerm = leaderTerm.get
     this.leaderTerm.set(-1L)
-    for (listener <- this.listeners.asScala)
-      listener.onLeaderStop(oldTerm)
+    for listener <- this.listeners.asScala do listener.onLeaderStop(oldTerm)
   }
 
   def isLeader: Boolean = this.leaderTerm.get > 0

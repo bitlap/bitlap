@@ -1,11 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server._
-import org.bitlap.server.config._
+import org.bitlap.server.*
+import org.bitlap.server.config.*
 import org.bitlap.server.rpc.GrpcServiceLive
 import zio.ZIOAppArgs.getArgs
-import zio._
+import zio.*
 
 /** bitlap 嵌入式服务 包含http,grpc,raft
  *  @author

@@ -8,7 +8,7 @@ import io.grpc.Status
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-package object network extends LazyLogging {
+package object network extends LazyLogging:
 
   type Identity[T] = T
 
@@ -18,4 +18,3 @@ package object network extends LazyLogging {
     Status.INTERNAL.withDescription(ex.getLocalizedMessage)
 
   lazy val statusApplyFunc: Status => Throwable = (st: Status) => st.asException()
-}

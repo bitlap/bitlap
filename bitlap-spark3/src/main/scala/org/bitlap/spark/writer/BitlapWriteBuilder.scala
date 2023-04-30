@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.writer
 
-import org.apache.spark.sql.connector.write._
+import org.apache.spark.sql.connector.write.*
 import org.apache.spark.sql.connector.write.BatchWrite
 
 /** @author

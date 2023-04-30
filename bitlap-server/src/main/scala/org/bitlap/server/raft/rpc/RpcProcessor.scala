@@ -16,17 +16,16 @@ import com.google.protobuf.Message
 abstract class RpcProcessor[T <: Message](executor: Executor = null, defaultResp: Message)
     extends RpcRequestProcessor[T](executor, defaultResp) {
 
-  override def handleRequest(rpcCtx: RpcContext, request: T) {
+  override def handleRequest(rpcCtx: RpcContext, request: T) =
     try {
       val msg = processRequest(request, new RpcRequestClosure(rpcCtx, this.defaultResp))
-      if (msg != null) {
+      if msg != null then {
         rpcCtx.sendResponse(msg)
       }
     } catch {
       case e: Exception => rpcCtx.sendResponse(processError(rpcCtx, e))
 
     }
-  }
 
   def processError(rpcCtx: RpcContext, exception: Exception): Message
 

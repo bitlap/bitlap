@@ -1,17 +1,17 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import io.circe.generic.auto._
+import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
 import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.server.config.BitlapHttpConfig
-import org.bitlap.server.http._
+import org.bitlap.server.http.*
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.ztapir._
-import zio._
-import zio.http._
-import zio.http.model._
+import sttp.tapir.ztapir.*
+import zio.*
+import zio.http.*
+import zio.http.model.*
 
 import java.io.IOException
 import java.sql.DriverManager

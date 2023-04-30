@@ -1,8 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values._
-import org.bitlap.network.driver_proto._
+import enumeratum.values.*
+import org.bitlap.network.driver_proto.*
 
 import java.sql.Types
 
@@ -12,7 +12,7 @@ import java.sql.Types
  */
 sealed abstract class TypeId(val value: Int, val name: String) extends IntEnumEntry
 
-object TypeId extends IntEnum[TypeId] {
+object TypeId extends IntEnum[TypeId]:
   final case object Unspecified   extends TypeId(0, "Any")
   final case object StringType    extends TypeId(1, "String")
   final case object IntType       extends TypeId(2, "Int")
@@ -47,5 +47,3 @@ object TypeId extends IntEnum[TypeId] {
   )
 
   def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)
-
-}

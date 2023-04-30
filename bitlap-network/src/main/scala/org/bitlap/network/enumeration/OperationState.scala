@@ -1,9 +1,10 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values._
+import enumeratum.values.*
 import org.bitlap.network.NetworkException.IllegalStateException
-import org.bitlap.network.driver_proto._
+import org.bitlap.network.driver_proto.*
+import izumi.reflect.dottyreflection.*
 
 /** bitlap客户端操作的状态
  *
@@ -13,7 +14,7 @@ import org.bitlap.network.driver_proto._
  *  @version 1.0
  */
 sealed abstract class OperationState(val value: Int, val terminal: Boolean) extends IntEnumEntry
-object OperationState extends IntEnum[OperationState] {
+object OperationState extends IntEnum[OperationState]:
 
   final case object UnknownState     extends OperationState(0, false)
   final case object InitializedState extends OperationState(1, false)
@@ -33,25 +34,23 @@ object OperationState extends IntEnum[OperationState] {
   def toBOperationState(operationState: OperationState): BOperationState =
     BOperationState.fromValue(operationState.value)
 
-  implicit final class ValidateTransition(val state: OperationState) extends AnyVal {
+  implicit final class ValidateTransition(val state: OperationState) extends AnyVal:
     def validateTransition(newState: OperationState): Unit =
       validate(state, newState)
-  }
 
   def validate(oldState: OperationState, newState: OperationState): Unit =
-    oldState match {
+    oldState match
       case InitializedState =>
-        newState match {
+        newState match
           case PendingState  =>
           case RunningState  =>
           case CanceledState =>
           case ClosedState   =>
           case TimeoutState  => ()
           case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
-        }
 
       case PendingState =>
-        newState match {
+        newState match
           case RunningState  =>
           case FinishedState =>
           case CanceledState =>
@@ -59,17 +58,15 @@ object OperationState extends IntEnum[OperationState] {
           case ClosedState   =>
           case TimeoutState  => ()
           case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
-        }
 
       case RunningState =>
-        newState match {
+        newState match
           case FinishedState =>
           case CanceledState =>
           case ErrorState    =>
           case ClosedState   =>
           case TimeoutState  => ()
           case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
-        }
 
       case FinishedState                         =>
       case CanceledState                         =>
@@ -77,6 +74,3 @@ object OperationState extends IntEnum[OperationState] {
       case ErrorState if ClosedState == newState => ()
       case _ =>
         throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
-    }
-
-}

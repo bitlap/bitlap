@@ -2,9 +2,9 @@
 package org.bitlap.network
 
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
-import zio._
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
+import zio.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -15,7 +15,8 @@ import scala.concurrent.duration.Duration
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait DriverAsyncRpc extends DriverRpc[Task] { self =>
+trait DriverAsyncRpc extends DriverRpc[Task]:
+  self =>
 
   private lazy val timeout = Duration("30s")
 
@@ -25,22 +26,19 @@ trait DriverAsyncRpc extends DriverRpc[Task] { self =>
 
   override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T, E <: Throwable, Z <: ZIO[_, _, _]](
+  def sync[T, E <: Throwable, Z <: ZIO[?, ?, ?]](
     action: self.type => Z
   ): T =
-    try {
+    try
       val future = zio.Unsafe.unsafe { implicit rt =>
         zio.Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
       }
       Await.result(future, timeout)
-    } catch {
-      case e: Throwable => throw e
-    }
+    catch case e: Throwable => throw e
 
   def when[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =
-    if (predicate) {
-      fa(this)
-    } else { ZIO.fail(exception) }
+    if predicate then fa(this)
+    else ZIO.fail(exception)
 
   def openSession(
     username: String,
@@ -72,5 +70,3 @@ trait DriverAsyncRpc extends DriverRpc[Task] { self =>
   def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus]
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue]
-
-}

@@ -2,8 +2,8 @@
 package org.bitlap.client
 
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
 
 /** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端[[org.bitlap.client.AsyncClient]]，但可以为其添加JDBC专属逻辑
  *

@@ -1,8 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.csv._
-import java.io._
+import bitlap.rolls.csv.*
+import bitlap.rolls.csv.CSVUtils.*
+import java.io.*
 
 /** csv 读写工具
  *  @author
@@ -11,31 +12,27 @@ import java.io._
  */
 trait CSVUtils {
 
-  implicit val format = new DefaultCsvFormat {
-    override def prependHeader: List[String] = List("time", "entity", "dimensions", "metric_name", "metric_value")
-    override def ignoreHeader: Boolean       = true
+  given CSVFormat = new CSVFormat {
+    override val hasHeaders: Boolean  = false
+    override val hasColIndex: Boolean = false
   }
 
-  def readCsvData(resource: String): List[Metric] = {
-    val reader = ClassLoader.getSystemResourceAsStream(resource)
-    readCsvData(reader)
-  }
-
-  def readCsvData(resource: InputStream): List[Metric] =
-    ReaderBuilder[Metric]
-      .setField[List[Dimension]](
-        _.dimensions,
-        dims => StringUtils.extractJsonValues[Dimension](dims)((k, v) => Dimension(k, v))
-      )
-      .convertFrom(resource)
-      .collect { case Some(v) => v }
+  def readCsvData(file: String): List[Metric] =
+    val (metadata, metrics) = CSVUtils.readCSV(
+      FileName(this.getClass.getClassLoader.getResource(file).getFile)
+    ) { line =>
+      line
+        .into[Metric]
+        .withFieldComputed(_.dimensions, dims => StringUtils.asClasses(dims)((k, v) => Dimension(k, v)))
+        .decode
+    }
+    metrics.toList
 
   def writeCsvData(file: File, metrics: List[Metric]): Boolean =
-    WriterBuilder[Metric]
-      .setField[List[Dimension]](
-        _.dimensions,
-        (ds: List[Dimension]) =>
-          s"""\"{${ds.map(kv => s"""\"\"${kv.key}\"\":\"\"${kv.value}\"\"""").mkString(",")}}\""""
-      )
-      .convertTo(metrics, file)
+    val status = CSVUtils.writeCSV(file, metrics) { m =>
+      m.into
+        .withFieldComputed(_.dimensions, dims => StringUtils.asString(dims.map(f => f.key -> f.value).toList))
+        .encode
+    }
+    status
 }

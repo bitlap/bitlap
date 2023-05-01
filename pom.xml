@@ -105,7 +105,7 @@
         <!-- plugins -->
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <dokka.version>1.7.20</dokka.version>
-        <drill-fmpp-maven-plugin.version>1.21.0</drill-fmpp-maven-plugin.version>
+        <drill-fmpp-maven-plugin.version>1.21.1</drill-fmpp-maven-plugin.version>
         <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>
         <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
         <surefire.version>3.0.0</surefire.version>

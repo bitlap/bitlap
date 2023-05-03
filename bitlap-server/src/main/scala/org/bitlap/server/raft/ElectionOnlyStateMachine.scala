@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-final class ElectionOnlyStateMachine extends StateMachineAdapter {
+final class ElectionOnlyStateMachine extends StateMachineAdapter:
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
@@ -50,4 +50,3 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter {
 
   def addLeaderStateListener(listener: LeaderStateListener): Unit =
     this.listeners.add(listener)
-}

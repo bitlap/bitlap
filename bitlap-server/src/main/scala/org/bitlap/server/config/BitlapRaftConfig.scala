@@ -21,7 +21,8 @@ final case class BitlapRaftConfig(
   initialServerAddressList: String,
   // 5s 100ms
   timeout: Duration)
-object BitlapRaftConfig {
+
+object BitlapRaftConfig:
 
   lazy val live: ULayer[BitlapRaftConfig] = ZLayer.succeed(
     BitlapRaftConfig(
@@ -32,4 +33,3 @@ object BitlapRaftConfig {
       Duration(BitlapContext.globalConf.get(BitlapConf.RAFT_TIMEOUT))
     )
   )
-}

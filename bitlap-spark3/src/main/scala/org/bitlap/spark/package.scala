@@ -12,7 +12,7 @@ package object spark {
 
   final val FORMAT: String = "bitlap"
 
-  Class.forName(classOf[Driver].getName)
+  Class.forName(classOf[org.bitlap.Driver].getName)
 
   implicit final class DataFrameOps(val dataFrame: DataFrame) extends AnyVal {
     def liftDataFrameWriter: Task[DataFrameWriter[Row]] =

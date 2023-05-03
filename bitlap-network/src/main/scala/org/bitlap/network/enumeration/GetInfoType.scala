@@ -10,12 +10,12 @@ import org.bitlap.network.driver_proto.*
  */
 sealed abstract class GetInfoType(val value: Int) extends IntEnumEntry
 object GetInfoType extends IntEnum[GetInfoType]:
-  final case object MaxDriverConnections    extends GetInfoType(1)
-  final case object MaxConcurrentActivities extends GetInfoType(10)
-  final case object DataSourceName          extends GetInfoType(20)
-  final case object ServerName              extends GetInfoType(30)
-  final case object DbmsName                extends GetInfoType(40)
-  final case object DbmsVer                 extends GetInfoType(50)
+  case object MaxDriverConnections    extends GetInfoType(1)
+  case object MaxConcurrentActivities extends GetInfoType(10)
+  case object DataSourceName          extends GetInfoType(20)
+  case object ServerName              extends GetInfoType(30)
+  case object DbmsName                extends GetInfoType(40)
+  case object DbmsVer                 extends GetInfoType(50)
 
   val values: IndexedSeq[GetInfoType] = findValues
 

@@ -18,7 +18,7 @@ import org.bitlap.network.NetworkException.SQLExecutedException
  *    梦境迷离
  *  @version 1.0,2023/4/8
  */
-trait HttpEndpoint {
+trait HttpEndpoint:
 
   /** 自定义异常Schema
    */
@@ -68,5 +68,3 @@ trait HttpEndpoint {
       .in("api" / "common" / "status")
       .errorOut(jsonBody[NetworkException])
       .out(stringBody)
-
-}

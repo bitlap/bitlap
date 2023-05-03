@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
+final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionNode])
 
@@ -85,5 +85,3 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
 
   def addLeaderStateListener(listener: => LeaderStateListener): Unit =
     this.listeners.add(listener)
-
-}

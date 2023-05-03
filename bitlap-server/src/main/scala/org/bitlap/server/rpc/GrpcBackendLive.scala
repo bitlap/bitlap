@@ -19,12 +19,12 @@ import org.bitlap.network.enumeration.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcBackendLive {
+object GrpcBackendLive:
   private[server] lazy val liveInstance: GrpcBackendLive = new GrpcBackendLive
   lazy val live: ULayer[DriverAsyncRpc]                  = ZLayer.succeed(liveInstance)
-}
+end GrpcBackendLive
 
-final class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
+final class GrpcBackendLive extends DriverAsyncRpc with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
@@ -129,5 +129,3 @@ final class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
     SessionManager
       .getInfo(sessionHandle, getInfoType)
       .provide(SessionManager.live)
-
-}

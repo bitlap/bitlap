@@ -12,7 +12,9 @@ import java.util.logging.Logger
 abstract class BitlapDriver extends Driver:
 
   override def connect(url: String, info: Properties): Connection =
-    try new BitlapConnection(url, info)
+    try
+      if acceptsURL(url) then new BitlapConnection(url, info)
+      else throw BitlapSQLException(s"Invalid bitlap jdbc url: $url")
     catch case ex: Exception => throw BitlapSQLException(ex.toString)
 
   /** Checks whether a given url is in a valid format.

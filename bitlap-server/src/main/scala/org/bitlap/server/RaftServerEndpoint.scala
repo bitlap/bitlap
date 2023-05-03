@@ -13,7 +13,7 @@ import zio.{ Runtime as _, * }
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-object RaftServerEndpoint {
+object RaftServerEndpoint:
 
   lazy val live: ZLayer[BitlapRaftConfig, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapRaftConfig) => new RaftServerEndpoint(conf))
@@ -26,8 +26,9 @@ object RaftServerEndpoint {
       _    <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Raft Server was interrupted").ignore)
-}
-final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
+end RaftServerEndpoint
+
+final class RaftServerEndpoint(raftConfig: BitlapRaftConfig):
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
@@ -62,4 +63,3 @@ final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
     while node.node == null do Thread.sleep(1000)
     node.node
   }
-}

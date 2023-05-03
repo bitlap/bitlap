@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.serde
 
+import org.bitlap.network.NetworkException.DataFormatException
 import org.bitlap.network.enumeration.TypeId
 
 import java.nio.ByteBuffer
@@ -29,8 +30,9 @@ private[network] object BitlapDeserializer:
     case TypeId.DateType      => dateParser
     case TypeId.ByteType      => byteParser
     case TypeId.BooleanType   => booleanParser
+    case _                    => throw DataFormatException(msg = s"Invalid type for typeId:$typeId")
 
-  private final case object intParser extends BitlapDeserializer:
+  private case object intParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.BooleanType => readOnlyByteBuffer.getInt == TRUE
@@ -41,7 +43,7 @@ private[network] object BitlapDeserializer:
         case _                  => readOnlyByteBuffer.getInt
       r.asInstanceOf[T]
 
-  private final case object shortParser extends BitlapDeserializer:
+  private case object shortParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => readOnlyByteBuffer.getShort.toString
@@ -52,14 +54,14 @@ private[network] object BitlapDeserializer:
         case _                 => readOnlyByteBuffer.getShort
       r.asInstanceOf[T]
 
-  private final case object doubleParser extends BitlapDeserializer:
+  private case object doubleParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => readOnlyByteBuffer.getDouble.toString
         case _                 => readOnlyByteBuffer.getDouble
       r.asInstanceOf[T]
 
-  private final case object longParser extends BitlapDeserializer:
+  private case object longParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => readOnlyByteBuffer.getLong.toString
@@ -68,7 +70,7 @@ private[network] object BitlapDeserializer:
 
       r.asInstanceOf[T]
 
-  private final case object booleanParser extends BitlapDeserializer:
+  private case object booleanParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => (readOnlyByteBuffer.get() == TRUE).toString
@@ -79,7 +81,7 @@ private[network] object BitlapDeserializer:
 
       r.asInstanceOf[T]
 
-  private final case object floatParser extends BitlapDeserializer:
+  private case object floatParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => readOnlyByteBuffer.getFloat.toString
@@ -88,7 +90,7 @@ private[network] object BitlapDeserializer:
 
       r.asInstanceOf[T]
 
-  private final case object timeParser extends BitlapDeserializer:
+  private case object timeParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => new Time(readOnlyByteBuffer.getLong).toString
@@ -97,7 +99,7 @@ private[network] object BitlapDeserializer:
 
       r.asInstanceOf[T]
 
-  private final case object dateParser extends BitlapDeserializer:
+  private case object dateParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => new Date(readOnlyByteBuffer.getLong).toString
@@ -105,7 +107,7 @@ private[network] object BitlapDeserializer:
         case _                 => new Date(readOnlyByteBuffer.getLong)
       r.asInstanceOf[T]
 
-  private final case object timestampParser extends BitlapDeserializer:
+  private case object timestampParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => new Timestamp(readOnlyByteBuffer.getLong).toString
@@ -114,7 +116,7 @@ private[network] object BitlapDeserializer:
 
       r.asInstanceOf[T]
 
-  private final case object byteParser extends BitlapDeserializer:
+  private case object byteParser extends BitlapDeserializer:
     override def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T =
       val r = targetType match
         case TypeId.StringType => readOnlyByteBuffer.get().toString

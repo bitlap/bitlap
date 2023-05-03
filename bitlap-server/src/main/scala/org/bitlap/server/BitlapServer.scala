@@ -5,18 +5,17 @@ import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
 import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
 import org.bitlap.server.session.SessionManager
-import zio.*
+import zio.{ Duration as ZDuration, * }
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.Duration
-import zio.Duration as ZDuration
+import scala.concurrent.duration.*
 
 /** bitlap 聚合服务
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
  */
-object BitlapServer extends zio.ZIOAppDefault {
+object BitlapServer extends zio.ZIOAppDefault:
 
   // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
@@ -27,7 +26,7 @@ object BitlapServer extends zio.ZIOAppDefault {
       t3   <- HttpServerEndpoint.service(args.toList).fork
       _ <- SessionManager
         .startListener()
-        .repeat(Schedule.fixed(ZDuration.fromScala(Duration(3000, TimeUnit.MILLISECONDS))))
+        .repeat(Schedule.fixed(ZDuration.fromScala(3.seconds)))
         .forkDaemon
       _ <- Console.printLine("""
                       |    __    _ __  __
@@ -60,4 +59,3 @@ object BitlapServer extends zio.ZIOAppDefault {
       .onTermination(_ => Console.printLine(s"Bitlap Server shutdown now").ignore)
       .onExit(_ => Console.printLine(s"Bitlap Server stopped").ignore)
       .onInterrupt(_ => Console.printLine(s"Bitlap Server was interrupted").ignore)
-}

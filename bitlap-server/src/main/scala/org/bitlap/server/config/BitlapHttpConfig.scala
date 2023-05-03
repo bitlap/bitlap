@@ -10,10 +10,9 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2023/3/11
  */
-final case class BitlapHttpConfig(port: Int)
+final case class BitlapHttpConfig(port: Int, threads: Int)
 
-object BitlapHttpConfig {
-  private val httpPort = BitlapContext.globalConf.get(BitlapConf.HTTP_SERVER_ADDRESS).asServerAddress.port
-  lazy val live: ULayer[BitlapHttpConfig] = ZLayer.succeed(BitlapHttpConfig(httpPort))
-
-}
+object BitlapHttpConfig:
+  private val httpPort    = BitlapContext.globalConf.get(BitlapConf.HTTP_SERVER_ADDRESS).asServerAddress.port
+  private val httpThreads = BitlapContext.globalConf.get(BitlapConf.HTTP_THREADS)
+  lazy val live: ULayer[BitlapHttpConfig] = ZLayer.succeed(BitlapHttpConfig(httpPort, httpThreads))

@@ -17,11 +17,12 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcServiceLive {
+object GrpcServiceLive:
   lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
     ZLayer.fromFunction((rpc: DriverAsyncRpc) => new GrpcServiceLive(rpc))
-}
-final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any] {
+end GrpcServiceLive
+
+final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any]:
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   override def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
@@ -152,4 +153,3 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
         _.getInfo(new SessionHandle(request.getSessionHandle), GetInfoType.toGetInfoType(request.infoType))
       )
       .mapBoth(errorApplyFunc, _.toBGetInfoResp)
-}

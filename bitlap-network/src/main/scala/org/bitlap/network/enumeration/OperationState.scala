@@ -16,15 +16,15 @@ import izumi.reflect.dottyreflection.*
 sealed abstract class OperationState(val value: Int, val terminal: Boolean) extends IntEnumEntry
 object OperationState extends IntEnum[OperationState]:
 
-  final case object UnknownState     extends OperationState(0, false)
-  final case object InitializedState extends OperationState(1, false)
-  final case object RunningState     extends OperationState(2, false)
-  final case object FinishedState    extends OperationState(3, true)
-  final case object CanceledState    extends OperationState(4, true)
-  final case object ClosedState      extends OperationState(5, true)
-  final case object ErrorState       extends OperationState(6, true)
-  final case object PendingState     extends OperationState(7, false)
-  final case object TimeoutState     extends OperationState(8, true)
+  case object UnknownState     extends OperationState(0, false)
+  case object InitializedState extends OperationState(1, false)
+  case object RunningState     extends OperationState(2, false)
+  case object FinishedState    extends OperationState(3, true)
+  case object CanceledState    extends OperationState(4, true)
+  case object ClosedState      extends OperationState(5, true)
+  case object ErrorState       extends OperationState(6, true)
+  case object PendingState     extends OperationState(7, false)
+  case object TimeoutState     extends OperationState(8, true)
 
   val values: IndexedSeq[OperationState] = findValues
 

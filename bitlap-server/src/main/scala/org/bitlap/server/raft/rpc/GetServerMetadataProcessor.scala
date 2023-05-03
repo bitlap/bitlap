@@ -20,7 +20,7 @@ class GetServerMetadataProcessor(executor: Executor = null)
     extends RpcProcessor[GetServerAddressReq](
       executor,
       GetServerAddressResp.getDefaultInstance
-    ) {
+    ):
 
   override def processRequest(request: GetServerAddressReq, done: RpcRequestClosure): Message = {
     val host    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
@@ -34,4 +34,3 @@ class GetServerMetadataProcessor(executor: Executor = null)
     GetServerAddressResp.newBuilder().setIp("").setPort(0).build()
 
   override def interest(): String = classOf[GetServerAddressReq].getName
-}

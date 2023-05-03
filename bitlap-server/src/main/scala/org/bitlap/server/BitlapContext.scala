@@ -21,7 +21,7 @@ import javax.annotation.Nullable
  *    梦境迷离
  *  @version 1.0,2022/10/31
  */
-object BitlapContext {
+object BitlapContext:
 
   lazy val globalConf = new BitlapConf()
 
@@ -112,5 +112,3 @@ object BitlapContext {
         }
       }
     } yield server).provideLayer(BitlapRaftConfig.live)
-
-}

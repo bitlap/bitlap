@@ -12,8 +12,6 @@ import zio.*
  */
 final case class BitlapGrpcConfig(port: Int)
 
-object BitlapGrpcConfig {
+object BitlapGrpcConfig:
   private val grpcPort                    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).asServerAddress.port
   lazy val live: ULayer[BitlapGrpcConfig] = ZLayer.succeed(BitlapGrpcConfig(grpcPort))
-
-}

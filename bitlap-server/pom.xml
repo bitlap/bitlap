@@ -31,7 +31,7 @@
         <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio-http_${scala.binary.version}</artifactId>
-            <version>0.0.5</version>
+            <version>${ziohttp.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -57,22 +57,22 @@
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
             <artifactId>tapir-zio-http-server_${scala.binary.version}</artifactId>
-            <version>1.3.0</version>
+            <version>${tapir.version}</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
             <artifactId>tapir-json-circe_${scala.binary.version}</artifactId>
-            <version>1.3.0</version>
+            <version>${tapir.version}</version>
         </dependency>
         <dependency>
             <groupId>com.softwaremill.sttp.tapir</groupId>
             <artifactId>tapir-swagger-ui-bundle_${scala.binary.version}</artifactId>
-            <version>1.3.0</version>
+            <version>${tapir.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
             <artifactId>circe-generic_${scala.binary.version}</artifactId>
-            <version>0.14.5</version>
+            <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

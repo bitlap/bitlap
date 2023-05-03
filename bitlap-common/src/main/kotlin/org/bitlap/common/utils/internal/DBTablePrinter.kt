@@ -140,7 +140,7 @@ object DBTablePrinter {
             }
             rowCount++
         }
-        return DBTable(tableNames, rowCount, columns)
+        return DBTable(tableNames, if (tableNames.isEmpty() && columns.isEmpty()) 0 else rowCount, columns)
     }
 
     @JvmStatic

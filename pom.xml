@@ -86,7 +86,7 @@
         <scala.binary.version>3</scala.binary.version>
         <rolls.version>0.2.7</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
-        <circe.version>0.14.3</circe.version>
+        <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
         <zio.version>2.0.12</zio.version>
         <zio.grpc.version>0.6.0-test4</zio.grpc.version>

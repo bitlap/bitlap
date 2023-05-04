@@ -6,7 +6,7 @@ package org.bitlap.server.raft
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-trait LeaderStateListener {
+trait LeaderStateListener:
 
   /** Called when current node becomes leader
    */
@@ -15,5 +15,3 @@ trait LeaderStateListener {
   /** Called when current node loses leadership.
    */
   def onLeaderStop(leaderTerm: Long): Unit
-
-}

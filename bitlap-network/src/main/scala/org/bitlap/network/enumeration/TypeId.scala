@@ -1,8 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values._
-import org.bitlap.network.driver_proto._
+import enumeratum.values.*
+import org.bitlap.network.driver_proto.*
 
 import java.sql.Types
 
@@ -12,19 +12,19 @@ import java.sql.Types
  */
 sealed abstract class TypeId(val value: Int, val name: String) extends IntEnumEntry
 
-object TypeId extends IntEnum[TypeId] {
-  final case object Unspecified   extends TypeId(0, "Any")
-  final case object StringType    extends TypeId(1, "String")
-  final case object IntType       extends TypeId(2, "Int")
-  final case object DoubleType    extends TypeId(3, "Double")
-  final case object LongType      extends TypeId(4, "Long")
-  final case object BooleanType   extends TypeId(5, "Boolean")
-  final case object TimestampType extends TypeId(6, "Timestamp")
-  final case object ShortType     extends TypeId(7, "Short")
-  final case object ByteType      extends TypeId(8, "Byte")
-  final case object FloatType     extends TypeId(9, "Float")
-  final case object TimeType      extends TypeId(10, "Time")
-  final case object DateType      extends TypeId(11, "Date")
+object TypeId extends IntEnum[TypeId]:
+  case object Unspecified   extends TypeId(0, "Any")
+  case object StringType    extends TypeId(1, "String")
+  case object IntType       extends TypeId(2, "Int")
+  case object DoubleType    extends TypeId(3, "Double")
+  case object LongType      extends TypeId(4, "Long")
+  case object BooleanType   extends TypeId(5, "Boolean")
+  case object TimestampType extends TypeId(6, "Timestamp")
+  case object ShortType     extends TypeId(7, "Short")
+  case object ByteType      extends TypeId(8, "Byte")
+  case object FloatType     extends TypeId(9, "Float")
+  case object TimeType      extends TypeId(10, "Time")
+  case object DateType      extends TypeId(11, "Date")
 
   val values: IndexedSeq[TypeId] = findValues
   def toTypeId(bTypeId: BTypeId): TypeId =
@@ -47,5 +47,3 @@ object TypeId extends IntEnum[TypeId] {
   )
 
   def bitlap2Jdbc: Map[TypeId, Int] = jdbc2Bitlap.map(kv => kv._2 -> kv._1)
-
-}

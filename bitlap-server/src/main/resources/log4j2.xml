@@ -6,7 +6,7 @@
             <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
         </Console>
 
-        <RollingFile name="RollingFile" filename="log/bitlap-server.log"
+        <RollingFile name="RollingFile" filename="logs/bitlap-server.log"
                      filepattern="log/%d{YYYYMMddHHmmss}-bitlap-server.log">
             <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
             <Policies>

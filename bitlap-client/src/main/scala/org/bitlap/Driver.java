@@ -3,10 +3,12 @@ package org.bitlap;
 import org.bitlap.jdbc.BitlapDriver;
 
 /**
- * bitlap 驱动。加载驱动时必须使用此类。
+ * @author 梦境迷离
+ * @version 1.0, 2023/5/3
  */
 public class Driver extends BitlapDriver {
+    
     static {
-        new Driver().register();
+        new org.bitlap.Driver().register();
     }
 }

@@ -5,16 +5,14 @@ import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.InputSplit
 import org.apache.spark.sql.connector.read.InputPartition
 
-import java.io._
+import java.io.*
 import org.apache.spark.SerializableWritable
 
 /** @since 2022/10/16
  *  @author
  *    梦境迷离
  */
-final class BitlapInputPartition(
-  bitlapInputSplit: BitlapInputSplit
-) extends InputPartition {
+final class BitlapInputPartition(bitlapInputSplit: BitlapInputSplit) extends InputPartition {
 
   lazy val bitlapWritableInputSplit: SerializableWritable[BitlapInputSplit] =
     new SerializableWritable[BitlapInputSplit](bitlapInputSplit)

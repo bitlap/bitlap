@@ -17,5 +17,4 @@ final case class ElectionNodeOptions(
   // ip:port,ip:port,ip:port
   initialServerAddressList: String,
   // raft node options
-  nodeOptions: NodeOptions
-)
+  nodeOptions: NodeOptions)

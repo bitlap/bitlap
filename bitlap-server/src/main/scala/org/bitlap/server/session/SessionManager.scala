@@ -6,13 +6,13 @@ import org.bitlap.common.BitlapConf
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
-import org.bitlap.network.handles._
+import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
-import zio.{ System => _, ZIO, _ }
+import zio.{ System as _, ZIO, * }
 import java.util.Date
-import java.util.concurrent._
-import scala.collection._
+import java.util.concurrent.*
+import scala.collection.*
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
@@ -45,7 +45,7 @@ object SessionManager extends LazyLogging {
     val current = System.currentTimeMillis
     ZIO
       .foreach(sessionStore.values().asScala) { session =>
-        if (session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout)) {
+        if session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout) then {
           val handle = session.sessionHandle
           logger.warn(
             s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
@@ -81,7 +81,7 @@ object SessionManager extends LazyLogging {
 
 }
 final class SessionManager extends LazyLogging {
-  import SessionManager._
+  import SessionManager.*
 
   def openSession(
     username: String,
@@ -108,9 +108,9 @@ final class SessionManager extends LazyLogging {
       sessionStore.remove(sessionHandle)
     }
     val closedOps = new ListBuffer[OperationHandle]()
-    for (opHandle <- opHandleSet) {
+    for opHandle <- opHandleSet do {
       val op = operationStore.getOrElse(opHandle, null)
-      if (op != null) {
+      if op != null then {
         op.setState(OperationState.ClosedState)
         operationStore.remove(opHandle)
       }
@@ -129,7 +129,7 @@ final class SessionManager extends LazyLogging {
       val session: Session = SessionManager.sessionAddLock.synchronized {
         sessionStore.get(sessionHandle)
       }
-      if (session == null) {
+      if session == null then {
         throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
       refreshSession(sessionHandle, session)
@@ -142,7 +142,7 @@ final class SessionManager extends LazyLogging {
       val session: Session = SessionManager.sessionAddLock.synchronized {
         sessionStore.get(sessionHandle)
       }
-      if (session == null) {
+      if session == null then {
         throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
       refreshSession(sessionHandle, session)
@@ -153,7 +153,7 @@ final class SessionManager extends LazyLogging {
   def getOperation(operationHandle: OperationHandle): Task[Operation] = ZIO.attemptBlocking {
     this.synchronized {
       val op = operationStore.getOrElse(operationHandle, null)
-      if (op == null) {
+      if op == null then {
         throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
       } else {
         refreshSession(op.parentSession.sessionHandle, op.parentSession)
@@ -171,8 +171,8 @@ final class SessionManager extends LazyLogging {
 
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
     SessionManager.sessionAddLock.synchronized {
-      session.lastAccessTime = System.currentTimeMillis()
-      if (sessionStore.containsKey(sessionHandle)) {
+      session.asInstanceOf[MemorySession]._lastAccessTime = System.currentTimeMillis()
+      if sessionStore.containsKey(sessionHandle) then {
         sessionStore.put(sessionHandle, session)
       } else {
         throw InternalException(s"Invalid SessionHandle: $sessionHandle")

@@ -2,9 +2,9 @@
 package org.bitlap.cli.interactive
 
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
-import sqlline._
+import sqlline.*
 
-import java.util.{ Collection => JCollection }
+import java.util.Collection as JCollection
 
 final class BitlapSqlApplication extends Application {
 

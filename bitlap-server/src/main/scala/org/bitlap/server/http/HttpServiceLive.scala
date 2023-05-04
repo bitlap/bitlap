@@ -3,9 +3,9 @@ package org.bitlap.server.http
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.utils.internal.DBTablePrinter
-import zio._
+import zio.*
 
-import java.sql._
+import java.sql.*
 import java.util.Properties
 
 /** HTTP 具体逻辑实现
@@ -13,10 +13,11 @@ import java.util.Properties
  *    梦境迷离
  *  @version 1.0,2023/3/13
  */
-object HttpServiceLive {
+object HttpServiceLive:
   lazy val live: ULayer[HttpServiceLive] = ZLayer.succeed(new HttpServiceLive)
-}
-final class HttpServiceLive extends LazyLogging {
+end HttpServiceLive
+
+final class HttpServiceLive extends LazyLogging:
 
   Class.forName(classOf[org.bitlap.Driver].getName)
 
@@ -48,5 +49,3 @@ final class HttpServiceLive extends LazyLogging {
       conn.close()
     }
   }
-
-}

@@ -1,11 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.common.jdbc._
-import org.bitlap.testkit.server._
-import org.junit._
+import org.bitlap.testkit.server.*
+import org.junit.*
+import bitlap.rolls.core.jdbc.*
 
-import java.sql._
+import java.sql.*
 
 class ServerSpec extends CSVUtils {
 
@@ -47,16 +47,16 @@ class ServerSpec extends CSVUtils {
        where _time >= 0
        group by _time
        """
-    val ret1 = Extractor[GenericRow4[Long, Double, Double, Long]].from(rs)
+    val ret1 = ResultSetX[TypeRow4[Long, Double, Double, Long]](rs).fetch()
     assert(ret1.nonEmpty)
 
     sql"create database if not exists $database"
     sql"use $database"
 
-    val showResult = Extractor[GenericRow1[String]].from(sql"show current_database")
+    val showResult = ResultSetX[TypeRow1[String]](sql"show current_database").fetch()
     println(database)
-    println(showResult.map(_.col1))
-    assert(showResult.nonEmpty && showResult.exists(_.col1 == database))
+    println(showResult.map(_.values))
+    assert(showResult.nonEmpty && showResult.exists(_.values.contains(database)))
   }
 
 }

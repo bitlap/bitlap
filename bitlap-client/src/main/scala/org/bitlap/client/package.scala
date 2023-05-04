@@ -17,7 +17,7 @@ package object client {
   implicit final class StringOpsForClient(val serverUri: String) extends AnyVal {
     def asServerAddress: ServerAddress = {
       val as =
-        if (serverUri.contains(Separator)) serverUri.split(Separator).toList
+        if serverUri.contains(Separator) then serverUri.split(Separator).toList
         else List(serverUri, Constants.DEFAULT_PORT)
       ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
     }

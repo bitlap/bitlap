@@ -1,8 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
 
 /** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC[[org.bitlap.network.DriverAsyncRpc]]，不应自己实现
  *
@@ -10,7 +10,8 @@ import org.bitlap.network.models._
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait DriverSyncRpc extends DriverRpc[Identity] { self =>
+trait DriverSyncRpc extends DriverRpc[Identity]:
+  self =>
 
   def pure[A](a: A): Identity[A] = a
 
@@ -44,4 +45,3 @@ trait DriverSyncRpc extends DriverRpc[Identity] { self =>
   def cancelOperation(opHandle: OperationHandle): Identity[Unit]
 
   def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus]
-}

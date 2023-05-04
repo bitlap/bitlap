@@ -16,10 +16,10 @@ import scala.jdk.CollectionConverters.IterableHasAsJava
 object QueryUtil {
 
   def constructUpsertStatement(tableName: String, columns: List[String]): String = {
-    if (columns.isEmpty) throw new IllegalArgumentException("At least one column must be provided for upserts")
+    if columns.isEmpty then throw new IllegalArgumentException("At least one column must be provided for upserts")
     val parameterList = ListBuffer[String]()
     var i             = 0
-    while (i < columns.size) {
+    while i < columns.size do {
       parameterList.append("?")
 
       i += 1

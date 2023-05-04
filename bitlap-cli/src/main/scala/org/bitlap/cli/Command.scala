@@ -15,8 +15,8 @@ object Command {
     server: String,
     user: String,
     password: String,
-    args: List[String]
-  ) extends Command
+    args: List[String])
+      extends Command
 
   final case class Server(operate: String) extends Command
 

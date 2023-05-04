@@ -3,7 +3,7 @@ package org.bitlap.testkit
 import com.github.javafaker.Faker
 
 import java.util.concurrent.TimeUnit
-import java.util.{ List => _, _ }
+import java.util.{ List as _, * }
 import java.text.SimpleDateFormat
 
 /** bitlap 假数据创建工具

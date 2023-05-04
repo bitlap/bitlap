@@ -2,15 +2,15 @@
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
-import org.bitlap.network.handles._
+import org.bitlap.network.handles.*
 
-import java.sql._
+import java.sql.*
 import java.util.concurrent.Executor
-import java.util.{ List => _, Properties }
-import java.{ util, _ }
+import java.util.{ List as _, Properties }
+import java.{ util, * }
 import scala.collection.immutable.ListMap
-import scala.jdk.CollectionConverters._
-import scala.util.control.Breaks._
+import scala.jdk.CollectionConverters.*
+import scala.util.control.Breaks.*
 
 /** bitlap Connection
  *
@@ -20,7 +20,7 @@ import scala.util.control.Breaks._
  *  @version 1.0
  */
 class BitlapConnection(uri: String, info: Properties) extends Connection {
-  import Constants._
+  import Constants.*
 
   private var session: SessionHandle               = _
   private var closed                               = true
@@ -39,22 +39,22 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     bitlapConfs = connParams.bitlapConfs
     sessionVars = sessionVars ++ ListMap(Constants.DBNAME_PROPERTY_KEY -> connParams.dbName)
 
-    for (kv <- info.entrySet.asScala)
+    for kv <- info.entrySet.asScala do
       kv.getKey match {
         case key: String =>
-          if (key.startsWith(BITLAP_CONF_PREFIX))
+          if key.startsWith(BITLAP_CONF_PREFIX) then
             bitlapConfs = bitlapConfs ++ ListMap(key.substring(BITLAP_CONF_PREFIX.length) -> info.getProperty(key))
         case _ =>
       }
 
-    if (info.containsKey(JdbcConnectionParams.AUTH_USER)) {
+    if info.containsKey(JdbcConnectionParams.AUTH_USER) then {
       sessionVars =
         sessionVars ++ ListMap(JdbcConnectionParams.AUTH_USER -> info.getProperty(JdbcConnectionParams.AUTH_USER))
-      if (info.containsKey(JdbcConnectionParams.AUTH_PASSWD))
+      if info.containsKey(JdbcConnectionParams.AUTH_PASSWD) then
         sessionVars =
           sessionVars ++ ListMap(JdbcConnectionParams.AUTH_PASSWD -> info.getProperty(JdbcConnectionParams.AUTH_PASSWD))
     }
-    if (info.containsKey(JdbcConnectionParams.AUTH_TYPE))
+    if info.containsKey(JdbcConnectionParams.AUTH_TYPE) then
       sessionVars =
         sessionVars ++ ListMap(JdbcConnectionParams.AUTH_TYPE -> info.getProperty(JdbcConnectionParams.AUTH_TYPE))
 
@@ -68,7 +68,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     var numRetries    = 0
     val retryInterval = 1000L
     breakable {
-      while (numRetries < maxRetries)
+      while numRetries < maxRetries do
         try {
           client = new BitlapClient(connParams.authorityList, bitlapConfs ++ sessionVars)
           session = client.openSession()
@@ -84,7 +84,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
             catch {
               case _: Exception =>
             }
-            if (numRetries >= maxRetries)
+            if numRetries >= maxRetries then
               throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = Option(e))
             else {
               System.err.println(
@@ -100,38 +100,40 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   }
 
   private def checkConnection(action: String): Unit =
-    if (closed) throw BitlapSQLException(s"Cannot $action after connection has been closed")
+    if closed then throw BitlapSQLException(s"Cannot $action after connection has been closed")
 
   private def executeInitSql(): Unit =
-    if (initFile != null && session != null) try {
-      val st = new BitlapStatement(this, session, client)
+    if initFile != null && session != null then
       try {
-        val sqlList = Utils.parseInitFile(initFile)
-        for (sql <- sqlList) {
-          println(s"Executing InitSql ... $sql")
-          val hasResult = st.execute(sql)
-          if (hasResult) try {
-            val rs = st.getResultSet()
-            try while (rs.next) println(rs.getString(1))
-            catch { case ignore: Exception => }
-            finally if (rs != null) rs.close()
-          } catch { case ignore: Exception => }
-        }
-      } catch {
-        case e: Exception =>
-          throw BitlapSQLException(e.getMessage)
-      } finally if (st != null) st.close()
-    }
+        val st = new BitlapStatement(this, session, client)
+        try {
+          val sqlList = Utils.parseInitFile(initFile)
+          for sql <- sqlList do {
+            println(s"Executing InitSql ... $sql")
+            val hasResult = st.execute(sql)
+            if hasResult then
+              try {
+                val rs = st.getResultSet()
+                try while rs.next do println(rs.getString(1))
+                catch { case ignore: Exception => }
+                finally if rs != null then rs.close()
+              } catch { case ignore: Exception => }
+          }
+        } catch {
+          case e: Exception =>
+            throw BitlapSQLException(e.getMessage)
+        } finally if st != null then st.close()
+      }
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def isWrapperFor(iface: Class[_]): Boolean = throw new SQLFeatureNotSupportedException(
+  override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
 
   override def close(): Unit =
     try
-      if (session != null) {
+      if session != null then {
         client.closeSession(session)
       }
     finally closed = true
@@ -200,11 +202,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def prepareCall(sql: String, resultSetType: Int, resultSetConcurrency: Int): CallableStatement =
     throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getTypeMap: util.Map[String, Class[_]] = throw new SQLFeatureNotSupportedException(
+  override def getTypeMap: util.Map[String, Class[?]] = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
 
-  override def setTypeMap(map: util.Map[String, Class[_]]): Unit = throw new SQLFeatureNotSupportedException(
+  override def setTypeMap(map: util.Map[String, Class[?]]): Unit = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
 
@@ -270,8 +272,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def createSQLXML(): SQLXML = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def isValid(timeout: Int): Boolean = {
-    if (timeout < 0) throw BitlapSQLException("timeout value was negative")
-    if (closed) return false
+    if timeout < 0 then throw BitlapSQLException("timeout value was negative")
+    if closed then return false
     var rc = false
     try {
       new BitlapDatabaseMetaData(this, session, client).getDatabaseProductName
@@ -303,13 +305,13 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def setSchema(schema: String): Unit = {
     // JDK 1.7
     checkConnection("setSchema")
-    if (schema == null || schema.isEmpty) throw BitlapSQLException("Schema name is null or empty")
-    if (schema.contains(";")) throw BitlapSQLException("invalid schema name")
+    if schema == null || schema.isEmpty then throw BitlapSQLException("Schema name is null or empty")
+    if schema.contains(";") then throw BitlapSQLException("invalid schema name")
     var stmt: Statement = null
     try {
       stmt = createStatement()
       stmt.execute("USE " + schema)
-    } finally if (stmt != null) stmt.close()
+    } finally if stmt != null then stmt.close()
   }
 
   override def getSchema: String = {
@@ -319,10 +321,10 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     try {
       stmt = createStatement()
       res = stmt.executeQuery("SHOW CURRENT_DATABASE")
-      if (res == null || !res.next) throw BitlapSQLException("Failed to get schema information")
+      if res == null || !res.next then throw BitlapSQLException("Failed to get schema information")
     } finally {
-      if (res != null) res.close()
-      if (stmt != null) stmt.close()
+      if res != null then res.close()
+      if stmt != null then stmt.close()
     }
     res.getString(1)
   }

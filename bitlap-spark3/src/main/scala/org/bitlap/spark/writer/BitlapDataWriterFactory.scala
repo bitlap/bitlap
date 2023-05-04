@@ -10,10 +10,8 @@ import org.apache.spark.sql.connector.write.DataWriter
  *    梦境迷离
  *  @version 1.0,2022/10/16
  */
-final class BitlapDataWriterFactory(
-  schema: StructType,
-  options: BitlapDataSourceWriteOptions
-) extends DataWriterFactory {
+final class BitlapDataWriterFactory(schema: StructType, options: BitlapDataSourceWriteOptions)
+    extends DataWriterFactory {
 
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] =
     new BitlapDataWriter(schema, options)

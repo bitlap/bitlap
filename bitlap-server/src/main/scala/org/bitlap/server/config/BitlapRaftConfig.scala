@@ -3,7 +3,7 @@ package org.bitlap.server.config
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.server.BitlapContext
-import zio._
+import zio.*
 
 import scala.concurrent.duration.Duration
 
@@ -20,9 +20,9 @@ final case class BitlapRaftConfig(
   // ip:port,ip:port,ip:port
   initialServerAddressList: String,
   // 5s 100ms
-  timeout: Duration
-)
-object BitlapRaftConfig {
+  timeout: Duration)
+
+object BitlapRaftConfig:
 
   lazy val live: ULayer[BitlapRaftConfig] = ZLayer.succeed(
     BitlapRaftConfig(
@@ -33,4 +33,3 @@ object BitlapRaftConfig {
       Duration(BitlapContext.globalConf.get(BitlapConf.RAFT_TIMEOUT))
     )
   )
-}

@@ -1,21 +1,21 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values._
-import org.bitlap.network.driver_proto._
+import enumeratum.values.*
+import org.bitlap.network.driver_proto.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/3/18
  */
 sealed abstract class GetInfoType(val value: Int) extends IntEnumEntry
-object GetInfoType extends IntEnum[GetInfoType] {
-  final case object MaxDriverConnections    extends GetInfoType(1)
-  final case object MaxConcurrentActivities extends GetInfoType(10)
-  final case object DataSourceName          extends GetInfoType(20)
-  final case object ServerName              extends GetInfoType(30)
-  final case object DbmsName                extends GetInfoType(40)
-  final case object DbmsVer                 extends GetInfoType(50)
+object GetInfoType extends IntEnum[GetInfoType]:
+  case object MaxDriverConnections    extends GetInfoType(1)
+  case object MaxConcurrentActivities extends GetInfoType(10)
+  case object DataSourceName          extends GetInfoType(20)
+  case object ServerName              extends GetInfoType(30)
+  case object DbmsName                extends GetInfoType(40)
+  case object DbmsVer                 extends GetInfoType(50)
 
   val values: IndexedSeq[GetInfoType] = findValues
 
@@ -24,5 +24,3 @@ object GetInfoType extends IntEnum[GetInfoType] {
 
   def toBGetInfoType(getInfoType: GetInfoType): BGetInfoType =
     BGetInfoType.fromValue(getInfoType.value)
-
-}

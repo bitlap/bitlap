@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark3
 
-import org.bitlap.spark._
+import org.bitlap.spark.*
 import org.apache.spark.sql.SparkSession
 import zio.ZIO
 

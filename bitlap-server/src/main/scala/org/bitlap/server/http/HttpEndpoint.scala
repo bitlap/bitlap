@@ -1,14 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.http
 
-import io.circe._
-import sttp.tapir._
-import sttp.tapir.generic.auto._
+import io.circe.*
+import sttp.tapir.*
+import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.jsonBody
-import io.circe.generic.auto._
+import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
 import sttp.tapir.Codec.JsonCodec
-import sttp.tapir.json.circe._
+import sttp.tapir.json.circe.*
 import org.bitlap.network.NetworkException
 import org.bitlap.network.NetworkException.SQLExecutedException
 
@@ -18,7 +18,7 @@ import org.bitlap.network.NetworkException.SQLExecutedException
  *    梦境迷离
  *  @version 1.0,2023/4/8
  */
-trait HttpEndpoint {
+trait HttpEndpoint:
 
   /** 自定义异常Schema
    */
@@ -68,5 +68,3 @@ trait HttpEndpoint {
       .in("api" / "common" / "status")
       .errorOut(jsonBody[NetworkException])
       .out(stringBody)
-
-}

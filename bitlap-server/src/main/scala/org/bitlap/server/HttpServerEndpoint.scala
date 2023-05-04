@@ -1,17 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import io.circe.generic.auto._
+import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
 import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.server.config.BitlapHttpConfig
-import org.bitlap.server.http._
+import org.bitlap.server.http.*
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.ztapir._
-import zio._
-import zio.http._
-import zio.http.model._
+import sttp.tapir.ztapir.*
+import zio.*
+import zio.http.*
+import zio.http.codec.*
+import zio.http.netty.NettyConfig
+import zio.http.netty.NettyConfig.LeakDetectionLevel
 
 import java.io.IOException
 import java.sql.DriverManager
@@ -19,26 +21,24 @@ import java.util.Properties
 
 /** bitlap http服务
  *
- *  初始化数据接口: http://localhost:8080/init
+ *  初始化数据接口: http://localhost:18081/init
  *
- *  查询数据接口: http://localhost:8080/sql
- *  @param port
+ *  查询数据接口: http://localhost:18081/sql
  */
-object HttpServerEndpoint {
+object HttpServerEndpoint:
   lazy val live: ZLayer[BitlapHttpConfig with HttpServiceLive, Nothing, HttpServerEndpoint] =
     ZLayer.fromFunction((config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
 
-  def service(args: List[String]): ZIO[HttpServerEndpoint, IOException, Unit] =
-    (for {
-      _ <- ZIO.serviceWithZIO[HttpServerEndpoint](_.httpServer())
-      _ <- Console.printLine(s"HTTP Server started")
-      _ <- ZIO.never
-    } yield ())
-      .onInterrupt(_ => Console.printLine(s"HTTP Server was interrupted").ignore)
-}
-final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) extends HttpEndpoint {
+  def service(args: List[String]): ZIO[HttpServerEndpoint, Nothing, ExitCode] =
+    ZIO.serviceWithZIO[HttpServerEndpoint](_.httpServer())
+
+end HttpServerEndpoint
+
+final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
+
+  Class.forName(classOf[org.bitlap.Driver].getCanonicalName)
 
   private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
     val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
@@ -60,7 +60,7 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
     ZioHttpInterpreter().toHttp(List(runServerEndpoint, statusServerEndpoint) ++ swaggerEndpoints)
 
   private val indexHtml: http.HttpApp[Any, Throwable] = Http.fromResource(s"static/index.html")
-  private val staticApp: http.HttpApp[Any, Throwable] = Http.collectRoute[Request] {
+  private val staticApp: http.HttpApp[Any, Throwable] = Http.collectHttp[Request] {
     case Method.GET -> !! / "init" =>
       // 使用初始化时，开启这个
       val properties = new Properties()
@@ -77,13 +77,21 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
       indexHtml
   }
 
-  def httpServer(): URIO[Any, ExitCode] =
-    Server
-      .serve(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
+  def httpServer(): ZIO[Any, Nothing, ExitCode] =
+    (Server
+      .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
+      .flatMap(port => Console.printLine(s"HTTP Server started at port:$port")) *> ZIO.never)
       .provide(
-        ServerConfig.live(ServerConfig.default.port(config.port)),
-        Server.live
+        ZLayer.succeed(
+          Server.Config.default
+            .port(config.port)
+        ),
+        ZLayer.succeed(
+          NettyConfig.default
+            .leakDetection(LeakDetectionLevel.PARANOID)
+            .maxThreads(config.threads)
+        ),
+        Server.customized
       )
       .exitCode
-
-}
+      .onInterrupt(_ => Console.printLine(s"HTTP Server was interrupted").ignore)

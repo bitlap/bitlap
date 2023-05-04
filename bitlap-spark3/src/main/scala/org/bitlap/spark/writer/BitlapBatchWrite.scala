@@ -1,16 +1,13 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.writer
 
-import org.apache.spark.sql.connector.write._
+import org.apache.spark.sql.connector.write.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/10/16
  */
-final class BitlapBatchWrite(
-  writeInfo: LogicalWriteInfo,
-  options: Map[String, String]
-) extends BatchWrite {
+final class BitlapBatchWrite(writeInfo: LogicalWriteInfo, options: Map[String, String]) extends BatchWrite {
 
   private lazy val bitlapOptions: BitlapDataSourceWriteOptions = new BitlapDataSourceWriteOptions(
     tableName = options.getOrElse("table", null),

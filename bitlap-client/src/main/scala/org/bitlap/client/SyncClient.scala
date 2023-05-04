@@ -1,10 +1,10 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.network._
+import org.bitlap.network.*
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
 
 /** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端 [[org.bitlap.client.AsyncClient]]
  *

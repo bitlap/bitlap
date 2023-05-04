@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Assertions.assertFalse
  *  @since 2021/11/21
  *  @version 1.0
  */
-class HandleSpec extends TestCase("HandleTests") {
+class HandleSpec extends TestCase("HandleTests"):
 
   @Test
-  def testOperationHandle = {
+  def testOperationHandle =
     val handleId = new handles.HandleIdentifier()
     val op = new handles.OperationHandle(
       OperationType.ExecuteStatement,
@@ -50,10 +50,9 @@ class HandleSpec extends TestCase("HandleTests") {
 
     val h1 = new handles.OperationHandle(op.toBOperationHandle())
     assertTrue(h1 == op)
-  }
 
   @Test
-  def testSessionHandle = {
+  def testSessionHandle =
     val handleId = new HandleIdentifier()
     val op       = new SessionHandle(handleId)
 
@@ -75,10 +74,9 @@ class HandleSpec extends TestCase("HandleTests") {
     )
 
     assertTrue(new SessionHandle(op.toBSessionHandle()) == op)
-  }
 
   @Test
-  def testInnerMethod(): Unit = {
+  def testInnerMethod(): Unit =
     val handleId = new HandleIdentifier()
     val op1      = new SessionHandle(handleId)
     val op2      = new SessionHandle(handleId)
@@ -87,5 +85,3 @@ class HandleSpec extends TestCase("HandleTests") {
     assertTrue(op1.hashCode() == op2.hashCode())
     assertFalse(op1.hashCode() == op3.hashCode())
     assertTrue(op3.toString.contains("handleId"))
-  }
-}

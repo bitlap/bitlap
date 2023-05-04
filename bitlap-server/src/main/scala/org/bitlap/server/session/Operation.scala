@@ -3,11 +3,11 @@ package org.bitlap.server.session
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.network.handles.OperationHandle
-import org.bitlap.network.models._
+import org.bitlap.network.models.*
 import java.util.concurrent.TimeUnit
 
 import scala.collection.mutable
-import org.bitlap.network.enumeration.OperationState._
+import org.bitlap.network.enumeration.OperationState.*
 import java.util.concurrent.CountDownLatch
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.{ OperationState, OperationType }
@@ -19,11 +19,8 @@ import org.bitlap.network.enumeration.{ OperationState, OperationType }
  *  @since 2021/11/20
  *  @version 1.0
  */
-abstract class Operation(
-  val parentSession: Session,
-  val opType: OperationType,
-  val hasResultSet: Boolean = false
-) extends LazyLogging {
+abstract class Operation(val parentSession: Session, val opType: OperationType, val hasResultSet: Boolean = false)
+    extends LazyLogging {
 
   @volatile var state: OperationState = OperationState.InitializedState
   val beginTime                       = System.currentTimeMillis()
@@ -43,9 +40,8 @@ abstract class Operation(
 
   def run(): Unit
 
-  def remove(operationHandle: OperationHandle) {
+  def remove(operationHandle: OperationHandle) =
     cache.remove(operationHandle)
-  }
 
   def getNextResultSet(): RowSet =
     cache.get(opHandle).map(_.rows).getOrElse(RowSet())
@@ -72,7 +68,7 @@ abstract class Operation(
         markOperationCompletedTime()
       case _ =>
     }
-    if (state.terminal) { // Unlock the execution thread as operation is already terminated.
+    if state.terminal then { // Unlock the execution thread as operation is already terminated.
       opTerminateMonitorLatch.countDown()
     }
   }
@@ -93,8 +89,8 @@ abstract class Operation(
   def waitToTerminate(timeOutMs: Long): Boolean = opTerminateMonitorLatch.await(timeOutMs, TimeUnit.MILLISECONDS)
 
   def isTimedOut(current: Long): Boolean = {
-    if (operationTimeout == 0) return false
-    if (operationTimeout > 0) { // check only when it's in terminal state
+    if operationTimeout == 0 then return false
+    if operationTimeout > 0 then { // check only when it's in terminal state
       return state.terminal && lastAccessTime + operationTimeout <= current
     }
     lastAccessTime + -operationTimeout <= current

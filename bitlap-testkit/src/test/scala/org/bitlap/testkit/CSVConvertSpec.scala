@@ -15,10 +15,10 @@ import java.io.File
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-class CsvConvertSpec extends CSVUtils {
+class CSVConvertSpec extends CSVUtils {
 
   @Test
-  def testCsvConvert1 {
+  def testCsvConvert1() = {
     val csv = readCsvData("simple_data.csv")
     println(csv.headOption)
     assertEquals(
@@ -33,7 +33,7 @@ class CsvConvertSpec extends CSVUtils {
   }
 
   @Test
-  def testMockZioRpcBackend1 {
+  def testMockZioRpcBackend1() = {
     val backend = new MockAsyncRpcBackend()
     val ret     = backend.fetchResults(new OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>

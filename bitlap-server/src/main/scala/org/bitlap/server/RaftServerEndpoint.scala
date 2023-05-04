@@ -4,16 +4,16 @@ package org.bitlap.server
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
 import org.bitlap.server.config.BitlapRaftConfig
-import org.bitlap.server.raft._
+import org.bitlap.server.raft.*
 import org.slf4j.LoggerFactory
-import zio.{ Runtime => _, _ }
+import zio.{ Runtime as _, * }
 
 /** bitlap raft cluster和rpc服务
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-object RaftServerEndpoint {
+object RaftServerEndpoint:
 
   lazy val live: ZLayer[BitlapRaftConfig, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapRaftConfig) => new RaftServerEndpoint(conf))
@@ -26,8 +26,9 @@ object RaftServerEndpoint {
       _    <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Raft Server was interrupted").ignore)
-}
-final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
+end RaftServerEndpoint
+
+final class RaftServerEndpoint(raftConfig: BitlapRaftConfig):
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
@@ -59,8 +60,6 @@ final class RaftServerEndpoint(raftConfig: BitlapRaftConfig) {
 
     node.init(electionOpts)
 
-    while (node.node == null)
-      Thread.sleep(1000)
+    while node.node == null do Thread.sleep(1000)
     node.node
   }
-}

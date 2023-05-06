@@ -31,7 +31,7 @@
         <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio-http_${scala.binary.version}</artifactId>
-            <version>${ziohttp.version}</version>
+            <version>${zio.http.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>

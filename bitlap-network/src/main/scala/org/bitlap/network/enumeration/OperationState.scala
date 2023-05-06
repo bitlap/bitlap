@@ -34,9 +34,10 @@ object OperationState extends IntEnum[OperationState]:
   def toBOperationState(operationState: OperationState): BOperationState =
     BOperationState.fromValue(operationState.value)
 
-  implicit final class ValidateTransition(val state: OperationState) extends AnyVal:
+  extension (state: OperationState)
     def validateTransition(newState: OperationState): Unit =
       validate(state, newState)
+  end extension
 
   def validate(oldState: OperationState, newState: OperationState): Unit =
     oldState match

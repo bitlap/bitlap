@@ -9,6 +9,7 @@ import org.bitlap.common.schema.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.server.BitlapContext
 import java.util.concurrent.Executor
+import org.bitlap.server.config.BitlapServerConfiguration
 
 /** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.rpc.GrpcServiceLive.getLeader()]]使用
  *
@@ -23,7 +24,7 @@ class GetServerMetadataProcessor(executor: Executor = null)
     ):
 
   override def processRequest(request: GetServerAddressReq, done: RpcRequestClosure): Message = {
-    val host    = BitlapContext.globalConf.get(BitlapConf.NODE_BIND_HOST).trim
+    val host    = BitlapServerConfiguration.config.get(BitlapConf.NODE_BIND_HOST).trim
     val address = host.asServerAddress
     val port    = address.port
     val ip      = address.ip

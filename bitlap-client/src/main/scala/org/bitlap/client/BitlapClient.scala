@@ -12,7 +12,7 @@ import org.bitlap.network.models.*
  *  @since 2021/11/21
  *  @version 1.0
  */
-final class BitlapClient(serverPeers: Array[String], props: Map[String, String]) {
+final class BitlapClient(serverPeers: Array[String], props: Map[String, String]):
 
   private lazy val syncClient: SyncClient = new SyncClient(serverPeers, props)
 
@@ -70,4 +70,3 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
     syncClient.getInfo(sessionHandle, getInfoType)
-}

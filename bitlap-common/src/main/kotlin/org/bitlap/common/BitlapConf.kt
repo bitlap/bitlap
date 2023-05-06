@@ -153,7 +153,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
          * timeout in milliseconds
          */
         @JvmField
-        val NODE_RPC_TIMEOUT = BitlapConfKey("bitlap.node.rpc.timeout", 3000L)
+        val RPC_TIMEOUT = BitlapConfKey("bitlap.node.rpc.timeout", 3000L)
             .overWritable(true)
             .validator { it != null && it >= 1000L }
 
@@ -183,5 +183,8 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
 
         @JvmField
         val SESSION_TIMEOUT = BitlapConfKey("bitlap.node.session.timeout", "20m").validator(Validators.NOT_BLANK)
+
+        @JvmField
+        val SESSION_INTERVAL = BitlapConfKey("bitlap.node.session.interval", "3s").validator(Validators.NOT_BLANK)
     }
 }

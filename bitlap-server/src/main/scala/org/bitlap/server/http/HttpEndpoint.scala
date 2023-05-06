@@ -22,12 +22,12 @@ trait HttpEndpoint:
 
   /** 自定义异常Schema
    */
-  implicit val exceptionSchema: Schema[NetworkException] =
+  given Schema[NetworkException] =
     Schema[NetworkException](SchemaType.SProduct(Nil), Some(Schema.SName("NetworkException")))
 
   /** 自定义异常编解码器
    */
-  implicit def exceptionCodec[A <: NetworkException]: JsonCodec[A] =
+  given exceptionCodec[A <: NetworkException]: JsonCodec[A] =
     implicitly[JsonCodec[io.circe.Json]].map(json =>
       json.as[A] match {
         case Left(_)      => throw new RuntimeException("MessageParsingError")
@@ -37,11 +37,11 @@ trait HttpEndpoint:
 
   /** 自定义异常序列化
    */
-  implicit def encodeException[A <: NetworkException]: Encoder[A] = (_: A) => Json.Null
+  given encodeException[A <: NetworkException]: Encoder[A] = (_: A) => Json.Null
 
   /** 自定义异常反序列化
    */
-  implicit def decodeException[A <: NetworkException]: Decoder[A] =
+  given decodeException[A <: NetworkException]: Decoder[A] =
     (c: HCursor) =>
       for {
         msg <- c.get[String]("msg")

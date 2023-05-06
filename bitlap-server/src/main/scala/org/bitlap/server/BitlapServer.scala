@@ -3,7 +3,7 @@ package org.bitlap.server
 
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
-import org.bitlap.server.rpc.{ GrpcBackendLive, GrpcServiceLive }
+import org.bitlap.server.rpc.*
 import org.bitlap.server.session.SessionManager
 import zio.{ Duration as ZDuration, * }
 
@@ -20,13 +20,14 @@ object BitlapServer extends zio.ZIOAppDefault:
   // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
     (for {
-      args <- getArgs
-      t1   <- RaftServerEndpoint.service(args.toList).fork
-      t2   <- GrpcServerEndpoint.service(args.toList).fork
-      t3   <- HttpServerEndpoint.service(args.toList).fork
+      args         <- getArgs
+      t1           <- RaftServerEndpoint.service(args.toList).fork
+      t2           <- GrpcServerEndpoint.service(args.toList).fork
+      t3           <- HttpServerEndpoint.service(args.toList).fork
+      serverConfig <- ZIO.serviceWith[BitlapServerConfiguration](_.sessionConfig)
       _ <- SessionManager
         .startListener()
-        .repeat(Schedule.fixed(ZDuration.fromScala(3.seconds)))
+        .repeat(Schedule.fixed(ZDuration.fromScala(serverConfig.interval)))
         .forkDaemon
       _ <- Console.printLine("""
                       |    __    _ __  __
@@ -42,15 +43,13 @@ object BitlapServer extends zio.ZIOAppDefault:
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
         HttpServerEndpoint.live,
-        BitlapGrpcConfig.live,
-        BitlapHttpConfig.live,
-        BitlapRaftConfig.live,
         HttpServiceLive.live,
         SessionManager.live,
         GrpcBackendLive.live,
         Scope.default,
         ZIOAppArgs.empty,
-        GrpcServiceLive.live
+        GrpcServiceLive.live,
+        BitlapServerConfiguration.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

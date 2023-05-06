@@ -10,7 +10,7 @@ import org.bitlap.common.schema.*
 import org.bitlap.common.utils.UuidUtil
 import org.bitlap.network.NetworkException.*
 import org.bitlap.network.{ DriverAsyncRpc, ServerAddress }
-import org.bitlap.server.config.BitlapRaftConfig
+import org.bitlap.server.config.*
 import zio.*
 
 import java.util.concurrent.atomic.AtomicBoolean
@@ -69,20 +69,16 @@ object BitlapContext:
   @Nullable
   def getLeaderAddress(): ZIO[Any, Throwable, ServerAddress] =
     (for {
-      conf    <- ZIO.serviceWith[BitlapRaftConfig](c => c.initialServerAddressList)
-      groupId <- ZIO.serviceWith[BitlapRaftConfig](c => c.groupId)
-      timeout <- ZIO.serviceWith[BitlapRaftConfig](c => c.timeout)
+      conf       <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.initialServerAddressList)
+      groupId    <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.groupId)
+      timeout    <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.timeout)
+      grpcConfig <- ZIO.serviceWith[BitlapServerConfiguration](c => c.grpcConfig)
       server <- ZIO.attempt {
         if isLeader then {
           if _node == null then {
             throw LeaderNotFoundException("cannot find a raft node instance")
           }
-
-          def grpcServerPort: Int = {
-            val address = globalConf.get(BitlapConf.NODE_BIND_HOST).trim
-            address.asServerAddress.port
-          }
-          Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcServerPort)).orNull
+          Option(_node.getLeaderId).map(l => ServerAddress(l.getIp, grpcConfig.port)).orNull
         } else {
           if cliClientService == null then {
             throw LeaderNotFoundException("cannot find a raft CliClientService instance")
@@ -111,4 +107,4 @@ object BitlapContext:
           else ServerAddress(re.getIp, re.getPort)
         }
       }
-    } yield server).provideLayer(BitlapRaftConfig.live)
+    } yield server).provideLayer(BitlapServerConfiguration.live)

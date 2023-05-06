@@ -14,6 +14,7 @@ import zio.http.*
 import zio.http.codec.*
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
+import org.bitlap.server.config.BitlapServerConfiguration
 
 import java.io.IOException
 import java.sql.DriverManager
@@ -26,8 +27,8 @@ import java.util.Properties
  *  查询数据接口: http://localhost:18081/sql
  */
 object HttpServerEndpoint:
-  lazy val live: ZLayer[BitlapHttpConfig with HttpServiceLive, Nothing, HttpServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) =>
+  lazy val live: ZLayer[BitlapServerConfiguration with HttpServiceLive, Nothing, HttpServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapServerConfiguration, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
 
@@ -36,7 +37,8 @@ object HttpServerEndpoint:
 
 end HttpServerEndpoint
 
-final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
+final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLive: HttpServiceLive)
+    extends HttpEndpoint:
 
   Class.forName(classOf[org.bitlap.Driver].getCanonicalName)
 
@@ -84,12 +86,12 @@ final class HttpServerEndpoint(config: BitlapHttpConfig, httpServiceLive: HttpSe
       .provide(
         ZLayer.succeed(
           Server.Config.default
-            .port(config.port)
+            .port(config.httpConfig.port)
         ),
         ZLayer.succeed(
           NettyConfig.default
             .leakDetection(LeakDetectionLevel.PARANOID)
-            .maxThreads(config.threads)
+            .maxThreads(config.httpConfig.threads)
         ),
         Server.customized
       )

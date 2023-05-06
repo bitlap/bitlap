@@ -14,13 +14,13 @@ class FakeDataUtilSpec extends CSVUtils {
   def testFakeData(): Unit = {
     val s: List[Metric] = FakeDataUtils.randMetrics(50)
     val file            = new File("./simple_data.csv")
-    writeCsvData(file, s)
+    writeCSVData(file, s)
 
-    val ms = readCsvData("./simple_data.csv")
+    val ms = readCSVData("./simple_data.csv")
     assert(s == ms)
 
-    writeCsvData(file, ms)
-    val newMs = readCsvData("./simple_data.csv")
+    writeCSVData(file, ms)
+    val newMs = readCSVData("./simple_data.csv")
     assert(newMs == s)
 
     file.delete()

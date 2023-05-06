@@ -21,7 +21,7 @@ object MockAsyncRpcBackend {
 }
 final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
 
-  val metrics: Seq[Metric] = readCsvData("simple_data.csv")
+  val metrics: Seq[Metric] = readCSVData("simple_data.csv")
 
   override def openSession(
     username: String,

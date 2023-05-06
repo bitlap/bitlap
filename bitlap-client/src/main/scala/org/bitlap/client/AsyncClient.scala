@@ -20,7 +20,7 @@ import zio.*
  *  @since 2021/11/21
  *  @version 1.0, zio 2.0
  */
-final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc {
+final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc:
 
   /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]
    *
@@ -166,4 +166,3 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         .mapBoth(statusApplyFunc, t => GetInfoValue.fromBGetInfoResp(t))
         .provideLayer(l)
     )
-}

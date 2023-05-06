@@ -12,7 +12,7 @@ object GenerateFakeData extends CSVUtils with App {
   def generateFakeData(): Boolean = {
     val s: List[Metric] = FakeDataUtils.randMetrics(50)
     val file            = new File("./bitlap-testkit/src/main/resources/simple_data.csv")
-    writeCsvData(file, s)
+    writeCSVData(file, s)
   }
 
   generateFakeData()

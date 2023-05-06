@@ -15,11 +15,11 @@ import java.io.File
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-class CSVConvertSpec extends CSVUtils {
+class CSVUtilsSpec extends CSVUtils {
 
   @Test
   def testCsvConvert1() = {
-    val csv = readCsvData("simple_data.csv")
+    val csv = readCSVData("simple_data.csv")
     println(csv.headOption)
     assertEquals(
       "Some(Metric(1666195200,14,List(Dimension(os,Windows 8), Dimension(city,西安)),pv,712739626))",
@@ -27,7 +27,7 @@ class CSVConvertSpec extends CSVUtils {
     )
 
     val tmp = new File("simple_data.csv")
-    val ret = writeCsvData(tmp, csv)
+    val ret = writeCSVData(tmp, csv)
     assert(ret)
     tmp.delete()
   }

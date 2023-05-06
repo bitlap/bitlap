@@ -25,7 +25,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   @volatile var state: OperationState = OperationState.InitializedState
   val beginTime                       = System.currentTimeMillis()
   @volatile var lastAccessTime        = beginTime
-  var operationTimeout                = parentSession.sessionConf.get(BitlapConf.NODE_RPC_TIMEOUT)
+  var operationTimeout                = parentSession.sessionConf.get(BitlapConf.RPC_TIMEOUT)
   var statement: String               = _
 
   lazy val opHandle: OperationHandle                = new OperationHandle(opType, hasResultSet)

@@ -39,6 +39,7 @@
             <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
             </plugin>
             <plugin>
                 <groupId>com.github.os72</groupId>

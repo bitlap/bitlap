@@ -39,11 +39,11 @@
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
+            <version>${javafaker.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>rolls-csv_3</artifactId>
+            <artifactId>rolls-csv_${scala.binary.version}</artifactId>
             <version>${rolls.version}</version>
         </dependency>
     </dependencies>

@@ -84,7 +84,7 @@
         <!-- scala -->
         <scala.version>3.2.2</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.2.7</rolls.version>
+        <rolls.version>0.2.8</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
@@ -94,7 +94,8 @@
         <scalapb.version>0.11.13</scalapb.version>
         <jupiter.version>5.9.3</jupiter.version>
         <tapir.version>1.3.0</tapir.version>
-        <ziohttp.version>3.0.0-RC1</ziohttp.version>
+        <zio.http.version>3.0.0-RC1</zio.http.version>
+        <javafaker.version>1.0.2</javafaker.version>
 
         <!-- others -->
         <carbondata.version>2.3.0</carbondata.version>

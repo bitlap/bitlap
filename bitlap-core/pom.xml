@@ -115,6 +115,7 @@
             <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>

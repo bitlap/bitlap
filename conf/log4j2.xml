@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration name="bitlap" status="WARN" monitorInterval="300">
+<Configuration name="bitlap" status="INFO" monitorInterval="300">
 
     <Properties>
         <property name="logDir">logs</property>
         <property name="logFileName">bitlap</property>
-        <property name="logLevel">info</property>
+        <property name="logLevel">INFO</property>
         <property name="logPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
 
         <!-- common log configuration  -->

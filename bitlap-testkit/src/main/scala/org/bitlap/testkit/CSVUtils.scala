@@ -17,7 +17,7 @@ trait CSVUtils {
     override val hasColIndex: Boolean = false
   }
 
-  def readCsvData(file: String): List[Metric] =
+  def readCSVData(file: String): List[Metric] =
     val (metadata, metrics) = CSVUtils.readCSV(
       FileName(this.getClass.getClassLoader.getResource(file).getFile)
     ) { line =>
@@ -28,7 +28,7 @@ trait CSVUtils {
     }
     metrics.toList
 
-  def writeCsvData(file: File, metrics: List[Metric]): Boolean =
+  def writeCSVData(file: File, metrics: List[Metric]): Boolean =
     val status = CSVUtils.writeCSV(file, metrics) { m =>
       m.into
         .withFieldComputed(_.dimensions, dims => StringUtils.asString(dims.map(f => f.key -> f.value).toList))

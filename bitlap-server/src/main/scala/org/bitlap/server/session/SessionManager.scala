@@ -16,6 +16,7 @@ import scala.collection.*
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
+import org.bitlap.server.config.BitlapServerConfiguration
 
 /** bitlap 会话管理器
  *  @author
@@ -23,7 +24,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
  *  @since 2021/11/20
  *  @version 2.0
  */
-object SessionManager extends LazyLogging {
+object SessionManager extends LazyLogging:
 
   private val sessionAddLock: Object = new Object
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
@@ -34,28 +35,29 @@ object SessionManager extends LazyLogging {
   private[session] lazy val operationStore: mutable.HashMap[OperationHandle, Operation] =
     mutable.HashMap[OperationHandle, Operation]()
 
-  private final val sessionTimeout = Duration(BitlapContext.globalConf.get(BitlapConf.SESSION_TIMEOUT)).toMillis
-
   lazy val live: ULayer[SessionManager] = ZLayer.succeed(new SessionManager())
 
   /** 启动会话监听，超时时清空会话，清空会话相关的操作缓存
    */
-  def startListener(): ZIO[SessionManager, Nothing, Unit] = {
+  def startListener(): ZIO[SessionManager & BitlapServerConfiguration, Nothing, Unit] =
     logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
     val current = System.currentTimeMillis
-    ZIO
-      .foreach(sessionStore.values().asScala) { session =>
-        if session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout) then {
-          val handle = session.sessionHandle
-          logger.warn(
-            s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
-          )
-          closeSession(handle)
-        } else ZIO.attempt(session.removeExpiredOperations(opHandleSet.toList))
-      }
-      .ignore <*
-      ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
-  }
+    for {
+      sessionConfig <- ZIO.serviceWith[BitlapServerConfiguration](_.sessionConfig)
+      sessionTimeout = sessionConfig.timeout.toMillis
+      _ <- ZIO
+        .foreach(sessionStore.values().asScala) { session =>
+          if session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout) then {
+            val handle = session.sessionHandle
+            logger.warn(
+              s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
+            )
+            closeSession(handle)
+          } else ZIO.attempt(session.removeExpiredOperations(opHandleSet.toList))
+        }
+        .ignore
+      _ <- ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
+    } yield ()
 
   def openSession(
     username: String,
@@ -79,8 +81,7 @@ object SessionManager extends LazyLogging {
   ): ZIO[SessionManager, Throwable, GetInfoValue] =
     ZIO.serviceWithZIO[SessionManager](sm => sm.getInfo(sessionHandle, getInfoType))
 
-}
-final class SessionManager extends LazyLogging {
+final class SessionManager extends LazyLogging:
   import SessionManager.*
 
   def openSession(
@@ -178,4 +179,6 @@ final class SessionManager extends LazyLogging {
         throw InternalException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
-}
+  end refreshSession
+
+end SessionManager

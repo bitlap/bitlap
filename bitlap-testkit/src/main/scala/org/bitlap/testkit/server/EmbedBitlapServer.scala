@@ -32,12 +32,11 @@ object EmbedBitlapServer extends zio.ZIOAppDefault {
       .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
-        BitlapGrpcConfig.live,
-        BitlapRaftConfig.live,
         Scope.default,
         MockAsyncRpcBackend.live,
         ZIOAppArgs.empty,
-        GrpcServiceLive.live
+        GrpcServiceLive.live,
+        BitlapServerConfiguration.testLive
       )
       .fold(
         e => ZIO.fail(e).exitCode,

@@ -7,6 +7,7 @@ import org.bitlap.server.config.BitlapRaftConfig
 import org.bitlap.server.raft.*
 import org.slf4j.LoggerFactory
 import zio.{ Runtime as _, * }
+import org.bitlap.server.config.BitlapServerConfiguration
 
 /** bitlap raft cluster和rpc服务
  *  @author
@@ -15,8 +16,8 @@ import zio.{ Runtime as _, * }
  */
 object RaftServerEndpoint:
 
-  lazy val live: ZLayer[BitlapRaftConfig, Nothing, RaftServerEndpoint] =
-    ZLayer.fromFunction((conf: BitlapRaftConfig) => new RaftServerEndpoint(conf))
+  lazy val live: ZLayer[BitlapServerConfiguration, Nothing, RaftServerEndpoint] =
+    ZLayer.fromFunction((conf: BitlapServerConfiguration) => new RaftServerEndpoint(conf))
 
   def service(args: List[String]): ZIO[RaftServerEndpoint, Throwable, Unit] =
     (for {
@@ -28,15 +29,15 @@ object RaftServerEndpoint:
       .onInterrupt(_ => Console.printLine(s"Raft Server was interrupted").ignore)
 end RaftServerEndpoint
 
-final class RaftServerEndpoint(raftConfig: BitlapRaftConfig):
+final class RaftServerEndpoint(config: BitlapServerConfiguration):
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
   def runRaft(): Task[Node] = ZIO.attempt {
-    val dataPath       = raftConfig.dataPath
-    val groupId        = raftConfig.groupId
-    val serverIdStr    = raftConfig.serverAddress
-    val initialConfStr = raftConfig.initialServerAddressList
+    val dataPath       = config.raftConfig.dataPath
+    val groupId        = config.raftConfig.groupId
+    val serverIdStr    = config.raftConfig.serverAddress
+    val initialConfStr = config.raftConfig.initialServerAddressList
 
     val electionOpts = ElectionNodeOptions(
       dataPath = dataPath,

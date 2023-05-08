@@ -1,14 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.reader
 
+import java.io.IOException
+import java.sql.*
+
+import org.bitlap.spark.util.SparkJdbcUtil
+
 import org.apache.spark.executor.InputMetrics
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.connector.read.PartitionReader
 import org.apache.spark.sql.types.StructType
-import org.bitlap.spark.util.SparkJdbcUtil
-
-import java.io.IOException
-import java.sql.*
 
 /** @since 2022/10/16
  *  @author

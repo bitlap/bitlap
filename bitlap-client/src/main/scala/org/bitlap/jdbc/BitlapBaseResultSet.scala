@@ -1,19 +1,20 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.models.*
-import org.bitlap.network.serde.BitlapSerde
-
 import java.io.*
 import java.math.BigDecimal
 import java.net.*
 import java.sql.*
 import java.util
 import java.util.Calendar
+
 import scala.annotation.*
 import scala.collection.mutable
 import scala.collection.mutable.Seq
 import scala.reflect.*
+
+import org.bitlap.network.models.*
+import org.bitlap.network.serde.BitlapSerde
 
 /** bitlap 抽象结果集
  *  @author

@@ -1,18 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.client.BitlapClient
-import org.bitlap.network.handles.SessionHandle
-
 import java.io.{ InputStream, Reader }
 import java.math.BigDecimal
 import java.net.URL
 import java.sql.*
 import java.text.MessageFormat
 import java.util.{ Calendar, Scanner }
+
+import scala.{ Array as _, Byte as _ }
 import scala.collection.mutable
 import scala.util.control.Breaks.{ break, breakable }
-import scala.{ Array as _, Byte as _ }
+
+import org.bitlap.client.BitlapClient
+import org.bitlap.network.handles.SessionHandle
 
 /** @author
  *    梦境迷离

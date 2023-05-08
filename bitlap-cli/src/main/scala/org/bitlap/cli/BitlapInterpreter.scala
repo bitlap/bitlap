@@ -1,19 +1,21 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli
 
+import java.io.*
+
+import scala.collection.mutable.ArrayBuffer
+
 import org.bitlap.cli.BitlapInterpreter.CliCommands.*
 import org.bitlap.cli.Command.{ Server, Sql }
 import org.bitlap.cli.interactive.BitlapSqlApplication
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
-import sqlline.*
-import zio.cli.HelpDoc.Span.text
-import zio.cli.{ Command as ZioCliCommand, * }
-import zio.{ Console, System as ZSystem, * }
 
-import java.io.*
-import scala.collection.mutable.ArrayBuffer
+import sqlline.*
+import zio.{ Console, System as ZSystem, * }
+import zio.cli.{ Command as ZioCliCommand, * }
+import zio.cli.HelpDoc.Span.text
 
 /** 基于zio-cli实现的命令行解释器
  *  @author

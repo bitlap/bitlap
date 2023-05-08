@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.http
 
-import org.bitlap.common.utils.internal.DBTable
-
 import scala.jdk.CollectionConverters.ListHasAsScala
+
+import org.bitlap.common.utils.internal.DBTable
 
 /** Desc: sql 查询的数据封装
  */

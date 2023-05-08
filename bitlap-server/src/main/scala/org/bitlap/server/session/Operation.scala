@@ -1,16 +1,18 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import com.typesafe.scalalogging.LazyLogging
-import org.bitlap.network.handles.OperationHandle
-import org.bitlap.network.models.*
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 import scala.collection.mutable
-import org.bitlap.network.enumeration.OperationState.*
-import java.util.concurrent.CountDownLatch
+
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.{ OperationState, OperationType }
+import org.bitlap.network.enumeration.OperationState.*
+import org.bitlap.network.handles.OperationHandle
+import org.bitlap.network.models.*
+
+import com.typesafe.scalalogging.LazyLogging
 
 /** bitlap 操作
  *
@@ -33,6 +35,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
 
   protected var operationStart    = 0L
   protected var operationComplete = 0L
+
   protected lazy val cache: mutable.HashMap[OperationHandle, QueryResult] =
     mutable.HashMap()
 

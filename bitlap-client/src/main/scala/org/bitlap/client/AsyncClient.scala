@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.client
 
-import io.grpc.*
 import org.bitlap.common.utils.UuidUtil
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.*
@@ -11,6 +10,8 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.enumeration.GetInfoType.toBGetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+
+import io.grpc.*
 import zio.*
 
 /** 异步RPC客户端，基于zio-grpc实现

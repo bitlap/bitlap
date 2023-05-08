@@ -11,6 +11,7 @@ import org.apache.spark.sql.types.StructType
  */
 final class BitlapPartitionReaderFactory(schema: StructType, options: BitlapDataSourceReadOptions)
     extends PartitionReaderFactory {
+
   override def createReader(inputPartition: InputPartition): PartitionReader[InternalRow] =
     new BitlapPartitionReader(
       options = options,

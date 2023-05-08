@@ -1,9 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli.interactive
 
-import org.bitlap.common.utils.StringEx
-import sqlline.*
 import scala.collection.mutable
+
+import org.bitlap.common.utils.StringEx
+
+import sqlline.*
 
 final class BitlapSqlPromptHandler(val line: SqlLine, val prompt: String) extends PromptHandler(line) {
 

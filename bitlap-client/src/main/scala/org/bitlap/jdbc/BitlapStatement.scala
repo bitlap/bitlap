@@ -1,12 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.client.BitlapClient
-import org.bitlap.network.handles.*
-import org.bitlap.network.enumeration.OperationState.*
-import org.bitlap.network.models.*
-
 import java.sql.*
+
+import org.bitlap.client.BitlapClient
+import org.bitlap.network.enumeration.OperationState.*
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
 
 /** bitlap Statement
  *
@@ -160,6 +160,7 @@ class BitlapStatement(
       isCancelled = false
       isQueryClosed = false
       isOperationComplete = false
+
   override def execute(sql: String): Boolean =
     checkConnection("execute")
     reInitState()

@@ -1,12 +1,13 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
-import com.google.protobuf.ByteString
+import java.nio.ByteBuffer
+import java.util.UUID
+
 import org.bitlap.network.driver_proto.*
 import org.bitlap.network.enumeration.OperationType
 
-import java.nio.ByteBuffer
-import java.util.UUID
+import com.google.protobuf.ByteString
 
 /** 客户端操作的媒介（≈句柄）
  *

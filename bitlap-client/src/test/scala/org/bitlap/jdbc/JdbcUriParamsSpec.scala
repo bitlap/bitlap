@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.junit.Test
-
 import scala.collection.immutable.ListMap
+
+import org.junit.Test
 
 /** @author
  *    梦境迷离

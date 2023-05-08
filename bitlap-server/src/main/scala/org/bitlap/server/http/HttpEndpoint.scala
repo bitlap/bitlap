@@ -1,16 +1,17 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.http
 
-import io.circe.*
-import sttp.tapir.*
-import sttp.tapir.generic.auto.*
-import sttp.tapir.json.circe.jsonBody
-import io.circe.generic.auto.*
-import io.circe.syntax.EncoderOps
-import sttp.tapir.Codec.JsonCodec
-import sttp.tapir.json.circe.*
 import org.bitlap.network.NetworkException
 import org.bitlap.network.NetworkException.SQLExecutedException
+
+import io.circe.*
+import io.circe.generic.auto.*
+import io.circe.syntax.EncoderOps
+import sttp.tapir.*
+import sttp.tapir.Codec.JsonCodec
+import sttp.tapir.generic.auto.*
+import sttp.tapir.json.circe.*
+import sttp.tapir.json.circe.jsonBody
 
 /** HTTP API 定义描述
  *

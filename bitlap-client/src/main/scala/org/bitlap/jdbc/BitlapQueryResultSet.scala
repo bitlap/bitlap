@@ -1,12 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
+import java.sql.*
+
+import scala.collection.mutable
+
 import org.bitlap.client.BitlapClient
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import scala.collection.mutable
-import java.sql.*
 import org.bitlap.network.models.OperationStatus
 
 /** bitlap 查询的结果集
@@ -132,6 +134,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
     catch
       case e: Exception =>
         throw BitlapSQLException(e.toString, "08S01", cause = Option(e))
+
   override def close(): Unit =
     if this.statement != null && this.statement.isInstanceOf[BitlapStatement] then
       val s = this.statement.asInstanceOf[BitlapStatement]

@@ -51,6 +51,7 @@ final class SyncClient(serverPeers: Array[String], props: Map[String, String]) e
     delegateClient.sync {
       _.getDatabases(sessionHandle, pattern)
     }
+
   override def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Identity[OperationHandle] =
     delegateClient.sync {
       _.getTables(sessionHandle, database, pattern)

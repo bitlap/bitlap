@@ -1,14 +1,16 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values.*
 import org.bitlap.network.driver_proto.*
+
+import enumeratum.values.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/3/18
  */
 sealed abstract class GetInfoType(val value: Int) extends IntEnumEntry
+
 object GetInfoType extends IntEnum[GetInfoType]:
   case object MaxDriverConnections    extends GetInfoType(1)
   case object MaxConcurrentActivities extends GetInfoType(10)

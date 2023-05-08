@@ -1,11 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli.interactive
 
+import java.util.Set as JSet
+
+import scala.jdk.CollectionConverters.*
+
 import sqlline.SqlLineProperty
 import sqlline.SqlLineProperty.Type
-
-import java.util.Set as JSet
-import scala.jdk.CollectionConverters.*
 
 class BitlapSqlLineProperty(
   name: String,

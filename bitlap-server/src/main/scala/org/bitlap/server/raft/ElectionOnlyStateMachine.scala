@@ -1,13 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft
 
-import com.alipay.sofa.jraft.core.*
-import com.alipay.sofa.jraft.{ Iterator as JRIterator, Status }
+import java.util.{ ArrayList as JArrayList, List as JList }
+import java.util.concurrent.atomic.*
+
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
 import org.slf4j.*
 
-import java.util.concurrent.atomic.*
-import java.util.{ ArrayList as JArrayList, List as JList }
-import scala.jdk.CollectionConverters.CollectionHasAsScala
+import com.alipay.sofa.jraft.{ Iterator as JRIterator, Status }
+import com.alipay.sofa.jraft.core.*
 
 /** raft状态机，暂未使用
  *  @author

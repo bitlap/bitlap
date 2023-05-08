@@ -1,20 +1,22 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import com.alipay.sofa.jraft.*
-import com.alipay.sofa.jraft.option.CliOptions
-import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.annotation.Nullable
+
 import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.*
 import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.NetworkException.*
 import org.bitlap.network.{ DriverAsyncRpc, ServerAddress }
+import org.bitlap.network.NetworkException.*
 import org.bitlap.server.config.*
-import zio.*
 
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.annotation.Nullable
+import com.alipay.sofa.jraft.*
+import com.alipay.sofa.jraft.option.CliOptions
+import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
+
+import zio.*
 
 /** bitlap 服务间上下文，用于grpc,http,raft数据依赖
  *  @author

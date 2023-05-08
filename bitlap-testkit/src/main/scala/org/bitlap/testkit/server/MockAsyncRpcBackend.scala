@@ -1,12 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
-import com.google.protobuf.ByteString
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.testkit.*
+
+import com.google.protobuf.ByteString
+
 import zio.*
 
 /** 用于测试的 bitlap rpc 服务端实现
@@ -19,6 +21,7 @@ import zio.*
 object MockAsyncRpcBackend {
   lazy val live: ULayer[DriverAsyncRpc] = ZLayer.succeed(new MockAsyncRpcBackend())
 }
+
 final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
 
   val metrics: Seq[Metric] = readCSVData("simple_data.csv")

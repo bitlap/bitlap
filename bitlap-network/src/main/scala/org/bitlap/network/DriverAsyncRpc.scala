@@ -1,13 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import zio.*
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import zio.*
 
 /** 函数式异步RPC API，客户端和服务端通用，基于 zio 2.0
  *

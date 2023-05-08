@@ -1,10 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values.*
+import java.sql.Types
+
 import org.bitlap.network.driver_proto.*
 
-import java.sql.Types
+import enumeratum.values.*
 
 /** @author
  *    梦境迷离
@@ -27,8 +28,10 @@ object TypeId extends IntEnum[TypeId]:
   case object DateType      extends TypeId(11, "Date")
 
   val values: IndexedSeq[TypeId] = findValues
+
   def toTypeId(bTypeId: BTypeId): TypeId =
     TypeId.withValueOpt(bTypeId.value).getOrElse(Unspecified)
+
   def toBTypeId(typeId: TypeId): BTypeId =
     BTypeId.fromValue(typeId.value)
 

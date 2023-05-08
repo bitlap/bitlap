@@ -1,15 +1,16 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft.rpc
 
+import java.util.concurrent.Executor
+
 import org.bitlap.client.*
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.schema.*
+import org.bitlap.server.BitlapContext
+import org.bitlap.server.config.BitlapServerConfiguration
 
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message
-import org.bitlap.common.schema.*
-import org.bitlap.common.BitlapConf
-import org.bitlap.server.BitlapContext
-import java.util.concurrent.Executor
-import org.bitlap.server.config.BitlapServerConfiguration
 
 /** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.rpc.GrpcServiceLive.getLeader()]]使用
  *

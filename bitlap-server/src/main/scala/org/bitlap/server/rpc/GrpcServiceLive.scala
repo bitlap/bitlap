@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
-import io.grpc.*
 import org.bitlap.network.*
 import org.bitlap.network.NetworkException.*
 import org.bitlap.network.driver_proto.*
@@ -9,6 +8,8 @@ import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.server.*
+
+import io.grpc.*
 import zio.*
 
 /** RPC的服务端API实现，基于 zio-grpc,zio 2.0
@@ -18,6 +19,7 @@ import zio.*
  *  @version 1.0,2022/4/21
  */
 object GrpcServiceLive:
+
   lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
     ZLayer.fromFunction((rpc: DriverAsyncRpc) => new GrpcServiceLive(rpc))
 end GrpcServiceLive
@@ -110,10 +112,11 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       } else {
         ZIO.succeed(ld)
       }
-    }.mapBoth(
-      errorApplyFunc,
-      t => BGetLeaderResp(Option(t.ip), t.port)
-    )
+    }
+      .mapBoth(
+        errorApplyFunc,
+        t => BGetLeaderResp(Option(t.ip), t.port)
+      )
   }
 
   override def cancelOperation(

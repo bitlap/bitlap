@@ -2,6 +2,7 @@
 package org.bitlap
 
 import org.apache.spark.sql.*
+
 import zio.*
 
 /** @since 2022/10/14
@@ -15,11 +16,13 @@ package object spark {
   Class.forName(classOf[org.bitlap.Driver].getName)
 
   implicit final class DataFrameOps(val dataFrame: DataFrame) extends AnyVal {
+
     def liftDataFrameWriter: Task[DataFrameWriter[Row]] =
       ZIO.attempt(dataFrame.write.format(FORMAT))
   }
 
   implicit final class SparkSessionOps(val sparkSession: SparkSession) extends AnyVal {
+
     def liftDataFrameReader: Task[DataFrameReader] =
       ZIO.attempt(sparkSession.read.format(FORMAT))
   }

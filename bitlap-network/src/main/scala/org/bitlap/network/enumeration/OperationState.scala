@@ -1,9 +1,10 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values.*
 import org.bitlap.network.NetworkException.IllegalStateException
 import org.bitlap.network.driver_proto.*
+
+import enumeratum.values.*
 import izumi.reflect.dottyreflection.*
 
 /** bitlap客户端操作的状态
@@ -14,6 +15,7 @@ import izumi.reflect.dottyreflection.*
  *  @version 1.0
  */
 sealed abstract class OperationState(val value: Int, val terminal: Boolean) extends IntEnumEntry
+
 object OperationState extends IntEnum[OperationState]:
 
   case object UnknownState     extends OperationState(0, false)
@@ -35,6 +37,7 @@ object OperationState extends IntEnum[OperationState]:
     BOperationState.fromValue(operationState.value)
 
   extension (state: OperationState)
+
     def validateTransition(newState: OperationState): Unit =
       validate(state, newState)
   end extension

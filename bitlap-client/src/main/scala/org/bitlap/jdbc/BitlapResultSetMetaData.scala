@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.network.enumeration.TypeId
-
 import java.sql.*
+
+import org.bitlap.network.enumeration.TypeId
 
 /** bitlap 结果集的元数据
  *  @author

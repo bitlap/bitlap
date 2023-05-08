@@ -1,17 +1,18 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.jdbc.Constants.*
-
 import java.io.*
 import java.net.*
 import java.util
 import java.util.ArrayList as JArrayList
 import java.util.regex.Pattern
+
 import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
+
+import org.bitlap.jdbc.Constants.*
 
 /** @author
  *    梦境迷离

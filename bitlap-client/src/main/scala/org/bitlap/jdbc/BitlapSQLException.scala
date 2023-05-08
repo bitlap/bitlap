@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.common.exception.BitlapException
-
 import java.sql.SQLException
+
+import org.bitlap.common.exception.BitlapException
 
 /** bitlap 客户端的SQL异常
  *  @author

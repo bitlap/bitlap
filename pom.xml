@@ -479,6 +479,7 @@
                         <scalafmt>
                             <version>3.7.3</version>
                             <file>.scalafmt.conf</file>
+                            <scalaMajorVersion>2.13</scalaMajorVersion>
                         </scalafmt>
                         <licenseHeader>
                             <content>/* Copyright (c) 2023 bitlap.org */</content>

@@ -1,13 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.config
 
-import zio.ZLayer
-import org.bitlap.common.BitlapConf
-import org.bitlap.client.*
-import zio.*
 import scala.concurrent.duration.Duration
-import org.bitlap.server.BitlapContext
+
+import org.bitlap.client.*
+import org.bitlap.common.BitlapConf
 import org.bitlap.network.ServerAddress
+import org.bitlap.server.BitlapContext
+
+import zio.*
 
 /** 包装kotlin配置，组成统一的Layer暴露出去
  *  @author

@@ -1,13 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.test
 
-import junit.framework.TestCase
-import junit.framework.TestCase.assertTrue
 import org.bitlap.network.enumeration.OperationType
-import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
 import org.bitlap.network.handles
+import org.bitlap.network.handles.{ HandleIdentifier, SessionHandle }
+
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertFalse
+
+import junit.framework.TestCase
+import junit.framework.TestCase.assertTrue
 
 /** @author
  *    梦境迷离

@@ -1,12 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
+import java.sql.{ Array as _, * }
+
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
-
-import java.sql.{ Array as _, * }
 
 /** bitlap 数据库元数据
  *

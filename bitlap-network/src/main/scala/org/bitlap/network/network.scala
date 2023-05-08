@@ -2,6 +2,7 @@
 package org.bitlap
 
 import com.typesafe.scalalogging.LazyLogging
+
 import io.grpc.Status
 
 /** @author

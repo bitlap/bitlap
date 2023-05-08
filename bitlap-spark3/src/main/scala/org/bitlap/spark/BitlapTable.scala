@@ -1,16 +1,18 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark
 
+import java.util.{ Map as JMap, Set as JSet }
+
+import scala.jdk.CollectionConverters.*
+
+import org.bitlap.spark.reader.BitlapScanBuilder
+import org.bitlap.spark.writer.BitlapWriteBuilder
+
 import org.apache.spark.sql.connector.catalog.*
 import org.apache.spark.sql.connector.read.ScanBuilder
 import org.apache.spark.sql.connector.write.*
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
-import org.bitlap.spark.reader.BitlapScanBuilder
-import org.bitlap.spark.writer.BitlapWriteBuilder
-
-import java.util.{ Map as JMap, Set as JSet }
-import scala.jdk.CollectionConverters.*
 
 /** @author
  *    梦境迷离

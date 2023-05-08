@@ -1,18 +1,20 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft
 
+import java.io.*
+import java.nio.file.Paths
+import java.util.concurrent.CopyOnWriteArrayList
+
+import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
+
+import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
+
+import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
-import com.alipay.sofa.jraft.*
-import org.apache.commons.io.FileUtils
-import org.slf4j.LoggerFactory
-import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
-
-import java.io.*
-import java.nio.file.Paths
-import java.util.concurrent.CopyOnWriteArrayList
 
 /** raft 选主
  *  @author

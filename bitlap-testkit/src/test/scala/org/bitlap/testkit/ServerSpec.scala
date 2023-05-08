@@ -1,11 +1,13 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.testkit.server.*
-import org.junit.*
-import bitlap.rolls.core.jdbc.*
-
 import java.sql.*
+
+import org.bitlap.testkit.server.*
+
+import org.junit.*
+
+import bitlap.rolls.core.jdbc.*
 
 class ServerSpec extends CSVUtils {
 

@@ -1,16 +1,17 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.client.BitlapClient
-import org.bitlap.network.handles.*
-
-import java.sql.*
-import java.util.concurrent.Executor
-import java.util.{ List as _, Properties }
 import java.{ util, * }
+import java.sql.*
+import java.util.{ List as _, Properties }
+import java.util.concurrent.Executor
+
 import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
+
+import org.bitlap.client.BitlapClient
+import org.bitlap.network.handles.*
 
 /** bitlap Connection
  *

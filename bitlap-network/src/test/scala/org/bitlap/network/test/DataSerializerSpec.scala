@@ -1,12 +1,13 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.test
 
+import java.io.*
+import java.sql.{ Date, Time, Timestamp }
+
 import org.bitlap.network.enumeration.TypeId
 import org.bitlap.network.serde.BitlapSerde
-import org.junit.Test
 
-import java.sql.{ Date, Time, Timestamp }
-import java.io.*
+import org.junit.Test
 
 /** @author
  *    梦境迷离

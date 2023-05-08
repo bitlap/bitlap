@@ -1,13 +1,16 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
+import org.bitlap.server.config.BitlapRaftConfig
+import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.raft.*
+
+import org.slf4j.LoggerFactory
+
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
-import org.bitlap.server.config.BitlapRaftConfig
-import org.bitlap.server.raft.*
-import org.slf4j.LoggerFactory
+
 import zio.{ Runtime as _, * }
-import org.bitlap.server.config.BitlapServerConfiguration
 
 /** bitlap raft cluster和rpc服务
  *  @author

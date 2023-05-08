@@ -1,10 +1,10 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.writer
 
-import org.apache.spark.sql.connector.write.DataWriterFactory
-import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.connector.write.DataWriter
+import org.apache.spark.sql.connector.write.DataWriterFactory
+import org.apache.spark.sql.types.StructType
 
 /** @author
  *    梦境迷离

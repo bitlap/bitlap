@@ -1,15 +1,16 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
+import java.sql.*
+
+import scala.collection.mutable.ListBuffer
+
 import org.bitlap.core.*
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.NetworkException.DataFormatException
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-
-import java.sql.*
-import scala.collection.mutable.ListBuffer
 
 /** bitlap 单机操作实现
  *

@@ -1,18 +1,21 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import com.google.protobuf.ByteString
+import java.util.concurrent.atomic.AtomicBoolean
+
+import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.*
+
 import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
 import org.bitlap.jdbc.BitlapSQLException
-import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.enumeration.*
+import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import zio.Task
 
-import java.util.concurrent.atomic.AtomicBoolean
-import scala.jdk.CollectionConverters.*
-import scala.collection.mutable.ListBuffer
+import com.google.protobuf.ByteString
+
+import zio.Task
 
 /** bitlap 单机会话实现
  *  @author

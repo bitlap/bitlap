@@ -1,11 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft.rpc
 
-import com.alipay.sofa.jraft.rpc.RpcRequestProcessor
-
 import java.util.concurrent.Executor
+
 import com.alipay.sofa.jraft.rpc.RpcContext
 import com.alipay.sofa.jraft.rpc.RpcRequestClosure
+import com.alipay.sofa.jraft.rpc.RpcRequestProcessor
 import com.google.protobuf.Message
 
 /** 编写raft rpc所需继承的抽象基类

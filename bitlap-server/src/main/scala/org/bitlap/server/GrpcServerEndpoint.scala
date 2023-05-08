@@ -1,14 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
+import org.bitlap.network.DriverAsyncRpc
+import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.rpc.*
+
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
-import org.bitlap.network.DriverAsyncRpc
-import org.bitlap.server.rpc.*
 import scalapb.zio_grpc
 import scalapb.zio_grpc.*
 import zio.*
-import org.bitlap.server.config.BitlapServerConfiguration
 
 /** bitlap grpc服务
  *
@@ -17,6 +18,7 @@ import org.bitlap.server.config.BitlapServerConfiguration
  *  @version 1.0,2021/12/3
  */
 object GrpcServerEndpoint:
+
   lazy val live: ZLayer[BitlapServerConfiguration, Nothing, GrpcServerEndpoint] =
     ZLayer.fromFunction((config: BitlapServerConfiguration) => new GrpcServerEndpoint(config))
 

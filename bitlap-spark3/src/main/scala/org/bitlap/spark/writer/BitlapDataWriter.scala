@@ -1,18 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.writer
 
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.connector.write.*
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.catalyst.analysis.SimpleAnalyzer
-import org.apache.spark.sql.catalyst.encoders.*
-import org.apache.spark.sql.catalyst.expressions.AttributeReference
+import java.io.IOException
+import java.sql.*
+
 import org.bitlap.spark.jdbc.BitlapJdbcDialect
 import org.bitlap.spark.util.*
 
-import java.io.IOException
-import java.sql.*
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.analysis.SimpleAnalyzer
+import org.apache.spark.sql.catalyst.encoders.*
+import org.apache.spark.sql.catalyst.expressions.AttributeReference
+import org.apache.spark.sql.connector.write.*
+import org.apache.spark.sql.types.StructType
 
 /** @author
  *    梦境迷离
@@ -27,9 +28,11 @@ class BitlapDataWriter(private val schema: StructType, private val options: Bitl
   private var numRecords                   = 0
 
   private lazy val _schema: StructType = options.schema
+
   private lazy val batchSize =
     String.valueOf(options.overriddenProps.getOrDefault("options", DEFAULT_BATCH_SIZE.toString)).toLong
   private lazy val attrs = schema.map(f => AttributeReference(f.name, f.dataType, f.nullable, f.metadata)()).toList
+
   private lazy val encoder: ExpressionEncoder[Row] =
     RowEncoder(schema).resolveAndBind(attrs.iterator.toSeq, SimpleAnalyzer)
 

@@ -1,10 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli.interactive
 
-import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
-import sqlline.*
-
 import java.util.Collection as JCollection
+
+import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
+
+import sqlline.*
 
 final class BitlapSqlApplication extends Application {
 

@@ -1,7 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import com.typesafe.scalalogging.LazyLogging
+import java.util.Date
+import java.util.concurrent.*
+
+import scala.collection.*
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration.Duration
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
 import org.bitlap.common.BitlapConf
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
@@ -9,14 +16,11 @@ import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapContext
-import zio.{ System as _, ZIO, * }
-import java.util.Date
-import java.util.concurrent.*
-import scala.collection.*
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.duration.Duration
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 import org.bitlap.server.config.BitlapServerConfiguration
+
+import com.typesafe.scalalogging.LazyLogging
+
+import zio.{ System as _, ZIO, * }
 
 /** bitlap 会话管理器
  *  @author
@@ -27,6 +31,7 @@ import org.bitlap.server.config.BitlapServerConfiguration
 object SessionManager extends LazyLogging:
 
   private val sessionAddLock: Object = new Object
+
   private lazy val sessionStore: ConcurrentHashMap[SessionHandle, Session] =
     new ConcurrentHashMap[SessionHandle, Session]()
 

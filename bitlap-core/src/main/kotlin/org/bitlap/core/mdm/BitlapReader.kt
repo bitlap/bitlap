@@ -5,6 +5,7 @@ import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.model.AggType
 import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.RawRow
+import org.bitlap.core.storage.BitlapStore
 import java.io.Closeable
 import java.io.Serializable
 
@@ -22,9 +23,7 @@ class BitlapReader : Serializable, Closeable {
      */
     fun read(query: Query): List<RawRow> {
         val table = BitlapContext.catalog.getTable(query.table, query.database)
-        val metricStore = table.getTableFormat()
-            .getProvider(table, BitlapContext.hadoopConf)
-            .getMetricStore()
+        val store = BitlapStore(table, BitlapContext.hadoopConf).open()
 
         if (query.hasDimensions()) {
             // TODO: with dimensions
@@ -38,13 +37,13 @@ class BitlapReader : Serializable, Closeable {
         val rows = mutableListOf<RawRow>()
         val time = query.time.timeRange
         if (shouldMaterialize) {
-            val mRows = metricStore.query(time, query.metrics.map { it.name })
+            val mRows = store.query(time, query.metrics.map { it.name })
                 .asSequence().map { it.metricKey to it }.toMap()
             // handle metric meta data
             val metrics = query.metrics.map { mRows[it.name]?.metric ?: 0.0 }.toTypedArray()
             rows.add(RawRow(metrics, metaColumns))
         } else {
-            val metas = metricStore.queryMeta(time, query.metrics.map { it.name })
+            val metas = store.queryMeta(time, query.metrics.map { it.name })
                 .asSequence().map { it.metricKey to it }.toMap()
             // handle metric meta data
             val metrics = query.metrics.map { metas[it.name]?.metricCount ?: 0.0 }.toTypedArray()

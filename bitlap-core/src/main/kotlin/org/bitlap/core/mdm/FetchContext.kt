@@ -16,11 +16,13 @@ import java.io.Serializable
  */
 class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializable {
 
+    lateinit var bestPlan: FetchPlan
+
     /**
      * find best plan to be executed
      */
     fun findBestPlan(): FetchPlan {
-        return when (oPlan) {
+        this.bestPlan = when (oPlan) {
             is PendingFetchPlan -> {
                 val dimensions = oPlan.analyzer.getDimensionColNamesWithoutTime()
                 when (dimensions.size) {
@@ -33,6 +35,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializabl
             }
             else -> oPlan
         }
+        return this.bestPlan
     }
 
     /**

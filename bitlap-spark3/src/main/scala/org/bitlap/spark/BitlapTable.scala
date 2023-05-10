@@ -16,13 +16,9 @@ import scala.jdk.CollectionConverters._
  *    梦境迷离
  *  @version 1.0,10/15/22
  */
-final class BitlapTable(val schema: StructType, val options: Map[String, String])
-    extends SupportsRead
-    with SupportsWrite {
+final class BitlapTable(val schema: StructType, val options: Map[String, String]) extends SupportsRead with SupportsWrite {
 
   private lazy val tableName: String = options.getOrElse("table", null)
-
-  private final val capability = Set(TableCapability.BATCH_READ, TableCapability.BATCH_WRITE)
 
   override def newScanBuilder(caseInsensitiveStringMap: CaseInsensitiveStringMap): ScanBuilder =
     new BitlapScanBuilder(_schema = schema, options = caseInsensitiveStringMap)
@@ -32,8 +28,19 @@ final class BitlapTable(val schema: StructType, val options: Map[String, String]
 
   override def name(): String = tableName
 
-  override def capabilities(): JSet[TableCapability] = capability.asJava
+  override def capabilities(): JSet[TableCapability] = BitlapTable.SUPPORT_CAPABILITIES.asJava
 
   def getOptions: JMap[String, String] = options.asJava
+}
 
+object BitlapTable {
+  val SUPPORT_CAPABILITIES: Set[TableCapability] = Set(
+    TableCapability.BATCH_READ,
+    TableCapability.BATCH_WRITE,
+//    TableCapability.OVERWRITE_BY_FILTER,
+    TableCapability.OVERWRITE_DYNAMIC,
+    TableCapability.V1_BATCH_WRITE,
+    TableCapability.ACCEPT_ANY_SCHEMA,
+    TableCapability.TRUNCATE
+  )
 }

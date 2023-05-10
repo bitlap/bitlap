@@ -17,7 +17,7 @@ import org.bitlap.core.event.DatabaseCreateEvent
 import org.bitlap.core.event.DatabaseDeleteEvent
 import org.bitlap.core.event.TableCreateEvent
 import org.bitlap.core.event.TableDeleteEvent
-import org.bitlap.core.storage.StoreType
+import org.bitlap.core.storage.TableFormat
 import org.bitlap.core.utils.Hcfs.readTable
 import org.bitlap.core.utils.Hcfs.writeTable
 import kotlin.streams.toList
@@ -185,7 +185,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         val tableDir = Path(dataPath, "$cleanDBName/$cleanName")
         val table = Table(
             cleanDBName, cleanName, tm, tm,
-            mutableMapOf(Table.TABLE_FORMAT_KEY to StoreType.CARBON.name), // TODO: default use carbon
+            mutableMapOf(Table.TABLE_FORMAT_KEY to TableFormat.PARQUET.name), // TODO: default use parquet
             tableDir.toString(),
         )
 

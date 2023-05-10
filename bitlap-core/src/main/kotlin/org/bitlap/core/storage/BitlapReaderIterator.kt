@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.storage.load
+package org.bitlap.core.storage
 
-import org.apache.carbondata.sdk.file.CarbonReader
 import org.bitlap.common.BitlapBatchIterator
 import org.bitlap.common.utils.PreConditions
 
@@ -12,16 +11,14 @@ import org.bitlap.common.utils.PreConditions
  * Created by IceMimosa
  * Date: 2021/7/14
  */
-open class MetricRowIterator<R>(private val reader: CarbonReader<Any>, private val rowHandler: (Array<*>) -> R?) : BitlapBatchIterator<R>() {
+open class BitlapReaderIterator<R>(private val reader: BitlapReader<R>, private val limit: Int) : BitlapBatchIterator<R>() {
 
     @Volatile
     private var close = false
 
     override fun nextBatch(): List<R> {
         this.checkOpen()
-        return this.reader.readNextBatchRow().mapNotNull {
-            this.rowHandler.invoke(it as Array<*>)
-        }
+        return this.reader.read(limit)
     }
 
     override fun hasNext(): Boolean {
@@ -44,14 +41,10 @@ open class MetricRowIterator<R>(private val reader: CarbonReader<Any>, private v
             return
         }
         close = true
-        try {
-            this.reader.close()
-        } catch (e: Exception) {
-            // ignore
-        }
+        this.reader.use {  }
     }
 
     private fun checkOpen() {
-        PreConditions.checkExpression(!close, msg = "MetricRowIterator has been closed.")
+        PreConditions.checkExpression(!close, msg = "BitlapReaderIterator has been closed.")
     }
 }

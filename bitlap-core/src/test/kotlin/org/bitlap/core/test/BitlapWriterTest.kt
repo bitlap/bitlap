@@ -8,7 +8,7 @@ import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.mdm.BitlapReader
-import org.bitlap.core.mdm.BitlapWriter
+import org.bitlap.core.mdm.BitlapEventWriter
 import org.bitlap.core.mdm.model.Query
 import org.bitlap.core.mdm.model.QueryMetric
 import org.bitlap.core.mdm.model.QueryTime
@@ -28,7 +28,7 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
             val (dbName, tableName) = randomDBTable()
             BitlapContext.catalog.createTable(tableName, dbName, true)
             val table = BitlapContext.catalog.getTable(tableName, dbName)
-            val writer = BitlapWriter(table, hadoopConf)
+            val writer = BitlapEventWriter(table, hadoopConf)
 
             val testTime = DateTime.parse("2021-01-01").millis
             val testTime2 = DateTime.parse("2021-01-02").millis
@@ -65,7 +65,7 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
             val (dbName, tableName) = randomDBTable()
             sql("create table $dbName.$tableName")
             val table = BitlapContext.catalog.getTable(tableName, dbName)
-            val writer = BitlapWriter(table, hadoopConf)
+            val writer = BitlapEventWriter(table, hadoopConf)
             val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.csv")!!
             writer.writeCsv(input)
             checkRows(
@@ -82,7 +82,7 @@ class BitlapWriterTest : BaseLocalFsTest(), SqlChecker {
             val (dbName, tableName) = randomDBTable()
             sql("create table $dbName.$tableName")
             val table = BitlapContext.catalog.getTable(tableName, dbName)
-            val writer = BitlapWriter(table, hadoopConf)
+            val writer = BitlapEventWriter(table, hadoopConf)
             val input = BitlapWriterTest::class.java.classLoader.getResourceAsStream("simple_data.xlsx")!!
             writer.writeExcel(input)
             checkRows(

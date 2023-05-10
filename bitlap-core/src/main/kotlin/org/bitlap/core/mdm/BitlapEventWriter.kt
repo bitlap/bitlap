@@ -14,7 +14,9 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
+import org.bitlap.core.BitlapContext
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.storage.BitlapStore
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
@@ -27,16 +29,14 @@ import java.io.Serializable
 import kotlin.system.measureTimeMillis
 
 /**
- * bitmap mdm [Event] writer
+ * bitlap mdm [Event] writer
  */
-class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, Closeable {
+class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializable, Closeable {
 
     @Volatile
     private var closed = false
     private val log = logger { }
-    private val storeProvider = table.getTableFormat().getProvider(table, hadoopConf)
-    private val metricStore = storeProvider.getMetricStore()
-    private val metricDimStore = storeProvider.getMetricDimStore()
+    private val store = BitlapStore(table, hadoopConf).open()
 
     /**
      * write mdm events
@@ -124,7 +124,7 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
                     )
                     r
                 }
-            metricStore.store(time, metricRows)
+            store.storeMetric(time, metricRows)
 
             // store metric with one dimension
             val metricDimRows = cleanRows
@@ -149,7 +149,7 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
                     )
                     r
                 }
-            metricDimStore.store(time, metricDimRows)
+            store.storeMetricDim(time, metricDimRows)
 
             // store metric with high cardinality dimensions
             // TODO
@@ -165,8 +165,7 @@ class BitlapWriter(val table: Table, hadoopConf: Configuration) : Serializable, 
     override fun close() {
         closed = true
         runCatching {
-            this.metricStore.close()
-            this.metricDimStore.close()
+            this.store.close()
         }.onFailure {
             log.error("Error when closing BitlapWriter, cause: ", it)
         }

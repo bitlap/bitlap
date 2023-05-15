@@ -20,7 +20,7 @@ import java.io.Closeable
 /**
  * Bitlap store implementation.
  */
-class BitlapStore(val table: Table, val hadoopConf: Configuration): Closeable {
+class BitlapStore(val table: Table, val hadoopConf: Configuration) : Closeable {
 
     private val tablePath = Path(table.path)
     private var fs: FileSystem = tablePath.getFileSystem(hadoopConf).also {

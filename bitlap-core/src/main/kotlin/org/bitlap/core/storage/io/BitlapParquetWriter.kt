@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.storage.io
 
 import org.apache.avro.Schema

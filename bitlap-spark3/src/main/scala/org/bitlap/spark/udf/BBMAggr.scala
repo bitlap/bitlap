@@ -1,21 +1,20 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.udf
+
+import org.bitlap.common.bitmap.BBM
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.TypeCheckSuccess
-import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import org.apache.spark.sql.catalyst.expressions.{ Expression, ExpressionDescription }
+import org.apache.spark.sql.catalyst.expressions.aggregate.{ ImperativeAggregate, TypedImperativeAggregate }
 import org.apache.spark.sql.catalyst.trees.BinaryLike
-import org.apache.spark.sql.types.{BinaryType, DataType, IntegerType, NullType}
-import org.bitlap.common.bitmap.BBM
+import org.apache.spark.sql.types.{ BinaryType, DataType, IntegerType, NullType }
 
-
-/**
- * Collect bucket and uid in each row into a [[BBM]].
+/** Collect bucket and uid in each row into a [[BBM]].
  */
 @ExpressionDescription(
-  usage =
-    """
+  usage = """
       _FUNC_(bucket, uid) - Collect `bucket` and `uid` in each row into a bucket bitmap.
     """
 )
@@ -23,8 +22,9 @@ case class BBMAggr(
   bucket: Expression,
   id: Expression,
   override val mutableAggBufferOffset: Int = 0,
-  override val inputAggBufferOffset: Int = 0
-) extends TypedImperativeAggregate[BBM] with BinaryLike[Expression] {
+  override val inputAggBufferOffset: Int = 0)
+    extends TypedImperativeAggregate[BBM]
+    with BinaryLike[Expression] {
 
   def this(bucket: Expression, uid: Expression) = {
     this(bucket, uid, 0, 0)
@@ -43,16 +43,17 @@ case class BBMAggr(
       case (IntegerType, IntegerType) =>
         TypeCheckSuccess
       case _ =>
-        TypeCheckResult.TypeCheckFailure(s"Input to function $prettyName should have " +
-          s"two arguments with ${IntegerType.simpleString} and ${IntegerType.simpleString}," +
-          s"but it's [${left.dataType.catalogString}, ${right.dataType.catalogString}]"
+        TypeCheckResult.TypeCheckFailure(
+          s"Input to function $prettyName should have " +
+            s"two arguments with ${IntegerType.simpleString} and ${IntegerType.simpleString}," +
+            s"but it's [${left.dataType.catalogString}, ${right.dataType.catalogString}]"
         )
     }
   }
 
   override def update(buffer: BBM, input: InternalRow): BBM = {
     val _bucket = bucket.eval(input).asInstanceOf[Int].toShort
-    val _uid = id.eval(input).asInstanceOf[Int]
+    val _uid    = id.eval(input).asInstanceOf[Int]
     buffer.add(_bucket, _uid)
     buffer
   }
@@ -83,7 +84,6 @@ case class BBMAggr(
   override def withNewInputAggBufferOffset(newOffset: Int): ImperativeAggregate =
     copy(inputAggBufferOffset = newOffset)
 
-
   override def nullable: Boolean = true
 
   override def dataType: DataType = BinaryType
@@ -93,4 +93,3 @@ case class BBMAggr(
 
   override def prettyName: String = "bbm_aggr"
 }
-

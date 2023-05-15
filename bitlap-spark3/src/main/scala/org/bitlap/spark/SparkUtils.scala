@@ -1,19 +1,19 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark
+
+import scala.jdk.CollectionConverters.ListHasAsScala
+
+import org.bitlap.common.data.Event
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.types._
-import org.bitlap.common.data.Event
 
-import scala.jdk.CollectionConverters.ListHasAsScala
-
-/**
- * spark utils
+/** spark utils
  */
 object SparkUtils {
 
-  /**
-   * get spark valid input schema
+  /** get spark valid input schema
    */
   def validSchema: StructType = {
     val fields = Event.getSchema.asScala.map { p =>
@@ -29,33 +29,27 @@ object SparkUtils {
     StructType(fields.toList)
   }
 
-
-  /**
-   * get hive table
+  /** get hive table
    */
   def getHiveTableIdentifier(tableName: String): TableIdentifier = {
     tableName.split("\\.") match {
-      case Array(name) => new TableIdentifier(name, None)
+      case Array(name)     => new TableIdentifier(name, None)
       case Array(db, name) => new TableIdentifier(name, Some(db))
-      case _ => throw new IllegalArgumentException(s"Illegal targetTableName=[$tableName]")
+      case _               => throw new IllegalArgumentException(s"Illegal targetTableName=[$tableName]")
     }
   }
 
-
-  /**
-   * make dataframe as a sql view to execute with `func`
+  /** make dataframe as a sql view to execute with `func`
    */
   def withTempView[T](dfs: (DataFrame, String)*)(func: => T): T = {
     try {
-      dfs.foreach {
-        case (df, viewName) =>
-          df.createOrReplaceTempView(viewName)
+      dfs.foreach { case (df, viewName) =>
+        df.createOrReplaceTempView(viewName)
       }
       func
     } finally {
-      dfs.foreach {
-        case (df, viewName) =>
-          df.sparkSession.catalog.dropTempView(viewName)
+      dfs.foreach { case (df, viewName) =>
+        df.sparkSession.catalog.dropTempView(viewName)
       }
     }
   }

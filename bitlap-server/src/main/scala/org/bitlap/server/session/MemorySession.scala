@@ -1,9 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import org.bitlap.server.BitlapContext
-import zio.Task
-
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.collection.mutable.ListBuffer
@@ -15,6 +12,7 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.server.BitlapContext
 
 import com.google.protobuf.ByteString
 

@@ -5,8 +5,7 @@ import java.sql.{ Array as _, * }
 import java.util.Properties
 import java.util.logging.Logger
 
-/**
- * bitlap jdbc driver
+/** bitlap jdbc driver
  */
 abstract class BitlapDriver extends Driver:
 

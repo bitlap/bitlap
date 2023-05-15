@@ -1,16 +1,18 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.udf
-
-import com.fasterxml.jackson.core.`type`.TypeReference
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import org.apache.commons.lang3.{ClassUtils, StringUtils}
-import org.bitlap.common.bitmap.{BBM, CBM, RBM}
-import org.bitlap.common.utils.BMUtils
 
 import scala.collection.mutable
 
-/**
- * bitlap internal udfs
+import org.bitlap.common.bitmap.{ BBM, CBM, RBM }
+import org.bitlap.common.utils.BMUtils
+
+import org.apache.commons.lang3.{ ClassUtils, StringUtils }
+
+import com.fasterxml.jackson.core.`type`.TypeReference
+import com.fasterxml.jackson.databind.{ DeserializationFeature, ObjectMapper }
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+
+/** bitlap internal udfs
  */
 object UDFUtils {
 
@@ -36,9 +38,8 @@ object UDFUtils {
     if (map == null || map.isEmpty) " "
     else {
       val treeMap = new mutable.TreeMap[String, String]()
-      map.foreach {
-        case (k, v) =>
-          treeMap += k -> v
+      map.foreach { case (k, v) =>
+        treeMap += k -> v
       }
       treeMap.toString
     }

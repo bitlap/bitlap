@@ -1,18 +1,20 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.writer
 
+import scala.reflect.ClassTag
+
+import org.bitlap.common.BitlapConf
+import org.bitlap.core.Constants
+import org.bitlap.jdbc.BitlapDatabaseMetaData
+import org.bitlap.spark.{ BitlapOptions, SparkUtils }
+import org.bitlap.spark.udf.{ BBMAggr, CBMAggr, UDFUtils }
+
 import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.{ DataFrame, SaveMode }
 import org.apache.spark.sql.catalyst.FunctionIdentifier
 import org.apache.spark.sql.catalyst.analysis.{ FunctionRegistryBase, SimpleFunctionRegistry }
 import org.apache.spark.sql.catalyst.expressions.aggregate.AggregateFunction
 import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils
-import org.apache.spark.sql.{ DataFrame, SaveMode }
-import org.bitlap.common.BitlapConf
-import org.bitlap.core.Constants
-import org.bitlap.jdbc.BitlapDatabaseMetaData
-import org.bitlap.spark.udf.{ BBMAggr, CBMAggr, UDFUtils }
-import org.bitlap.spark.{ BitlapOptions, SparkUtils }
-
-import scala.reflect.ClassTag
 
 /** bitlap mdm model writer
  */
@@ -20,6 +22,7 @@ class BitlapMdmWriter(val data: DataFrame, val options: BitlapOptions) {
 
   private val spark      = data.sparkSession
   private val UDF_PREFIX = "bitlap_spark_udf"
+
   private lazy val serverConf: BitlapConf =
     JdbcUtils.withConnection(options) { conn =>
       val metaData = conn.getMetaData.asInstanceOf[BitlapDatabaseMetaData]
@@ -27,6 +30,7 @@ class BitlapMdmWriter(val data: DataFrame, val options: BitlapOptions) {
     }
   private lazy val tableIdentifier = this.options.tableIdentifier
   private lazy val rootPath: Path  = new Path(this.serverConf.get(BitlapConf.ROOT_DIR_DATA))
+
   private lazy val tablePath =
     new Path(new Path(rootPath, tableIdentifier.database.getOrElse(Constants.DEFAULT_DATABASE)), tableIdentifier.table)
 

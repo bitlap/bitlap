@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.storage.io
 
 import org.apache.avro.Schema
@@ -13,7 +14,6 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
-import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.TimeFilterFun
 import org.bitlap.core.storage.BitlapReader
@@ -139,10 +139,12 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
     }
 
     private fun getMetricDimFilter(metrics: List<String>, dimension: String, dimensionFilter: PrunePushedFilter): FilterPredicate {
-        var filter = BitlapReaders.makeParquetFilterAnd(listOf(
-            "mk" to metrics,
-            "dk" to listOf(dimension)
-        ))
+        var filter = BitlapReaders.makeParquetFilterAnd(
+            listOf(
+                "mk" to metrics,
+                "dk" to listOf(dimension)
+            )
+        )
         val dimFilter = BitlapReaders.makeParquetFilterFromPrunePushedFilter(dimensionFilter, "d")
         if (dimFilter != null) {
             filter = FilterApi.and(filter, dimFilter)
@@ -169,29 +171,28 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         // TODO: add enum & add shard_id if cbm is too big
         val METRIC_SCHEMA: Schema = SchemaBuilder.builder()
             .record("metric").namespace(BitlapParquetProvider::class.java.packageName).fields()
-                .optionalString("mk")
-                .optionalLong("t")
-                // .optionalString(ek)
-                // .name("m").type().array().items().bytesType().noDefault()
-                // .name("e").type().array().items().bytesType().noDefault()
-                .optionalBytes("m")
-                .optionalBytes("e")
-                .optionalString("meta")
+            .optionalString("mk")
+            .optionalLong("t")
+            // .optionalString(ek)
+            // .name("m").type().array().items().bytesType().noDefault()
+            // .name("e").type().array().items().bytesType().noDefault()
+            .optionalBytes("m")
+            .optionalBytes("e")
+            .optionalString("meta")
             .endRecord()
-
 
         val METRIC_DIM_SCHEMA: Schema = SchemaBuilder.builder()
             .record("metric").namespace(BitlapParquetProvider::class.java.packageName).fields()
-                .optionalString("mk")
-                .optionalString("dk")
-                .optionalString("d")
-                .optionalLong("t")
-                // .optionalString(ek)
-                // .name("m").type().array().items().bytesType().noDefault()
-                // .name("e").type().array().items().bytesType().noDefault()
-                .optionalBytes("m")
-                .optionalBytes("e")
-                .optionalString("meta")
+            .optionalString("mk")
+            .optionalString("dk")
+            .optionalString("d")
+            .optionalLong("t")
+            // .optionalString(ek)
+            // .name("m").type().array().items().bytesType().noDefault()
+            // .name("e").type().array().items().bytesType().noDefault()
+            .optionalBytes("m")
+            .optionalBytes("e")
+            .optionalString("meta")
             .endRecord()
     }
 }

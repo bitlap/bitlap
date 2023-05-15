@@ -41,7 +41,7 @@ open class BitlapReaderIterator<R>(private val reader: BitlapReader<R>, private 
             return
         }
         close = true
-        this.reader.use {  }
+        this.reader.use { }
     }
 
     private fun checkOpen() {

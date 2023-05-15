@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.storage
 
 import java.io.Closeable

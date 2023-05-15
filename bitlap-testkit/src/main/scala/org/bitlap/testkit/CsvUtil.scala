@@ -1,11 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
+import java.io._
+
+import scala.jdk.CollectionConverters.ListHasAsScala
+
 import org.bitlap.common.data.Event
 import org.bitlap.csv._
-
-import java.io._
-import scala.jdk.CollectionConverters.ListHasAsScala
 
 /** csv 读写工具
  *  @author

@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.storage.io
 
 import org.apache.avro.generic.GenericRecord
@@ -5,7 +6,7 @@ import org.apache.avro.util.Utf8
 import org.apache.parquet.filter2.compat.FilterCompat
 import org.apache.parquet.filter2.predicate.FilterPredicate
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Arrays
 
 /**
  * get default value [default] if the [key] does not exist.

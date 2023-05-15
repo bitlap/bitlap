@@ -10,6 +10,7 @@ import enumeratum.values.*
  *  @version 1.0,2023/3/18
  */
 sealed abstract class GetInfoType(val value: Int) extends IntEnumEntry
+
 object GetInfoType extends IntEnum[GetInfoType] {
   final case object MaxDriverConnections extends GetInfoType(1)
 
@@ -25,7 +26,6 @@ object GetInfoType extends IntEnum[GetInfoType] {
 
   final case object DbmsVer extends GetInfoType(50)
 
-
   val values: IndexedSeq[GetInfoType] = findValues
 
   def toGetInfoType(bGetInfoType: BGetInfoType): GetInfoType =
@@ -33,4 +33,4 @@ object GetInfoType extends IntEnum[GetInfoType] {
 
   def toBGetInfoType(getInfoType: GetInfoType): BGetInfoType =
     BGetInfoType.fromValue(getInfoType.value)
-}  
+}

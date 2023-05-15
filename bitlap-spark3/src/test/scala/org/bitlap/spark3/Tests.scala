@@ -1,14 +1,16 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark3
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.{ SaveMode, SparkSession }
 
-/**
- * TODO: unit tests
+/** TODO: unit tests
  */
 object Tests {
+
   def main(args: Array[String]): Unit = {
 
-    val spark = SparkSession.builder()
+    val spark = SparkSession
+      .builder()
       .master("local[*,2]")
       .getOrCreate()
 

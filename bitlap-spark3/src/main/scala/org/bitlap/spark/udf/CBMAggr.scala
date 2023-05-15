@@ -1,20 +1,20 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.udf
+
+import org.bitlap.common.bitmap.CBM
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.TypeCheckSuccess
-import org.apache.spark.sql.catalyst.expressions.aggregate.{ImperativeAggregate, TypedImperativeAggregate}
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import org.apache.spark.sql.catalyst.expressions.{ Expression, ExpressionDescription }
+import org.apache.spark.sql.catalyst.expressions.aggregate.{ ImperativeAggregate, TypedImperativeAggregate }
 import org.apache.spark.sql.catalyst.trees.TernaryLike
-import org.apache.spark.sql.types.{BinaryType, DataType, IntegerType, LongType, NullType}
-import org.bitlap.common.bitmap.CBM
+import org.apache.spark.sql.types.{ BinaryType, DataType, IntegerType, LongType, NullType }
 
-/**
- * Collect bucket, id and count into a [[CBM]].
+/** Collect bucket, id and count into a [[CBM]].
  */
 @ExpressionDescription(
-  usage =
-    """
+  usage = """
       _FUNC_(bucket, id, count) - Collect `bucket`, `id` and `count` into a CBM.
     """
 )
@@ -23,8 +23,9 @@ case class CBMAggr(
   id: Expression,
   count: Expression,
   override val mutableAggBufferOffset: Int = 0,
-  override val inputAggBufferOffset: Int = 0
-) extends TypedImperativeAggregate[CBM] with TernaryLike[Expression] {
+  override val inputAggBufferOffset: Int = 0)
+    extends TypedImperativeAggregate[CBM]
+    with TernaryLike[Expression] {
 
   def this(bucket: Expression, uid: Expression, count: Expression) = {
     this(bucket, uid, count, 0, 0)
@@ -45,18 +46,19 @@ case class CBMAggr(
       case (IntegerType, IntegerType, LongType) =>
         TypeCheckSuccess
       case _ =>
-        TypeCheckResult.TypeCheckFailure(s"Input to function $prettyName should have " +
-          s"three arguments with ${IntegerType.simpleString}, ${IntegerType.simpleString} and ${LongType.simpleString}," +
-          s"but it's [${first.dataType.catalogString}, " +
-          s"${second.dataType.catalogString}, ${third.dataType.catalogString}]"
+        TypeCheckResult.TypeCheckFailure(
+          s"Input to function $prettyName should have " +
+            s"three arguments with ${IntegerType.simpleString}, ${IntegerType.simpleString} and ${LongType.simpleString}," +
+            s"but it's [${first.dataType.catalogString}, " +
+            s"${second.dataType.catalogString}, ${third.dataType.catalogString}]"
         )
     }
   }
 
   override def update(buffer: CBM, input: InternalRow): CBM = {
     val _bucket = bucket.eval(input).asInstanceOf[Int]
-    val _id = id.eval(input).asInstanceOf[Int]
-    val _count = count.eval(input).asInstanceOf[Number].longValue()
+    val _id     = id.eval(input).asInstanceOf[Int]
+    val _count  = count.eval(input).asInstanceOf[Number].longValue()
     buffer.add(_bucket, _id, _count)
   }
 
@@ -86,12 +88,12 @@ case class CBMAggr(
   override def withNewInputAggBufferOffset(newOffset: Int): ImperativeAggregate =
     copy(inputAggBufferOffset = newOffset)
 
-
   override def nullable: Boolean = true
 
   override def dataType: DataType = BinaryType
 
-  override protected def withNewChildrenInternal(newFirst: Expression, newSecond: Expression, newThird: Expression): Expression =
+  override protected def withNewChildrenInternal(newFirst: Expression, newSecond: Expression, newThird: Expression)
+    : Expression =
     copy(bucket = newFirst, id = newSecond, count = newThird)
 
   override def prettyName: String = "cbm_aggr"

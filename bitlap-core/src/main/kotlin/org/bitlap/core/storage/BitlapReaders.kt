@@ -1,3 +1,4 @@
+/* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.storage
 
 import org.apache.avro.Schema
@@ -57,7 +58,6 @@ object BitlapReaders {
         }
         return FilterApi.`in`(FilterApi.binaryColumn(column), values.map { Binary.fromString(it) }.toSet())
     }
-
 
     /**
      * make parquet filter from [PrunePushedFilter]

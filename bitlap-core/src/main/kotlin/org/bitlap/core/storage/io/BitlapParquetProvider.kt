@@ -61,7 +61,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         val metricFilter = BitlapReaders.makeParquetFilter("mk", metrics)
         val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_SCHEMA, projections)
         return BitlapParquetReader(fs, inputs, METRIC_SCHEMA, requestedProjection, metricFilter.compact()) { row ->
-            val metaObj = JSONUtils.fromJson(row.getOr("meta", "{}"), MetricRowMeta::class.java)
+            val metaObj = JSONUtils.fromJson(row.getWithDefault("meta", "{}"), MetricRowMeta::class.java)
             if (timeFunc(metaObj.tm)) {
                 metaObj
             } else {
@@ -79,9 +79,9 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
             if (tm != null && timeFunc(tm as Long)) {
                 MetricRow(
                     tm,
-                    row.getOr("mk", ""),
-                    CBM(row.getOr("m", ByteArray(0))),
-                    BBM(row.getOr("e", ByteArray(0)))
+                    row.getWithDefault("mk", ""),
+                    CBM(row.getWithDefault("m", ByteArray(0))),
+                    BBM(row.getWithDefault("e", ByteArray(0)))
                 )
             } else {
                 null
@@ -101,7 +101,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         val filter = this.getMetricDimFilter(metrics, dimension, dimensionFilter)
         val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_DIM_SCHEMA, projections)
         return BitlapParquetReader(fs, inputs, METRIC_DIM_SCHEMA, requestedProjection, filter.compact()) { row ->
-            val metaObj = JSONUtils.fromJson(row.getOr("meta", "{}"), MetricDimRowMeta::class.java)
+            val metaObj = JSONUtils.fromJson(row.getWithDefault("meta", "{}"), MetricDimRowMeta::class.java)
             if (timeFunc(metaObj.tm)) {
                 metaObj
             } else {
@@ -126,11 +126,11 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
             if (tm != null && timeFunc(tm as Long)) {
                 MetricDimRow(
                     tm,
-                    row.getOr("mk", ""),
-                    row.getOr("dk", ""),
-                    row.getOr("d", ""),
-                    CBM(row.getOr("m", ByteArray(0))),
-                    BBM(row.getOr("e", ByteArray(0)))
+                    row.getWithDefault("mk", ""),
+                    row.getWithDefault("dk", ""),
+                    row.getWithDefault("d", ""),
+                    CBM(row.getWithDefault("m", ByteArray(0))),
+                    BBM(row.getWithDefault("e", ByteArray(0)))
                 )
             } else {
                 null

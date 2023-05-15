@@ -7,7 +7,10 @@ import org.apache.parquet.filter2.predicate.FilterPredicate
 import java.nio.ByteBuffer
 import java.util.*
 
-fun <T> GenericRecord?.getOr(key: String, default: T): T {
+/**
+ * get default value [default] if the [key] does not exist.
+ */
+fun <T> GenericRecord?.getWithDefault(key: String, default: T): T {
     if (this == null || !this.hasField(key)) return default
     val value = this.get(key)
     return when {

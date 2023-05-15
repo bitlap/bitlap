@@ -1,13 +1,14 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
-import zio.Task
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
 
-import java.util.concurrent.atomic.AtomicBoolean
+import zio.Task
 
 /** bitlap 会话
  *
@@ -23,7 +24,7 @@ trait Session {
   val username: String
   val sessionManager: SessionManager
 
-  var lastAccessTime: Long
+  def lastAccessTime: Long
 
   def sessionConf: BitlapConf
 

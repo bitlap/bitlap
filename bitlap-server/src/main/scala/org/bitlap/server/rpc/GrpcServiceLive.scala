@@ -1,29 +1,30 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
-import io.grpc._
-import org.bitlap.network._
-import org.bitlap.network.NetworkException._
-import org.bitlap.network.driver_proto._
+import org.bitlap.network.*
+import org.bitlap.network.NetworkException.*
+import org.bitlap.network.driver_proto.*
 import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
 import org.bitlap.network.enumeration.GetInfoType
-import org.bitlap.network.handles._
-import org.bitlap.server._
-import org.bitlap.tools._
-import zio._
+import org.bitlap.network.handles.*
+import org.bitlap.server.*
 
-/** RPC的服务端API实现，基于 zio-grpc,zio 1.0
+import io.grpc.*
+import zio.*
+
+/** RPC的服务端API实现，基于 zio-grpc,zio 2.0
  *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcServiceLive {
+object GrpcServiceLive:
+
   lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
-    ZLayer.fromFunction((rpc: DriverAsyncRpc) => GrpcServiceLive(rpc))
-}
-@apply
-final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any] {
+    ZLayer.fromFunction((rpc: DriverAsyncRpc) => new GrpcServiceLive(rpc))
+end GrpcServiceLive
+
+final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any]:
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   override def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
@@ -106,15 +107,16 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
   override def getLeader(request: BGetLeaderReq): ZIO[Any, Status, BGetLeaderResp] = {
     val leaderAddress = BitlapContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
-      if (ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty) {
+      if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
         ZIO.fail(LeaderNotFoundException(s"requestId: ${request.requestId}"))
       } else {
         ZIO.succeed(ld)
       }
-    }.mapBoth(
-      errorApplyFunc,
-      t => BGetLeaderResp(Option(t.ip), t.port)
-    )
+    }
+      .mapBoth(
+        errorApplyFunc,
+        t => BGetLeaderResp(Option(t.ip), t.port)
+      )
   }
 
   override def cancelOperation(
@@ -154,4 +156,3 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
         _.getInfo(new SessionHandle(request.getSessionHandle), GetInfoType.toGetInfoType(request.infoType))
       )
       .mapBoth(errorApplyFunc, _.toBGetInfoResp)
-}

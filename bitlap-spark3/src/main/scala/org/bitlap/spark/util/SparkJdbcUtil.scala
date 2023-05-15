@@ -1,20 +1,20 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.util
 
-import org.apache.spark.executor.InputMetrics
-import org.apache.spark.sql.catalyst.expressions.SpecificInternalRow
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.apache.spark.sql.catalyst.util.{ DateTimeUtils, GenericArrayData }
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.types._
-import org.apache.spark.unsafe.types.UTF8String
-import org.apache.spark.sql.jdbc.{ JdbcDialect, JdbcType }
-
 import java.sql.{ PreparedStatement, ResultSet }
-import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils.getCommonJDBCType
-import java.util.Locale
 import java.sql.Connection
+import java.util.Locale
+
+import org.apache.spark.executor.InputMetrics
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.apache.spark.sql.catalyst.expressions.SpecificInternalRow
+import org.apache.spark.sql.catalyst.util.{ DateTimeUtils, GenericArrayData }
+import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils.getCommonJDBCType
+import org.apache.spark.sql.jdbc.{ JdbcDialect, JdbcType }
+import org.apache.spark.sql.types.*
+import org.apache.spark.unsafe.types.UTF8String
 
 /** @author
  *    梦境迷离
@@ -31,7 +31,7 @@ object SparkJdbcUtil {
   private type JDBCValueGetter = (ResultSet, InternalRow, Int) => Unit
 
   private def nullSafeConvert[T](input: T, f: T => Any): Any =
-    if (input == null) {
+    if input == null then {
       null
     } else {
       f(input)
@@ -107,19 +107,19 @@ object SparkJdbcUtil {
       (rs: ResultSet, row: InternalRow, pos: Int) =>
         // DateTimeUtils.fromJavaDate does not handle null value, so we need to check it.
         val dateVal = rs.getDate(pos + 1)
-        if (dateVal != null) {
+        if dateVal != null then {
           row.setInt(pos, DateTimeUtils.fromJavaDate(dateVal))
         } else {
           row.update(pos, null)
         }
 
-      // When connecting with Oracle DB through JDBC, the precision and scale of BigDecimal
-      // object returned by ResultSet.getBigDecimal is not correctly matched to the table
-      // schema reported by ResultSetMetaData.getPrecision and ResultSetMetaData.getScale.
-      // If inserting values like 19999 into a column with NUMBER(12, 2) type, you get through
-      // a BigDecimal object with scale as 0. But the dataframe schema has correct type as
-      // DecimalType(12, 2). Thus, after saving the dataframe into parquet file and then
-      // retrieve it, you will get wrong result 199.99.
+    // When connecting with Oracle DB through JDBC, the precision and scale of BigDecimal
+    // object returned by ResultSet.getBigDecimal is not correctly matched to the table
+    // schema reported by ResultSetMetaData.getPrecision and ResultSetMetaData.getScale.
+    // If inserting values like 19999 into a column with NUMBER(12, 2) type, you get through
+    // a BigDecimal object with scale as 0. But the dataframe schema has correct type as
+    // DecimalType(12, 2). Thus, after saving the dataframe into parquet file and then
+    // retrieve it, you will get wrong result 199.99.
     // So it is needed to set precision and scale for Decimal based on JDBC metadata.
     case Fixed(p, s) =>
       (rs: ResultSet, row: InternalRow, pos: Int) =>
@@ -141,7 +141,7 @@ object SparkJdbcUtil {
         val bytes = rs.getBytes(pos + 1)
         var ans   = 0L
         var j     = 0
-        while (j < bytes.length) {
+        while j < bytes.length do {
           ans = 256 * ans + (255 & bytes(j))
           j = j + 1
         }
@@ -161,7 +161,7 @@ object SparkJdbcUtil {
     case TimestampType =>
       (rs: ResultSet, row: InternalRow, pos: Int) =>
         val t = rs.getTimestamp(pos + 1)
-        if (t != null) {
+        if t != null then {
           row.setLong(pos, DateTimeUtils.fromJavaTimestamp(t))
         } else {
           row.update(pos, null)
@@ -186,7 +186,7 @@ object SparkJdbcUtil {
             // some underling types are not String such as uuid, inet, cidr, etc.
             array
               .asInstanceOf[Array[java.lang.Object]]
-              .map(obj => if (obj == null) null else UTF8String.fromString(obj.toString))
+              .map(obj => if obj == null then null else UTF8String.fromString(obj.toString))
 
         case DateType =>
           (array: Object) =>
@@ -263,7 +263,7 @@ object SparkJdbcUtil {
      *  InputFormats throwing exceptions.
      */
     def closeIfNeeded(): Unit =
-      if (!closed) {
+      if !closed then {
         // Note: it's important that we set closed = true before calling close(), since setting it
         // afterwards would permit us to call close() multiple times if close() threw an exception.
         closed = true
@@ -271,10 +271,10 @@ object SparkJdbcUtil {
       }
 
     override def hasNext: Boolean = {
-      if (!finished) {
-        if (!gotNext) {
+      if !finished then {
+        if !gotNext then {
           nextValue = getNext()
-          if (finished) {
+          if finished then {
             closeIfNeeded()
           }
           gotNext = true
@@ -284,7 +284,7 @@ object SparkJdbcUtil {
     }
 
     override def next(): U = {
-      if (!hasNext) {
+      if !hasNext then {
         throw new NoSuchElementException("End of stream")
       }
       gotNext = false
@@ -312,15 +312,15 @@ object SparkJdbcUtil {
         }
 
       override protected def getNext(): InternalRow =
-        if (rs.next()) {
+        if rs.next() then {
           //          inputMetrics.incRecordsRead(1)
           val m = classOf[InputMetrics].getDeclaredMethod("incRecordsRead", classOf[Long])
           m.setAccessible(true)
           m.invoke(inputMetrics, 1)
           var i = 0
-          while (i < getters.length) {
+          while i < getters.length do {
             getters(i).apply(rs, mutableRow, i)
-            if (rs.wasNull) mutableRow.setNullAt(i)
+            if rs.wasNull then mutableRow.setNullAt(i)
             i = i + 1
           }
           mutableRow

@@ -1,14 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.reader
 
+import java.io.IOException
+import java.sql.*
+
+import org.bitlap.spark.util.SparkJdbcUtil
+
 import org.apache.spark.executor.InputMetrics
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.connector.read.PartitionReader
 import org.apache.spark.sql.types.StructType
-import org.bitlap.spark.util.SparkJdbcUtil
-
-import java.io.IOException
-import java.sql._
 
 /** @since 2022/10/16
  *  @author
@@ -17,8 +18,8 @@ import java.sql._
 final class BitlapPartitionReader(
   options: BitlapDataSourceReadOptions,
   schema: StructType,
-  bitlapPartition: BitlapInputPartition
-) extends PartitionReader[InternalRow] {
+  bitlapPartition: BitlapInputPartition)
+    extends PartitionReader[InternalRow] {
 
   private var currentRow: InternalRow         = InternalRow.empty
   private var iterator: Iterator[InternalRow] = Iterator.empty
@@ -37,7 +38,7 @@ final class BitlapPartitionReader(
   }
 
   override def next(): Boolean =
-    if (!iterator.hasNext) {
+    if !iterator.hasNext then {
       false
     } else {
       currentRow = iterator.next()
@@ -47,7 +48,7 @@ final class BitlapPartitionReader(
   override def get(): InternalRow = currentRow
 
   override def close(): Unit =
-    if (resultSet != null) {
+    if resultSet != null then {
       try
         resultSet.close()
       catch {

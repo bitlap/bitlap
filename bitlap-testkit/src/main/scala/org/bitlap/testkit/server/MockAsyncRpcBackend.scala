@@ -1,35 +1,36 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
+import org.bitlap.network.*
+import org.bitlap.network.enumeration.*
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
+import org.bitlap.testkit.*
+
 import com.google.protobuf.ByteString
-import org.bitlap.network._
-import org.bitlap.network.enumeration._
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
-import org.bitlap.testkit._
-import org.bitlap.tools.apply
-import zio._
+
+import zio.*
 
 /** 用于测试的 bitlap rpc 服务端实现
  *
- *  使用固定的测试数据：simple_data.csv
+ *  使用固定的测试数据: simple_data.csv
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
 object MockAsyncRpcBackend {
-  lazy val live: ULayer[DriverAsyncRpc] = ZLayer.succeed(MockAsyncRpcBackend())
+  lazy val live: ULayer[DriverAsyncRpc] = ZLayer.succeed(new MockAsyncRpcBackend())
 }
-@apply
-class MockAsyncRpcBackend extends DriverAsyncRpc with CsvUtil {
 
-  val metrics: Seq[Metric] = readCsvData("simple_data.csv")
+final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
+
+  val metrics: Seq[Metric] = readCSVData("simple_data.csv")
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, SessionHandle] = ZIO.succeed(SessionHandle(new HandleIdentifier()))
+  ): ZIO[Any, Throwable, SessionHandle] = ZIO.succeed(new SessionHandle(new HandleIdentifier()))
 
   override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] = ZIO.unit
 

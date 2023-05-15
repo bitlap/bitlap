@@ -10,7 +10,7 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.bitlap.spark.reader.BitlapScanBuilder
 import org.bitlap.spark.writer.BitlapWriteBuilder
 
-import java.util.{Map => JMap, Set => JSet}
+import java.util.{Set, Map => JMap, Set => JSet}
 import scala.jdk.CollectionConverters._
 
 /** @author

@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.common.exception.BitlapException
-
 import java.sql.SQLException
+
+import org.bitlap.common.exception.BitlapException
 
 /** bitlap 客户端的SQL异常
  *  @author
@@ -15,10 +15,8 @@ final case class BitlapSQLException(
   msg: String,
   state: String = null,
   code: Int = -1,
-  cause: Option[Throwable] = None
-) extends SQLException(msg, state, code, cause.orNull)
+  cause: Option[Throwable] = None)
+    extends SQLException(msg, state, code, cause.orNull)
 
-final case class BitlapJdbcUriParseException(
-  msg: String,
-  cause: Option[Throwable] = None
-) extends BitlapException(msg, cause.orNull)
+final case class BitlapJdbcUriParseException(msg: String, cause: Option[Throwable] = None)
+    extends BitlapException(msg, cause.orNull)

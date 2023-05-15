@@ -1,18 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import org.bitlap.client.BitlapClient
-import org.bitlap.network.handles.SessionHandle
-
 import java.io.{ InputStream, Reader }
 import java.math.BigDecimal
 import java.net.URL
-import java.sql._
+import java.sql.*
 import java.text.MessageFormat
 import java.util.{ Calendar, Scanner }
+
+import scala.{ Array as _, Byte as _ }
 import scala.collection.mutable
 import scala.util.control.Breaks.{ break, breakable }
-import scala.{ Array => _, Byte => _ }
+
+import org.bitlap.client.BitlapClient
+import org.bitlap.network.handles.SessionHandle
 
 /** @author
  *    梦境迷离
@@ -22,57 +23,49 @@ class BitlapPreparedStatement(
   private val connection: Connection,
   private val sessHandle: SessionHandle,
   private val client: BitlapClient,
-  private val sql: String
-) extends BitlapStatement(connection, sessHandle, client)
-    with PreparedStatement {
+  private val sql: String)
+    extends BitlapStatement(connection, sessHandle, client)
+    with PreparedStatement:
 
   private val parameters = new mutable.HashMap[Int, String]
 
-  private def getCharIndexFromSqlByParamLocation(sql: String, cchar: Char, paramLoc: Int): Int = {
+  private def getCharIndexFromSqlByParamLocation(sql: String, cchar: Char, paramLoc: Int): Int =
     var signalCount = 0
     var charIndex   = -1
     var num         = 0
     breakable {
-      for (i <- 0 until sql.length) {
+      for i <- 0 until sql.length do
         val c = sql.charAt(i)
-        if (c == '\'' || c == '\\') // record the count of char "'" and char "\"
+        if c == '\'' || c == '\\' then // record the count of char "'" and char "\"
           signalCount += 1
-        else if (c == cchar && signalCount % 2 == 0) { // check if the ? is really the parameter
+        else if c == cchar && signalCount % 2 == 0 then // check if the ? is really the parameter
           num += 1
-          if (num == paramLoc) {
+          if num == paramLoc then
             charIndex = i
             break()
-          }
-        }
-      }
     }
     charIndex
-  }
 
-  private def updateSql(sql: String, parameters: mutable.HashMap[Int, String]): String = {
-    if (!sql.contains("?")) return sql
+  private def updateSql(sql: String, parameters: mutable.HashMap[Int, String]): String =
+    if !sql.contains("?") then return sql
     val newSql   = new StringBuffer(sql)
     var paramLoc = 1
-    while (getCharIndexFromSqlByParamLocation(sql, '?', paramLoc) > 0) {
+    while getCharIndexFromSqlByParamLocation(sql, '?', paramLoc) > 0 do
       // check the user has set the needs parameters
-      if (parameters.contains(paramLoc)) {
+      if parameters.contains(paramLoc) then
         val tt = getCharIndexFromSqlByParamLocation(newSql.toString, '?', 1)
         newSql.deleteCharAt(tt)
         newSql.insert(tt, parameters.get(paramLoc))
-      }
       paramLoc += 1
-    }
     newSql.toString
-  }
 
   override def execute: Boolean = super.execute(updateSql(sql, parameters))
 
   override def executeQuery(): ResultSet = super.executeQuery(updateSql(sql, parameters))
 
-  override def executeUpdate(): Int = {
+  override def executeUpdate(): Int =
     super.executeUpdate(updateSql(sql, parameters))
     0
-  }
 
   override def setNull(parameterIndex: Int, sqlType: Int): Unit = throw new SQLFeatureNotSupportedException(
     "Method not supported"
@@ -198,10 +191,15 @@ class BitlapPreparedStatement(
     "Method not supported"
   )
 
-  override def setObject(parameterIndex: Int, x: Any, targetSqlType: Int, scaleOrLength: Int): Unit =
-    if (x == null) setNull(parameterIndex, Types.NULL)
+  override def setObject(
+    parameterIndex: Int,
+    x: Any,
+    targetSqlType: Int,
+    scaleOrLength: Int
+  ): Unit =
+    if x == null then setNull(parameterIndex, Types.NULL)
     else
-      x match {
+      x match
         case str: String         => setString(parameterIndex, str)
         case sh: Short           => setShort(parameterIndex, sh)
         case i: Int              => setInt(parameterIndex, i)
@@ -231,7 +229,6 @@ class BitlapPreparedStatement(
               x.getClass.getName
             )
           )
-      }
 
   override def setAsciiStream(parameterIndex: Int, x: InputStream, length: Long): Unit =
     throw new SQLFeatureNotSupportedException("Method not supported")
@@ -246,10 +243,9 @@ class BitlapPreparedStatement(
     "Method not supported"
   )
 
-  override def setBinaryStream(parameterIndex: Int, x: InputStream): Unit = {
+  override def setBinaryStream(parameterIndex: Int, x: InputStream): Unit =
     val str = new Scanner(x, "UTF-8").useDelimiter("\\A").next
     parameters.put(parameterIndex, str)
-  }
 
   override def setCharacterStream(parameterIndex: Int, reader: Reader): Unit =
     throw new SQLFeatureNotSupportedException("Method not supported")
@@ -268,4 +264,3 @@ class BitlapPreparedStatement(
   override def setNClob(parameterIndex: Int, reader: Reader): Unit = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
-}

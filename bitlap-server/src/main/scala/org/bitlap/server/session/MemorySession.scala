@@ -1,21 +1,26 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.session
 
-import com.google.protobuf.ByteString
-import org.bitlap.common.{BitlapConf, BitlapVersionInfo}
-import org.bitlap.jdbc.BitlapSQLException
-import org.bitlap.network.enumeration.GetInfoType._
-import org.bitlap.network.enumeration._
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
 import org.bitlap.server.BitlapContext
 import zio.Task
 
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters._
 
-/** bitlap 会话
+import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.*
+
+import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
+import org.bitlap.jdbc.BitlapSQLException
+import org.bitlap.network.enumeration.*
+import org.bitlap.network.enumeration.GetInfoType.*
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
+
+import com.google.protobuf.ByteString
+
+import zio.Task
+
+/** bitlap 单机会话实现
  *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3
@@ -27,16 +32,18 @@ final class MemorySession(
   val sessionManager: SessionManager,
   val sessionHandle: SessionHandle = new SessionHandle(new HandleIdentifier()),
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
-  val creationTime: Long = System.currentTimeMillis()
-) extends Session {
+  val creationTime: Long = System.currentTimeMillis())
+    extends Session {
 
-  override var lastAccessTime: Long = _
+  private[session] var _lastAccessTime: Long = _
+
+  override def lastAccessTime: Long = _lastAccessTime
 
   override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
 
   override def open(): Unit = {
     this.sessionState.compareAndSet(false, true)
-    lastAccessTime = System.currentTimeMillis()
+    _lastAccessTime = System.currentTimeMillis()
   }
 
   override def executeStatement(
@@ -73,7 +80,7 @@ final class MemorySession(
   override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
       val op = SessionManager.operationStore.getOrElse(operationHandle, null)
-      if (op != null) {
+      if op != null then {
         op.setState(OperationState.ClosedState)
         removeOperation(operationHandle)
       }
@@ -82,8 +89,8 @@ final class MemorySession(
   override def cancelOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
       val op = SessionManager.operationStore.getOrElse(operationHandle, null)
-      if (op != null) {
-        if (op.state.terminal) {
+      if op != null then {
+        if op.state.terminal then {
           println(s"$operationHandle Operation is already aborted in state - ${op.state}")
         } else {
           println(s"$operationHandle Attempting to cancel from state - ${op.state}")
@@ -95,7 +102,7 @@ final class MemorySession(
 
   override def removeExpiredOperations(handles: List[OperationHandle]): List[Operation] = {
     val removed = new ListBuffer[Operation]()
-    for (handle <- handles) {
+    for handle <- handles do {
       val operation = removeTimedOutOperation(handle)
       operation.foreach(f => removed.append(f))
     }
@@ -121,18 +128,17 @@ final class MemorySession(
     operation
   }
 
-  private def addOperation(operation: Operation) {
+  private def addOperation(operation: Operation) =
     this.synchronized {
       SessionManager.opHandleSet.append(operation.opHandle)
       SessionManager.operationStore.put(operation.opHandle, operation)
     }
-  }
 
   private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
     this.synchronized {
       val r   = SessionManager.operationStore.remove(operationHandle)
       val idx = SessionManager.opHandleSet.indexOf(operationHandle)
-      if (idx != -1) {
+      if idx != -1 then {
         SessionManager.opHandleSet.remove(idx)
       }
       r
@@ -140,7 +146,7 @@ final class MemorySession(
 
   private def removeTimedOutOperation(operationHandle: OperationHandle): Option[Operation] = {
     val operation = SessionManager.operationStore.get(operationHandle)
-    if (operation != null && operation.get.isTimedOut(System.currentTimeMillis)) {
+    if operation != null && operation.get.isTimedOut(System.currentTimeMillis) then {
       return removeOperation(operationHandle)
     }
     operation
@@ -148,7 +154,7 @@ final class MemorySession(
 
   override def getNoOperationTime: Long = {
     val noMoreOpHandle = SessionManager.opHandleSet.isEmpty
-    if (noMoreOpHandle) System.currentTimeMillis - lastAccessTime
+    if noMoreOpHandle then System.currentTimeMillis - _lastAccessTime
     else 0
   }
 

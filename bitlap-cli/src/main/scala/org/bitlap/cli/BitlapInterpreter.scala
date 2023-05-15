@@ -1,19 +1,21 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli
 
-import org.bitlap.cli.BitlapInterpreter.CliCommands._
+import java.io.*
+
+import scala.collection.mutable.ArrayBuffer
+
+import org.bitlap.cli.BitlapInterpreter.CliCommands.*
 import org.bitlap.cli.Command.{ Server, Sql }
 import org.bitlap.cli.interactive.BitlapSqlApplication
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
-import sqlline._
-import zio.cli.HelpDoc.Span.text
-import zio.cli.{ Command => ZioCliCommand, _ }
-import zio.{ Console, System => ZSystem, _ }
 
-import java.io._
-import scala.collection.mutable.ArrayBuffer
+import sqlline.*
+import zio.{ Console, System as ZSystem, * }
+import zio.cli.{ Command as ZioCliCommand, * }
+import zio.cli.HelpDoc.Span.text
 
 /** 基于zio-cli实现的命令行解释器
  *  @author
@@ -56,7 +58,7 @@ trait BitlapInterpreter {
       classOf[BitlapSqlApplication].getCanonicalName
     )
     val defaultSql = sqlBuild(sql.args)
-    if (!StringEx.nullOrBlank(defaultSql)) {
+    if !StringEx.nullOrBlank(defaultSql) then {
       sqlArgs ++= Array("-e", defaultSql)
     }
     // sql line REPL or execute sql directly
@@ -64,7 +66,7 @@ trait BitlapInterpreter {
     val line = new SqlLine()
     line.getOpts.set(BitlapPrompt, projectName)
     val status = line.begin(sqlArgs.toArray, null, false)
-    if (!java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT)) {
+    if !java.lang.Boolean.getBoolean(SqlLineOpts.PROPERTY_NAME_EXIT) then {
       // System.exit(status.ordinal)
       status.ordinal()
     } else {
@@ -75,7 +77,7 @@ trait BitlapInterpreter {
   private def getHistoryPath(projectName: String): String = {
     val home = System.getProperty("user.home")
     val os   = System.getProperty("os.name").toLowerCase
-    val child = if (os.contains("windows")) {
+    val child = if os.contains("windows") then {
       projectName
     } else {
       s".$projectName" // default is: ~/.bitlap
@@ -87,7 +89,7 @@ trait BitlapInterpreter {
 
 object BitlapInterpreter {
 
-  import org.bitlap.cli.BitlapInterpreter.CliOptions._
+  import org.bitlap.cli.BitlapInterpreter.CliOptions.*
 
   val bitlap: ZioCliCommand[Command] = ZioCliCommand("bitlap", Options.none, Args.none)
     .withHelp(help)

@@ -1,31 +1,32 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.rpc
 
-import com.typesafe.scalalogging.LazyLogging
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core._
+import org.bitlap.core.*
 import org.bitlap.jdbc.Constants
-import org.bitlap.network._
-import org.bitlap.network.handles._
-import org.bitlap.network.models._
-import org.bitlap.server.session.SessionManager
-import org.bitlap.tools._
-import zio._
+import org.bitlap.network.*
 import org.bitlap.network.NetworkException.SQLExecutedException
-import org.bitlap.network.enumeration._
+import org.bitlap.network.enumeration.*
+import org.bitlap.network.handles.*
+import org.bitlap.network.models.*
+import org.bitlap.server.session.SessionManager
 
-/** 异步RPC的服务端实现，基于 zio 1.0
+import com.typesafe.scalalogging.LazyLogging
+
+import zio.*
+
+/** 异步RPC的服务端实现，基于 zio 2.0
  *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcBackendLive {
-  private[server] lazy val liveInstance: GrpcBackendLive = GrpcBackendLive.apply()
+object GrpcBackendLive:
+  private[server] lazy val liveInstance: GrpcBackendLive = new GrpcBackendLive
   lazy val live: ULayer[DriverAsyncRpc]                  = ZLayer.succeed(liveInstance)
-}
-@apply
-class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
+end GrpcBackendLive
+
+final class GrpcBackendLive extends DriverAsyncRpc with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
@@ -130,5 +131,3 @@ class GrpcBackendLive extends DriverAsyncRpc with LazyLogging {
     SessionManager
       .getInfo(sessionHandle, getInfoType)
       .provide(SessionManager.live)
-
-}

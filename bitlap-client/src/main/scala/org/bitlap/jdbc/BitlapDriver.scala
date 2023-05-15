@@ -1,20 +1,20 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.jdbc
 
-import java.sql.{ Array => _, _ }
+import java.sql.{ Array as _, * }
 import java.util.Properties
 import java.util.logging.Logger
 
 /**
  * bitlap jdbc driver
  */
-private[jdbc] abstract class BitlapDriver extends Driver {
+abstract class BitlapDriver extends Driver:
 
   override def connect(url: String, info: Properties): Connection =
-    try new BitlapConnection(url, info)
-    catch {
-      case ex: Exception => throw BitlapSQLException(ex.toString)
-    }
+    try
+      if acceptsURL(url) then new BitlapConnection(url, info)
+      else throw BitlapSQLException(s"Invalid bitlap jdbc url: $url")
+    catch case ex: Exception => throw BitlapSQLException(ex.toString)
 
   /** Checks whether a given url is in a valid format.
    *
@@ -27,14 +27,12 @@ private[jdbc] abstract class BitlapDriver extends Driver {
    *    - decide on uri format
    */
   override def acceptsURL(url: String): Boolean =
-    if (url == null || url.isEmpty) false
+    if url == null || url.isEmpty then false
     else url.startsWith(Constants.URL_PREFIX)
 
-  override def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] = {
+  override def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] =
     var curInfo: Properties = new Properties(info)
-    if (url != null && url.startsWith(Constants.URL_PREFIX)) {
-      curInfo = parseURL(url, curInfo)
-    }
+    if url != null && url.startsWith(Constants.URL_PREFIX) then curInfo = parseURL(url, curInfo)
 
     val hostProp = new DriverPropertyInfo(
       Constants.HOST_PROPERTY_KEY,
@@ -59,7 +57,6 @@ private[jdbc] abstract class BitlapDriver extends Driver {
 
     println(s"Driver connect to: host[${hostProp.value}],port[${portProp.value}],database:[${dbProp.value}]")
     Array(hostProp, portProp, dbProp)
-  }
 
   override def getMajorVersion(): Int = Constants.MAJOR_VERSION
 
@@ -71,10 +68,9 @@ private[jdbc] abstract class BitlapDriver extends Driver {
 
   def register(): Unit =
     try java.sql.DriverManager.registerDriver(this)
-    catch {
+    catch
       case e: Exception =>
         throw BitlapSQLException("Error occurred while registering JDBC driver", cause = Option(e))
-    }
 
   /** Takes a url in the form of jdbc:bitlap://[hostname1,hostname2]:[port]/[db_name] and parses it.
    *
@@ -82,12 +78,10 @@ private[jdbc] abstract class BitlapDriver extends Driver {
    *  @param defaults
    *  @return
    */
-  private def parseURL(url: String, defaults: Properties): Properties = {
-    val urlProps = if (defaults != null) new Properties(defaults) else new Properties()
-    if (!url.startsWith(Constants.URL_PREFIX)) {
-      throw BitlapSQLException(s"Invalid connection url: $url")
-    }
-    if (url.length <= Constants.URL_PREFIX.length) return urlProps
+  private def parseURL(url: String, defaults: Properties): Properties =
+    val urlProps = if defaults != null then new Properties(defaults) else new Properties()
+    if !url.startsWith(Constants.URL_PREFIX) then throw BitlapSQLException(s"Invalid connection url: $url")
+    if url.length <= Constants.URL_PREFIX.length then return urlProps
 
     // [hostname]:[port]/[db_name]
     val connectionInfo: String = url.substring(Constants.URL_PREFIX.length)
@@ -96,20 +90,12 @@ private[jdbc] abstract class BitlapDriver extends Driver {
     val hostPortAndDatabase = connectionInfo.split("/", 2)
 
     // [hostname]:[port]
-    if (hostPortAndDatabase(0).nonEmpty) {
+    if hostPortAndDatabase(0).nonEmpty then
       val hostAndPort = hostPortAndDatabase(0).split(":", 2)
       urlProps.setProperty(Constants.HOST_PROPERTY_KEY, hostAndPort(0))
-      if (hostAndPort.size > 1) {
-        urlProps.setProperty(Constants.PORT_PROPERTY_KEY, hostAndPort(1))
-      } else {
-        urlProps.setProperty(Constants.PORT_PROPERTY_KEY, Constants.DEFAULT_PORT)
-      }
-    }
+      if hostAndPort.size > 1 then urlProps.setProperty(Constants.PORT_PROPERTY_KEY, hostAndPort(1))
+      else urlProps.setProperty(Constants.PORT_PROPERTY_KEY, Constants.DEFAULT_PORT)
 
     // [db_name]
-    if (hostPortAndDatabase.size > 1) {
-      urlProps.setProperty(Constants.DBNAME_PROPERTY_KEY, hostPortAndDatabase(1))
-    }
+    if hostPortAndDatabase.size > 1 then urlProps.setProperty(Constants.DBNAME_PROPERTY_KEY, hostPortAndDatabase(1))
     urlProps
-  }
-}

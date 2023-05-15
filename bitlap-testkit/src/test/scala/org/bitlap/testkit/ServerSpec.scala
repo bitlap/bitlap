@@ -1,19 +1,21 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import org.bitlap.common.jdbc._
-import org.bitlap.testkit.server._
-import org.junit._
+import java.sql.*
 
-import java.sql._
+import org.bitlap.testkit.server.*
 
-class ServerSpec extends CsvUtil {
+import org.junit.*
 
-  private lazy val table    = s"test_table_${FakeDataUtil.randEntityNumber}"
-  private lazy val database = s"test_database_${FakeDataUtil.randEntityNumber}"
+import bitlap.rolls.core.jdbc.*
+
+class ServerSpec extends CSVUtils {
+
+  private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
+  private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
-  implicit lazy val conn: Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+  given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
   // 每个测试都会执行一次，需要修改！
   @Before
@@ -38,7 +40,7 @@ class ServerSpec extends CsvUtil {
     sql"drop table $table cascade"
 
   // 执行FakeDataUtilSpec 生成新的mock数据
-  // 在java 9以上运行时，需要JVM参数：--add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+  // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
   def query_test1(): Unit = {
     val rs = sql"""
@@ -47,16 +49,16 @@ class ServerSpec extends CsvUtil {
        where _time >= 0
        group by _time
        """
-    val ret1 = Extractor[GenericRow4[Long, Double, Double, Long]].from(rs)
+    val ret1 = ResultSetX[TypeRow4[Long, Double, Double, Long]](rs).fetch()
     assert(ret1.nonEmpty)
 
     sql"create database if not exists $database"
     sql"use $database"
 
-    val showResult = Extractor[GenericRow1[String]].from(sql"show current_database")
+    val showResult = ResultSetX[TypeRow1[String]](sql"show current_database").fetch()
     println(database)
-    println(showResult.map(_.col1))
-    assert(showResult.nonEmpty && showResult.exists(_.col1 == database))
+    println(showResult.map(_.values))
+    assert(showResult.nonEmpty && showResult.exists(_.values.contains(database)))
   }
 
 }

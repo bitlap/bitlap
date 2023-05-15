@@ -5,4 +5,9 @@ package org.bitlap.testkit
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-final case class Metric(time: Long, entity: Int, dimensions: List[Dimension], name: String, value: Long)
+final case class Metric(
+  time: Long,
+  entity: Int,
+  dimensions: List[Dimension],
+  name: String,
+  value: Long)

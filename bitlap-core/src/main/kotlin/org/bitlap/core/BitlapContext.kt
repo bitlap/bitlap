@@ -8,7 +8,7 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.data.impl.BitlapCatalogImpl
 import org.bitlap.core.sql.BitlapSqlPlanner
 import org.bitlap.core.sql.QueryContext
-import org.bitlap.network.handles.HandleIdentifier
+import org.bitlap.network.HandleIdentifier
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 

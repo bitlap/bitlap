@@ -7,7 +7,7 @@ package org.bitlap.jdbc
  *  @since 2021/8/28
  *  @version 1.0
  */
-object Constants {
+object Constants:
 
   /** Major version number of this driver.
    */
@@ -51,4 +51,3 @@ object Constants {
   final val BITLAP_INIT_SQL        = "initFile"
   final val BITLAP_RETRIES         = "retries"
   final val BITLAP_DEFAULT_RETRIES = 1
-}

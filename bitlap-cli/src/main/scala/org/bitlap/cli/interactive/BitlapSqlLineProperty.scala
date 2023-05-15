@@ -1,32 +1,33 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.cli.interactive
 
+import java.util.Set as JSet
+
+import scala.jdk.CollectionConverters.*
+
 import sqlline.SqlLineProperty
 import sqlline.SqlLineProperty.Type
 
-import java.util.{ Set => JSet }
-import scala.jdk.CollectionConverters._
-
 class BitlapSqlLineProperty(
   name: String,
-  `type`: Type,
-  defaultValue: AnyRef,
-  couldBeStored: Boolean = true,
-  isReadOnly: Boolean = false,
-  availableValues: Set[String] = Set.empty
-) extends SqlLineProperty {
+  _type: Type,
+  _defaultValue: AnyRef,
+  _couldBeStored: Boolean = true,
+  _isReadOnly: Boolean = false,
+  _availableValues: Set[String] = Set.empty)
+    extends SqlLineProperty {
 
   override def propertyName(): String = name
 
-  override def defaultValue(): AnyRef = defaultValue
+  override def defaultValue(): AnyRef = _defaultValue
 
-  override def isReadOnly: Boolean = isReadOnly
+  override def isReadOnly: Boolean = _isReadOnly
 
-  override def couldBeStored: Boolean = couldBeStored
+  override def couldBeStored: Boolean = _couldBeStored
 
-  override def `type`(): Type = `type`
+  override def `type`(): Type = _type
 
-  override def getAvailableValues: JSet[String] = availableValues.asJava
+  override def getAvailableValues: JSet[String] = _availableValues.asJava
 }
 
 object BitlapSqlLineProperty {

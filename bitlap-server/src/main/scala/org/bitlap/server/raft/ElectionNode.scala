@@ -1,24 +1,27 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server.raft
 
+import java.io.*
+import java.nio.file.Paths
+import java.util.concurrent.CopyOnWriteArrayList
+
+import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
+
+import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
+
+import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.conf.Configuration
 import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
-import com.alipay.sofa.jraft._
-import org.apache.commons.io.FileUtils
-import org.slf4j.LoggerFactory
-import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
 
-import java.io._
-import java.nio.file.Paths
-import java.util.concurrent.CopyOnWriteArrayList
-
-/** @author
+/** raft 选主
+ *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28
  */
-final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
+final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionNode])
 
@@ -31,7 +34,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
   private var started = false
 
   override def init(opts: ElectionNodeOptions): Boolean = {
-    if (this.started) {
+    if this.started then {
       LOG.info("[ElectionNode: {}] already started.", opts.serverAddress)
       return true
     }
@@ -40,7 +43,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     this.fsm = new ElectionOnlyStateMachine(this.listeners)
     nodeOpts.setFsm(this.fsm)
     val initialConf = new Configuration
-    if (!initialConf.parse(opts.initialServerAddressList))
+    if !initialConf.parse(opts.initialServerAddressList) then
       throw new IllegalArgumentException("Fail to parse initConf: " + opts.initialServerAddressList)
 
     // Set the initial cluster configuration
@@ -58,19 +61,19 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
     nodeOpts.setRaftMetaUri(Paths.get(dataPath, "meta").toString)
     val groupId  = opts.groupId
     val serverId = new PeerId
-    if (!serverId.parse(opts.serverAddress))
+    if !serverId.parse(opts.serverAddress) then
       throw new IllegalArgumentException("Fail to parse serverId: " + opts.serverAddress)
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
     rpcServer.registerProcessor(new GetServerMetadataProcessor())
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
-    if (this.node != null) this.started = true
+    if this.node != null then this.started = true
     this.started
   }
 
   override def shutdown(): Unit = {
-    if (!this.started) return
-    if (this.raftGroupService != null) {
+    if !this.started then return
+    if this.raftGroupService != null then {
       this.raftGroupService.shutdown()
       try this.raftGroupService.join()
       catch {
@@ -84,5 +87,3 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions] {
 
   def addLeaderStateListener(listener: => LeaderStateListener): Unit =
     this.listeners.add(listener)
-
-}

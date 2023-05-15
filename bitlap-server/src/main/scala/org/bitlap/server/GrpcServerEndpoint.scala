@@ -1,14 +1,15 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
+import org.bitlap.network.DriverAsyncRpc
+import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.rpc.*
+
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
-import org.bitlap.network.DriverAsyncRpc
-import org.bitlap.server.config.BitlapGrpcConfig
-import org.bitlap.server.rpc._
 import scalapb.zio_grpc
-import scalapb.zio_grpc._
-import zio._
+import scalapb.zio_grpc.*
+import zio.*
 
 /** bitlap grpc服务
  *
@@ -16,9 +17,10 @@ import zio._
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-object GrpcServerEndpoint {
-  lazy val live: ZLayer[BitlapGrpcConfig, Nothing, GrpcServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapGrpcConfig) => new GrpcServerEndpoint(config))
+object GrpcServerEndpoint:
+
+  lazy val live: ZLayer[BitlapServerConfiguration, Nothing, GrpcServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapServerConfiguration) => new GrpcServerEndpoint(config))
 
   def service(
     args: List[String]
@@ -30,18 +32,18 @@ object GrpcServerEndpoint {
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
-}
-final class GrpcServerEndpoint(val config: BitlapGrpcConfig) {
+
+end GrpcServerEndpoint
+
+final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
 
   private def builder =
-    ServerBuilder.forPort(config.port).addService(ProtoReflectionService.newInstance())
+    ServerBuilder.forPort(config.grpcConfig.port).addService(ProtoReflectionService.newInstance())
 
   def runGrpc(): ZIO[DriverAsyncRpc with GrpcServiceLive with Scope, Throwable, ZEnvironment[zio_grpc.Server]] =
     ServerLayer
       .fromServiceList(
-        builder.asInstanceOf[ServerBuilder[_]],
+        builder.asInstanceOf[ServerBuilder[?]],
         ServiceList.accessEnv[DriverAsyncRpc, GrpcServiceLive]
       )
       .build
-
-}

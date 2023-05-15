@@ -1,8 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import enumeratum.values._
-import org.bitlap.network.driver_proto._
+import org.bitlap.network.driver_proto.*
+
+import enumeratum.values.*
 
 /** bitlap客户端操作类型
  *  @author
@@ -12,7 +13,7 @@ import org.bitlap.network.driver_proto._
  */
 sealed abstract class OperationType(val value: Int) extends IntEnumEntry
 
-object OperationType extends IntEnum[OperationType] {
+object OperationType extends IntEnum[OperationType]:
 
   final case object UnknownOperation extends OperationType(0)
   final case object ExecuteStatement extends OperationType(1)
@@ -23,5 +24,3 @@ object OperationType extends IntEnum[OperationType] {
 
   def toOperationType(bOperationType: BOperationType): OperationType =
     OperationType.withValueOpt(bOperationType.value).getOrElse(UnknownOperation)
-
-}

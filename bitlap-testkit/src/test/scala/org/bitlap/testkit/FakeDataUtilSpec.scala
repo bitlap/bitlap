@@ -1,29 +1,27 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
-import java.io.File
+import java.io.*
+
 import org.junit.Test
-import java.io.FileInputStream
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/10/24
  */
-class FakeDataUtilSpec extends CsvUtil {
+class FakeDataUtilSpec extends CSVUtils {
 
   @Test
   def testFakeData(): Unit = {
-    val s: List[Metric] = FakeDataUtil.randMetrics(50)
+    val s: List[Metric] = FakeDataUtils.randMetrics(50)
     val file            = new File("./simple_data.csv")
-    writeCsvData(file, s)
+    writeCSVData(file, s)
 
-    val fileInputStream1 = new FileInputStream(new File("./simple_data.csv"))
-    val ms               = readCsvData(fileInputStream1)
+    val ms = readCSVData("./simple_data.csv")
     assert(s == ms)
 
-    writeCsvData(file, ms)
-    val fileInputStream2 = new FileInputStream(new File("./simple_data.csv"))
-    val newMs            = readCsvData(fileInputStream2)
+    writeCSVData(file, ms)
+    val newMs = readCSVData("./simple_data.csv")
     assert(newMs == s)
 
     file.delete()

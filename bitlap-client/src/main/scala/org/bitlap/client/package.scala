@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap
+package org.bitlap.client
 
 import org.bitlap.jdbc.Constants
 import org.bitlap.network.ServerAddress
@@ -8,17 +8,25 @@ import org.bitlap.network.ServerAddress
  *    梦境迷离
  *  @version 1.0,2022/11/21
  */
-package object client {
 
-  private val Separator = ":"
+private val Separator = ":"
 
-  implicit final class StringOpsForClient(val s: String) extends AnyVal {
-    def asServerAddress: ServerAddress = {
-      val as = if (s.contains(Separator)) s.split(Separator).toList else List(s, Constants.DEFAULT_PORT)
-      ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
-    }
+/** 从字符串解析IP:PORT，返回[[org.bitlap.network.ServerAddress]]
+ */
+extension (serverUri: String)
+
+  def asServerAddress: ServerAddress = {
+    val as =
+      if serverUri.contains(Separator) then serverUri.split(Separator).toList
+      else List(serverUri, Constants.DEFAULT_PORT)
+    ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
   }
+end extension
 
-  def toServerAddresses(serverPeers: Array[String]): List[ServerAddress] =
+/** 从字符串解析Array(IP:PORT,IP:PORT,IP:PORT,...)，返回[[org.bitlap.network.ServerAddress]]的列表
+ */
+extension (serverPeers: Array[String])
+
+  def asServerAddresses: List[ServerAddress] =
     serverPeers.filter(_.nonEmpty).map(_.asServerAddress).toList
-}
+end extension

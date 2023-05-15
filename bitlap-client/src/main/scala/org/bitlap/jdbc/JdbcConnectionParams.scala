@@ -9,7 +9,7 @@ import scala.collection.immutable.ListMap
  *  @since 2023/3/11
  *  @version 1.0
  */
-private[jdbc] class JdbcConnectionParams {
+private[jdbc] class JdbcConnectionParams:
   private[this] var _dbName: String                       = Constants.DEFAULT_DB
   private[this] var _bitlapConfs: ListMap[String, String] = ListMap[String, String]()
   private[this] var _sessionVars: ListMap[String, String] = ListMap[String, String]()
@@ -35,12 +35,9 @@ private[jdbc] class JdbcConnectionParams {
   def authorityList_=(value: Array[String]): Unit =
     __authorityList = value
 
-}
-
-object JdbcConnectionParams {
+object JdbcConnectionParams:
 
   // For a jdbc url: jdbc:bitlap://<host>:<port>/dbName;sess_var_list?bitlap_conf_list
   private[jdbc] val AUTH_TYPE   = "auth"
   private[jdbc] val AUTH_USER   = "user"
   private[jdbc] val AUTH_PASSWD = "password"
-}

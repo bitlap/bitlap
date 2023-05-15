@@ -1,11 +1,12 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit.server
 
-import org.bitlap.server._
-import org.bitlap.server.config._
+import org.bitlap.server.*
+import org.bitlap.server.config.*
 import org.bitlap.server.rpc.GrpcServiceLive
+
+import zio.*
 import zio.ZIOAppArgs.getArgs
-import zio._
 
 /** bitlap 嵌入式服务 包含http,grpc,raft
  *  @author
@@ -32,12 +33,11 @@ object EmbedBitlapServer extends zio.ZIOAppDefault {
       .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
-        BitlapGrpcConfig.live,
-        BitlapRaftConfig.live,
         Scope.default,
         MockAsyncRpcBackend.live,
         ZIOAppArgs.empty,
-        GrpcServiceLive.live
+        GrpcServiceLive.live,
+        BitlapServerConfiguration.testLive
       )
       .fold(
         e => ZIO.fail(e).exitCode,

@@ -1,17 +1,18 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
-import com.github.javafaker.Faker
 
-import java.util.concurrent.TimeUnit
-import java.util.{ List => _, _ }
 import java.text.SimpleDateFormat
+import java.util.{ List as _, * }
+import java.util.concurrent.TimeUnit
+
+import com.github.javafaker.Faker
 
 /** bitlap 假数据创建工具
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/20
  */
-object FakeDataUtil {
+object FakeDataUtils {
 
   private lazy val random: Random = new Random(System.nanoTime())
 

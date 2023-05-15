@@ -6,6 +6,7 @@ import cn.hutool.setting.Setting
 import cn.hutool.system.SystemUtil
 import org.bitlap.common.conf.BitlapConfKey
 import org.bitlap.common.conf.Validators
+import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
 import java.io.Serializable
 
@@ -42,9 +43,9 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
     }
 
     init {
-        // merge props
+        // force merge props
         this.conf.forEach { (key, value) ->
-            this.set(key, value)
+            this.set(key, value, true)
         }
     }
 
@@ -69,6 +70,21 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
             return this.get(confKey)?.toString()
         }
         return this.props[key]
+    }
+
+    @JvmOverloads
+    fun clone(other: Map<String, String> = emptyMap()): BitlapConf {
+        val thisConf = BitlapConf(this.props.toMap())
+        other.forEach { (k, v) -> thisConf.set(k, v) }
+        return thisConf
+    }
+
+    fun toJson(): String {
+        return JSONUtils.toJson(this.props)
+    }
+
+    override fun toString(): String {
+        return this.props.toString()
     }
 
     @Suppress("UNCHECKED_CAST")

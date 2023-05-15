@@ -19,7 +19,7 @@ final class BitlapScan(
   private var bitlapDataSourceReadOptions: BitlapDataSourceReadOptions = _
 
   private val url   = options.getOrDefault("url", null)
-  private val table = options.getOrDefault("table", null)
+  private val table = options.getOrDefault("dbtable", null)
 
   override def readSchema(): StructType = schema
 

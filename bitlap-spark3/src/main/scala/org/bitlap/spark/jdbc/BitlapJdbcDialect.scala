@@ -8,7 +8,8 @@ object BitlapJdbcDialect extends JdbcDialect {
 
   override def canHandle(url: String): Boolean = url.startsWith("jdbc:bitlap")
 
-  /** This is only called for ArrayType (see JdbcUtils.makeSetter)
+  /**
+   * This is only called for ArrayType (see JdbcUtils.makeSetter)
    */
   override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
     case StringType => Some(JdbcType("VARCHAR", java.sql.Types.VARCHAR))

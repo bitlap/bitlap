@@ -14,8 +14,9 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.common.utils.PreConditions
-import org.bitlap.core.BitlapContext
+import org.bitlap.common.utils.UuidUtil
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.storage.BitlapStore
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
@@ -48,7 +49,10 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializa
             return
         }
         val elapsed = measureTimeMillis {
-            this.write0(events)
+            QueryContext.use {
+                it.queryId = UuidUtil.uuid()
+                this.write0(events)
+            }
         }
         log.info { "End writing ${events.size} events, elapsed ${elapsed}ms." }
     }
@@ -68,7 +72,7 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializa
     private fun writeExcel0(excel: Pair<List<String>, List<List<Any?>>>) {
         val (header, rows) = excel
         PreConditions.checkExpression(
-            header == listOf("time", "entity", "dimensions", "metric_name", "metric_value"),
+            header == Event.schema.map { it.first },
             msg = "Header $header is invalid."
         )
         val events = rows.map { row ->

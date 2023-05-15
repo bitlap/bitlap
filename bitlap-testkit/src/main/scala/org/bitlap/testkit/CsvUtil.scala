@@ -1,8 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.testkit
 
+import org.bitlap.common.data.Event
 import org.bitlap.csv._
+
 import java.io._
+import scala.jdk.CollectionConverters.ListHasAsScala
 
 /** csv 读写工具
  *  @author
@@ -12,7 +15,7 @@ import java.io._
 trait CsvUtil {
 
   implicit val format = new DefaultCsvFormat {
-    override def prependHeader: List[String] = List("time", "entity", "dimensions", "metric_name", "metric_value")
+    override def prependHeader: List[String] = Event.getSchema.asScala.map(_.getFirst).toList
     override def ignoreHeader: Boolean       = true
   }
 

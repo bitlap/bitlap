@@ -5,9 +5,8 @@ import java.sql.{ Array => _, _ }
 import java.util.Properties
 import java.util.logging.Logger
 
-/** Desc: bitlap 的JDBC驱动
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/4/16
+/**
+ * bitlap jdbc driver
  */
 private[jdbc] abstract class BitlapDriver extends Driver {
 

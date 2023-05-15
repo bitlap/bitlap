@@ -19,6 +19,17 @@ interface Event : Serializable {
     val metric: Metric
 
     companion object {
+        // event schema
+        @JvmStatic
+        val schema = listOf(
+            "time" to "long",
+            "entity" to "integer",
+            "dimensions" to "string", // json, map<string, string>
+            "metric_name" to "string",
+            "metric_value" to "double"
+        )
+
+        @JvmStatic
         fun of(time: Long, entity: Entity, dimension: Dimension, metric: Metric) =
             EventImpl(time, entity, dimension, metric)
     }

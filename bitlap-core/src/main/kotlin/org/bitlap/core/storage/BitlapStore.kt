@@ -5,7 +5,6 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapIterator
-import org.bitlap.common.TimeRange
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.DateEx.utc
 import org.bitlap.core.data.metadata.Table
@@ -59,7 +58,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration): Closeable {
         }
         // get output path
         val date = tm.utc()
-        val output = Path(metricDataPath, "${date.withTimeAtStartOfDay().millis}/${date.millis}")
+        val output = Path(metricDataPath, "${Keyword.TIME}=${date.millis}")
 
         // write rows in one batch
         val sortRows = rows.sortedBy { "${it.metricKey}${it.tm}" }
@@ -78,7 +77,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration): Closeable {
         }
         // get output path
         val date = tm.utc()
-        val output = Path(metricDimDataPath, "${date.withTimeAtStartOfDay().millis}/${date.millis}")
+        val output = Path(metricDimDataPath, "${Keyword.TIME}=${date.millis}")
 
         // write rows in one batch
         val sortRows = rows.sortedBy { "${it.metricKey}${it.dimensionKey}${it.dimension}${it.tm}" }
@@ -87,22 +86,6 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration): Closeable {
         writer.use {
             it.writeBatch(sortRows)
         }
-    }
-
-    fun query(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRow> {
-        val timeFunc = { tm: Long ->
-            time.contains(tm.utc())
-        }
-        val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
-        return this.queryCBM(timeFilter, metrics)
-    }
-
-    fun queryMeta(time: TimeRange, metrics: List<String>): BitlapIterator<MetricRowMeta> {
-        val timeFunc = { tm: Long ->
-            time.contains(tm.utc())
-        }
-        val timeFilter = PruneTimeFilter().add(Keyword.TIME, timeFunc, time.toString())
-        return this.queryMeta(timeFilter, metrics)
     }
 
     /**

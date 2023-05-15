@@ -8,10 +8,12 @@ import org.apache.hadoop.fs.Path
 import org.apache.parquet.filter2.predicate.FilterApi
 import org.apache.parquet.filter2.predicate.FilterPredicate
 import org.apache.parquet.hadoop.ParquetWriter
+import org.apache.parquet.hadoop.util.HiddenFileFilter
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.utils.JSONUtils
 import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.TimeFilterFun
 import org.bitlap.core.storage.BitlapReader
@@ -148,11 +150,18 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         return filter
     }
 
+    // TODO: get partitions
     private fun listFilePath(dataPath: Path, timeFunc: TimeFilterFun): List<Path> {
         return fs.listStatus(dataPath)
-            .map { it.path }
-            .flatMap { subPath -> fs.listStatus(subPath) { timeFunc(it.name.toLong()) }.map { it.path } }
-            .flatMap { filePath -> fs.listStatus(filePath).map { it.path } }
+            .filter {
+                it.isDirectory && run {
+                    val (_, name) = it.path.name.split("=")
+                    timeFunc(name.toLong())
+                }
+            }
+            .flatMap { filePath ->
+                fs.listStatus(filePath.path, HiddenFileFilter.INSTANCE).map { it.path }
+            }
     }
 
     companion object {

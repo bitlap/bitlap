@@ -14,13 +14,14 @@ object GetInfoType extends IntEnum[GetInfoType] {
   final case object MaxConcurrentActivities extends GetInfoType(10)
   final case object DataSourceName          extends GetInfoType(20)
   final case object ServerName              extends GetInfoType(30)
+  final case object ServerConf              extends GetInfoType(31)
   final case object DbmsName                extends GetInfoType(40)
   final case object DbmsVer                 extends GetInfoType(50)
 
   val values: IndexedSeq[GetInfoType] = findValues
 
   def toGetInfoType(bGetInfoType: BGetInfoType): GetInfoType =
-    GetInfoType.withValueOpt(bGetInfoType.value).getOrElse(MaxDriverConnections)
+    GetInfoType.withValueOpt(bGetInfoType.value).getOrElse(throw new Exception("Invalid GetInfoType"))
 
   def toBGetInfoType(getInfoType: GetInfoType): BGetInfoType =
     BGetInfoType.fromValue(getInfoType.value)

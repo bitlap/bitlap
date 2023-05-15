@@ -1,14 +1,9 @@
 package org.bitlap.spark3
 
-import org.apache.spark.sql.execution.QueryExecution
-import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 /**
- * Desc:
- * 
- * Mail: k.chen@nio.com
- * Created by IceMimosa
- * Date: 2023/4/14
+ * TODO: unit tests
  */
 object Tests {
   def main(args: Array[String]): Unit = {
@@ -16,14 +11,28 @@ object Tests {
     val spark = SparkSession.builder()
       .master("local[*,2]")
       .getOrCreate()
-    import spark.implicits._
 
-    val df = Seq(("John", 31), ("Bob", 28)).toDF("name", "age")
+    val path = Tests.getClass.getClassLoader.getResource("simple_data.csv").getPath
 
+    val df = spark.read
+      .option("header", "true")
+      .option("inferSchema", "true")
+      .option("quote", "\"")
+      .option("escape", "\"")
+      .csv(path)
+      .selectExpr(
+        "cast(time as bigint) as time",
+        "entity",
+        "dimensions",
+        "metric_name",
+        "cast(metric_value as double) as metric_value"
+      )
     df.show(false)
 
     df.write
       .format("bitlap")
+      .option("url", "jdbc:bitlap://localhost:23333")
+      .option("dbtable", "xxx")
       .mode(SaveMode.Overwrite)
       .save()
   }

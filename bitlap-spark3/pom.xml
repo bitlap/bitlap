@@ -14,16 +14,15 @@
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
             <artifactId>bitlap-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
-            <artifactId>bitlap-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio_${scala.binary.version}</artifactId>
-            <version>${zio.version}</version>
+            <artifactId>bitlap-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>

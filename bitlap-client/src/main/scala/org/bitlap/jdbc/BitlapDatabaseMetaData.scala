@@ -2,11 +2,13 @@
 package org.bitlap.jdbc
 
 import org.bitlap.client.BitlapClient
-import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.utils.JSONUtils
+import org.bitlap.network.enumeration.{GetInfoType, TypeId}
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
 
-import java.sql.{ Array => _, _ }
+import java.sql.{Array => _, _}
 
 /** bitlap 数据库元数据
  *
@@ -47,6 +49,11 @@ class BitlapDatabaseMetaData(
   override def getDatabaseProductVersion: String = {
     val result = client.getInfo(session, GetInfoType.DbmsVer).value
     deserialize[String](TypeId.StringType, result)
+  }
+
+  def getDatabaseConf: BitlapConf = {
+    val result = client.getInfo(session, GetInfoType.ServerConf).value
+    new BitlapConf(JSONUtils.fromJsonAsMap(deserialize[String](TypeId.StringType, result)))
   }
 
   override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")

@@ -2,17 +2,18 @@
 package org.bitlap.server.session
 
 import com.google.protobuf.ByteString
-import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
+import org.bitlap.common.{BitlapConf, BitlapVersionInfo}
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.enumeration.GetInfoType._
 import org.bitlap.network.enumeration._
 import org.bitlap.network.handles._
 import org.bitlap.network.models._
+import org.bitlap.server.BitlapContext
 import zio.Task
 
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters._
 
 /** bitlap 会话
  *  @author
@@ -31,7 +32,7 @@ final class MemorySession(
 
   override var lastAccessTime: Long = _
 
-  override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
+  override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
 
   override def open(): Unit = {
     this.sessionState.compareAndSet(false, true)
@@ -155,6 +156,8 @@ final class MemorySession(
     getInfoType match {
       case ServerName =>
         GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+      case ServerConf =>
+        GetInfoValue(ByteString.copyFromUtf8(BitlapContext.globalConf.toJson))
       case DbmsName =>
         GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
       case DbmsVer =>

@@ -39,8 +39,7 @@ open class RowValueMeta : Serializable {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
         other as RowValueMeta
-        if (!values.contentEquals(other.values)) return false
-        return true
+        return values.contentEquals(other.values)
     }
 
     override fun hashCode(): Int {

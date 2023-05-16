@@ -41,8 +41,8 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
         confOverlay = config
       )
 
-  def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): RowSet =
-    syncClient.fetchResults(operationHandle, maxRows, fetchType).results
+  def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): FetchResults =
+    syncClient.fetchResults(operationHandle, maxRows, fetchType)
 
   def getTables(
     sessionHandle: SessionHandle,

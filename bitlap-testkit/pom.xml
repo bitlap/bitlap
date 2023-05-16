@@ -25,16 +25,6 @@
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-network</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>grpc-stub</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>grpc-protobuf</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>

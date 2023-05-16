@@ -30,6 +30,20 @@ trait BitlapSerde:
 
   @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T =
+    BitlapSerde.deserialize(realType, byteString)
+
+  def serialize(any: Any): ByteString = BitlapSerde.serialize(any)
+
+end BitlapSerde
+
+object BitlapSerde:
+
+  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  def deserialize[T: ClassTag](realType: TypeId, byteArray: scala.Array[Byte]): T =
+    deserialize[T](realType, ByteString.copyFrom(ByteBuffer.wrap(byteArray)))
+
+  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T =
     val readOnlyByteBuffer = byteString.asReadOnlyByteBuffer()
     val typeName           = classTag[T].runtimeClass.getSimpleName
     val targetType = TypeId.values.find(_.name.toLowerCase == typeName.toLowerCase).getOrElse(TypeId.Unspecified)

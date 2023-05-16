@@ -57,7 +57,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializabl
      * Merge metrics with more than one dimensions
      *
      *
-     * TODO: should find best cartesian base here, use first one currently. For example:
+     * TODO should find best cartesian base here, use first one currently. For example:
      *   1. split into parts of a given size
      *   2. or split into parts with CBO
      *   3. or (merge metric -> mertic dim) or (merge dim -> merge metric)

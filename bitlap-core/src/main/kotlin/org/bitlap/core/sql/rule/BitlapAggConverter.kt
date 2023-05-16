@@ -21,7 +21,7 @@ import org.bitlap.core.sql.udf.UDFNames
 class BitlapAggConverter : AbsRelRule(BitlapAggregate::class.java, "BitlapAggConverter") {
 
     companion object {
-        // TODO: see AggregateReduceFunctionsRule, support other aggregate functions
+        // TODO (see AggregateReduceFunctionsRule, support other aggregate functions)
         private val NEED_CONVERTS = listOf(
             SqlSumAggFunction::class.java,
             SqlSumEmptyIsZeroAggFunction::class.java,

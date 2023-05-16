@@ -91,7 +91,7 @@ class BitlapMdmWriter(val data: DataFrame, val options: BitlapOptions) {
     this.writeMetricDim(mdmCleanView)
   }
 
-  // TODO: metric_value support double
+  // TODO (metric_value support double)
   private def writeMetric(df: DataFrame): Unit = {
     val rdf = SparkUtils.withTempView(df -> "bitlap_spark_mdm_clean_metric_view") {
       spark.sql(s"""
@@ -121,7 +121,7 @@ class BitlapMdmWriter(val data: DataFrame, val options: BitlapOptions) {
            |order by _time, mk, t
            |""".stripMargin)
     }
-    // TODO: options
+    // TODO (options)
     rdf.write
       .mode(SaveMode.Overwrite)
       .partitionBy("_time")

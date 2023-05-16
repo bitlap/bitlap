@@ -106,7 +106,7 @@ object Utils:
         line = line.trim
         if line.nonEmpty then
           if line.startsWith("#") || line.startsWith("--") then {
-            // todo: continue is not supported
+            // TODO (continue is not supported)
           } else
             line = line.concat(" ")
             sb.append(line)

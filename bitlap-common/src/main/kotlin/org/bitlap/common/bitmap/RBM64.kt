@@ -101,7 +101,7 @@ open class RBM64 : AbsBM {
     override fun getBytes(): ByteArray = getBytes(null)
     override fun getBytes(buffer: ByteBuffer?): ByteArray {
         this.repair()
-        val buf = buffer ?: ByteBuffer.allocate(Int.SIZE_BYTES + _rbm.serializedSizeInBytes().toInt()) // TODO: optimize
+        val buf = buffer ?: ByteBuffer.allocate(Int.SIZE_BYTES + _rbm.serializedSizeInBytes().toInt()) // TODO (optimize)
         buf.putInt(Versions.RBM64_VERSION_V1)
         _rbm.serialize(buf)
         return buf.array()

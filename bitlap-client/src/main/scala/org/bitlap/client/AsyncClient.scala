@@ -27,7 +27,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
    *
    *  客户端使用[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]操作SQL，目前所有操作必须读基于leader。
    *
-   *  TODO: 当leader不存在时，client无法做任何操作
+   *  TODO (当leader不存在时，client无法做任何操作)
    */
   private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
     ZIO

@@ -185,7 +185,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         val tableDir = Path(dataPath, "$cleanDBName/$cleanName")
         val table = Table(
             cleanDBName, cleanName, tm, tm,
-            mutableMapOf(Table.TABLE_FORMAT_KEY to TableFormat.PARQUET.name), // TODO: default use parquet
+            mutableMapOf(Table.TABLE_FORMAT_KEY to TableFormat.PARQUET.name),
             tableDir.toString(),
         )
 

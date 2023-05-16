@@ -40,9 +40,9 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         metrics: List<String>,
         metricType: Class<out DataType>,
     ): RowIterator {
-        // TODO: add store cache
+        // TODO (add store cache)
         val store = BitlapStore(table, BitlapContext.hadoopConf).open()
-        // TODO: eager consume? remote should be eager
+        // TODO (eager consume? remote should be eager)
         val container = when (metricType) {
             DataTypeRowValueMeta::class.java -> {
                 MDContainer<MetricRowMeta, RowValueMeta>(1).also { container ->
@@ -113,9 +113,9 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         dimension: String,
         dimensionFilter: PrunePushedFilter,
     ): RowIterator {
-        // TODO: add store cache
+        // TODO (add store cache)
         val store = BitlapStore(table, BitlapContext.hadoopConf).open()
-        // TODO: eager consume? remote should be eager
+        // TODO (eager consume? remote should be eager)
         val container = when (metricType) {
             DataTypeRowValueMeta::class.java -> {
                 MDContainer<MetricDimRowMeta, RowValueMeta>(2).also { container ->

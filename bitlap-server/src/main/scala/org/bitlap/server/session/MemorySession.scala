@@ -66,7 +66,7 @@ final class MemorySession(
   ): Task[RowSet] =
     sessionManager.getOperation(operationHandle).map { op =>
       val rows = op.getNextResultSet()
-      op.remove(operationHandle) // TODO: work with fetch offset & size
+      op.remove(operationHandle) // TODO (work with fetch offset & size)
       rows
     }
 

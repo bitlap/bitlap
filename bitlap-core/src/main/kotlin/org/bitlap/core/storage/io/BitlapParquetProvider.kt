@@ -152,7 +152,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         return filter
     }
 
-    // TODO: get partitions
+    // TODO (get partitions)
     private fun listFilePath(dataPath: Path, timeFunc: TimeFilterFun): List<Path> {
         return fs.listStatus(dataPath)
             .filter {
@@ -168,7 +168,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
 
     companion object {
 
-        // TODO: add enum & add shard_id if cbm is too big
+        // TODO (add enum & add shard_id if cbm is too big)
         val METRIC_SCHEMA: Schema = SchemaBuilder.builder()
             .record("metric").namespace(BitlapParquetProvider::class.java.packageName).fields()
             .optionalString("mk")

@@ -89,7 +89,7 @@ open class BitlapConf(private val conf: Map<String, String> = emptyMap()) : Seri
 
     @Suppress("UNCHECKED_CAST")
     fun <T> get(key: BitlapConfKey<T>): T? {
-        // TODO: Add cache
+        // TODO (Add cache)
         var value = this.props[key.key]
         if (value == null) {
             value = SystemUtil.get(key.getSysKey(), SystemUtil.get(key.getEnvKey()))

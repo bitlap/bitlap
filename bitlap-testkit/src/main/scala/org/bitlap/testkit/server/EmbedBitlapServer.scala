@@ -19,8 +19,8 @@ object EmbedBitlapServer extends zio.ZIOAppDefault {
   override def run =
     (for {
       args <- getArgs
-      _    <- RaftServerEndpoint.service(args.toList).fork
-      _    <- GrpcServerEndpoint.service(args.toList).fork
+      t1    <- RaftServerEndpoint.service(args.toList).fork
+      t2    <- GrpcServerEndpoint.service(args.toList).fork
       _ <- Console.printLine("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____
@@ -29,6 +29,7 @@ object EmbedBitlapServer extends zio.ZIOAppDefault {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
+      _ <- ZIO.collectAll(Seq(t1.join, t2.join))
     } yield ())
       .provide(
         RaftServerEndpoint.live,

@@ -15,7 +15,7 @@ abstract class BitlapDriver extends Driver:
       else throw BitlapSQLException(s"Invalid bitlap jdbc url: $url")
     catch
       case ex: BitlapSQLException => throw ex
-      case ex: Exception => throw BitlapSQLException(ex.toString)
+      case ex: Exception          => throw BitlapSQLException(ex.toString)
 
   /** Checks whether a given url is in a valid format.
    *

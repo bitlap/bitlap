@@ -25,9 +25,9 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Checking Code Style
-        run: ./mvnw .
-      - name: Checking Code Style
+      - name: Checking Code Style  (Scala 3 and Kotlin)
+        run: ./mvnw spotless:check
+      - name: Checking Code Style (Scala 2)
         run: ./mvnw spotless:check -pl bitlap-spark3
 
       - name: Build with Maven

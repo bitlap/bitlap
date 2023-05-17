@@ -63,7 +63,7 @@
         <frontend.project.name>bitlap-server-ui</frontend.project.name>
 
         <!-- common libs -->
-        <slf4j.version>2.0.6</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
         <hutool.version>5.8.18</hutool.version>
@@ -148,6 +148,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
         </dependency>
@@ -157,9 +162,9 @@
             <version>${log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio-logging-slf4j_3</artifactId>
+            <version>2.1.12</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
@@ -238,6 +243,12 @@
             <groupId>com.typesafe.scala-logging</groupId>
             <artifactId>scala-logging_${scala.binary.version}</artifactId>
             <version>${scala.logging.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>

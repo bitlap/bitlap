@@ -25,10 +25,12 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Checking Code Style  (Scala 3 and Kotlin)
-        run: ./mvnw spotless:check
-      - name: Checking Code Style (Scala 2)
+      - name: Checking Code Style (Scala2 Code)
         run: ./mvnw spotless:check -pl bitlap-spark3
+      - name: Checking Code Style  (Scala3 Code)
+        run: ./mvnw spotless:check -pl bitlap-server -pl bitlap-client -pl bitlap-cli -pl bitlap-network
+      - name: Checking Code Style  (Kotlin Code)
+        run: ./mvnw spotless:check -pl bitlap-common -pl bitlap-core    
 
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package

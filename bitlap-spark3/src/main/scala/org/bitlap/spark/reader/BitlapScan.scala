@@ -12,8 +12,8 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 final class BitlapScan(
   private val schema: StructType,
   private val options: CaseInsensitiveStringMap,
-  private val whereClause: String
-) extends Scan
+  private val whereClause: String)
+    extends Scan
     with Batch {
 
   private var bitlapDataSourceReadOptions: BitlapDataSourceReadOptions = _

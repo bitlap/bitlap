@@ -113,13 +113,13 @@ object SparkJdbcUtil {
           row.update(pos, null)
         }
 
-      // When connecting with Oracle DB through JDBC, the precision and scale of BigDecimal
-      // object returned by ResultSet.getBigDecimal is not correctly matched to the table
-      // schema reported by ResultSetMetaData.getPrecision and ResultSetMetaData.getScale.
-      // If inserting values like 19999 into a column with NUMBER(12, 2) type, you get through
-      // a BigDecimal object with scale as 0. But the dataframe schema has correct type as
-      // DecimalType(12, 2). Thus, after saving the dataframe into parquet file and then
-      // retrieve it, you will get wrong result 199.99.
+    // When connecting with Oracle DB through JDBC, the precision and scale of BigDecimal
+    // object returned by ResultSet.getBigDecimal is not correctly matched to the table
+    // schema reported by ResultSetMetaData.getPrecision and ResultSetMetaData.getScale.
+    // If inserting values like 19999 into a column with NUMBER(12, 2) type, you get through
+    // a BigDecimal object with scale as 0. But the dataframe schema has correct type as
+    // DecimalType(12, 2). Thus, after saving the dataframe into parquet file and then
+    // retrieve it, you will get wrong result 199.99.
     // So it is needed to set precision and scale for Decimal based on JDBC metadata.
     case Fixed(p, s) =>
       (rs: ResultSet, row: InternalRow, pos: Int) =>

@@ -472,20 +472,12 @@
                     <scala>
                         <!-- These are the defaults, you can override if you want -->
                         <includes>
-                            <include>bitlap-server/src/main/scala/**/*.scala</include>
-                            <include>bitlap-server/src/test/scala/**/*.scala</include>
-                            <include>bitlap-client/src/main/scala/**/*.scala</include>
-                            <include>bitlap-client/src/test/scala/**/*.scala</include>
-                            <include>bitlap-network/src/main/scala/**/*.scala</include>
-                            <include>bitlap-network/src/test/scala/**/*.scala</include>
-                            <include>bitlap-cli/src/main/scala/**/*.scala</include>
-                            <include>bitlap-cli/src/test/scala/**/*.scala</include>
-                            <include>bitlap-testkit/src/main/scala/**/*.scala</include>
-                            <include>bitlap-testkit/src/test/scala/**/*.scala</include>
+                            <include>src/main/scala/**/*.scala</include>
+                            <include>src/test/scala/**/*.scala</include>
                         </includes>
 
                         <!--   为了统一格式化，仅能在root模块执行spotless命令，否则找不到文件  -->
-                        <!--     spark3模块例外                   -->
+                        <!--     spark3模块例外，在spark3模块编写Scala3代码将无法编译                  -->
                         <scalafmt>
                             <version>${scalafmt.version}</version>
                             <file>.scalafmt.conf</file>

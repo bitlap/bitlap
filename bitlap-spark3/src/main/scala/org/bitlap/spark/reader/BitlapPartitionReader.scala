@@ -18,8 +18,8 @@ import org.apache.spark.sql.types.StructType
 final class BitlapPartitionReader(
   options: BitlapDataSourceReadOptions,
   schema: StructType,
-  bitlapPartition: BitlapInputPartition
-) extends PartitionReader[InternalRow] {
+  bitlapPartition: BitlapInputPartition)
+    extends PartitionReader[InternalRow] {
 
   private var currentRow: InternalRow         = InternalRow.empty
   private var iterator: Iterator[InternalRow] = Iterator.empty

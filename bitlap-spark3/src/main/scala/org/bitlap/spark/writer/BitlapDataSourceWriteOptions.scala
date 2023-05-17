@@ -16,5 +16,5 @@ final class BitlapDataSourceWriteOptions(
   val tenantId: String,
   val schema: StructType,
   val overriddenProps: Properties,
-  val skipNormalizingIdentifier: Boolean
-) extends Serializable
+  val skipNormalizingIdentifier: Boolean)
+    extends Serializable

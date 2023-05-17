@@ -2,6 +2,7 @@
 package org.bitlap.spark
 
 import scala.jdk.CollectionConverters.ListHasAsScala
+import scala.util.matching.Regex
 
 import org.bitlap.common.data.Event
 
@@ -29,13 +30,16 @@ object SparkUtils {
     StructType(fields.toList)
   }
 
+  private val dbRegex      = "(.*)(\\.)(.*)".r
+  private val regex: Regex = "(.*)".r
+
   /** get hive table
    */
   def getHiveTableIdentifier(tableName: String): TableIdentifier = {
-    tableName.split("\\.") match {
-      case Array(name)     => new TableIdentifier(name, None)
-      case Array(db, name) => new TableIdentifier(name, Some(db))
-      case _               => throw new IllegalArgumentException(s"Illegal targetTableName=[$tableName]")
+    tableName match {
+      case dbRegex(db, name) => new TableIdentifier(name, Some(db))
+      case regex(name)       => new TableIdentifier(name, None)
+      case _                 => throw new IllegalArgumentException(s"Illegal targetTableName=[$tableName]")
     }
   }
 

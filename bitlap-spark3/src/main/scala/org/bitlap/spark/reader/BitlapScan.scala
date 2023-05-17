@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.reader
 
-import org.apache.spark.sql.connector.read.*
+import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
@@ -12,8 +12,8 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 final class BitlapScan(
   private val schema: StructType,
   private val options: CaseInsensitiveStringMap,
-  private val whereClause: String)
-    extends Scan
+  private val whereClause: String
+) extends Scan
     with Batch {
 
   private var bitlapDataSourceReadOptions: BitlapDataSourceReadOptions = _

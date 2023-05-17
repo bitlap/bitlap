@@ -22,8 +22,8 @@ case class BBMAggr(
   bucket: Expression,
   id: Expression,
   override val mutableAggBufferOffset: Int = 0,
-  override val inputAggBufferOffset: Int = 0)
-    extends TypedImperativeAggregate[BBM]
+  override val inputAggBufferOffset: Int = 0
+) extends TypedImperativeAggregate[BBM]
     with BinaryLike[Expression] {
 
   def this(bucket: Expression, uid: Expression) = {

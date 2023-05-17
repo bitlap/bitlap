@@ -12,5 +12,5 @@ final class BitlapDataSourceReadOptions(
   val scan: String,
   val tenantId: String,
   val overriddenProps: Properties,
-  val selectStatement: String)
-    extends Serializable {}
+  val selectStatement: String
+) extends Serializable {}

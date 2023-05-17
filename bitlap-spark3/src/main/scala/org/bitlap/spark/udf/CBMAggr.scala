@@ -23,8 +23,8 @@ case class CBMAggr(
   id: Expression,
   count: Expression,
   override val mutableAggBufferOffset: Int = 0,
-  override val inputAggBufferOffset: Int = 0)
-    extends TypedImperativeAggregate[CBM]
+  override val inputAggBufferOffset: Int = 0
+) extends TypedImperativeAggregate[CBM]
     with TernaryLike[Expression] {
 
   def this(bucket: Expression, uid: Expression, count: Expression) = {
@@ -92,8 +92,11 @@ case class CBMAggr(
 
   override def dataType: DataType = BinaryType
 
-  override protected def withNewChildrenInternal(newFirst: Expression, newSecond: Expression, newThird: Expression)
-    : Expression =
+  override protected def withNewChildrenInternal(
+    newFirst: Expression,
+    newSecond: Expression,
+    newThird: Expression
+  ): Expression =
     copy(bucket = newFirst, id = newSecond, count = newThird)
 
   override def prettyName: String = "cbm_aggr"

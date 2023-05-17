@@ -116,6 +116,8 @@
         <surefire.version>3.1.0</surefire.version>
         <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <spotless-maven-plugin.version>2.27.2</spotless-maven-plugin.version>
+        <scalafmt.version>3.7.3</scalafmt.version>
     </properties>
 
     <dependencies>
@@ -379,10 +381,9 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <!--        2和3跨版本                -->
                         <args>
-                            <arg>-Ywarn-unused</arg>
                             <arg>-Ytasty-reader</arg>
-                            <arg>-Yretain-trees</arg>
                         </args>
                     </configuration>
                 </plugin>
@@ -466,20 +467,27 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.27.2</version>
+                <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <scala>
                         <!-- These are the defaults, you can override if you want -->
                         <includes>
-                            <include>src/main/scala/**/*.scala</include>
-                            <include>src/test/scala/**/*.scala</include>
-                            <include>src/main/scala/**/*.sc</include>
-                            <include>src/test/scala/**/*.sc</include>
+                            <include>bitlap-server/src/main/scala/**/*.scala</include>
+                            <include>bitlap-server/src/test/scala/**/*.scala</include>
+                            <include>bitlap-client/src/main/scala/**/*.scala</include>
+                            <include>bitlap-client/src/test/scala/**/*.scala</include>
+                            <include>bitlap-network/src/main/scala/**/*.scala</include>
+                            <include>bitlap-network/src/test/scala/**/*.scala</include>
+                            <include>bitlap-cli/src/main/scala/**/*.scala</include>
+                            <include>bitlap-cli/src/test/scala/**/*.scala</include>
+                            <include>bitlap-testkit/src/main/scala/**/*.scala</include>
+                            <include>bitlap-testkit/src/test/scala/**/*.scala</include>
                         </includes>
 
                         <!--   为了统一格式化，仅能在root模块执行spotless命令，否则找不到文件  -->
+                        <!--     spark3模块例外                   -->
                         <scalafmt>
-                            <version>3.7.3</version>
+                            <version>${scalafmt.version}</version>
                             <file>.scalafmt.conf</file>
                             <scalaMajorVersion>2.13</scalaMajorVersion>
                         </scalafmt>

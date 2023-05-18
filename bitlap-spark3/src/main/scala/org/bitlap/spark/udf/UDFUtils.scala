@@ -55,7 +55,7 @@ object UDFUtils {
   }
 
   // ------------------------------------------------------------
-  // bitmap
+  // bitmap functions
   // ------------------------------------------------------------
   def rbmCount(bytes: Array[Byte]): Long = BMUtils.fromBytes(bytes, new RBM()).getCountUnique
 

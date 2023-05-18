@@ -7,7 +7,6 @@ import org.bitlap.jdbc.BitlapDriver;
  * @version 1.0, 2023/5/3
  */
 public class Driver extends BitlapDriver {
-    
     static {
         new org.bitlap.Driver().register();
     }

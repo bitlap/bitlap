@@ -10,7 +10,7 @@ import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
 import org.apache.hadoop.fs.Path
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.mdm.BitlapWriter
+import org.bitlap.core.mdm.BitlapEventWriter
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
@@ -40,7 +40,7 @@ class SqlLoadData(
             catalog.getTable(tableName.names[1], tableName.names[0])
         }
         // only support overwrite = true
-        BitlapWriter(table, BitlapContext.hadoopConf).use {
+        BitlapEventWriter(table, BitlapContext.hadoopConf).use {
             if (path.startsWith("classpath:", true)) {
                 it.writeCsv(path)
             }

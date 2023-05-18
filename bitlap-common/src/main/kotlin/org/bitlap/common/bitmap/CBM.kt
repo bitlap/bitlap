@@ -568,7 +568,7 @@ class CBM : AbsBM, ComparableBM {
             if (hasWeight) {
                 return cbms.fold(CBM()) { a, b -> a.or(b) }
             }
-            // TODO: replace with fast way
+            // TODO (replace with fast way)
             return cbms.fold(CBM()) { a, b -> a.or(b) }
         }
 

@@ -5,6 +5,7 @@ import org.bitlap.network.*
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.testkit.*
 
 import com.google.protobuf.ByteString
@@ -49,11 +50,11 @@ final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
   ): ZIO[Any, Throwable, FetchResults] = {
     val convert = (metric: Metric) =>
       List(
-        ByteString.copyFromUtf8(metric.time.toString),
-        ByteString.copyFromUtf8(metric.entity.toString),
-        ByteString.copyFromUtf8(metric.dimensions.map(_.value).headOption.getOrElse("")),
-        ByteString.copyFromUtf8(metric.name),
-        ByteString.copyFromUtf8(metric.value.toString)
+        BitlapSerde.serialize(metric.time),
+        BitlapSerde.serialize(metric.entity),
+        BitlapSerde.serialize(metric.dimensions.map(_.value).headOption.getOrElse("")),
+        BitlapSerde.serialize(metric.name),
+        BitlapSerde.serialize(metric.value)
       )
     ZIO.succeed(
       FetchResults(
@@ -69,8 +70,8 @@ final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
     ZIO.succeed(
       TableSchema.apply(
         List(
-          ColumnDesc("time", TypeId.IntType),
-          ColumnDesc("entity", TypeId.LongType),
+          ColumnDesc("time", TypeId.LongType),
+          ColumnDesc("entity", TypeId.IntType),
           ColumnDesc("dimensions", TypeId.StringType), // TODO not support object type
           ColumnDesc("metric_name", TypeId.StringType),
           ColumnDesc("metric_value", TypeId.IntType)

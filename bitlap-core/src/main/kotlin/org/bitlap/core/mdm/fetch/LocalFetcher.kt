@@ -23,6 +23,7 @@ import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PruneTimeFilter
+import org.bitlap.core.storage.BitlapStore
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
@@ -39,13 +40,13 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         metrics: List<String>,
         metricType: Class<out DataType>,
     ): RowIterator {
-        val storeProvider = table.getTableFormat().getProvider(table, BitlapContext.hadoopConf)
-        val metricStore = storeProvider.getMetricStore()
-        // TODO: eager consume? remote should be eager
+        // TODO (add store cache)
+        val store = BitlapStore(table, BitlapContext.hadoopConf).open()
+        // TODO (eager consume? remote should be eager)
         val container = when (metricType) {
             DataTypeRowValueMeta::class.java -> {
                 MDContainer<MetricRowMeta, RowValueMeta>(1).also { container ->
-                    metricStore.queryMeta(timeFilter, metrics)
+                    store.queryMeta(timeFilter, metrics)
                         .asSequence()
                         .forEach { row ->
                             container.put(
@@ -58,7 +59,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeRBM::class.java -> {
                 MDContainer<MetricRow, RBM>(1).also { container ->
-                    metricStore.queryBBM(timeFilter, metrics).asSequence()
+                    store.queryBBM(timeFilter, metrics).asSequence()
                         .forEach { row ->
                             container.put(
                                 row.tm, row,
@@ -70,7 +71,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeBBM::class.java -> {
                 MDContainer<MetricRow, BBM>(1).also { container ->
-                    metricStore.queryBBM(timeFilter, metrics).asSequence()
+                    store.queryBBM(timeFilter, metrics).asSequence()
                         .forEach { row ->
                             container.put(
                                 row.tm, row,
@@ -82,7 +83,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeCBM::class.java -> {
                 MDContainer<MetricRow, CBM>(1).also { container ->
-                    metricStore.queryCBM(timeFilter, metrics).asSequence()
+                    store.queryCBM(timeFilter, metrics).asSequence()
                         .forEach { row ->
                             container.put(
                                 row.tm, row,
@@ -112,13 +113,13 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
         dimension: String,
         dimensionFilter: PrunePushedFilter,
     ): RowIterator {
-        val storeProvider = table.getTableFormat().getProvider(table, BitlapContext.hadoopConf)
-        val metricDimStore = storeProvider.getMetricDimStore()
-        // TODO: eager consume? remote should be eager
+        // TODO (add store cache)
+        val store = BitlapStore(table, BitlapContext.hadoopConf).open()
+        // TODO (eager consume? remote should be eager)
         val container = when (metricType) {
             DataTypeRowValueMeta::class.java -> {
                 MDContainer<MetricDimRowMeta, RowValueMeta>(2).also { container ->
-                    metricDimStore.queryMeta(timeFilter, metrics, dimension, dimensionFilter)
+                    store.queryMeta(timeFilter, metrics, dimension, dimensionFilter)
                         .asSequence()
                         .forEach { row ->
                             container.put(
@@ -131,7 +132,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeRBM::class.java -> {
                 MDContainer<MetricDimRow, RBM>(2).also { container ->
-                    metricDimStore.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                    store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
                         .forEach { row ->
                             container.put(
                                 listOf(row.tm, row.dimension), row,
@@ -143,7 +144,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeBBM::class.java -> {
                 MDContainer<MetricDimRow, BBM>(2).also { container ->
-                    metricDimStore.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                    store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
                         .forEach { row ->
                             container.put(
                                 listOf(row.tm, row.dimension), row,
@@ -155,7 +156,7 @@ class LocalFetcher(val context: FetchContext) : Fetcher {
             }
             DataTypeCBM::class.java -> {
                 MDContainer<MetricDimRow, CBM>(2).also { container ->
-                    metricDimStore.queryCBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
+                    store.queryCBM(timeFilter, metrics, dimension, dimensionFilter).asSequence()
                         .forEach { row ->
                             container.put(
                                 listOf(row.tm, row.dimension), row,

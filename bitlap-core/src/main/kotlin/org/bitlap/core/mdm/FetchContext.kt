@@ -16,11 +16,13 @@ import java.io.Serializable
  */
 class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializable {
 
+    lateinit var bestPlan: FetchPlan
+
     /**
      * find best plan to be executed
      */
     fun findBestPlan(): FetchPlan {
-        return when (oPlan) {
+        this.bestPlan = when (oPlan) {
             is PendingFetchPlan -> {
                 val dimensions = oPlan.analyzer.getDimensionColNamesWithoutTime()
                 when (dimensions.size) {
@@ -33,6 +35,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializabl
             }
             else -> oPlan
         }
+        return this.bestPlan
     }
 
     /**
@@ -54,7 +57,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) : Serializabl
      * Merge metrics with more than one dimensions
      *
      *
-     * TODO: should find best cartesian base here, use first one currently. For example:
+     * TODO should find best cartesian base here, use first one currently. For example:
      *   1. split into parts of a given size
      *   2. or split into parts with CBO
      *   3. or (merge metric -> mertic dim) or (merge dim -> merge metric)

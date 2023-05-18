@@ -17,7 +17,7 @@ import java.sql.ResultSet
  */
 class QueryExecution(private val statement: String, private val sessionId: SessionId) {
 
-    private val runtimeConf: BitlapConf = BitlapContext.bitlapConf // TODO: merge session conf
+    private val runtimeConf: BitlapConf = BitlapContext.bitlapConf // TODO (merge session conf)
     private val planner = BitlapContext.sqlPlanner
 
     fun execute(): ResultSet {

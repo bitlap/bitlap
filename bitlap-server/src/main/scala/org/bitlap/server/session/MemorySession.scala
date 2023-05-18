@@ -12,6 +12,7 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.server.BitlapContext
 
 import com.google.protobuf.ByteString
 
@@ -36,7 +37,7 @@ final class MemorySession(
 
   override def lastAccessTime: Long = _lastAccessTime
 
-  override def sessionConf: BitlapConf = new BitlapConf(_sessionConf.asJava)
+  override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
 
   override def open(): Unit = {
     this.sessionState.compareAndSet(false, true)
@@ -65,7 +66,7 @@ final class MemorySession(
   ): Task[RowSet] =
     sessionManager.getOperation(operationHandle).map { op =>
       val rows = op.getNextResultSet()
-      op.remove(operationHandle) // TODO: work with fetch offset & size
+      op.remove(operationHandle) // TODO (work with fetch offset & size)
       rows
     }
 
@@ -159,6 +160,8 @@ final class MemorySession(
     getInfoType match {
       case ServerName =>
         GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+      case ServerConf =>
+        GetInfoValue(ByteString.copyFromUtf8(BitlapContext.globalConf.toJson))
       case DbmsName =>
         GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
       case DbmsVer =>

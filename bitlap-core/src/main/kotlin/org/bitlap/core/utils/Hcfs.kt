@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.utils
 
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.bitlap.core.data.metadata.Table
@@ -32,5 +33,12 @@ object Hcfs {
             it.readFully(buf, 0, len)
             Table.from(buf, tableDir.toString())
         }
+    }
+
+    /**
+     * clone conf
+     */
+    fun FileSystem.newConf(): Configuration {
+        return Configuration(this.conf)
     }
 }

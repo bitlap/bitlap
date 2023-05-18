@@ -91,7 +91,7 @@ open class Range<C : Comparable<C>>(val lower: LeftCut<C>, val upper: RightCut<C
         return lower <= value && upper >= value
     }
 
-    // TODO: containsAll, encloses, intersection...
+    // TODO (containsAll, encloses, intersection...)
 
     fun isValid(): Boolean = lower <= upper
     fun isEmpty(): Boolean = lower > upper ||

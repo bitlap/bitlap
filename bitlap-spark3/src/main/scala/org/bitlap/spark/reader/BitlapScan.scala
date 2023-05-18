@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.reader
 
-import org.apache.spark.sql.connector.read.*
+import org.apache.spark.sql.connector.read._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
@@ -19,7 +19,7 @@ final class BitlapScan(
   private var bitlapDataSourceReadOptions: BitlapDataSourceReadOptions = _
 
   private val url   = options.getOrDefault("url", null)
-  private val table = options.getOrDefault("table", null)
+  private val table = options.getOrDefault("dbtable", null)
 
   override def readSchema(): StructType = schema
 

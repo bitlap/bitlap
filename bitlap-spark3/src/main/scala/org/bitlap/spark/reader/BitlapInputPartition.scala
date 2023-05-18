@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.spark.reader
 
-import java.io.*
+import java.io._
 
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.InputSplit

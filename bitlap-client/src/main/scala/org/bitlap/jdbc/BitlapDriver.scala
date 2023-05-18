@@ -5,9 +5,7 @@ import java.sql.{ Array as _, * }
 import java.util.Properties
 import java.util.logging.Logger
 
-/** Desc: bitlap 的JDBC驱动
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/4/16
+/** bitlap jdbc driver
  */
 abstract class BitlapDriver extends Driver:
 
@@ -15,7 +13,9 @@ abstract class BitlapDriver extends Driver:
     try
       if acceptsURL(url) then new BitlapConnection(url, info)
       else throw BitlapSQLException(s"Invalid bitlap jdbc url: $url")
-    catch case ex: Exception => throw BitlapSQLException(ex.toString)
+    catch
+      case ex: BitlapSQLException => throw ex
+      case ex: Exception          => throw BitlapSQLException(ex.toString)
 
   /** Checks whether a given url is in a valid format.
    *
@@ -24,7 +24,7 @@ abstract class BitlapDriver extends Driver:
    *  jdbc:bitlap:// - run in embedded mode jdbc:bitlap://localhost - connect to localhost default port (10000)
    *  jdbc:bitlap://localhost:5050 - connect to localhost port 5050
    *
-   *  TODO: - write a better regex.
+   *  TODO - write a better regex.
    *    - decide on uri format
    */
   override def acceptsURL(url: String): Boolean =

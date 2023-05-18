@@ -16,6 +16,7 @@ class QueryContext : Serializable {
     var statement: String? = null
     var originalPlan: SqlNode? = null
     var currentSelectNode: SqlSelect? = null
+    var queryId: String? = null
 
     @Volatile var sessionId: SessionId? = null
 

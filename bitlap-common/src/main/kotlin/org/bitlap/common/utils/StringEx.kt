@@ -41,4 +41,15 @@ object StringEx {
     fun String?.nullOrBlank(): Boolean {
         return this.isNullOrBlank()
     }
+
+    /**
+     * get [default] if this is blank
+     */
+    @JvmStatic
+    fun String?.blankOr(default: String): String {
+        if (this.isNullOrBlank()) {
+            return default
+        }
+        return this
+    }
 }

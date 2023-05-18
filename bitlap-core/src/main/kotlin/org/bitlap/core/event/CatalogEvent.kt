@@ -11,7 +11,7 @@ import org.bitlap.core.data.metadata.Table
  * Date: 2021/7/21
  */
 
-// TODO: Add event status, exception, and etc.
+// TODO (Add event status, exception, and etc.)
 
 // database
 data class DatabaseCreateEvent(val database: Database) : BitlapEvent

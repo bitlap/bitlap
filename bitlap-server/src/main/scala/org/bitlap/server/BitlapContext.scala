@@ -25,7 +25,7 @@ import zio.*
  */
 object BitlapContext:
 
-  lazy val globalConf = new BitlapConf()
+  lazy val globalConf: BitlapConf = org.bitlap.core.BitlapContext.INSTANCE.getBitlapConf
 
   private val initNode = new AtomicBoolean(false)
   private val initRpc  = new AtomicBoolean(false)

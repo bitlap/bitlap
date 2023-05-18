@@ -16,7 +16,7 @@ class UdfTest : BaseLocalFsTest(), SqlChecker {
     init {
 
         "test lambda udf registry" {
-            // TODO: not support kotlin lambda and inline class, should clean it like apache spark
+            // TODO (not support kotlin lambda and inline class, should clean it like apache spark)
             // for example, kotlin compiler generate class is: org.bitlap.core.test.sql.UdfTest$1$1
             FunctionRegistry.register("test_hello") { s: String ->
                 "hello $s"

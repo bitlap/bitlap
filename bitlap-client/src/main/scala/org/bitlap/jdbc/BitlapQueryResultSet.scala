@@ -20,14 +20,15 @@ import org.bitlap.network.models.OperationStatus
 class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows: Int, private val _row: Row = null)
     extends BitlapBaseResultSet:
 
-  private var warningChain: SQLWarning                = _
-  private var row: Row                                = _row
-  private val columnNames: mutable.ListBuffer[String] = mutable.ListBuffer.empty
-  private val columnTypes: mutable.ListBuffer[String] = mutable.ListBuffer.empty
+  private var warningChain: SQLWarning                           = _
+  private var row: Row                                           = _row
+  override protected val columnNames: mutable.ListBuffer[String] = mutable.ListBuffer.empty
+  override protected val columnTypes: mutable.ListBuffer[String] = mutable.ListBuffer.empty
 
   private var emptyResultSet                   = false
   private var rowsFetched                      = 0
   protected var closed: Boolean                = false
+  protected var hasMore                        = true
   protected var fetchSize                      = 0
   private var fetchFirst                       = false
   private var fetchedRows: List[Row]           = List.empty
@@ -100,11 +101,14 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
         fetchedRows = null
         fetchedRowsItr = null
         fetchFirst = false
+        hasMore = true
 
-      if fetchedRows.isEmpty || !fetchedRowsItr.hasNext then
+      if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) && hasMore then
         val result = client.fetchResults(stmtHandle, maxRows = fetchSize, 1)
-        if result != null then
-          fetchedRows = result.rows
+        hasMore = result.hasMoreRows
+        val r = result.results
+        if r != null then
+          fetchedRows = r.rows
           fetchedRowsItr = fetchedRows.iterator
       if fetchedRowsItr.hasNext then row = fetchedRowsItr.next()
       else return false

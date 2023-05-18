@@ -8,7 +8,7 @@ import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.mdm.BitlapWriter
+import org.bitlap.core.mdm.BitlapEventWriter
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
 
@@ -301,7 +301,7 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
             checkRows(
                 """
                     select city, oo, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
-                    from $db.$table 
+                    from $db.$table
                     where _time >= 100
                     group by city, oo
                     order by city, oo
@@ -310,12 +310,25 @@ class QueryTest : BaseLocalFsTest(), SqlChecker {
                     listOf("北京", null, 8, 24, 3)
                 )
             )
+            checkRows(
+                """
+                    select _time, city, o1, o2, o3, sum(vv) as vv, sum(pv) as pv, count(distinct vv) uv
+                    from $db.$table 
+                    where _time >= 100
+                    group by _time, city, o1, o2, o3
+                    order by _time, city, o1, o2, o3
+                """.trimIndent(),
+                listOf(
+                    listOf(100, "北京", null, null, null, 4, 12, 3),
+                    listOf(200, "北京", null, null, null, 4, 12, 3)
+                )
+            )
         }
     }
 
     private fun prepareTestData(database: String, tableName: String, time: Long) {
         val table = BitlapContext.catalog.getTable(tableName, database)
-        val writer = BitlapWriter(table, hadoopConf)
+        val writer = BitlapEventWriter(table, hadoopConf)
         writer.use {
             it.write(
                 listOf(

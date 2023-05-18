@@ -64,7 +64,7 @@ class MetricMergeDimFetchPlan(override val subPlans: List<FetchPlan>) : AbsFetch
         }
 
         // let rows2 as Join Build Table
-        // TODO: consider sort merge join
+        // TODO (consider sort merge join)
         val buffer = rows2.rows.asSequence().toList().groupBy { it[0] }
         for (r1 in rows1) {
             val keys1 = r1.getByTypes(rows1.keyTypes)

@@ -4,6 +4,8 @@ package org.bitlap.jdbc
 import java.sql.{ Array as _, * }
 
 import org.bitlap.client.BitlapClient
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.utils.JSONUtils
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
@@ -20,7 +22,7 @@ class BitlapDatabaseMetaData(
   private val session: SessionHandle,
   private val client: BitlapClient)
     extends DatabaseMetaData
-    with BitlapSerde:
+    with BitlapSerde {
   override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def allTablesAreSelectable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
@@ -46,6 +48,11 @@ class BitlapDatabaseMetaData(
   override def getDatabaseProductVersion: String =
     val result = client.getInfo(session, GetInfoType.DbmsVer).value
     deserialize[String](TypeId.StringType, result)
+
+  def getDatabaseConf: BitlapConf = {
+    val result = client.getInfo(session, GetInfoType.ServerConf).value
+    new BitlapConf(JSONUtils.fromJsonAsMap(deserialize[String](TypeId.StringType, result)))
+  }
 
   override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -556,3 +563,4 @@ class BitlapDatabaseMetaData(
   override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
   )
+}

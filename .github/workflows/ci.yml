@@ -30,7 +30,7 @@ jobs:
 
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
-        
+
       - name: Docker Build
         run: bash docker.sh ${{ vars.VERSION }}
         working-directory: ./docker
@@ -39,11 +39,11 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}        
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Push
         if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
         run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ vars.VERSION }}
-        
+  
   
   test:
     runs-on: ubuntu-latest

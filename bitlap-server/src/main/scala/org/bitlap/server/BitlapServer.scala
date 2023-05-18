@@ -11,6 +11,8 @@ import org.bitlap.server.rpc.*
 import org.bitlap.server.session.SessionManager
 
 import zio.{ Duration as ZDuration, * }
+import zio.logging.LogFormat
+import zio.logging.backend.SLF4J
 
 /** bitlap 聚合服务
  *  @author
@@ -18,6 +20,8 @@ import zio.{ Duration as ZDuration, * }
  *  @version 1.0,2022/10/19
  */
 object BitlapServer extends zio.ZIOAppDefault:
+
+  private lazy val logger = Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
 
   // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
@@ -51,7 +55,8 @@ object BitlapServer extends zio.ZIOAppDefault:
         Scope.default,
         ZIOAppArgs.empty,
         GrpcServiceLive.live,
-        BitlapServerConfiguration.live
+        BitlapServerConfiguration.live,
+        logger
       )
       .fold(
         e => ZIO.fail(e).exitCode,

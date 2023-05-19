@@ -93,7 +93,7 @@
         <zio-cli.version>0.4.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>
         <jupiter.version>5.9.3</jupiter.version>
-        <tapir.version>1.3.0</tapir.version>
+        <tapir.version>1.4.0</tapir.version>
         <zio.http.version>3.0.0-RC1</zio.http.version>
         <javafaker.version>1.0.2</javafaker.version>
 

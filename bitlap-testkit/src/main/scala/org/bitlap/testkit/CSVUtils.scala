@@ -14,11 +14,22 @@ import bitlap.rolls.csv.CSVUtils.*
 trait CSVUtils {
 
   given CSVFormat = new CSVFormat {
-    override val hasHeaders: Boolean  = false
+    override val hasHeaders: Boolean  = true
     override val hasColIndex: Boolean = false
   }
 
-  def readCSVData(file: String): List[Metric] =
+  def readCSVData(file: File): List[Metric] =
+    val (metadata, metrics) = CSVUtils.readCSV(
+      FileName(file.getName)
+    ) { line =>
+      line
+        .into[Metric]
+        .withFieldComputed(_.dimensions, dims => StringUtils.asClasses(dims)((k, v) => Dimension(k, v)))
+        .decode
+    }
+    metrics.toList
+
+  def readClasspathCSVData(file: String): List[Metric] =
     val (metadata, metrics) = CSVUtils.readCSV(
       FileName(this.getClass.getClassLoader.getResource(file).getFile)
     ) { line =>

@@ -19,7 +19,7 @@ import junit.framework.TestCase.assertTrue
 class HandleSpec extends TestCase("HandleTests"):
 
   @Test
-  def testOperationHandle =
+  def testOperationHandle: Unit =
     val handleId = new handles.HandleIdentifier()
     val op = new handles.OperationHandle(
       OperationType.ExecuteStatement,
@@ -54,7 +54,7 @@ class HandleSpec extends TestCase("HandleTests"):
     assertTrue(h1 == op)
 
   @Test
-  def testSessionHandle =
+  def testSessionHandle: Unit =
     val handleId = new HandleIdentifier()
     val op       = new SessionHandle(handleId)
 
@@ -86,4 +86,4 @@ class HandleSpec extends TestCase("HandleTests"):
     assertTrue(op1.equals(op2))
     assertTrue(op1.hashCode() == op2.hashCode())
     assertFalse(op1.hashCode() == op3.hashCode())
-    assertTrue(op3.toString.contains("handleId"))
+    assertTrue(op3.toString.contains("org.bitlap.network.handles$SessionHandle"))

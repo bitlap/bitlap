@@ -31,8 +31,8 @@ trait DriverAsyncRpc extends DriverRpc[Task]:
     action: self.type => Z
   ): T =
     try
-      val future = zio.Unsafe.unsafe { implicit rt =>
-        zio.Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
+      val future = Unsafe.unsafe { implicit rt =>
+        Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
       }
       Await.result(future, timeout)
     catch case e: Throwable => throw e

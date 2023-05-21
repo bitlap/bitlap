@@ -17,11 +17,11 @@ class FakeDataUtilSpec extends CSVUtils {
     val file            = new File("./simple_data.csv")
     writeCSVData(file, s)
 
-    val ms = readCSVData("./simple_data.csv")
+    val ms = readCSVData(new File("./simple_data.csv"))
     assert(s == ms)
 
     writeCSVData(file, ms)
-    val newMs = readCSVData("./simple_data.csv")
+    val newMs = readCSVData(new File("./simple_data.csv"))
     assert(newMs == s)
 
     file.delete()

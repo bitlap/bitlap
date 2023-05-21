@@ -18,7 +18,7 @@ import org.apache.spark.sql.types.{ BinaryType, DataType, IntegerType, LongType,
       _FUNC_(bucket, id, count) - Collect `bucket`, `id` and `count` into a CBM.
     """
 )
-case class CBMAggr(
+final case class CBMAggr(
   bucket: Expression,
   id: Expression,
   count: Expression,
@@ -26,10 +26,6 @@ case class CBMAggr(
   override val inputAggBufferOffset: Int = 0)
     extends TypedImperativeAggregate[CBM]
     with TernaryLike[Expression] {
-
-  def this(bucket: Expression, uid: Expression, count: Expression) = {
-    this(bucket, uid, count, 0, 0)
-  }
 
   override def first: Expression = bucket
 
@@ -100,4 +96,8 @@ case class CBMAggr(
     copy(bucket = newFirst, id = newSecond, count = newThird)
 
   override def prettyName: String = "cbm_aggr"
+}
+
+object CBMAggr {
+  def apply(bucket: Expression, uid: Expression, count: Expression) = new CBMAggr(bucket, uid, count, 0, 0)
 }

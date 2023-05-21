@@ -18,17 +18,13 @@ import org.apache.spark.sql.types.{ BinaryType, DataType, IntegerType, NullType 
       _FUNC_(bucket, uid) - Collect `bucket` and `uid` in each row into a bucket bitmap.
     """
 )
-case class BBMAggr(
+final case class BBMAggr(
   bucket: Expression,
   id: Expression,
   override val mutableAggBufferOffset: Int = 0,
   override val inputAggBufferOffset: Int = 0)
     extends TypedImperativeAggregate[BBM]
     with BinaryLike[Expression] {
-
-  def this(bucket: Expression, uid: Expression) = {
-    this(bucket, uid, 0, 0)
-  }
 
   override def left: Expression = bucket
 
@@ -92,4 +88,8 @@ case class BBMAggr(
     copy(bucket = newLeft, id = newRight)
 
   override def prettyName: String = "bbm_aggr"
+}
+
+object BBMAggr {
+  def apply(bucket: Expression, uid: Expression) = new BBMAggr(bucket, uid, 0, 0)
 }

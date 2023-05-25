@@ -77,23 +77,23 @@
         <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.version>1.8.20</kotlin.version>
-        <kotlinx.coroutines.version>1.6.4</kotlinx.coroutines.version>
+        <kotlinx.coroutines.version>1.7.1</kotlinx.coroutines.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
         <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->
         <scala.version>3.2.2</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.2.8</rolls.version>
+        <rolls.version>0.2.9</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
         <zio.version>2.0.13</zio.version>
         <zio.grpc.version>0.6.0-test4</zio.grpc.version>
-        <zio-cli.version>0.4.0</zio-cli.version>
+        <zio-cli.version>0.5.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>
         <jupiter.version>5.9.3</jupiter.version>
-        <tapir.version>1.3.0</tapir.version>
+        <tapir.version>1.4.0</tapir.version>
         <zio.http.version>3.0.0-RC1</zio.http.version>
         <javafaker.version>1.0.2</javafaker.version>
 
@@ -114,7 +114,7 @@
         <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>
         <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
         <surefire.version>3.1.0</surefire.version>
-        <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
         <spotless-maven-plugin.version>2.27.2</spotless-maven-plugin.version>
         <scalafmt.version>3.7.3</scalafmt.version>
@@ -520,7 +520,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

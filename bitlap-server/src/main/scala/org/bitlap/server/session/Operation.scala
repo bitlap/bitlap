@@ -30,7 +30,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   var operationTimeout                = parentSession.sessionConf.get(BitlapConf.RPC_TIMEOUT)
   var statement: String               = _
 
-  lazy val opHandle: OperationHandle                = new OperationHandle(opType, hasResultSet)
+  lazy val opHandle: OperationHandle                = OperationHandle(opType, hasResultSet)
   lazy val confOverlay: mutable.Map[String, String] = mutable.HashMap[String, String]()
 
   protected var operationStart    = 0L

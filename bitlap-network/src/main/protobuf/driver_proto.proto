@@ -40,8 +40,7 @@ message BFetchResultsResp {
 }
 
 message BHandleIdentifier {
-  bytes guid = 1;
-  bytes secret = 2;
+  string value = 1;
 }
 
 message BSessionHandle {

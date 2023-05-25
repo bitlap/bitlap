@@ -31,7 +31,7 @@ final class MockAsyncRpcBackend extends DriverAsyncRpc with CSVUtils {
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, SessionHandle] = ZIO.succeed(new SessionHandle(new HandleIdentifier()))
+  ): ZIO[Any, Throwable, SessionHandle] = ZIO.succeed(SessionHandle(HandleIdentifier()))
 
   override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] = ZIO.unit
 

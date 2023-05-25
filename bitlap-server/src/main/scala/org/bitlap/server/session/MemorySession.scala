@@ -28,7 +28,7 @@ final class MemorySession(
   val password: String,
   _sessionConf: scala.collection.Map[String, String],
   val sessionManager: SessionManager,
-  val sessionHandle: SessionHandle = new SessionHandle(new HandleIdentifier()),
+  val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
   val creationTime: Long = System.currentTimeMillis())
     extends Session {

@@ -6,7 +6,7 @@ import java.io.File
 import org.bitlap.network.enumeration.{ OperationType, TypeId }
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.testkit.server.MockDriverTask
+import org.bitlap.testkit.server.MockDriverIO
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -35,9 +35,9 @@ class CSVUtilsSpec extends CSVUtils {
   }
 
   @Test
-  def testMockDriverTask(): Unit = {
-    val driverTask = new MockDriverTask()
-    val ret        = driverTask.fetchResults(new OperationHandle(OperationType.ExecuteStatement), 50, 1)
+  def testMockDriverIO(): Unit = {
+    val driverIO = new MockDriverIO()
+    val ret      = driverIO.fetchResults(OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>
       zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()
     }

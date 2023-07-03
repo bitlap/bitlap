@@ -19,11 +19,11 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-object MockDriverTask {
-  lazy val live: ULayer[DriverTask] = ZLayer.succeed(new MockDriverTask())
+object MockDriverIO {
+  lazy val live: ULayer[DriverIO] = ZLayer.succeed(new MockDriverIO())
 }
 
-final class MockDriverTask extends DriverTask with CSVUtils {
+final class MockDriverIO extends DriverIO with CSVUtils {
 
   val metrics: Seq[Metric] = readClasspathCSVData("simple_data.csv")
 

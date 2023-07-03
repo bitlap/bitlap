@@ -23,10 +23,10 @@ import zio.*
  */
 object GrpcBackendLive:
   private[server] lazy val liveInstance: GrpcBackendLive = new GrpcBackendLive
-  lazy val live: ULayer[DriverTask]                      = ZLayer.succeed(liveInstance)
+  lazy val live: ULayer[DriverIO]                        = ZLayer.succeed(liveInstance)
 end GrpcBackendLive
 
-final class GrpcBackendLive extends DriverTask with LazyLogging:
+final class GrpcBackendLive extends DriverIO with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(

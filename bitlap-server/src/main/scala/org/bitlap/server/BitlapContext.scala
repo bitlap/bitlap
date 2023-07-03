@@ -8,7 +8,7 @@ import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.*
 import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.{ DriverTask, ServerAddress }
+import org.bitlap.network.{ DriverIO, ServerAddress }
 import org.bitlap.network.NetworkException.*
 import org.bitlap.server.config.*
 
@@ -34,22 +34,22 @@ object BitlapContext:
   private var cliClientService: CliClientServiceImpl = _
 
   @volatile
-  private var _driverTask: DriverTask = _
+  private var _driverIO: DriverIO = _
 
   @volatile
   private var _node: Node = _
 
-  def driverTask: DriverTask =
-    if _driverTask == null then {
-      throw InternalException("cannot find an driverTask instance")
+  def driverIO: DriverIO =
+    if _driverIO == null then {
+      throw InternalException("cannot find a DriverIO instance")
     } else {
-      _driverTask
+      _driverIO
     }
 
-  def fillRpc(driverTask: DriverTask): UIO[Unit] =
+  def fillRpc(driverIO: DriverIO): UIO[Unit] =
     ZIO.succeed {
       if initRpc.compareAndSet(false, true) then {
-        _driverTask = driverTask
+        _driverIO = driverIO
       }
     }
 

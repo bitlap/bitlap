@@ -21,11 +21,11 @@ import zio.*
  */
 object GrpcServiceLive:
 
-  lazy val live: ZLayer[DriverTask, Nothing, GrpcServiceLive] =
-    ZLayer.fromFunction((rpc: DriverTask) => new GrpcServiceLive(rpc))
+  lazy val live: ZLayer[DriverIO, Nothing, GrpcServiceLive] =
+    ZLayer.fromFunction((rpc: DriverIO) => new GrpcServiceLive(rpc))
 end GrpcServiceLive
 
-final class GrpcServiceLive(private val rpc: DriverTask) extends ZDriverService[RequestContext]:
+final class GrpcServiceLive(private val rpc: DriverIO) extends ZDriverService[RequestContext]:
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
   override def openSession(request: BOpenSessionReq, context: RequestContext): IO[StatusException, BOpenSessionResp] =

@@ -24,7 +24,7 @@ object RaftServerEndpoint:
 
   def service(args: List[String]): ZIO[RaftServerEndpoint, Throwable, Unit] =
     (for {
-      node <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaft())
+      node <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
       _    <- BitlapContext.fillNode(node)
       _    <- Console.printLine(s"Raft Server started")
       _    <- ZIO.never
@@ -36,7 +36,7 @@ final class RaftServerEndpoint(config: BitlapServerConfiguration):
 
   private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
 
-  def runRaft(): Task[Node] = ZIO.attempt {
+  def runRaftServer(): Task[Node] = ZIO.attempt {
     val dataPath       = config.raftConfig.dataPath
     val groupId        = config.raftConfig.groupId
     val serverIdStr    = config.raftConfig.serverAddress

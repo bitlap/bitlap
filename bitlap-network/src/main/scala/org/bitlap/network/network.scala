@@ -3,7 +3,7 @@ package org.bitlap
 
 import com.typesafe.scalalogging.LazyLogging
 
-import io.grpc.Status
+import io.grpc.*
 
 /** @author
  *    梦境迷离
@@ -15,7 +15,5 @@ package object network extends LazyLogging:
 
   /** TODO grpc client 获取不到cause，错误内容放到description中
    */
-  lazy val errorApplyFunc: Throwable => Status = (ex: Throwable) =>
-    Status.INTERNAL.withDescription(ex.getLocalizedMessage)
-
-  lazy val statusApplyFunc: Status => Throwable = (st: Status) => st.asException()
+  lazy val errorApplyFunc: Throwable => StatusException = (ex: Throwable) =>
+    new StatusException(Status.fromThrowable(ex))

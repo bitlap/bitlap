@@ -16,7 +16,7 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait DriverAsyncRpc extends DriverRpc[Task]:
+trait DriverTask extends DriverX[Task]:
   self =>
 
   private lazy val timeout = Duration("30s")

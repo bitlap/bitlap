@@ -8,7 +8,7 @@ import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.schema.*
 import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.{ DriverAsyncRpc, ServerAddress }
+import org.bitlap.network.{ DriverTask, ServerAddress }
 import org.bitlap.network.NetworkException.*
 import org.bitlap.server.config.*
 
@@ -34,19 +34,19 @@ object BitlapContext:
   private var cliClientService: CliClientServiceImpl = _
 
   @volatile
-  private var _asyncRpc: DriverAsyncRpc = _
+  private var _asyncRpc: DriverTask = _
 
   @volatile
   private var _node: Node = _
 
-  def asyncRpc: DriverAsyncRpc =
+  def asyncRpc: DriverTask =
     if _asyncRpc == null then {
       throw InternalException("cannot find an AsyncRpc instance")
     } else {
       _asyncRpc
     }
 
-  def fillRpc(asyncRpc: DriverAsyncRpc): UIO[Unit] =
+  def fillRpc(asyncRpc: DriverTask): UIO[Unit] =
     ZIO.succeed {
       if initRpc.compareAndSet(false, true) then {
         _asyncRpc = asyncRpc

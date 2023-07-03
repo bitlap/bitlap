@@ -21,7 +21,7 @@ import zio.*
  *  @since 2021/11/21
  *  @version 1.0, zio 2.0
  */
-final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverAsyncRpc:
+final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverTask:
 
   /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]
    *
@@ -42,11 +42,13 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
 
   /** 根据 IP:PORT 获取grpc channel，考虑leader转移，所以每次都将创建Layer
    */
-  private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = DriverServiceClient.live(
-    scalapb.zio_grpc.ZManagedChannel(builder =
-      ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[?]]
+  private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = ZLayer.scoped {
+    DriverServiceClient.scoped(
+      scalapb.zio_grpc.ZManagedChannel(builder =
+        ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[?]]
+      )
     )
-  )
+  }.orDie
 
   override def openSession(
     username: String,
@@ -56,7 +58,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .openSession(BOpenSessionReq(username, password, props ++ configuration))
-        .mapBoth(statusApplyFunc, r => new SessionHandle(r.getSessionHandle))
+        .map(r => new SessionHandle(r.getSessionHandle))
         .provideLayer(l)
     )
 
@@ -64,7 +66,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
-        .mapBoth(statusApplyFunc, _ => ())
+        .map(_ => ())
         .provideLayer(l)
     )
 
@@ -79,7 +81,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         .executeStatement(
           BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), props ++ confOverlay, queryTimeout)
         )
-        .mapBoth(statusApplyFunc, r => new OperationHandle(r.getOperationHandle))
+        .map(r => new OperationHandle(r.getOperationHandle))
         .provideLayer(l)
     )
 
@@ -93,7 +95,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         .fetchResults(
           BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)
         )
-        .mapBoth(statusApplyFunc, r => FetchResults.fromBFetchResultsResp(r))
+        .map(r => FetchResults.fromBFetchResultsResp(r))
         .provideLayer(l)
     )
 
@@ -101,7 +103,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, t => TableSchema.fromBGetResultSetMetadataResp(t))
+        .map(t => TableSchema.fromBGetResultSetMetadataResp(t))
         .provideLayer(l)
     )
 
@@ -109,7 +111,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getDatabases(BGetDatabasesReq(Option(sessionHandle.toBSessionHandle()), pattern))
-        .mapBoth(statusApplyFunc, t => new OperationHandle(t.getOperationHandle))
+        .map(t => new OperationHandle(t.getOperationHandle))
         .provideLayer(l)
     )
 
@@ -121,7 +123,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getTables(BGetTablesReq(Option(sessionHandle.toBSessionHandle()), database, pattern))
-        .mapBoth(statusApplyFunc, t => new OperationHandle(t.getOperationHandle))
+        .map(t => new OperationHandle(t.getOperationHandle))
         .provideLayer(l)
     )
 
@@ -140,7 +142,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, _ => ())
+        .map(_ => ())
         .provideLayer(l)
     )
 
@@ -148,7 +150,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, t => OperationStatus.fromBGetOperationStatusResp(t))
+        .map(t => OperationStatus.fromBGetOperationStatusResp(t))
         .provideLayer(l)
     )
 
@@ -156,7 +158,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .mapBoth(statusApplyFunc, _ => ())
+        .map(_ => ())
         .provideLayer(l)
     )
 
@@ -164,6 +166,6 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
-        .mapBoth(statusApplyFunc, t => GetInfoValue.fromBGetInfoResp(t))
+        .map(t => GetInfoValue.fromBGetInfoResp(t))
         .provideLayer(l)
     )

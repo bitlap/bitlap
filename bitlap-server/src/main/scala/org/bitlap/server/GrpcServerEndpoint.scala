@@ -1,7 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import org.bitlap.network.DriverAsyncRpc
+import org.bitlap.network.DriverTask
+import org.bitlap.network.driver_service.ZioDriverService.*
 import org.bitlap.server.config.BitlapServerConfiguration
 import org.bitlap.server.rpc.*
 
@@ -24,11 +25,11 @@ object GrpcServerEndpoint:
 
   def service(
     args: List[String]
-  ): ZIO[DriverAsyncRpc with GrpcServiceLive with Scope with GrpcServerEndpoint, Throwable, Unit] =
+  ): ZIO[GrpcServiceLive with Scope with GrpcServerEndpoint, Throwable, Unit] =
     (for {
       _ <- Console.printLine(s"Grpc Server started")
       _ <- BitlapContext.fillRpc(GrpcBackendLive.liveInstance)
-      _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpc())
+      _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
@@ -37,13 +38,18 @@ end GrpcServerEndpoint
 
 final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
 
-  private def builder =
-    ServerBuilder.forPort(config.grpcConfig.port).addService(ProtoReflectionService.newInstance())
+  private val serverLayer =
+    ServerLayer.fromServiceList(
+      io.grpc.ServerBuilder.forPort(config.grpcConfig.port).addService(ProtoReflectionService.newInstance()),
+      ServiceList
+        .addFromEnvironment[ZDriverService[RequestContext]]
+    )
 
-  def runGrpc(): ZIO[DriverAsyncRpc with GrpcServiceLive with Scope, Throwable, ZEnvironment[zio_grpc.Server]] =
-    ServerLayer
-      .fromServiceList(
-        builder.asInstanceOf[ServerBuilder[?]],
-        ServiceList.accessEnv[DriverAsyncRpc, GrpcServiceLive]
-      )
-      .build
+  def runGrpcServer(): URIO[Any, ExitCode] = ZLayer
+    .make[Server](
+      serverLayer,
+      GrpcServiceLive.live,
+      GrpcBackendLive.live
+    )
+    .launch
+    .exitCode

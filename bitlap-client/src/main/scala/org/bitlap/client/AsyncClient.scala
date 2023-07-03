@@ -66,7 +66,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
-        .map(_ => ())
+        .unit
         .provideLayer(l)
     )
 
@@ -142,7 +142,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .map(_ => ())
+        .unit
         .provideLayer(l)
     )
 
@@ -158,7 +158,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     leaderClientLayer.flatMap(l =>
       DriverServiceClient
         .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .map(_ => ())
+        .unit
         .provideLayer(l)
     )
 

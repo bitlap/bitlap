@@ -19,11 +19,11 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-object MockAsyncRpcBackend {
-  lazy val live: ULayer[DriverTask] = ZLayer.succeed(new MockAsyncRpcBackend())
+object MockDriverTask {
+  lazy val live: ULayer[DriverTask] = ZLayer.succeed(new MockDriverTask())
 }
 
-final class MockAsyncRpcBackend extends DriverTask with CSVUtils {
+final class MockDriverTask extends DriverTask with CSVUtils {
 
   val metrics: Seq[Metric] = readClasspathCSVData("simple_data.csv")
 

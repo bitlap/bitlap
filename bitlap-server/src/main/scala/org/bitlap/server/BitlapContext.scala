@@ -34,22 +34,22 @@ object BitlapContext:
   private var cliClientService: CliClientServiceImpl = _
 
   @volatile
-  private var _asyncRpc: DriverTask = _
+  private var _driverTask: DriverTask = _
 
   @volatile
   private var _node: Node = _
 
-  def asyncRpc: DriverTask =
-    if _asyncRpc == null then {
-      throw InternalException("cannot find an AsyncRpc instance")
+  def driverTask: DriverTask =
+    if _driverTask == null then {
+      throw InternalException("cannot find an driverTask instance")
     } else {
-      _asyncRpc
+      _driverTask
     }
 
-  def fillRpc(asyncRpc: DriverTask): UIO[Unit] =
+  def fillRpc(driverTask: DriverTask): UIO[Unit] =
     ZIO.succeed {
       if initRpc.compareAndSet(false, true) then {
-        _asyncRpc = asyncRpc
+        _driverTask = driverTask
       }
     }
 
@@ -64,8 +64,10 @@ object BitlapContext:
     }
 
   def isLeader: Boolean = {
-    while _node == null do Thread.sleep(1000)
-    _node.isLeader
+    while (_node == null) {
+      Thread.sleep(1000)
+      _node.isLeader
+    }
   }
 
   @Nullable

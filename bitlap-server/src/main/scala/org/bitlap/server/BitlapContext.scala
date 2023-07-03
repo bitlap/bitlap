@@ -66,8 +66,8 @@ object BitlapContext:
   def isLeader: Boolean = {
     while (_node == null) {
       Thread.sleep(1000)
-      _node.isLeader
     }
+    _node.isLeader
   }
 
   @Nullable

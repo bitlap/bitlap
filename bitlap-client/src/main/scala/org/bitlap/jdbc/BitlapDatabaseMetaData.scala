@@ -5,7 +5,7 @@ import java.sql.{ Array as _, * }
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.utils.JSONUtils
+import org.bitlap.common.utils.JsonEx
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
@@ -51,7 +51,7 @@ class BitlapDatabaseMetaData(
 
   def getDatabaseConf: BitlapConf = {
     val result = client.getInfo(session, GetInfoType.ServerConf).value
-    new BitlapConf(JSONUtils.fromJsonAsMap(deserialize[String](TypeId.StringType, result)))
+    new BitlapConf(JsonEx.jsonAsMap(deserialize[String](TypeId.StringType, result)))
   }
 
   override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")

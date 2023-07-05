@@ -22,10 +22,6 @@ import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
 
 /** bitlap http服务
- *
- *  初始化数据接口: http://localhost:18081/init
- *
- *  查询数据接口: http://localhost:18081/sql
  */
 object HttpServerEndpoint:
 

@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.mdm
 
-import cn.hutool.core.convert.Convert
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
@@ -12,18 +12,15 @@ import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
-import org.bitlap.common.utils.JSONUtils
-import org.bitlap.common.utils.PreConditions
-import org.bitlap.common.utils.UuidUtil
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.common.utils.JsonEx.jsonAsMap
+import org.bitlap.common.utils.RandomEx
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.storage.BitlapStore
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.utils.Excel.readCsv
-import org.bitlap.core.utils.Excel.readExcel
 import java.io.Closeable
 import java.io.InputStream
 import java.io.Serializable
@@ -50,7 +47,7 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializa
         }
         val elapsed = measureTimeMillis {
             QueryContext.use {
-                it.queryId = UuidUtil.uuid()
+                it.queryId = RandomEx.uuid(true)
                 this.write0(events)
             }
         }
@@ -60,29 +57,22 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializa
     /**
      * write mdm events from csv
      */
-    fun writeCsv(path: String) = this.writeExcel0(path.readCsv())
-    fun writeCsv(input: InputStream) = this.writeExcel0(input.readCsv())
-
-    /**
-     * write mdm events from excel
-     */
-    fun writeExcel(path: String) = this.writeExcel0(path.readExcel())
-    fun writeExcel(input: InputStream) = this.writeExcel0(input.readExcel())
-
-    private fun writeExcel0(excel: Pair<List<String>, List<List<Any?>>>) {
-        val (header, rows) = excel
-        PreConditions.checkExpression(
-            header == Event.schema.map { it.first },
-            msg = "Header $header is invalid."
-        )
-        val events = rows.map { row ->
-            val (time, entity, dimensions, metricName, metricValue) = row
-            Event.of(
-                Convert.toLong(time),
-                Entity(Convert.toInt(entity)),
-                Dimension(JSONUtils.fromJsonAsMap(Convert.toStr(dimensions))),
-                Metric(Convert.toStr(metricName), Convert.toDouble(metricValue))
-            )
+    fun writeCsv(input: InputStream) {
+        val headers = Event.schema.map { it.first }
+        val events = csvReader { skipEmptyLine = true }.open(input) {
+            readAllWithHeaderAsSequence()
+                .map { row -> headers.map { h -> row[h] } }
+                .filter { row -> row.all { !it.isNullOrBlank() } }
+                .map { row ->
+                    val (time, entity, dimensions, metricName, metricValue) = row
+                    Event.of(
+                        time!!.toLong(),
+                        Entity(entity!!.toInt()),
+                        Dimension(dimensions.jsonAsMap()),
+                        Metric(metricName!!, metricValue!!.toDouble())
+                    )
+                }
+                .toList()
         }
         this.write(events)
     }

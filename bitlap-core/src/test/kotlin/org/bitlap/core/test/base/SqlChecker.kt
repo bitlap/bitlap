@@ -6,7 +6,7 @@ import io.kotest.assertions.Expected
 import io.kotest.assertions.failure
 import io.kotest.assertions.print.print
 import io.kotest.matchers.shouldBe
-import org.bitlap.common.utils.Sql.toTable
+import org.bitlap.common.utils.SqlEx.toTable
 import org.bitlap.common.utils.internal.DBTable
 import org.bitlap.core.SessionId
 import org.bitlap.core.sql.QueryExecution

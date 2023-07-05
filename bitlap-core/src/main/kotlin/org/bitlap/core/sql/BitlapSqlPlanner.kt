@@ -23,7 +23,7 @@ import org.apache.calcite.sql2rel.RelDecorrelator
 import org.apache.calcite.sql2rel.SqlToRelConverter
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.RelBuilder
-import org.bitlap.core.data.BitlapCatalog
+import org.bitlap.core.catalog.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
 import org.bitlap.core.sql.rule.ENUMERABLE_RULES
 import org.bitlap.core.sql.rule.RULES

@@ -1,9 +1,9 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.data
+package org.bitlap.core.catalog
 
 import org.bitlap.core.Constants.DEFAULT_DATABASE
-import org.bitlap.core.data.metadata.Database
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Database
+import org.bitlap.core.catalog.metadata.Table
 
 /**
  * Desc: Catalog for schema, datasource, and etc.

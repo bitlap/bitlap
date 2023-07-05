@@ -9,7 +9,7 @@ import org.bitlap.cli.BitlapInterpreter.CliCommands.*
 import org.bitlap.cli.Command.{ Server, Sql }
 import org.bitlap.cli.interactive.BitlapSqlApplication
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
-import org.bitlap.common.BitlapConf
+import org.bitlap.common.{ BitlapConf, BitlapConfs }
 import org.bitlap.common.utils.StringEx
 
 import sqlline.*
@@ -44,7 +44,7 @@ trait BitlapInterpreter {
   private def handleSqlCli(sql: Sql): Int = {
     println(s"Connecting to bitlap with args: $sql")
     val conf        = new BitlapConf()
-    val projectName = conf.get(BitlapConf.PROJECT_NAME)
+    val projectName = conf.get(BitlapConfs.PROJECT_NAME)
     val sqlArgs = ArrayBuffer(
       "-d",
       classOf[org.bitlap.Driver].getCanonicalName,
@@ -84,7 +84,6 @@ trait BitlapInterpreter {
     }
     new File(home, child).getAbsolutePath
   }
-
 }
 
 object BitlapInterpreter {
@@ -118,7 +117,7 @@ object BitlapInterpreter {
     val sqlHelp: HelpDoc    = HelpDoc.p("bitlap sql command.")
     val help: HelpDoc       = HelpDoc.p("bitlap cli command.")
 
-    val hostOpt = Options
+    val hostOpt: Options[String] = Options
       .text("server")
       .withDefault("127.0.0.1:23333")
       .alias("s")
@@ -133,5 +132,4 @@ object BitlapInterpreter {
       .withDefault("")
       .alias("p")
   }
-
 }

@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapIterator
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.DateEx.utc
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PruneTimeFilter

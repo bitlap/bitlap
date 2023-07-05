@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.sql.rule
 
-import cn.hutool.core.util.ReflectUtil
 import org.apache.calcite.plan.RelOptRuleCall
 import org.apache.calcite.plan.hep.HepRelVertex
 import org.apache.calcite.rel.RelNode
@@ -21,6 +20,7 @@ import org.bitlap.core.sql.rel.BitlapSort
 import org.bitlap.core.sql.rel.BitlapTableScan
 import org.bitlap.core.sql.rel.BitlapUnion
 import org.bitlap.core.sql.rel.BitlapValues
+import org.joor.Reflect
 
 /**
  * Convert calcite rel node to bitlap rel node.
@@ -45,7 +45,7 @@ class BitlapRelConverter : AbsRelRule(RelNode::class.java, "BitlapRelConverter")
             is HepRelVertex -> {
                 // next parent should be HepRelVertex's parent and next level should be current level, because it's a wrapper
                 rel.also {
-                    ReflectUtil.invoke<Void>(it, "replaceRel", this.convert00(it.currentRel, call))
+                    Reflect.on(it).call("replaceRel", this.convert00(it.currentRel, call))
                 }
             }
             is LogicalSort -> {

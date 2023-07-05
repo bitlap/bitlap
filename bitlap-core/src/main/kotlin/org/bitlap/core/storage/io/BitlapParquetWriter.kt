@@ -11,8 +11,8 @@ import org.apache.parquet.hadoop.ParquetWriter
 import org.apache.parquet.hadoop.metadata.CompressionCodecName
 import org.apache.parquet.hadoop.util.HadoopOutputFile
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.utils.RandomEx
 import org.bitlap.common.utils.StringEx.blankOr
-import org.bitlap.common.utils.UuidUtil
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.storage.BitlapWriter
 import org.bitlap.core.storage.BitlapWriters
@@ -30,7 +30,7 @@ class BitlapParquetWriter<T>(
 ) : BitlapWriter<T> {
 
     private val conf = fs.newConf()
-    private val txId = QueryContext.get().queryId.blankOr(UuidUtil.uuid())
+    private val txId = QueryContext.get().queryId.blankOr(RandomEx.uuid(true))
     private val outputFile = Path(output, BitlapWriters.genUniqueFile(txId, "mdm", "${CompressionCodecName.SNAPPY.extension}.parquet"))
     private var writer: ParquetWriter<GenericRecord>? = null
 

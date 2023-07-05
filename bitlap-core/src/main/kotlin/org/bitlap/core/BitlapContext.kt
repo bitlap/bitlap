@@ -5,8 +5,8 @@ import org.apache.hadoop.conf.Configuration
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.EventBus
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.utils.UuidUtil
-import org.bitlap.core.data.impl.BitlapCatalogImpl
+import org.bitlap.common.utils.RandomEx
+import org.bitlap.core.catalog.impl.BitlapCatalogImpl
 import org.bitlap.core.sql.BitlapSqlPlanner
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.network.handles.HandleIdentifier
@@ -76,7 +76,7 @@ data class SessionId(
 ) {
     companion object {
         fun fakeSessionId(): SessionId {
-            return SessionId(HandleIdentifier(UuidUtil.uuid()))
+            return SessionId(HandleIdentifier(RandomEx.uuid(true)))
         }
     }
 }

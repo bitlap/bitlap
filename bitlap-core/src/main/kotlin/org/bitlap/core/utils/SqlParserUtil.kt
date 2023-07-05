@@ -16,7 +16,7 @@ import org.apache.calcite.sql.util.SqlOperatorTables
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.Frameworks
 import org.bitlap.core.Constants
-import org.bitlap.core.data.BitlapCatalog
+import org.bitlap.core.catalog.BitlapCatalog
 import org.bitlap.core.sql.table.BitlapSqlQueryTable
 import org.bitlap.core.sql.udf.FunctionRegistry
 

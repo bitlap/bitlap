@@ -23,17 +23,12 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, val type: C
     }
 
     /**
-     * Property group
-     */
-    // var group = "default"
-
-    /**
      * Assign default value by function
      */
     var defaultBy: (BitlapConf) -> T? = { this.defaultValue }
 
     /**
-     * System property, default is: bitlap.[group].[key]
+     * System property, default is: bitlap.[key]
      */
     var sys = ""
     fun getSysKey(): String {
@@ -44,7 +39,7 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, val type: C
     }
 
     /**
-     * System environment property, default is: BITLAP_[group]_[key] (uppercase)
+     * System environment property, default is: BITLAP_[key] (uppercase)
      */
     var env = ""
     fun getEnvKey(): String {
@@ -55,15 +50,11 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, val type: C
     }
 
     var desc = ""
-    var version = "0.4.0-SNAPSHOT"
-    var validator: Validator<T>? = null
+    var version = "1.0.0"
+    var validators: MutableList<Validator<T>> = mutableListOf()
     var overWritable: Boolean = false
 
-    fun defaultBy(func: (BitlapConf) -> T?): BitlapConfKey<T> = this.also { this.defaultBy = func }
-
-//    fun group(groupName: String): BitlapConfKey<T> = this.also {
-//        it.group = groupName
-//    }
+    fun defaultBy(func: (BitlapConf) -> T): BitlapConfKey<T> = this.also { this.defaultBy = func }
 
     fun sys(systemProperty: String): BitlapConfKey<T> = this.also { it.sys = systemProperty }
 
@@ -73,7 +64,9 @@ class BitlapConfKey<T>(val key: String, val defaultValue: T? = null, val type: C
 
     fun version(version: String): BitlapConfKey<T> = this.also { it.version = version }
 
-    fun validator(v: Validator<T>): BitlapConfKey<T> = this.also { it.validator = v }
+    fun validator(v: Validator<T>): BitlapConfKey<T> = this.also { it.validators.add(v) }
+
+    fun validators(vararg v: Validator<T>): BitlapConfKey<T> = this.also { it.validators.addAll(v) }
 
     fun overWritable(o: Boolean): BitlapConfKey<T> = this.also { it.overWritable = o }
 

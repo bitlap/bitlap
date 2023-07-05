@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.common
 
-import cn.hutool.core.date.DateUtil
 import mu.KLogger
 import mu.KotlinLogging
 import java.time.Duration
@@ -21,8 +20,8 @@ fun <T> doIf(flag: Boolean, t: T, func: (T) -> T): T {
  * see [kotlin.system.measureTimeMillis] and [kotlin.time.measureTimedValue]
  */
 fun <T> elapsed(block: () -> T): Pair<T, Duration> {
-    val timer = DateUtil.timer()
-    return block() to Duration.ofMillis(timer.interval())
+    val start = System.currentTimeMillis()
+    return block() to Duration.ofMillis(System.currentTimeMillis() - start)
 }
 
 /**
@@ -38,4 +37,18 @@ fun logger(clazz: Class<*>): KLogger {
 
 fun logger(name: String): KLogger {
     return KotlinLogging.logger(name)
+}
+
+/**
+ * like sql nvl
+ */
+fun <T> nvl(t: T?, default: T?): T? {
+    return t ?: default
+}
+
+/**
+ * like sql coalesce
+ */
+fun <T> coalesce(vararg t: T?): T? {
+    return t.find { it != null }
 }

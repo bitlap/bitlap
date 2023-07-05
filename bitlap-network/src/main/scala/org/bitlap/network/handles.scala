@@ -4,8 +4,8 @@ package org.bitlap.network
 import java.nio.ByteBuffer
 import java.util.UUID
 
-import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.driver_proto.*
+import org.bitlap.common.utils.RandomEx
+import org.bitlap.network.Driver.*
 import org.bitlap.network.enumeration.OperationType
 
 import com.google.protobuf.ByteString
@@ -51,8 +51,8 @@ object handles:
    *  @param publicId
    *  @param secretId
    */
-  final case class HandleIdentifier(value: String = UuidUtil.uuid()):
-    def toBHandleIdentifier(): BHandleIdentifier = BHandleIdentifier(value = UuidUtil.uuid())
+  final case class HandleIdentifier(value: String = RandomEx.uuid(true)):
+    def toBHandleIdentifier(): BHandleIdentifier = BHandleIdentifier(value = RandomEx.uuid(true))
   end HandleIdentifier
 
   /** 会话处理器句柄

@@ -8,7 +8,7 @@ import java.sql.ResultSet
 /**
  * common sql utils
  */
-object Sql {
+object SqlEx {
 
     /**
      * print sql result beautifully

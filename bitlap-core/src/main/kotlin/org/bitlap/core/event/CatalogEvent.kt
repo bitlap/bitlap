@@ -2,8 +2,8 @@
 package org.bitlap.core.event
 
 import org.bitlap.common.BitlapEvent
-import org.bitlap.core.data.metadata.Database
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Database
+import org.bitlap.core.catalog.metadata.Table
 
 /**
  * Mail: chk19940609@gmail.com

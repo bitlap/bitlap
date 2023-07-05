@@ -3,7 +3,7 @@ package org.bitlap.spark.writer
 
 import scala.reflect.ClassTag
 
-import org.bitlap.common.BitlapConf
+import org.bitlap.common.{ BitlapConf, BitlapConfs }
 import org.bitlap.core.Constants
 import org.bitlap.jdbc.BitlapDatabaseMetaData
 import org.bitlap.spark.{ BitlapOptions, SparkUtils }
@@ -29,7 +29,7 @@ class BitlapMdmWriter(val data: DataFrame, val options: BitlapOptions) {
       metaData.getDatabaseConf
     }
   private lazy val tableIdentifier = this.options.tableIdentifier
-  private lazy val rootPath: Path  = new Path(this.serverConf.get(BitlapConf.ROOT_DIR_DATA))
+  private lazy val rootPath: Path  = new Path(this.serverConf.get(BitlapConfs.ROOT_DIR))
 
   private lazy val tablePath =
     new Path(new Path(rootPath, tableIdentifier.database.getOrElse(Constants.DEFAULT_DATABASE)), tableIdentifier.table)

@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.data.metadata
+package org.bitlap.core.catalog.metadata
 
 /**
  * Database

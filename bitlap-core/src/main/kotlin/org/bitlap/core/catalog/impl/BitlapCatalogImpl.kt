@@ -1,18 +1,19 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.data.impl
+package org.bitlap.core.catalog.impl
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
+import org.bitlap.common.BitlapConfs
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.Constants.DEFAULT_DATABASE
-import org.bitlap.core.data.BitlapCatalog
-import org.bitlap.core.data.metadata.Database
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.BitlapCatalog
+import org.bitlap.core.catalog.metadata.Database
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.event.DatabaseCreateEvent
 import org.bitlap.core.event.DatabaseDeleteEvent
 import org.bitlap.core.event.TableCreateEvent
@@ -40,7 +41,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     private val rootPath by lazy {
-        Path(conf.get(BitlapConf.ROOT_DIR_DATA))
+        Path(conf.get(BitlapConfs.ROOT_DIR))
     }
 
     private val dataPath by lazy {

@@ -31,7 +31,7 @@ object HttpServerEndpoint:
     )
 
   def service(args: List[String]): ZIO[HttpServerEndpoint, Nothing, ExitCode] =
-    ZIO.serviceWithZIO[HttpServerEndpoint](_.httpServer())
+    ZIO.serviceWithZIO[HttpServerEndpoint](_.runHttpServer())
 
 end HttpServerEndpoint
 
@@ -78,7 +78,7 @@ final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLiv
       indexHtml
   }
 
-  def httpServer(): ZIO[Any, Nothing, ExitCode] =
+  def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
       .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
       .flatMap(port => Console.printLine(s"HTTP Server started at port:$port")) *> ZIO.never)

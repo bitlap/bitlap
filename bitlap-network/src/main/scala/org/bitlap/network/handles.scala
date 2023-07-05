@@ -47,17 +47,10 @@ object handles:
       true
 
   /** 统一标识符定义
-   *
-   *  @param publicId
-   *  @param secretId
    */
-  final case class HandleIdentifier(value: String = RandomEx.uuid(true)):
-    def toBHandleIdentifier(): BHandleIdentifier = BHandleIdentifier(value = RandomEx.uuid(true))
-  end HandleIdentifier
+  final case class HandleIdentifier(value: String = RandomEx.uuid(true))
 
   /** 会话处理器句柄
-   *
-   *  @param handleId
    */
   final case class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId):
 
@@ -65,7 +58,7 @@ object handles:
       this(HandleIdentifier(bSessionHandle.sessionId.map(_.value).orNull))
 
     def toBSessionHandle(): BSessionHandle =
-      BSessionHandle(Some(super.getHandleId().toBHandleIdentifier()))
+      BSessionHandle(Some(BHandleIdentifier.of(handleId.value)))
   end SessionHandle
 
   final case class OperationHandle(
@@ -84,7 +77,7 @@ object handles:
     def toBOperationHandle(): BOperationHandle =
       BOperationHandle(
         hasResultSet = hasResultSet,
-        operationId = Some(handleId.toBHandleIdentifier()),
+        operationId = Some(BHandleIdentifier.of(handleId.value)),
         operationType = BOperationType.fromValue(opType.value)
       )
   end OperationHandle

@@ -4,13 +4,13 @@ package org.bitlap.network
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC[[org.bitlap.network.DriverAsyncRpc]]，不应自己实现
+/** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC[[org.bitlap.network.DriverIO]]，不应自己实现
  *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait DriverSyncRpc extends DriverRpc[Identity]:
+trait DriverC extends DriverX[Identity]:
   self =>
 
   def pure[A](a: A): Identity[A] = a

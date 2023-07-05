@@ -4,12 +4,13 @@ package org.bitlap.server.rpc
 import org.bitlap.network.*
 import org.bitlap.network.NetworkException.*
 import org.bitlap.network.driver_proto.*
-import org.bitlap.network.driver_service.ZioDriverService.ZDriverService
+import org.bitlap.network.driver_service.ZioDriverService.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.server.*
 
 import io.grpc.*
+import scalapb.zio_grpc.RequestContext
 import zio.*
 
 /** RPC的服务端API实现，基于 zio-grpc,zio 2.0
@@ -20,14 +21,14 @@ import zio.*
  */
 object GrpcServiceLive:
 
-  lazy val live: ZLayer[DriverAsyncRpc, Nothing, GrpcServiceLive] =
-    ZLayer.fromFunction((rpc: DriverAsyncRpc) => new GrpcServiceLive(rpc))
+  lazy val live: ZLayer[DriverIO, Nothing, GrpcServiceLive] =
+    ZLayer.fromFunction((rpc: DriverIO) => new GrpcServiceLive(rpc))
 end GrpcServiceLive
 
-final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverService[Any, Any]:
+final class GrpcServiceLive(private val rpc: DriverIO) extends ZDriverService[RequestContext]:
 
   // 直接使用zio-grpc的Status表示错误 避免处理多重错误
-  override def openSession(request: BOpenSessionReq): ZIO[Any, Status, BOpenSessionResp] =
+  override def openSession(request: BOpenSessionReq, context: RequestContext): IO[StatusException, BOpenSessionResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -43,7 +44,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
           )
       )
 
-  override def closeSession(request: BCloseSessionReq): ZIO[Any, Status, BCloseSessionResp] =
+  override def closeSession(request: BCloseSessionReq, context: RequestContext)
+    : IO[StatusException, BCloseSessionResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -52,7 +54,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, _ => BCloseSessionResp())
 
-  override def executeStatement(request: BExecuteStatementReq): ZIO[Any, Status, BExecuteStatementResp] =
+  override def executeStatement(request: BExecuteStatementReq, context: RequestContext)
+    : IO[StatusException, BExecuteStatementResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -66,7 +69,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, hd => BExecuteStatementResp(Some(hd.toBOperationHandle())))
 
-  override def fetchResults(request: BFetchResultsReq): ZIO[Any, Status, BFetchResultsResp] =
+  override def fetchResults(request: BFetchResultsReq, context: RequestContext)
+    : IO[StatusException, BFetchResultsResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -75,7 +79,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, _.toBFetchResultsResp)
 
-  override def getResultSetMetadata(request: BGetResultSetMetadataReq): ZIO[Any, Status, BGetResultSetMetadataResp] =
+  override def getResultSetMetadata(request: BGetResultSetMetadataReq, context: RequestContext)
+    : IO[StatusException, BGetResultSetMetadataResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -85,8 +90,9 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       .mapBoth(errorApplyFunc, _.toBGetResultSetMetadataResp)
 
   override def getDatabases(
-    request: BGetDatabasesReq
-  ): ZIO[Any, Status, BGetDatabasesResp] =
+    request: BGetDatabasesReq,
+    context: RequestContext
+  ): IO[StatusException, BGetDatabasesResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -95,7 +101,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, t => BGetDatabasesResp(Option(t.toBOperationHandle())))
 
-  override def getTables(request: BGetTablesReq): ZIO[Any, Status, BGetTablesResp] =
+  override def getTables(request: BGetTablesReq, context: RequestContext): IO[StatusException, BGetTablesResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -104,7 +110,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, t => BGetTablesResp(Option(t.toBOperationHandle())))
 
-  override def getLeader(request: BGetLeaderReq): ZIO[Any, Status, BGetLeaderResp] = {
+  override def getLeader(request: BGetLeaderReq, context: RequestContext): IO[StatusException, BGetLeaderResp] = {
     val leaderAddress = BitlapContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
@@ -120,8 +126,9 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
   }
 
   override def cancelOperation(
-    request: BCancelOperationReq
-  ): ZIO[Any, Status, BCancelOperationResp] =
+    request: BCancelOperationReq,
+    context: RequestContext
+  ): IO[StatusException, BCancelOperationResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -130,7 +137,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, _ => BCancelOperationResp())
 
-  override def getOperationStatus(request: BGetOperationStatusReq): ZIO[Any, Status, BGetOperationStatusResp] =
+  override def getOperationStatus(request: BGetOperationStatusReq, context: RequestContext)
+    : IO[StatusException, BGetOperationStatusResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -139,7 +147,8 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, _.toBGetOperationStatusResp)
 
-  override def closeOperation(request: BCloseOperationReq): ZIO[Any, Status, BCloseOperationResp] =
+  override def closeOperation(request: BCloseOperationReq, context: RequestContext)
+    : IO[StatusException, BCloseOperationResp] =
     rpc
       .when(
         BitlapContext.isLeader,
@@ -148,7 +157,7 @@ final class GrpcServiceLive(private val rpc: DriverAsyncRpc) extends ZDriverServ
       )
       .mapBoth(errorApplyFunc, _ => BCloseOperationResp())
 
-  override def getInfo(request: BGetInfoReq): ZIO[Any, Status, BGetInfoResp] =
+  override def getInfo(request: BGetInfoReq, context: RequestContext): IO[StatusException, BGetInfoResp] =
     rpc
       .when(
         BitlapContext.isLeader,

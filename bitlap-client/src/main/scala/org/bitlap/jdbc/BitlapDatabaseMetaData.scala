@@ -92,7 +92,7 @@ class BitlapDatabaseMetaData(
     "Method not supported"
   )
 
-  override def getIdentifierQuoteString: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getIdentifierQuoteString: String = "\""
 
   override def getSQLKeywords: String = throw new SQLFeatureNotSupportedException("Method not supported")
 

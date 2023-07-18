@@ -13,6 +13,8 @@ import scala.util.control.Breaks.*
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles.*
 
+import bitlap.rolls.core.jdbc.{ sql as sqlx, * }
+
 /** bitlap Connection
  *
  *  @author
@@ -22,6 +24,8 @@ import org.bitlap.network.handles.*
  */
 class BitlapConnection(uri: String, info: Properties) extends Connection {
   import Constants.*
+
+  given Connection = this
 
   private var session: SessionHandle               = _
   private var closed                               = true
@@ -314,16 +318,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    var res: ResultSet  = null
-    var stmt: Statement = null
-    try {
-      stmt = createStatement()
-      res = stmt.executeQuery("SHOW CURRENT_DATABASE")
-      if res == null || !res.next then throw BitlapSQLException("Failed to get schema information")
-      return res.getString(1)
-    } finally {
-      if res != null then res.close()
-      if stmt != null then stmt.close()
+    val rs = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE").fetch()
+    if (rs.nonEmpty) {
+      return rs.head.productElement(0).toString
     }
     null
   }

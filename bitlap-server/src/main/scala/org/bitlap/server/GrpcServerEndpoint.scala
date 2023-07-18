@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
-import org.bitlap.network.Driver.ZioDriver.*
+import org.bitlap.network.Driver.ZioDriver.DriverService as _
 import org.bitlap.network.DriverIO
 import org.bitlap.server.config.BitlapServerConfiguration
 import org.bitlap.server.service.*

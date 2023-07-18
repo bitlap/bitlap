@@ -320,9 +320,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     checkConnection("getSchema")
     val rs = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE").fetch()
     if (rs.nonEmpty) {
-      return rs.head.productElement(0).toString
-    }
-    null
+      // todo typed
+      rs.head.values(0).asInstanceOf[String]
+    } else null
   }
 
   override def abort(executor: Executor): Unit = throw new SQLFeatureNotSupportedException("Method not supported")

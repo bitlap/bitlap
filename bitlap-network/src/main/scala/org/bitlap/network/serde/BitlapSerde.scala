@@ -24,11 +24,11 @@ import izumi.reflect.dottyreflection.*
  */
 trait BitlapSerde:
 
-  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  @implicitNotFound("Could not find an implicit ClassTag[${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteArray: scala.Array[Byte]): T =
     deserialize[T](realType, ByteString.copyFrom(ByteBuffer.wrap(byteArray)))
 
-  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  @implicitNotFound("Could not find an implicit ClassTag[${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T =
     BitlapSerde.deserialize(realType, byteString)
 
@@ -38,11 +38,11 @@ end BitlapSerde
 
 object BitlapSerde:
 
-  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  @implicitNotFound("Could not find an implicit ClassTag[${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteArray: scala.Array[Byte]): T =
     deserialize[T](realType, ByteString.copyFrom(ByteBuffer.wrap(byteArray)))
 
-  @implicitNotFound("Could not find an implicit ClassTag[\\${T}]")
+  @implicitNotFound("Could not find an implicit ClassTag[${T}]")
   def deserialize[T: ClassTag](realType: TypeId, byteString: ByteString): T =
     val readOnlyByteBuffer = byteString.asReadOnlyByteBuffer()
     val typeName           = classTag[T].runtimeClass.getSimpleName

@@ -3,7 +3,7 @@ package org.bitlap.testkit.server
 
 import org.bitlap.server.*
 import org.bitlap.server.config.*
-import org.bitlap.server.rpc.GrpcServiceLive
+import org.bitlap.server.service.DriverGrpcService
 
 import zio.*
 import zio.ZIOAppArgs.getArgs
@@ -37,7 +37,7 @@ object EmbedBitlapServer extends zio.ZIOAppDefault {
         Scope.default,
         MockDriverIO.live,
         ZIOAppArgs.empty,
-        GrpcServiceLive.live,
+        DriverGrpcService.live,
         BitlapServerConfiguration.testLive
       )
       .fold(

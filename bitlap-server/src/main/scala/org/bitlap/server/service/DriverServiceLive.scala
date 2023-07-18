@@ -1,5 +1,5 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.service
 
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.jdbc.Constants
@@ -20,12 +20,12 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcBackendLive:
-  private[server] lazy val liveInstance: GrpcBackendLive = new GrpcBackendLive
-  lazy val live: ULayer[DriverIO]                        = ZLayer.succeed(liveInstance)
-end GrpcBackendLive
+object DriverServiceLive:
+  private[server] lazy val liveInstance: DriverServiceLive = new DriverServiceLive
+  lazy val live: ULayer[DriverIO]                          = ZLayer.succeed(liveInstance)
+end DriverServiceLive
 
-final class GrpcBackendLive extends DriverIO with LazyLogging:
+final class DriverServiceLive extends DriverIO with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(

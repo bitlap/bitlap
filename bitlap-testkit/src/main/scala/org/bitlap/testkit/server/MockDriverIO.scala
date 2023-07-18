@@ -41,7 +41,7 @@ final class MockDriverIO extends DriverIO with CSVUtils {
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
   ): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.ExecuteStatement, true, sessionHandle.handleId))
+    ZIO.succeed(OperationHandle(OperationType.ExecuteStatement, true, sessionHandle.handleId))
 
   override def fetchResults(
     opHandle: OperationHandle,
@@ -87,7 +87,7 @@ final class MockDriverIO extends DriverIO with CSVUtils {
     database: String,
     pattern: String
   ): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.GetTables))
+    ZIO.succeed(OperationHandle(OperationType.GetTables))
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] = ZIO.unit
 

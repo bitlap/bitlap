@@ -7,7 +7,7 @@ import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
-import org.bitlap.server.rpc.*
+import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
 
 import zio.{ Duration as ZDuration, * }
@@ -51,10 +51,10 @@ object BitlapServer extends zio.ZIOAppDefault:
         HttpServerEndpoint.live,
         HttpServiceLive.live,
         SessionManager.live,
-        GrpcBackendLive.live,
+        DriverServiceLive.live,
         Scope.default,
         ZIOAppArgs.empty,
-        GrpcServiceLive.live,
+        DriverGrpcService.live,
         BitlapServerConfiguration.live,
         logger
       )

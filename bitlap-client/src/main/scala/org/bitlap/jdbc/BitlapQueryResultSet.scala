@@ -103,7 +103,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
         fetchFirst = false
         hasMore = true
 
-      if (fetchedRows.isEmpty || !fetchedRowsItr.hasNext) && hasMore then
+      if (fetchedRows == null || fetchedRows.isEmpty || !fetchedRowsItr.hasNext) && hasMore then
         val result = client.fetchResults(stmtHandle, maxRows = fetchSize, 1)
         hasMore = result.hasMoreRows
         val r = result.results

@@ -9,6 +9,11 @@ package org.bitlap.jdbc
  */
 object Constants:
 
+  /**
+   * Driver name
+   */
+  val NAME = "Bitlap JDBC Driver"
+
   /** Major version number of this driver.
    */
   val MAJOR_VERSION = 0

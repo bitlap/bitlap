@@ -54,13 +54,13 @@ class BitlapDatabaseMetaData(
     new BitlapConf(JsonEx.jsonAsMap(deserialize[String](TypeId.StringType, result)))
   }
 
-  override def getDriverName: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDriverName: String = Constants.NAME
 
-  override def getDriverVersion: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDriverVersion: String = "0"
 
-  override def getDriverMajorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDriverMajorVersion: Int = Constants.MAJOR_VERSION
 
-  override def getDriverMinorVersion: Int = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDriverMinorVersion: Int = Constants.MINOR_VERSION
 
   override def usesLocalFiles(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -106,7 +106,7 @@ class BitlapDatabaseMetaData(
 
   override def getSearchStringEscape: String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getExtraNameCharacters: String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getExtraNameCharacters: String = ""
 
   override def supportsAlterTableWithAddColumn(): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"
@@ -320,13 +320,11 @@ class BitlapDatabaseMetaData(
 
   override def getMaxUserNameLength: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getDefaultTransactionIsolation: Int = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getDefaultTransactionIsolation: Int = Connection.TRANSACTION_NONE
 
-  override def supportsTransactions(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def supportsTransactions(): Boolean = false
 
-  override def supportsTransactionIsolationLevel(level: Int): Boolean = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def supportsTransactionIsolationLevel(level: Int): Boolean = level == Connection.TRANSACTION_NONE
 
   override def supportsDataDefinitionAndDataManipulationTransactions(): Boolean =
     throw new SQLFeatureNotSupportedException("Method not supported")

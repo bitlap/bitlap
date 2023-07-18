@@ -20,12 +20,12 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object DriverServiceLive:
-  private[server] lazy val liveInstance: DriverServiceLive = new DriverServiceLive
-  lazy val live: ULayer[DriverIO]                          = ZLayer.succeed(liveInstance)
-end DriverServiceLive
+object DriverService:
+  private[server] lazy val liveInstance: DriverService = new DriverService
+  lazy val live: ULayer[DriverIO]                      = ZLayer.succeed(liveInstance)
+end DriverService
 
-final class DriverServiceLive extends DriverIO with LazyLogging:
+final class DriverService extends DriverIO with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(

@@ -51,7 +51,7 @@ object BitlapServer extends zio.ZIOAppDefault:
         HttpServerEndpoint.live,
         HttpServiceLive.live,
         SessionManager.live,
-        DriverServiceLive.live,
+        DriverService.live,
         Scope.default,
         ZIOAppArgs.empty,
         DriverGrpcService.live,

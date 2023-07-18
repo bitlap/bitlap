@@ -88,7 +88,7 @@
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
-        <zio.version>2.0.13</zio.version>
+        <zio.version>2.0.15</zio.version>
         <zio.grpc.version>0.6.0-rc5</zio.grpc.version>
         <zio-cli.version>0.5.0</zio-cli.version>
         <scalapb.version>0.11.13</scalapb.version>

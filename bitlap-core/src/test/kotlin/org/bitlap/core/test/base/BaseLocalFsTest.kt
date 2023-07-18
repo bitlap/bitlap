@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.BitlapConfs
+import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.common.utils.RandomEx
 import org.bitlap.core.BitlapContext
 import org.joda.time.DateTime
@@ -35,7 +35,7 @@ abstract class BaseLocalFsTest : StringSpec() {
             }
             // set bitlap properties
             conf = BitlapContext.bitlapConf
-            conf.set(BitlapConfs.ROOT_DIR.key, workPath.toString(), true)
+            conf.set(BitlapConfKeys.ROOT_DIR.key, workPath.toString(), true)
         }
 
         afterSpec {

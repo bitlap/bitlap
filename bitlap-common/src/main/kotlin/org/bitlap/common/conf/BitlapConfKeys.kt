@@ -1,8 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.common
+package org.bitlap.common.conf
 
-import org.bitlap.common.conf.BitlapConfKey
-import org.bitlap.common.conf.Validators
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -10,11 +8,11 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Desc: bitlap conf keys
  *
- * Mail: k.chen@nio.com
+ * Mail: chk19940609@gmail.com
  * Created by IceMimosa
  * Date: 2023/6/27
  */
-object BitlapConfs {
+object BitlapConfKeys {
 
     /**
      * Project name, default is bitlap

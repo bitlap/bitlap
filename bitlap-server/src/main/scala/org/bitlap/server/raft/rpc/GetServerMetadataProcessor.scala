@@ -4,7 +4,8 @@ package org.bitlap.server.raft.rpc
 import java.util.concurrent.Executor
 
 import org.bitlap.client.*
-import org.bitlap.common.{ BitlapConf, BitlapConfs }
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.network.{ GetServerAddressReq, GetServerAddressResp }
 import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapServerConfiguration
@@ -25,7 +26,7 @@ class GetServerMetadataProcessor(executor: Executor, conf: BitlapConf)
     ):
 
   override def processRequest(request: GetServerAddressReq, done: RpcRequestClosure): Message = {
-    val host    = conf.get(BitlapConfs.NODE_HOST).trim
+    val host    = conf.get(BitlapConfKeys.NODE_HOST).trim
     val address = host.asServerAddress
     val port    = address.port
     val ip      = address.ip

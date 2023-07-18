@@ -32,6 +32,10 @@ trait Session {
 
   def creationTime: Long
 
+  def currentSchema: String
+
+  def currentSchema_=(schema: String): Unit
+
   def open(): Unit
 
   def executeStatement(

@@ -6,7 +6,8 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 
 import org.bitlap.client.*
-import org.bitlap.common.{ BitlapConf, BitlapConfs }
+import org.bitlap.common.BitlapConf
+import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.network.ServerAddress
 import org.bitlap.server.BitlapContext
 
@@ -30,26 +31,26 @@ end BitlapServerConfiguration
 final case class BitlapServerConfiguration(underlayConf: BitlapConf):
 
   val grpcConfig: BitlapGrpcConfig = BitlapGrpcConfig(
-    underlayConf.get(BitlapConfs.NODE_HOST).asServerAddress.port
+    underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress.port
   )
 
   val raftConfig: BitlapRaftConfig = BitlapRaftConfig(
-    underlayConf.get(BitlapConfs.NODE_RAFT_DIR),
-    underlayConf.get(BitlapConfs.NODE_RAFT_GROUP_ID),
-    underlayConf.get(BitlapConfs.NODE_RAFT_HOST),
-    underlayConf.get(BitlapConfs.NODE_RAFT_PEERS),
-    Duration(underlayConf.getMillis(BitlapConfs.NODE_RAFT_TIMEOUT), TimeUnit.MILLISECONDS)
+    underlayConf.get(BitlapConfKeys.NODE_RAFT_DIR),
+    underlayConf.get(BitlapConfKeys.NODE_RAFT_GROUP_ID),
+    underlayConf.get(BitlapConfKeys.NODE_RAFT_HOST),
+    underlayConf.get(BitlapConfKeys.NODE_RAFT_PEERS),
+    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_RAFT_TIMEOUT), TimeUnit.MILLISECONDS)
   )
 
   val httpConfig: BitlapHttpConfig =
     BitlapHttpConfig(
-      underlayConf.get(BitlapConfs.NODE_HTTP_HOST).asServerAddress.port,
-      underlayConf.get[Integer](BitlapConfs.NODE_HTTP_THREADS)
+      underlayConf.get(BitlapConfKeys.NODE_HTTP_HOST).asServerAddress.port,
+      underlayConf.get[Integer](BitlapConfKeys.NODE_HTTP_THREADS)
     )
 
   val sessionConfig: BitlapSessionConfig = BitlapSessionConfig(
-    Duration(underlayConf.getMillis(BitlapConfs.NODE_SESSION_EXPIRY_PERIOD), TimeUnit.MILLISECONDS),
-    Duration(underlayConf.getMillis(BitlapConfs.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS)
+    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_PERIOD), TimeUnit.MILLISECONDS),
+    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS)
   )
 
 end BitlapServerConfiguration

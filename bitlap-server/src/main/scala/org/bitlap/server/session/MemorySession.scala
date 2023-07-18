@@ -7,6 +7,7 @@ import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
+import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
@@ -35,13 +36,20 @@ final class MemorySession(
 
   private[session] var _lastAccessTime: Long = _
 
+  private[session] var _currentSchema: String = _
+
   override def lastAccessTime: Long = _lastAccessTime
 
   override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
 
+  override def currentSchema: String = _currentSchema
+
+  override def currentSchema_=(schema: String): Unit = _currentSchema = schema
+
   override def open(): Unit = {
     this.sessionState.compareAndSet(false, true)
     _lastAccessTime = System.currentTimeMillis()
+    _currentSchema = Database.DEFAULT_DATABASE
   }
 
   override def executeStatement(
@@ -120,17 +128,14 @@ final class MemorySession(
       hasResultSet = true
     )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
-    addOperation(operation)
-    operation.statement = statement
-    operation.run()
-    operation
-  }
-
-  private def addOperation(operation: Operation) =
     this.synchronized {
       SessionManager.opHandleSet.append(operation.opHandle)
       SessionManager.operationStore.put(operation.opHandle, operation)
     }
+    operation.statement = statement
+    operation.run()
+    operation
+  }
 
   private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
     this.synchronized {

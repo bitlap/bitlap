@@ -17,3 +17,20 @@ package object network extends LazyLogging:
    */
   lazy val errorApplyFunc: Throwable => StatusException = (ex: Throwable) =>
     new StatusException(Status.fromThrowable(ex))
+
+  extension [R <: AutoCloseable](r: R)
+
+    def use[T](func: R => T): T = {
+      try {
+        func(r)
+      } finally {
+        try {
+          r.close()
+        } catch {
+          case _: Throwable =>
+        }
+      }
+    }
+  end extension
+
+end network

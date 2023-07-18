@@ -5,12 +5,11 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.BitlapConfs
 import org.bitlap.common.LifeCycleWrapper
+import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.Constants.DEFAULT_DATABASE
 import org.bitlap.core.catalog.BitlapCatalog
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.core.catalog.metadata.Table
@@ -29,10 +28,6 @@ import kotlin.streams.toList
 open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Configuration) : BitlapCatalog,
     LifeCycleWrapper() {
 
-    fun currentDatabase(): String {
-        return BitlapContext.getSession().currentSchema
-    }
-
     private val fs: FileSystem by lazy {
         rootPath.getFileSystem(hadoopConf).also {
             it.setWriteChecksum(false)
@@ -41,7 +36,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     private val rootPath by lazy {
-        Path(conf.get(BitlapConfs.ROOT_DIR))
+        Path(conf.get(BitlapConfKeys.ROOT_DIR))
     }
 
     private val dataPath by lazy {
@@ -55,29 +50,10 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
         if (!fs.exists(dataPath)) {
             fs.mkdirs(dataPath)
         }
-        val defaultDBPath = Path(dataPath, DEFAULT_DATABASE)
+        val defaultDBPath = Path(dataPath, Database.DEFAULT_DATABASE)
         if (!fs.exists(defaultDBPath)) {
             fs.mkdirs(defaultDBPath)
         }
-    }
-
-    override fun showCurrentDatabase(): String {
-        return currentDatabase()
-    }
-
-    override fun useDatabase(name: String): Boolean {
-        val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
-        if (cleanName == DEFAULT_DATABASE) {
-            BitlapContext.updateSession(BitlapContext.getSession().copy(currentSchema = DEFAULT_DATABASE))
-            return true
-        }
-        val p = Path(dataPath, cleanName)
-        val exists = fs.exists(p)
-        if (!exists) {
-            throw BitlapException("Unable to use database $cleanName, it does not exist.")
-        }
-        BitlapContext.updateSession(BitlapContext.getSession().copy(currentSchema = cleanName))
-        return true
     }
 
     /**
@@ -87,7 +63,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
      */
     override fun createDatabase(name: String, ifNotExists: Boolean): Boolean {
         val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
-        if (cleanName == DEFAULT_DATABASE) {
+        if (cleanName == Database.DEFAULT_DATABASE) {
             throw BitlapException("Unable to create default database, it's built-in.")
         }
         val p = Path(dataPath, cleanName)
@@ -110,7 +86,7 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
      */
     override fun dropDatabase(name: String, ifExists: Boolean, cascade: Boolean): Boolean {
         val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
-        if (cleanName == DEFAULT_DATABASE) {
+        if (cleanName == Database.DEFAULT_DATABASE) {
             throw BitlapException("Unable to drop default database, it's built-in.")
         }
         val p = Path(dataPath, cleanName)
@@ -136,11 +112,11 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
      */
     override fun renameDatabase(from: String, to: String): Boolean {
         val cleanFrom = PreConditions.checkNotBlank(from, "database").trim().lowercase()
-        if (cleanFrom == DEFAULT_DATABASE) {
+        if (cleanFrom == Database.DEFAULT_DATABASE) {
             throw BitlapException("Unable to rename default database, it's built-in.")
         }
         val cleanTo = PreConditions.checkNotBlank(to, "database").trim().lowercase()
-        if (cleanTo == DEFAULT_DATABASE) {
+        if (cleanTo == Database.DEFAULT_DATABASE) {
             throw BitlapException("Unable to rename to default database, it's built-in.")
         }
         val f = Path(dataPath, cleanFrom)
@@ -168,7 +144,16 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     }
 
     /**
-     * List all [Database], it also contains [DEFAULT_DATABASE]
+     * Check if [name] is a valid database name.
+     */
+    override fun databaseExists(name: String): Boolean {
+        val cleanName = PreConditions.checkNotBlank(name, "database").trim().lowercase()
+        val p = Path(dataPath, cleanName)
+        return fs.exists(p)
+    }
+
+    /**
+     * List all [Database], it also contains [Database.DEFAULT_DATABASE]
      */
     override fun listDatabases(): List<Database> {
         return fs.listStatus(dataPath).asSequence().filter { it.isDirectory }.map { Database(it.path.name) }.toList()
@@ -248,7 +233,9 @@ open class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopCon
     override fun listTables(database: String): List<Table> {
         val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().lowercase()
         val dbDir = Path(dataPath, cleanDBName)
-        return fs.listStatus(dbDir).toList().parallelStream().filter { it.isDirectory }.map { fs.readTable(it.path) }
+        return fs.listStatus(dbDir).toList().parallelStream()
+            .filter { it.isDirectory }
+            .map { fs.readTable(it.path) }
             .toList()
     }
 }

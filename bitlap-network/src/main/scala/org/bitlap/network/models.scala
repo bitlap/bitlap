@@ -18,7 +18,7 @@ object models:
    */
   sealed trait Model
 
-  final case class QueryResult(tableSchema: TableSchema, rows: RowSet) extends Model
+  final case class QueryResultSet(tableSchema: TableSchema, rows: RowSet) extends Model
 
   final case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) extends Model:
     def toBRowSet: BRowSet = BRowSet(startRowOffset = startOffset, rows = rows.map(_.toBRow))

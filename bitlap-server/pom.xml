@@ -94,7 +94,7 @@
         <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio-logging-slf4j_3</artifactId>
-            <version>2.1.12</version>
+            <version>${zio.logging.version}</version>
         </dependency>
     </dependencies>
 

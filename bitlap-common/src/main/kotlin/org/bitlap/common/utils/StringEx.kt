@@ -2,6 +2,7 @@
 package org.bitlap.common.utils
 
 import java.io.File
+import java.util.UUID
 
 /**
  * Mail: chk19940609@gmail.com
@@ -51,5 +52,15 @@ object StringEx {
             return default
         }
         return this
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun uuid(removeDash: Boolean = false): String {
+        val uuid = UUID.randomUUID().toString()
+        if (removeDash) {
+            uuid.replace("-", "")
+        }
+        return uuid
     }
 }

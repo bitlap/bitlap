@@ -18,22 +18,23 @@ class SqlUseDatabase(
     val database: SqlIdentifier?,
 ) : BitlapSqlDdlNode(pos, OPERATOR, listOfNotNull(database)) {
 
+    lateinit var useDatabase: String
+
     companion object {
         val OPERATOR = SqlSpecialOperator("USE", SqlKind.OTHER)
     }
 
     override val resultTypes: List<Pair<String, SqlTypeName>>
         get() = listOf(
-            "result" to SqlTypeName.BOOLEAN
+            "result" to SqlTypeName.VARCHAR
         )
 
     override fun operator(context: DataContext): List<Array<Any?>> {
         if (database == null || database.simple == null) {
             throw BitlapException("Unable to use database with null.")
         }
-
-        return listOf(
-            arrayOf(catalog.useDatabase(database.simple!!))
-        )
+        val db = catalog.getDatabase(database.simple)
+        this.useDatabase = db.name
+        return listOf(arrayOf(db.name))
     }
 }

@@ -6,7 +6,7 @@ import javax.annotation.Nullable
 
 import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.utils.RandomEx
+import org.bitlap.common.utils.StringEx
 import org.bitlap.network.{ DriverIO, GetServerAddressReq, GetServerAddressResp, ServerAddress }
 import org.bitlap.network.NetworkException.*
 import org.bitlap.server.config.*
@@ -99,7 +99,7 @@ object BitlapContext:
             leader.getEndpoint,
             GetServerAddressReq
               .newBuilder()
-              .setRequestId(RandomEx.uuid(true))
+              .setRequestId(StringEx.uuid(true))
               .build(),
             timeout.toMillis
           )

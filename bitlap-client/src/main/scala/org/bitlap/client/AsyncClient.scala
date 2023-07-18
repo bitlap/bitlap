@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.common.utils.RandomEx
+import org.bitlap.common.utils.StringEx
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
@@ -32,7 +32,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
   private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
     ZIO
       .foreach(serverPeers.asServerAddresses) { address =>
-        getLeader(RandomEx.uuid(true)).provideLayer(clientLayer(address.ip, address.port))
+        getLeader(StringEx.uuid(true)).provideLayer(clientLayer(address.ip, address.port))
       }
       .map(_.find(_.isDefined).flatten)
       .map { f =>

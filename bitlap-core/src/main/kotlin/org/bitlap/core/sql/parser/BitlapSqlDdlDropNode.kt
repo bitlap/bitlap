@@ -14,7 +14,7 @@ import org.bitlap.core.BitlapContext
  */
 abstract class BitlapSqlDdlDropNode(
     open val pos: SqlParserPos,
-    open val op: SqlOperator,
+    override val op: SqlOperator,
     open val operands: List<SqlNode>,
     open val ifExists: Boolean,
 ) : SqlDrop(op, pos, ifExists), BitlapSqlDdlRel {

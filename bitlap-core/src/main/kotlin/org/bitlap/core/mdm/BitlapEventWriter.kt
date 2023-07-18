@@ -13,7 +13,7 @@ import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.logger
 import org.bitlap.common.utils.JsonEx.jsonAsMap
-import org.bitlap.common.utils.RandomEx
+import org.bitlap.common.utils.StringEx
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.storage.BitlapStore
@@ -47,7 +47,7 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) : Serializa
         }
         val elapsed = measureTimeMillis {
             QueryContext.use {
-                it.queryId = RandomEx.uuid(true)
+                it.queryId = StringEx.uuid(true)
                 this.write0(events)
             }
         }

@@ -36,7 +36,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   protected var operationStart    = 0L
   protected var operationComplete = 0L
 
-  protected lazy val cache: mutable.HashMap[OperationHandle, QueryResult] =
+  protected lazy val cache: mutable.HashMap[OperationHandle, QueryResultSet] =
     mutable.HashMap()
 
   private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)

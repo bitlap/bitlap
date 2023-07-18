@@ -47,7 +47,7 @@ if [[ $? -eq 0 ]]; then
   echo "=============================================================================="
   
   # 运行server，运行交互式sql（阻止容器退出）
-  #docker run --name bitlap:$tag -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:$tag
+  #docker run --name bitlap:$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333  bitlap:$tag
   #echo "===============  🎉 bitlap_server running successfully !!!  ======================="
 fi
 pwd

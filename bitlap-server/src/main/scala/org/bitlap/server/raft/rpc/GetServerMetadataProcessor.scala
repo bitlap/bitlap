@@ -13,7 +13,7 @@ import org.bitlap.server.config.BitlapServerConfiguration
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message
 
-/** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.rpc.GrpcServiceLive.getLeader()]]使用
+/** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.service.DriverGrpcService.getLeader()]]使用
  *
  *  @author
  *    梦境迷离

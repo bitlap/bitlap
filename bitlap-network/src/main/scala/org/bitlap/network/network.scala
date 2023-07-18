@@ -13,24 +13,11 @@ package object network extends LazyLogging:
 
   type Identity[T] = T
 
-  /** TODO grpc client 获取不到cause，错误内容放到description中
-   */
   lazy val errorApplyFunc: Throwable => StatusException = (ex: Throwable) =>
     new StatusException(Status.fromThrowable(ex))
 
-  extension [R <: AutoCloseable](r: R)
+  extension [R <: AutoCloseable](r: R) def use[T](func: R => T): T = scala.util.Using.resource(r)(func)
 
-    def use[T](func: R => T): T = {
-      try {
-        func(r)
-      } finally {
-        try {
-          r.close()
-        } catch {
-          case _: Throwable =>
-        }
-      }
-    }
   end extension
 
 end network

@@ -47,7 +47,7 @@
 2. 执行打包 `mvn package -Pwebapp`
 3. 运行 `org.bitlap.server.BitlapServer`
    - 在Java8+以上中需要添加虚拟机参数，请参考`bin/bitlap-env.sh`中的`# JDK11="......"`
-4. 访问可视化页面 `http://localhost:18081`
+4. 访问可视化页面 `http://localhost:22333`
 
 ## 打包
 
@@ -62,6 +62,6 @@
 # 打包
 cd docker;sh docker.sh 0.4.0-SNAPSHOT
 # 运行 
-docker run --name bitlap:0.4.0-SNAPSHOT -dit -p 18081:18081 -p 23333:23333 -p 12222:12222  bitlap:0.4.0-SNAPSHOT
+docker run --name bitlap:0.4.0-SNAPSHOT -dit -p 23333:23333 -p 24333:24333 -p 22333:22333  bitlap:0.4.0-SNAPSHOT
 ```
-- 访问 `http://localhost:18081`
+- 访问 `http://localhost:22333`

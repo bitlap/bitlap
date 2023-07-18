@@ -320,7 +320,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       stmt = createStatement()
       res = stmt.executeQuery("SHOW CURRENT_DATABASE")
       if res == null || !res.next then throw BitlapSQLException("Failed to get schema information")
-      return  res.getString(1)
+      return res.getString(1)
     } finally {
       if res != null then res.close()
       if stmt != null then stmt.close()

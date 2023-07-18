@@ -9,8 +9,7 @@ package org.bitlap.jdbc
  */
 object Constants:
 
-  /**
-   * Driver name
+  /** Driver name
    */
   val NAME = "Bitlap JDBC Driver"
 

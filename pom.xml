@@ -118,7 +118,7 @@
         <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
         <surefire.version>3.1.0</surefire.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
-        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>1.13.4</frontend-maven-plugin.version>
         <spotless-maven-plugin.version>2.27.2</spotless-maven-plugin.version>
         <scalafmt.version>3.7.3</scalafmt.version>
     </properties>

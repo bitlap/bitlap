@@ -7,7 +7,7 @@ import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.Constants.DEFAULT_DATABASE
+import org.bitlap.core.catalog.metadata.Database.Companion.DEFAULT_DATABASE
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
 
@@ -57,6 +57,17 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
             sql("drop table if exists $testDB.$testTable")
             // show
             sql("show tables in $testDB").size shouldBe 0
+        }
+
+        "test use statement" {
+            val (db, table) = randomDBTable()
+            sql("create table $db.$table")
+            sql("use $db")
+            checkRows(
+                "show current_database",
+                listOf(listOf(db)),
+                db
+            )
         }
     }
 }

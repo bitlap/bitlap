@@ -11,7 +11,7 @@ import org.apache.calcite.schema.ScannableTable
 import org.apache.calcite.schema.impl.AbstractTable
 import org.apache.calcite.sql.type.SqlTypeName
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.MDColumnAnalyzer
 import org.bitlap.core.sql.QueryContext

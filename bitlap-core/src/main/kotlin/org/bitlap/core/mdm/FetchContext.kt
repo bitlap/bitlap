@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.mdm
 
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.mdm.fetch.LocalFetcher
 import org.bitlap.core.mdm.format.DataType
 import org.bitlap.core.mdm.plan.MetricFetchPlan

@@ -28,7 +28,7 @@ class CSVUtilsSpec extends CSVUtils {
       csv.headOption.toString
     )
 
-    val tmp = new File("./simple_data.csv")
+    val tmp = new File("simple_data.csv")
     val ret = writeCSVData(tmp, csv)
     assert(ret)
     tmp.delete()

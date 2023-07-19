@@ -66,7 +66,8 @@
         <slf4j.version>1.7.36</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
         <bitmap.version>0.9.27-bitlap</bitmap.version>
-        <hutool.version>5.8.18</hutool.version>
+        <joor.version>0.9.14</joor.version>
+        <config4k.version>0.6.0</config4k.version>
         <gson.version>2.10.1</gson.version>
         <joda.version>2.12.5</joda.version>
         <disruptor.version>3.4.4</disruptor.version>
@@ -77,14 +78,15 @@
         <!-- kotlin -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.version>1.8.20</kotlin.version>
-        <kotlinx.coroutines.version>1.7.1</kotlinx.coroutines.version>
+        <kotlinx.coroutines.version>1.7.2</kotlinx.coroutines.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
+        <kotlin.csv.version>1.9.1</kotlin.csv.version>
         <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->
         <scala.version>3.2.2</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.2.9</rolls.version>
+        <rolls.version>0.2.10</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
@@ -95,6 +97,7 @@
         <jupiter.version>5.9.3</jupiter.version>
         <tapir.version>1.5.0</tapir.version>
         <zio.http.version>3.0.0-RC1</zio.http.version>
+        <zio.logging.version>2.1.12</zio.logging.version>
         <javafaker.version>1.0.2</javafaker.version>
 
         <!-- others -->
@@ -146,60 +149,22 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+
+        <!-- scala -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala3-library_${scala.binary.version}</artifactId>
+            <version>${scala.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala3-compiler_${scala.binary.version}</artifactId>
+            <version>${scala.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio-logging-slf4j_3</artifactId>
-            <version>2.1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${disruptor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>${joda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-setting</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-crypto</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-system</artifactId>
-            <version>${hutool.version}</version>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_${scala.binary.version}</artifactId>
+            <version>${scala.logging.version}</version>
         </dependency>
 
         <!-- test  -->
@@ -226,54 +191,6 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>${jupiter.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <!-- scala -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala3-library_${scala.binary.version}</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala3-compiler_${scala.binary.version}</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging_${scala.binary.version}</artifactId>
-            <version>${scala.logging.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.bitlap</groupId>
-            <artifactId>rolls-csv_${scala.binary.version}</artifactId>
-            <version>${rolls.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.beachape</groupId>
-            <artifactId>enumeratum_${scala.binary.version}</artifactId>
-            <version>${enumeratum.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-parser_${scala.binary.version}</artifactId>
-            <version>${circe.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-generic_${scala.binary.version}</artifactId>
-            <version>${circe.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-core_${scala.binary.version}</artifactId>
-            <version>${circe.version}</version>
         </dependency>
     </dependencies>
 

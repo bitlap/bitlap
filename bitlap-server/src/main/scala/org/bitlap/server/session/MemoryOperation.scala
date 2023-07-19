@@ -22,7 +22,7 @@ final class MemoryOperation(parentSession: Session, opType: OperationType, hasRe
     extends Operation(parentSession, opType, hasResultSet)
     with BitlapSerde {
 
-  def mapTo(rs: ResultSet): QueryResult = {
+  def mapTo(rs: ResultSet): QueryResultSet = {
     // get schema
     val metaData = rs.getMetaData
     val columns = (1 to metaData.getColumnCount).map { it =>
@@ -54,7 +54,7 @@ final class MemoryOperation(parentSession: Session, opType: OperationType, hasRe
       }
       rows.append(Row(cl.toList))
     }
-    QueryResult(
+    QueryResultSet(
       TableSchema(columns.toList),
       RowSet(rows.toList)
     )
@@ -63,15 +63,9 @@ final class MemoryOperation(parentSession: Session, opType: OperationType, hasRe
   override def run(): Unit = {
     super.setState(OperationState.RunningState)
     try {
-      cache.put(
-        opHandle,
-        mapTo(
-          new QueryExecution(
-            statement,
-            new SessionId(parentSession.sessionHandle.handleId)
-          ).execute()
-        )
-      )
+      val execution = new QueryExecution(statement, parentSession.currentSchema).execute()
+      parentSession.currentSchema = execution.getCurrentSchema // reset current schema
+      cache.put(opHandle, mapTo(execution.getData))
       super.setState(OperationState.FinishedState)
     } catch {
       case e: Exception =>

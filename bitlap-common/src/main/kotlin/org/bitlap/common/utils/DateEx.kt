@@ -12,13 +12,25 @@ object DateEx {
     /**
      * get time with local zone
      */
-    fun Long.time(): DateTime {
-        return DateTime(this)
+    @JvmStatic
+    @JvmOverloads
+    fun Long.time(zone: DateTimeZone = DateTimeZone.getDefault()): DateTime {
+        return DateTime(this, zone)
+    }
+
+    /**
+     * get time with local zone
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun String.time(zone: DateTimeZone = DateTimeZone.getDefault()): DateTime {
+        return DateTime(this, zone)
     }
 
     /**
      * get utc time
      */
+    @JvmStatic
     fun Long.utc(): DateTime {
         return DateTime(this, DateTimeZone.UTC)
     }

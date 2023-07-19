@@ -1,11 +1,11 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.client
 
-import org.bitlap.common.utils.UuidUtil
+import org.bitlap.common.utils.StringEx
 import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.*
-import org.bitlap.network.driver_proto.*
-import org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient
+import org.bitlap.network.Driver.*
+import org.bitlap.network.Driver.ZioDriver.DriverServiceClient
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.enumeration.GetInfoType.toBGetInfoType
 import org.bitlap.network.handles.*
@@ -23,16 +23,16 @@ import zio.*
  */
 final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverIO:
 
-  /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]
+  /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
    *
-   *  客户端使用[[org.bitlap.network.driver_service.ZioDriverService.DriverServiceClient]]操作SQL，目前所有操作必须读基于leader。
+   *  客户端使用[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]操作SQL，目前所有操作必须读基于leader。
    *
    *  TODO (当leader不存在时，client无法做任何操作)
    */
   private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
     ZIO
       .foreach(serverPeers.asServerAddresses) { address =>
-        getLeader(UuidUtil.uuid()).provideLayer(clientLayer(address.ip, address.port))
+        getLeader(StringEx.uuid(true)).provideLayer(clientLayer(address.ip, address.port))
       }
       .map(_.find(_.isDefined).flatten)
       .map { f =>

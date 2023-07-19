@@ -10,7 +10,7 @@ import org.bitlap.network.models.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-trait Driver extends DriverX[Identity]:
+trait DriverIdentity extends DriverX[Identity]:
   self =>
 
   def pure[A](a: A): Identity[A] = a

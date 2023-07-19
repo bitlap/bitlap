@@ -6,7 +6,7 @@ import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 import org.bitlap.common.bitmap.RBM
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.Fetcher
 import org.bitlap.core.mdm.MDContainer

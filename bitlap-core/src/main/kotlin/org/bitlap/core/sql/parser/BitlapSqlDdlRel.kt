@@ -6,6 +6,7 @@ import org.apache.calcite.DataContext
 import org.apache.calcite.prepare.RelOptTableImpl
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.logical.LogicalTableScan
+import org.apache.calcite.sql.SqlOperator
 import org.apache.calcite.sql.type.SqlTypeName
 import org.apache.calcite.tools.RelBuilder
 import org.bitlap.core.sql.table.BitlapSqlDdlTable
@@ -16,6 +17,11 @@ import org.bitlap.core.sql.table.BitlapSqlDdlTable
  * Date: 2021/7/28
  */
 interface BitlapSqlDdlRel {
+
+    /**
+     * sql operator
+     */
+    val op: SqlOperator
 
     /**
      * ddl result type definition

@@ -3,7 +3,7 @@ package org.bitlap.network.enumeration
 
 import java.sql.Types
 
-import org.bitlap.network.driver_proto.*
+import org.bitlap.network.Driver.*
 
 import enumeratum.values.*
 

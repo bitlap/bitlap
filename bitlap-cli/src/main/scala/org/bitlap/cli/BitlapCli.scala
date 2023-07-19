@@ -7,9 +7,11 @@ import zio.*
  *
  *  @version zio 2.0
  */
-object BitlapCli extends zio.ZIOAppDefault with BitlapInterpreter {
+object BitlapCli extends ZIOAppDefault with BitlapInterpreter {
 
-  override def run =
-    bitlapApp.run(Nil).provideLayer(ZLayer.succeed(Console.ConsoleLive)).exitCode
-
+  override def run: ZIO[ZIOAppArgs & Scope, Nothing, Unit] =
+    for {
+      args <- getArgs
+      _    <- bitlapApp.run(args.toList).provideLayer(ZLayer.succeed(Console.ConsoleLive)).exitCode
+    } yield ()
 }

@@ -16,7 +16,7 @@ import com.google.protobuf.Message
 abstract class RpcProcessor[T <: Message](executor: Executor = null, defaultResp: Message)
     extends RpcRequestProcessor[T](executor, defaultResp):
 
-  override def handleRequest(rpcCtx: RpcContext, request: T) =
+  override def handleRequest(rpcCtx: RpcContext, request: T): Unit =
     try {
       val msg = processRequest(request, new RpcRequestClosure(rpcCtx, this.defaultResp))
       if msg != null then {

@@ -1,8 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.server.rpc
+package org.bitlap.server.service
 
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.core.*
 import org.bitlap.jdbc.Constants
 import org.bitlap.network.*
 import org.bitlap.network.NetworkException.SQLExecutedException
@@ -21,12 +20,12 @@ import zio.*
  *    梦境迷离
  *  @version 1.0,2022/4/21
  */
-object GrpcBackendLive:
-  private[server] lazy val liveInstance: GrpcBackendLive = new GrpcBackendLive
-  lazy val live: ULayer[DriverIO]                        = ZLayer.succeed(liveInstance)
-end GrpcBackendLive
+object DriverService:
+  private[server] lazy val liveInstance: DriverService = new DriverService
+  lazy val live: ULayer[DriverIO]                      = ZLayer.succeed(liveInstance)
+end DriverService
 
-final class GrpcBackendLive extends DriverIO with LazyLogging:
+final class DriverService extends DriverIO with LazyLogging:
 
   // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
@@ -37,14 +36,7 @@ final class GrpcBackendLive extends DriverIO with LazyLogging:
     SessionManager
       .openSession(username, password, configuration)
       .map { session =>
-        val coreSession = BitlapContext.initSession(session.sessionHandle.handleId)
-        val newCoreSession = coreSession.copy(
-          new SessionId(session.sessionHandle.handleId),
-          session.sessionState,
-          session.creationTime,
-          configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
-        )
-        BitlapContext.updateSession(newCoreSession)
+        session.currentSchema = configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
         session.sessionHandle
       }
       .provide(SessionManager.live)

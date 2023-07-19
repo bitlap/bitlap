@@ -4,8 +4,8 @@ package org.bitlap.network
 import java.nio.ByteBuffer
 import java.util.UUID
 
-import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.driver_proto.*
+import org.bitlap.common.utils.StringEx
+import org.bitlap.network.Driver.*
 import org.bitlap.network.enumeration.OperationType
 
 import com.google.protobuf.ByteString
@@ -48,7 +48,7 @@ object handles:
 
   /** 统一标识符定义
    */
-  final case class HandleIdentifier(value: String = UuidUtil.uuid())
+  final case class HandleIdentifier(value: String = StringEx.uuid(true))
 
   /** 会话处理器句柄
    */

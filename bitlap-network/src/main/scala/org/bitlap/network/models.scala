@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
-import org.bitlap.network.driver_proto.*
+import org.bitlap.network.Driver.*
 import org.bitlap.network.enumeration.*
 
 import com.google.protobuf.ByteString
@@ -18,7 +18,7 @@ object models:
    */
   sealed trait Model
 
-  final case class QueryResult(tableSchema: TableSchema, rows: RowSet) extends Model
+  final case class QueryResultSet(tableSchema: TableSchema, rows: RowSet) extends Model
 
   final case class RowSet(rows: List[Row] = Nil, startOffset: Long = 0) extends Model:
     def toBRowSet: BRowSet = BRowSet(startRowOffset = startOffset, rows = rows.map(_.toBRow))
@@ -41,7 +41,7 @@ object models:
         RowSet.fromBRowSet(bFetchResults.getResults)
       )
 
-  /** The wrapper class of the Proto buffer [[org.bitlap.network.driver_proto.BRow]].
+  /** The wrapper class of the Proto buffer [[org.bitlap.network.Driver.BRow]].
    */
   final case class Row(values: List[ByteString] = Nil) extends Model:
     def toBRow: BRow = BRow(values)
@@ -58,7 +58,7 @@ object models:
         getResultSetMetadataResp.getSchema.columns.map(b => ColumnDesc.fromBColumnDesc(b)).toList
       )
 
-  /** The wrapper class of the Proto buffer [[org.bitlap.network.driver_proto.BColumnDesc]]
+  /** The wrapper class of the Proto buffer [[org.bitlap.network.Driver.BColumnDesc]]
    */
   final case class ColumnDesc(columnName: String, typeDesc: TypeId) extends Model:
 

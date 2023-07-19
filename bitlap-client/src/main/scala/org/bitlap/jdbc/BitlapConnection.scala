@@ -13,6 +13,8 @@ import scala.util.control.Breaks.*
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles.*
 
+import bitlap.rolls.core.jdbc.{ sql as sqlx, * }
+
 /** bitlap Connection
  *
  *  @author
@@ -23,8 +25,11 @@ import org.bitlap.network.handles.*
 class BitlapConnection(uri: String, info: Properties) extends Connection {
   import Constants.*
 
+  given Connection = this
+
   private var session: SessionHandle               = _
   private var closed                               = true
+  private var readOnly                             = false
   private var warningChain: SQLWarning             = _
   private var client: BitlapClient                 = _
   private var initFile: String                     = _
@@ -159,11 +164,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def nativeSQL(sql: String): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setAutoCommit(autoCommit: Boolean): Unit = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def setAutoCommit(autoCommit: Boolean): Unit = ()
 
-  override def getAutoCommit: Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getAutoCommit: Boolean = false
 
   override def commit(): Unit = ()
 
@@ -174,17 +177,15 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     new BitlapDatabaseMetaData(this, session, client)
   }
 
-  override def setReadOnly(readOnly: Boolean): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def setReadOnly(readOnly: Boolean): Unit = this.readOnly = readOnly
 
-  override def isReadOnly: Boolean = false
+  override def isReadOnly: Boolean = this.readOnly
 
   override def setCatalog(catalog: String): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getCatalog: String = ""
 
-  override def setTransactionIsolation(level: Int): Unit = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def setTransactionIsolation(level: Int): Unit = ()
 
   override def getTransactionIsolation: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -317,17 +318,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    var res: ResultSet  = null
-    var stmt: Statement = null
-    try {
-      stmt = createStatement()
-      res = stmt.executeQuery("SHOW CURRENT_DATABASE")
-      if res == null || !res.next then throw BitlapSQLException("Failed to get schema information")
-    } finally {
-      if res != null then res.close()
-      if stmt != null then stmt.close()
-    }
-    res.getString(1)
+    val rs = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE").fetch()
+    if (rs.nonEmpty) {
+      // todo typed
+      rs.head.values(0).asInstanceOf[String]
+    } else null
   }
 
   override def abort(executor: Executor): Unit = throw new SQLFeatureNotSupportedException("Method not supported")

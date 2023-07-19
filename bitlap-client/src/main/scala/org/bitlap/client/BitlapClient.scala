@@ -21,8 +21,7 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
     password: String = "",
     config: Map[String, String] = Map.empty
   ): SessionHandle =
-    syncClient
-      .openSession(username, password, config)
+    syncClient.openSession(username, password, config)
 
   def closeSession(sessionHandle: SessionHandle): Unit =
     syncClient.closeSession(sessionHandle)
@@ -33,13 +32,7 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
     queryTimeout: Long,
     config: Map[String, String] = Map.empty
   ): OperationHandle =
-    syncClient
-      .executeStatement(
-        statement = statement,
-        sessionHandle = sessionHandle,
-        queryTimeout = queryTimeout,
-        confOverlay = config
-      )
+    syncClient.executeStatement(sessionHandle, statement, queryTimeout, config)
 
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): FetchResults =
     syncClient.fetchResults(operationHandle, maxRows, fetchType)
@@ -48,13 +41,14 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
     sessionHandle: SessionHandle,
     database: String,
     pattern: String
-  ): OperationHandle = syncClient
-    .getTables(sessionHandle, database, pattern)
+  ): OperationHandle =
+    syncClient.getTables(sessionHandle, database, pattern)
 
   def getDatabases(
     sessionHandle: SessionHandle,
     pattern: String
-  ): OperationHandle = syncClient.getDatabases(sessionHandle, pattern)
+  ): OperationHandle =
+    syncClient.getDatabases(sessionHandle, pattern)
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
     syncClient.getResultSetMetadata(operationHandle)

@@ -70,14 +70,31 @@
             <version>${tapir.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-generic_${scala.binary.version}</artifactId>
-            <version>${circe.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
+        </dependency>
+
+        <!-- log -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.zio</groupId>
+            <artifactId>zio-logging-slf4j_3</artifactId>
+            <version>${zio.logging.version}</version>
         </dependency>
     </dependencies>
 
@@ -157,19 +174,19 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>install node and npm</id>
+                                <id>install node and yarn</id>
                                 <goals>
-                                    <goal>install-node-and-npm</goal>
+                                    <goal>install-node-and-yarn</goal>
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v16.18.1</nodeVersion>
-                                    <npmVersion>8.19.2</npmVersion>
+                                    <yarnVersion>v1.22.19</yarnVersion>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>install</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>yarn</goal>
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
@@ -179,10 +196,10 @@
                             <execution>
                                 <id>build</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run build</arguments>
+                                    <arguments>build</arguments>
                                 </configuration>
                             </execution>
                         </executions>

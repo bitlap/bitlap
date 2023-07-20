@@ -10,6 +10,8 @@ import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
+import bitlap.rolls.core.jdbc.{sql as sqlx}
+
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles.*
 
@@ -304,7 +306,6 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def setSchema(schema: String): Unit = {
-    // JDK 1.7
     checkConnection("setSchema")
     if schema == null || schema.isEmpty then throw BitlapSQLException("Schema name is null or empty")
     if schema.contains(";") then throw BitlapSQLException("invalid schema name")
@@ -317,17 +318,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    var res: ResultSet  = null
-    var stmt: Statement = null
-    try {
-      stmt = createStatement()
-      res = stmt.executeQuery("SHOW CURRENT_DATABASE")
-      if res == null || !res.next then throw BitlapSQLException("Failed to get schema information")
-    } finally {
-      if res != null then res.close()
-      if stmt != null then stmt.close()
-    }
-    res.getString(1)
+    val rs   = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE")
+    val data = rs.fetch()
+    if (data.nonEmpty) {
+      data.headOption.flatMap(_.lazyColumns.headOption).map(_.asInstanceOf[String]).orNull
+    } else null
   }
 
   override def abort(executor: Executor): Unit = throw new SQLFeatureNotSupportedException("Method not supported")

@@ -82,9 +82,9 @@
         <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->
-        <scala.version>3.2.2</scala.version>
+        <scala.version>3.3.0</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.2.9</rolls.version>
+        <rolls.version>0.3.1+8-305c6829-SNAPSHOT</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.2</enumeratum.version>
@@ -323,15 +323,13 @@
     </dependencyManagement>
 
     <!-- If not working: https://stackoverflow.com/questions/8223689/maven-project-defined-repository-not-works -->
-    <!--
     <repositories>
         <repository>
-            <id>kotlinx</id>
-            <name>kotlinx</name>
-            <url>https://kotlin.bintray.com/kotlinx/</url>
+            <id>oss</id>
+            <name>oss</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
     </repositories>
-    -->
     <build>
         <pluginManagement>
             <plugins>

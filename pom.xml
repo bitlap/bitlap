@@ -84,7 +84,7 @@
         <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->
-        <scala.version>3.2.2</scala.version>
+        <scala.version>3.3.0</scala.version>
         <scala.binary.version>3</scala.binary.version>
         <rolls.version>0.2.10</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>

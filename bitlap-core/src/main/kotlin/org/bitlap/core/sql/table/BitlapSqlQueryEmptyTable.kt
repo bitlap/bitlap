@@ -5,7 +5,7 @@ import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.Enumerable
 import org.apache.calcite.linq4j.Linq4j
 import org.apache.calcite.rex.RexNode
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 
 /**
  * empty table

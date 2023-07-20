@@ -2,7 +2,7 @@
 package org.bitlap.core.storage
 
 import org.apache.hadoop.fs.FileSystem
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.storage.io.BitlapParquetProvider
 
 /**

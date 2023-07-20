@@ -1,9 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
-package org.bitlap.core.data
+package org.bitlap.core.catalog
 
-import org.bitlap.core.Constants.DEFAULT_DATABASE
-import org.bitlap.core.data.metadata.Database
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Database
+import org.bitlap.core.catalog.metadata.Table
 
 /**
  * Desc: Catalog for schema, datasource, and etc.
@@ -15,16 +14,6 @@ import org.bitlap.core.data.metadata.Table
 interface BitlapCatalog {
 
     /**
-     * Show current_database.
-     */
-    fun showCurrentDatabase(): String
-
-    /**
-     * Use [Database] with [name].
-     */
-    fun useDatabase(name: String): Boolean
-
-/**
      * Create [Database] with [name].
      *
      * if [ifNotExists] is false, exception will be thrown when [Database] exists, otherwise ignored.
@@ -50,7 +39,12 @@ interface BitlapCatalog {
     fun getDatabase(name: String): Database
 
     /**
-     * List all [Database], it also contains [DEFAULT_DATABASE]
+     * Check if [name] is a valid database name.
+     */
+    fun databaseExists(name: String): Boolean
+
+    /**
+     * List all [Database], it also contains [Database.DEFAULT_DATABASE]
      */
     fun listDatabases(): List<Database>
 
@@ -59,7 +53,7 @@ interface BitlapCatalog {
      *
      * if [ifNotExists] is false, exception will be thrown when [Table] exists, otherwise ignore.
      */
-    fun createTable(name: String, database: String = DEFAULT_DATABASE, ifNotExists: Boolean = false): Boolean
+    fun createTable(name: String, database: String = Database.DEFAULT_DATABASE, ifNotExists: Boolean = false): Boolean
 
     /**
      * Drop [Table] with [name] in the [database].
@@ -67,15 +61,15 @@ interface BitlapCatalog {
      * [ifExists] if set false, exception will be thrown when [Table] does not exist, otherwise ignore.
      * [cascade] if set true, it will drop all data in the table.
      */
-    fun dropTable(name: String, database: String = DEFAULT_DATABASE, ifExists: Boolean = false, cascade: Boolean = false): Boolean
+    fun dropTable(name: String, database: String = Database.DEFAULT_DATABASE, ifExists: Boolean = false, cascade: Boolean = false): Boolean
 
     /**
      * get [Table] with [name] in the [database].
      */
-    fun getTable(name: String, database: String = DEFAULT_DATABASE): Table
+    fun getTable(name: String, database: String = Database.DEFAULT_DATABASE): Table
 
     /**
      * List all [Table] in the [database].
      */
-    fun listTables(database: String = DEFAULT_DATABASE): List<Table>
+    fun listTables(database: String = Database.DEFAULT_DATABASE): List<Table>
 }

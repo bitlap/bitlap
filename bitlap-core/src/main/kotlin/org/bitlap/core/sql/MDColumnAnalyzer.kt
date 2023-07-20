@@ -9,7 +9,7 @@ import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlNode
 import org.apache.calcite.sql.SqlNodeList
 import org.apache.calcite.sql.SqlSelect
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.mdm.format.DataType
 import org.bitlap.core.mdm.format.DataTypeBBM
 import org.bitlap.core.mdm.format.DataTypeCBM

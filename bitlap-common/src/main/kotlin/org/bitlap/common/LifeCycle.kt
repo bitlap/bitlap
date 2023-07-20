@@ -1,7 +1,6 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.common
 
-import cn.hutool.core.thread.ThreadUtil
 import java.io.Closeable
 
 /**
@@ -46,7 +45,8 @@ abstract class LifeCycleThread(val name: String, val daemon: Boolean) : LifeCycl
     constructor(name: String) : this(name, false)
 
     val thread: Thread by lazy {
-        ThreadUtil.newThread(this, name, daemon).also {
+        Thread(this, name).also {
+            it.isDaemon = daemon
             it.setUncaughtExceptionHandler { t, e -> this.handleException(t, e) }
         }
     }
@@ -82,6 +82,6 @@ abstract class LifeCycleThread(val name: String, val daemon: Boolean) : LifeCycl
     }
 
     fun join() {
-        ThreadUtil.waitForDie(this.thread)
+        runCatching { this.thread.join() }
     }
 }

@@ -1,10 +1,10 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.server
 
+import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
 import org.bitlap.network.DriverIO
-import org.bitlap.network.driver_service.ZioDriverService.*
 import org.bitlap.server.config.BitlapServerConfiguration
-import org.bitlap.server.rpc.*
+import org.bitlap.server.service.*
 
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
@@ -25,10 +25,10 @@ object GrpcServerEndpoint:
 
   def service(
     args: List[String]
-  ): ZIO[GrpcServiceLive with Scope with GrpcServerEndpoint, Throwable, Unit] =
+  ): ZIO[DriverGrpcService with Scope with GrpcServerEndpoint, Throwable, Unit] =
     (for {
       _ <- Console.printLine(s"Grpc Server started")
-      _ <- BitlapContext.fillRpc(GrpcBackendLive.liveInstance)
+      _ <- BitlapContext.fillRpc(DriverService.liveInstance)
       _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
       _ <- ZIO.never
     } yield ())
@@ -48,8 +48,8 @@ final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
   def runGrpcServer(): URIO[Any, ExitCode] = ZLayer
     .make[Server](
       serverLayer,
-      GrpcServiceLive.live,
-      GrpcBackendLive.live
+      DriverGrpcService.live,
+      DriverService.live
     )
     .launch
     .exitCode

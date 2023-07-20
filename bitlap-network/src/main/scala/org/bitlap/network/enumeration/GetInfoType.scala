@@ -1,7 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network.enumeration
 
-import org.bitlap.network.driver_proto.*
+import org.bitlap.network.Driver.*
 
 import enumeratum.values.*
 

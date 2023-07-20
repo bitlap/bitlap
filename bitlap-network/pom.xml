@@ -63,6 +63,32 @@
             <artifactId>grpc-netty</artifactId>
             <version>${grpc.netty.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.bitlap</groupId>
+            <artifactId>rolls-csv_${scala.binary.version}</artifactId>
+            <version>${rolls.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.beachape</groupId>
+            <artifactId>enumeratum_${scala.binary.version}</artifactId>
+            <version>${enumeratum.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-parser_${scala.binary.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic_${scala.binary.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-core_${scala.binary.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

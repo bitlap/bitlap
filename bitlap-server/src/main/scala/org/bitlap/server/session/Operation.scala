@@ -27,7 +27,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   @volatile var state: OperationState = OperationState.InitializedState
   val beginTime                       = System.currentTimeMillis()
   @volatile var lastAccessTime        = beginTime
-  var operationTimeout                = parentSession.sessionConf.get(BitlapConf.RPC_TIMEOUT)
+  var operationTimeout                = 3000L // TODO (config)
   var statement: String               = _
 
   lazy val opHandle: OperationHandle                = OperationHandle(opType, hasResultSet)
@@ -36,7 +36,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   protected var operationStart    = 0L
   protected var operationComplete = 0L
 
-  protected lazy val cache: mutable.HashMap[OperationHandle, QueryResult] =
+  protected lazy val cache: mutable.HashMap[OperationHandle, QueryResultSet] =
     mutable.HashMap()
 
   private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)

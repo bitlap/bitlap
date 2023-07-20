@@ -1,6 +1,7 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.core.test.sql
 
+import org.bitlap.common.utils.DateEx.time
 import org.bitlap.core.sql.udf.FunctionRegistry
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
@@ -59,7 +60,15 @@ class UdfTest : BaseLocalFsTest(), SqlChecker {
                      ,date_format('2023-01-01', 'yyyyMMdd') d3
                      ,date_format('2023-01-01T00:00:00.000+08:00', 'yyyy-MM-dd HH:mm:ss') d3
                 """.trimIndent(),
-                listOf(listOf("20230101", "2023-01-01 00:00:00", "20230101", "2023-01-01 00:00:00"))
+                // listOf(listOf("20230101", "2023-01-01 00:00:00", "20230101", "2023-01-01 00:00:00"))
+                listOf(
+                    listOf(
+                        1672502400000.time().toString("yyyyMMdd"),
+                        1672502400000.time().toString("yyyy-MM-dd HH:mm:ss"),
+                        "2023-01-01".time().toString("yyyyMMdd"),
+                        "2023-01-01T00:00:00.000+08:00".time().toString("yyyy-MM-dd HH:mm:ss")
+                    )
+                )
             )
         }
     }

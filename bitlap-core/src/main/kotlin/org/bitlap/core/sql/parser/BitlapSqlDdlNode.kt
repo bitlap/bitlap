@@ -14,7 +14,7 @@ import org.bitlap.core.BitlapContext
  */
 abstract class BitlapSqlDdlNode(
     open val pos: SqlParserPos,
-    open val op: SqlOperator,
+    override val op: SqlOperator,
     open val operands: List<SqlNode>
 ) : SqlCall(pos), BitlapSqlDdlRel {
 

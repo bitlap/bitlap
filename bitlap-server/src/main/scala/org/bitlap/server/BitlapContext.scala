@@ -6,9 +6,8 @@ import javax.annotation.Nullable
 
 import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.schema.*
-import org.bitlap.common.utils.UuidUtil
-import org.bitlap.network.{ DriverIO, ServerAddress }
+import org.bitlap.common.utils.StringEx
+import org.bitlap.network.{ DriverIO, GetServerAddressReq, GetServerAddressResp, ServerAddress }
 import org.bitlap.network.NetworkException.*
 import org.bitlap.server.config.*
 
@@ -100,7 +99,7 @@ object BitlapContext:
             leader.getEndpoint,
             GetServerAddressReq
               .newBuilder()
-              .setRequestId(UuidUtil.uuid())
+              .setRequestId(StringEx.uuid(true))
               .build(),
             timeout.toMillis
           )

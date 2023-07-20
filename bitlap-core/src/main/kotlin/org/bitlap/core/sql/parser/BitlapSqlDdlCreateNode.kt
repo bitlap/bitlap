@@ -14,7 +14,7 @@ import org.bitlap.core.BitlapContext
  */
 abstract class BitlapSqlDdlCreateNode(
     open val pos: SqlParserPos,
-    open val op: SqlOperator,
+    override val op: SqlOperator,
     open val operands: List<SqlNode>,
     open val _replace: Boolean,
     open val ifNotExists: Boolean,

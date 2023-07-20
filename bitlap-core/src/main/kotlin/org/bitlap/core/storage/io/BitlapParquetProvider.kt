@@ -12,8 +12,9 @@ import org.apache.parquet.hadoop.ParquetWriter
 import org.apache.parquet.hadoop.util.HiddenFileFilter
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
-import org.bitlap.common.utils.JSONUtils
-import org.bitlap.core.data.metadata.Table
+import org.bitlap.common.utils.JsonEx.json
+import org.bitlap.common.utils.JsonEx.jsonAs
+import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.TimeFilterFun
 import org.bitlap.core.storage.BitlapReader
@@ -37,7 +38,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
                 put(1, row.tm)
                 put(2, row.metric.getBytes())
                 put(3, row.entity.getBytes())
-                put(4, JSONUtils.toJson(row.metadata))
+                put(4, row.metadata.json())
             }
         }
     }
@@ -51,7 +52,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
                 put(3, row.tm)
                 put(4, row.metric.getBytes())
                 put(5, row.entity.getBytes())
-                put(6, JSONUtils.toJson(row.metadata))
+                put(6, row.metadata.json())
             }
         }
     }
@@ -61,7 +62,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         val metricFilter = BitlapReaders.makeParquetFilter("mk", metrics)
         val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_SCHEMA, projections)
         return BitlapParquetReader(fs, inputs, METRIC_SCHEMA, requestedProjection, metricFilter.compact()) { row ->
-            val metaObj = JSONUtils.fromJson(row.getWithDefault("meta", "{}"), MetricRowMeta::class.java)
+            val metaObj = row.getWithDefault("meta", "{}").jsonAs<MetricRowMeta>()
             if (timeFunc(metaObj.tm)) {
                 metaObj
             } else {
@@ -101,7 +102,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) : Tabl
         val filter = this.getMetricDimFilter(metrics, dimension, dimensionFilter)
         val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_DIM_SCHEMA, projections)
         return BitlapParquetReader(fs, inputs, METRIC_DIM_SCHEMA, requestedProjection, filter.compact()) { row ->
-            val metaObj = JSONUtils.fromJson(row.getWithDefault("meta", "{}"), MetricDimRowMeta::class.java)
+            val metaObj = row.getWithDefault("meta", "{}").jsonAs<MetricDimRowMeta>()
             if (timeFunc(metaObj.tm)) {
                 metaObj
             } else {

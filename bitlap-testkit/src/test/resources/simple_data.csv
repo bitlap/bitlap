@@ -1,4 +1,4 @@
-time,entity,dimensions,name,value
+time,entity,dimensions,metric_name,metric_value
 1666195200,14,"{""os"":""Windows 8"",""city"":""西安""}",pv,712739626
 1666022400,84,"{""os"":""BlackBerry""}",pv,563535213
 1666108800,79,"{""os"":""Android OS""}",vv,418403605

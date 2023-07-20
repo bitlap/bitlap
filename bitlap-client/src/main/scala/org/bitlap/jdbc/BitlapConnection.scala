@@ -10,10 +10,11 @@ import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
-import bitlap.rolls.core.jdbc.{sql as sqlx}
-
 import org.bitlap.client.BitlapClient
 import org.bitlap.network.handles.*
+
+import bitlap.rolls.core.jdbc.{ sql as sqlx, * }
+import bitlap.rolls.core.jdbc.sql as sqlx
 
 /** bitlap Connection
  *
@@ -25,8 +26,11 @@ import org.bitlap.network.handles.*
 class BitlapConnection(uri: String, info: Properties) extends Connection {
   import Constants.*
 
+  given Connection = this
+
   private var session: SessionHandle               = _
   private var closed                               = true
+  private var readOnly                             = false
   private var warningChain: SQLWarning             = _
   private var client: BitlapClient                 = _
   private var initFile: String                     = _
@@ -161,11 +165,9 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def nativeSQL(sql: String): String = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def setAutoCommit(autoCommit: Boolean): Unit = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def setAutoCommit(autoCommit: Boolean): Unit = ()
 
-  override def getAutoCommit: Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def getAutoCommit: Boolean = false
 
   override def commit(): Unit = ()
 
@@ -176,17 +178,15 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     new BitlapDatabaseMetaData(this, session, client)
   }
 
-  override def setReadOnly(readOnly: Boolean): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def setReadOnly(readOnly: Boolean): Unit = this.readOnly = readOnly
 
-  override def isReadOnly: Boolean = false
+  override def isReadOnly: Boolean = this.readOnly
 
   override def setCatalog(catalog: String): Unit = throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def getCatalog: String = ""
 
-  override def setTransactionIsolation(level: Int): Unit = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def setTransactionIsolation(level: Int): Unit = ()
 
   override def getTransactionIsolation: Int = throw new SQLFeatureNotSupportedException("Method not supported")
 

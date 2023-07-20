@@ -15,8 +15,8 @@ import org.apache.calcite.sql.util.ListSqlOperatorTable
 import org.apache.calcite.sql.util.SqlOperatorTables
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.Frameworks
-import org.bitlap.core.Constants
-import org.bitlap.core.data.BitlapCatalog
+import org.bitlap.core.catalog.BitlapCatalog
+import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.core.sql.table.BitlapSqlQueryTable
 import org.bitlap.core.sql.udf.FunctionRegistry
 
@@ -37,7 +37,7 @@ object SqlParserUtil {
             val dbName = it.name
             val schema = CalciteSchema.createRootSchema(true, true, dbName, root).plus()
             catalog.listTables(dbName).forEach { t ->
-                if (dbName == Constants.DEFAULT_DATABASE) {
+                if (dbName == Database.DEFAULT_DATABASE) {
                     root.add(t.name, BitlapSqlQueryTable(t))
                 } else {
                     schema.add(t.name, BitlapSqlQueryTable(t))

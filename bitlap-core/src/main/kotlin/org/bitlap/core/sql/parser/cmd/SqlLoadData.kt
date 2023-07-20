@@ -41,8 +41,11 @@ class SqlLoadData(
         }
         // only support overwrite = true
         BitlapEventWriter(table, BitlapContext.hadoopConf).use {
-            if (path.startsWith("classpath:", true)) {
-                it.writeCsv(path)
+            if (path.startsWith("classpath:", true) && path.length > 10) {
+                val input = SqlLoadData::class.java.classLoader.getResourceAsStream(path.substring(10))
+                if (input != null) {
+                    it.writeCsv(input)
+                }
             }
             // hadoop file system should support protocal
             else {

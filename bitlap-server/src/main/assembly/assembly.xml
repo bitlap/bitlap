@@ -20,7 +20,7 @@
             <fileMode>0644</fileMode>
             <includes>
                 <include>*.xml</include>
-                <include>*.setting</include>
+                <include>*.conf</include>
                 <include>*.csv</include>
                 <include>*.sql</include>
             </includes>

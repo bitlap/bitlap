@@ -7,6 +7,8 @@ import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.type.SqlTypeName
+import org.bitlap.common.utils.StringEx.blankOr
+import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 /**
@@ -34,6 +36,9 @@ class SqlShowTables(
         )
 
     override fun operator(context: DataContext): List<Array<Any?>> {
-        return catalog.listTables(catalog.currentDatabase()).map { arrayOf(it.database, it.name, it.createTime) }
+        val currentSchema = database?.simple.blankOr(QueryContext.get().currentSchema!!)
+        return catalog.listTables(currentSchema).map {
+            arrayOf(it.database, it.name, it.createTime)
+        }
     }
 }

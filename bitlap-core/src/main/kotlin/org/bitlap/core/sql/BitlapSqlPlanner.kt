@@ -23,7 +23,7 @@ import org.apache.calcite.sql2rel.RelDecorrelator
 import org.apache.calcite.sql2rel.SqlToRelConverter
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.RelBuilder
-import org.bitlap.core.data.BitlapCatalog
+import org.bitlap.core.catalog.BitlapCatalog
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
 import org.bitlap.core.sql.rule.ENUMERABLE_RULES
 import org.bitlap.core.sql.rule.RULES
@@ -54,7 +54,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
         return when (sqlNode) {
             is BitlapSqlDdlRel -> {
                 val rel = sqlNode.rel(RelBuilder.create(config))
-                BitlapSqlPlan(statement, rel, rel)
+                BitlapSqlPlan(statement, sqlNode, rel, rel)
             }
             else -> {
                 // 1. validate sql plan
@@ -98,7 +98,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
                     hepPlanner.root = rel
                     hepPlanner.findBestExp()
                 }
-                BitlapSqlPlan(statement, root.rel, relNode)
+                BitlapSqlPlan(statement, sqlNode, root.rel, relNode)
             }
         }
     }

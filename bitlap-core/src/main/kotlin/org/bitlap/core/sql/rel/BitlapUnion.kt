@@ -14,8 +14,9 @@ class BitlapUnion(
     cluster: RelOptCluster,
     traits: RelTraitSet,
     inputs: List<RelNode>,
-    all: Boolean
-) : Union(cluster, traits, inputs, all) {
+    all: Boolean,
+    override var parent: RelNode? = null
+) : Union(cluster, traits, inputs, all), BitlapNode {
 
     override fun copy(traitSet: RelTraitSet, inputs: MutableList<RelNode>, all: Boolean): SetOp {
         return BitlapUnion(this.cluster, traitSet, inputs, all)

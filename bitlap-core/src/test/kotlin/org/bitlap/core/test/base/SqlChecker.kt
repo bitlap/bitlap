@@ -6,9 +6,9 @@ import io.kotest.assertions.Expected
 import io.kotest.assertions.failure
 import io.kotest.assertions.print.print
 import io.kotest.matchers.shouldBe
-import org.bitlap.common.utils.Sql.toTable
+import org.bitlap.common.utils.SqlEx.toTable
 import org.bitlap.common.utils.internal.DBTable
-import org.bitlap.core.SessionId
+import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.core.sql.QueryExecution
 
 /**
@@ -19,16 +19,16 @@ interface SqlChecker {
     /**
      * execute sql statement
      */
-    fun sql(statement: String): SqlResult {
-        val rs = QueryExecution(statement, SessionId.fakeSessionId()).execute()
-        return SqlResult(statement, rs.toTable())
+    fun sql(statement: String, currentSchema: String = Database.DEFAULT_DATABASE): SqlResult {
+        val rs = QueryExecution(statement, currentSchema).execute()
+        return SqlResult(statement, rs.data.toTable())
     }
 
     /**
      * check rows
      */
-    fun checkRows(statement: String, rows: List<List<Any?>>) {
-        val result = sql(statement).result
+    fun checkRows(statement: String, rows: List<List<Any?>>, currentSchema: String = Database.DEFAULT_DATABASE) {
+        val result = sql(statement, currentSchema).result
         try {
             result.size shouldBe rows.size
             result.zip(rows).forEach { (r1, r2) ->

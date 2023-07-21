@@ -58,6 +58,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+          cache: maven
 
       # because there are some error tests      
       - name: Test

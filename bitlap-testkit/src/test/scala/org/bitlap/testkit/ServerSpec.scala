@@ -18,9 +18,7 @@ class ServerSpec extends CSVUtils {
   given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
   // 每个测试都会执行一次，需要修改！
-  val server = new Thread {
-    override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
-  }
+  val server: Thread = new Thread(() => EmbedBitlapServer.main(scala.Array.empty))
 
   @Before
   def startServer(): Unit = {

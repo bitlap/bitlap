@@ -27,10 +27,10 @@ jobs:
           cache: maven
 
       - name: Checking Code Style
-        run: ./mvnw spotless:check
+        run: mvn spotless:check
 
       - name: Build with Maven
-        run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
+        run: mvn -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
 
       - name: Docker Build
         run: bash docker.sh ${{ vars.VERSION }}
@@ -62,7 +62,7 @@ jobs:
 
       # because there are some error tests      
       - name: Test
-        run: ./mvnw -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
+        run: mvn -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
 
       - name: Upload test coverage report
         run: bash <(curl -s https://codecov.io/bash)

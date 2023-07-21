@@ -321,7 +321,8 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     val rs   = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE")
     val data = rs.fetch()
     if (data.nonEmpty) {
-      data.headOption.flatMap(_.lazyColumns.headOption).map(_.asInstanceOf[String]).orNull
+      val res: String = data.headOption.map(_.columns[rs.Out]._1).orNull
+      res
     } else null
   }
 

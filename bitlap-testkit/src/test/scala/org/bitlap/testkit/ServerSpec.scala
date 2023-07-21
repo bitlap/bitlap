@@ -9,23 +9,23 @@ import org.junit.*
 
 import bitlap.rolls.core.jdbc.*
 
-object ServerSpec {
+class ServerSpec extends CSVUtils {
+
   private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
   private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
-
   given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
-}
-
-class ServerSpec extends CSVUtils {
-
-  import ServerSpec.*
 
   // 每个测试都会执行一次，需要修改！
+  val server = new Thread {
+    override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
+  }
+
   @Before
   def startServer(): Unit = {
-    EmbedBitlapServer.main(scala.Array.empty)
+    server.setDaemon(true)
+    server.start()
     Thread.sleep(3000L)
 
     initTable()
@@ -54,13 +54,13 @@ class ServerSpec extends CSVUtils {
     assert(ret1.nonEmpty)
     println(ret1)
 
-//    sql"create database if not exists $database"
-//    sql"use $database"
+    //    sql"create database if not exists $database"
+    //    sql"use $database"
 
-//    val showResult = ResultSetX[TypeRow1[String]](sql"show current_database").fetch()
-//    println(database)
-//    println(showResult.map(_.values))
-//    assert(showResult.nonEmpty && showResult.exists(_.values.contains(database)))
+    //    val showResult = ResultSetX[TypeRow1[String]](sql"show current_database").fetch()
+    //    println(database)
+    //    println(showResult.map(_.values))
+    //    assert(showResult.nonEmpty && showResult.exists(_.values.contains(database)))
   }
 
 }

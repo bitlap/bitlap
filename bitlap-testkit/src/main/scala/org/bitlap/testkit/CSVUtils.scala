@@ -11,13 +11,12 @@ import bitlap.rolls.csv.CSVUtils.*
  *    梦境迷离
  *  @version 1.0,2022/5/2
  */
-object Format extends CSVFormat {
-  override val hasHeaders: Boolean  = true
-  override val hasColIndex: Boolean = false
-}
-
 trait CSVUtils {
-  given CSVFormat = Format
+
+  given CSVFormat = new CSVFormat {
+    override val hasHeaders: Boolean  = true
+    override val hasColIndex: Boolean = false
+  }
 
   def readCSVData(file: File): List[Metric] =
     val (metadata, metrics) = CSVUtils.readCSV(

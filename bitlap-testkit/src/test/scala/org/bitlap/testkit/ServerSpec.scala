@@ -9,13 +9,18 @@ import org.junit.*
 
 import bitlap.rolls.core.jdbc.*
 
-class ServerSpec extends CSVUtils {
-
+object ServerSpec {
   private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
   private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
+
   given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+}
+
+class ServerSpec extends CSVUtils {
+
+  import ServerSpec.*
 
   // 每个测试都会执行一次，需要修改！
   @Before

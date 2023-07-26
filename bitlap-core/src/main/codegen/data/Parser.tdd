@@ -407,6 +407,7 @@
   # items in this list become non-reserved.
   nonReservedKeywordsToAdd: [
     "IF"
+    "DEFAULT_"
   ]
 
   # List of non-reserved keywords to remove;

@@ -19,16 +19,17 @@ interface SqlChecker {
     /**
      * execute sql statement
      */
-    fun sql(statement: String, currentSchema: String = Database.DEFAULT_DATABASE): SqlResult {
-        val rs = QueryExecution(statement, currentSchema).execute()
+    fun sql(statement: String, session: SqlSession = SqlSession()): SqlResult {
+        val rs = QueryExecution(statement, session.currentSchema).execute()
+        session.currentSchema = rs.currentSchema
         return SqlResult(statement, rs.data.toTable())
     }
 
     /**
      * check rows
      */
-    fun checkRows(statement: String, rows: List<List<Any?>>, currentSchema: String = Database.DEFAULT_DATABASE) {
-        val result = sql(statement, currentSchema).result
+    fun checkRows(statement: String, rows: List<List<Any?>>, session: SqlSession = SqlSession()) {
+        val result = sql(statement, session).result
         try {
             result.size shouldBe rows.size
             result.zip(rows).forEach { (r1, r2) ->
@@ -77,3 +78,5 @@ class SqlResult(private val statement: String, private val table: DBTable) {
         return this.result == other
     }
 }
+
+data class SqlSession(var currentSchema: String = Database.DEFAULT_DATABASE)

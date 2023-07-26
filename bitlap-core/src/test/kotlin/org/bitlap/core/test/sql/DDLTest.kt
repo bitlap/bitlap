@@ -10,6 +10,7 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.catalog.metadata.Database.Companion.DEFAULT_DATABASE
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
+import org.bitlap.core.test.base.SqlSession
 
 /**
  * Mail: chk19940609@gmail.com
@@ -60,13 +61,20 @@ class DDLTest : BaseLocalFsTest(), SqlChecker {
         }
 
         "test use statement" {
+            val session = SqlSession()
             val (db, table) = randomDBTable()
-            sql("create table $db.$table")
-            sql("use $db")
+            sql("create table $db.$table", session)
+            sql("use $db", session)
             checkRows(
                 "show current_database",
                 listOf(listOf(db)),
-                db
+                session
+            )
+            sql("use default", session)
+            checkRows(
+                "show current_database",
+                listOf(listOf(DEFAULT_DATABASE)),
+                session
             )
         }
     }

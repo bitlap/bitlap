@@ -37,19 +37,6 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): FetchResults =
     syncClient.fetchResults(operationHandle, maxRows, fetchType)
 
-  def getTables(
-    sessionHandle: SessionHandle,
-    database: String,
-    pattern: String
-  ): OperationHandle =
-    syncClient.getTables(sessionHandle, database, pattern)
-
-  def getDatabases(
-    sessionHandle: SessionHandle,
-    pattern: String
-  ): OperationHandle =
-    syncClient.getDatabases(sessionHandle, pattern)
-
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
     syncClient.getResultSetMetadata(operationHandle)
 

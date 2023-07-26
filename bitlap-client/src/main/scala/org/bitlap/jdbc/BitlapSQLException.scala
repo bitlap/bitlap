@@ -3,6 +3,8 @@ package org.bitlap.jdbc
 
 import java.sql.SQLException
 
+import scala.jdk.CollectionConverters.*
+
 import org.bitlap.common.exception.BitlapException
 
 /** bitlap 客户端的SQL异常
@@ -19,4 +21,4 @@ final case class BitlapSQLException(
     extends SQLException(msg, state, code, cause.orNull)
 
 final case class BitlapJdbcUriParseException(msg: String, cause: Option[Throwable] = None)
-    extends BitlapException(msg, cause.orNull)
+    extends BitlapException(msg, Map.empty[String, String].asJava, cause.orNull)

@@ -11,10 +11,10 @@ import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
 import org.bitlap.client.BitlapClient
+import org.bitlap.common.exception.BitlapExceptions
 import org.bitlap.network.handles.*
 
-import bitlap.rolls.core.jdbc.{ sql as sqlx, * }
-import bitlap.rolls.core.jdbc.sql as sqlx
+import bitlap.rolls.core.jdbc.{ columns, sqlQ, ResultSetX, TypeRow1 }
 
 /** bitlap Connection
  *
@@ -132,11 +132,14 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
         } finally if st != null then st.close()
       }
 
-  override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def unwrap[T](iface: Class[T]): T = {
+    if (!iface.isInstance(this)) {
+      throw BitlapExceptions.illegalException(iface.getName)
+    }
+    this.asInstanceOf[T]
+  }
 
-  override def isWrapperFor(iface: Class[?]): Boolean = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def isWrapperFor(iface: Class[?]): Boolean = iface.isInstance(this)
 
   override def close(): Unit =
     try
@@ -159,11 +162,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     new BitlapPreparedStatement(this, session, client, sql)
   }
 
-  override def prepareCall(sql: String): CallableStatement = throw new SQLFeatureNotSupportedException(
-    "Method not supported"
-  )
+  override def prepareCall(sql: String): CallableStatement =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def nativeSQL(sql: String): String = throw new SQLFeatureNotSupportedException("Method not supported")
+  override def nativeSQL(sql: String): String =
+    throw new SQLFeatureNotSupportedException("Method not supported")
 
   override def setAutoCommit(autoCommit: Boolean): Unit = ()
 
@@ -308,22 +311,18 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   override def setSchema(schema: String): Unit = {
     checkConnection("setSchema")
     if schema == null || schema.isEmpty then throw BitlapSQLException("Schema name is null or empty")
-    if schema.contains(";") then throw BitlapSQLException("invalid schema name")
-    var stmt: Statement = null
-    try {
-      stmt = createStatement()
-      stmt.execute("USE " + schema)
-    } finally if stmt != null then stmt.close()
+    ResultSetX[TypeRow1[String]](sqlQ"USE $schema").fetch()
   }
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    val rs   = ResultSetX[TypeRow1[String]](sqlx"SHOW CURRENT_DATABASE")
+    val rs   = ResultSetX[TypeRow1[String]](sqlQ"SHOW CURRENT_DATABASE")
     val data = rs.fetch()
     if (data.nonEmpty) {
-      val res: String = data.headOption.map(_.columns[rs.Out]._1).orNull
-      res
-    } else null
+      data.headOption.map(_.columns[rs.Out]._1).orNull
+    } else {
+      null
+    }
   }
 
   override def abort(executor: Executor): Unit = throw new SQLFeatureNotSupportedException("Method not supported")

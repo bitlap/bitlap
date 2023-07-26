@@ -1,6 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.network
 
+import scala.jdk.CollectionConverters.*
+
 import org.bitlap.common.exception.BitlapException
 
 import izumi.reflect.dottyreflection.*
@@ -14,7 +16,7 @@ import izumi.reflect.dottyreflection.*
  *  @version 1.0
  */
 sealed abstract class NetworkException(val code: Int = -1, val msg: String, val cause: Option[Throwable] = None)
-    extends BitlapException(if msg == null then "" else msg, cause.orNull)
+    extends BitlapException(if msg == null then "" else msg, Map.empty[String, String].asJava, cause.orNull)
     with Product
 
 object NetworkException:

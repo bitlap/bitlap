@@ -79,16 +79,6 @@ final class MockDriverIO extends DriverIO with CSVUtils {
       )
     )
 
-  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(new OperationHandle(OperationType.GetSchemas))
-
-  override def getTables(
-    sessionHandle: SessionHandle,
-    database: String,
-    pattern: String
-  ): ZIO[Any, Throwable, OperationHandle] =
-    ZIO.succeed(OperationHandle(OperationType.GetTables))
-
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] = ZIO.unit
 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] = ZIO.unit

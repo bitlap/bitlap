@@ -39,10 +39,6 @@ trait DriverX[F[_]]:
 
   def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
-  def getDatabases(sessionHandle: SessionHandle, pattern: String): F[OperationHandle]
-
-  def getTables(sessionHandle: SessionHandle, database: String, pattern: String): F[OperationHandle]
-
   def cancelOperation(opHandle: OperationHandle): F[Unit]
 
   def closeOperation(opHandle: OperationHandle): F[Unit]

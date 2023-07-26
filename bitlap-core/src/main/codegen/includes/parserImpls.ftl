@@ -167,11 +167,15 @@ SqlDrop SqlDropTable(Span s, boolean replace) :
  */
 SqlShowDatabases SqlShowDatabases() :
 {
+    SqlIdentifier pattern = null;
 }
 {
     <SHOW> ( <SCHEMAS> | <DATABASES> )
+    [
+        <LIKE> pattern = CompoundIdentifier()
+    ]
     {
-        return new SqlShowDatabases(getPos());
+        return new SqlShowDatabases(getPos(), pattern);
     }
 }
 

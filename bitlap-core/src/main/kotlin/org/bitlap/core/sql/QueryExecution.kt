@@ -34,7 +34,7 @@ class QueryExecution(
         } catch (e: Throwable) {
             when (e) {
                 is BitlapException -> throw e
-                else -> throw BitlapException(statement, e)
+                else -> throw BitlapException(statement, emptyMap(), e)
             }
         }
     }

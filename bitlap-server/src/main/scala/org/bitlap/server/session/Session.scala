@@ -26,6 +26,8 @@ trait Session {
 
   def lastAccessTime: Long
 
+  def lastAccessTime_=(time: Long): Unit
+
   def sessionConf: BitlapConf
 
   def sessionState: AtomicBoolean
@@ -61,5 +63,5 @@ trait Session {
 
   def getNoOperationTime: Long
 
-  def getInfo(getInfoType: GetInfoType): GetInfoValue
+  def getInfo(getInfoType: GetInfoType): Task[GetInfoValue]
 }

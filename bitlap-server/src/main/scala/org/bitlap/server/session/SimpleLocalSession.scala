@@ -17,14 +17,14 @@ import org.bitlap.server.BitlapContext
 
 import com.google.protobuf.ByteString
 
-import zio.Task
+import zio.{ System as _, * }
 
 /** bitlap 单机会话实现
  *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-final class MemorySession(
+final class SimpleLocalSession(
   val username: String,
   val password: String,
   _sessionConf: scala.collection.Map[String, String],
@@ -39,6 +39,8 @@ final class MemorySession(
   private[session] var _currentSchema: String = _
 
   override def lastAccessTime: Long = _lastAccessTime
+
+  override def lastAccessTime_=(time: Long): Unit = _lastAccessTime = time
 
   override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
 
@@ -122,7 +124,7 @@ final class MemorySession(
     statement: String,
     confOverlay: scala.collection.Map[String, String] = Map.empty
   ): Operation = {
-    val operation = new MemoryOperation(
+    val operation = new SimpleOperation(
       parentSession,
       OperationType.ExecuteStatement,
       hasResultSet = true
@@ -161,17 +163,19 @@ final class MemorySession(
     else 0
   }
 
-  override def getInfo(getInfoType: GetInfoType): GetInfoValue =
-    getInfoType match {
-      case ServerName =>
-        GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
-      case ServerConf =>
-        GetInfoValue(ByteString.copyFromUtf8(BitlapContext.globalConf.toJson))
-      case DbmsName =>
-        GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
-      case DbmsVer =>
-        GetInfoValue(ByteString.copyFromUtf8(BitlapVersionInfo.getVersion))
-      case _ =>
-        throw BitlapSQLException("Unrecognized GetInfoType value: " + getInfoType.toString)
-    }
+  override def getInfo(getInfoType: GetInfoType): Task[GetInfoValue] =
+    ZIO.succeed(
+      getInfoType match {
+        case ServerName =>
+          GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+        case ServerConf =>
+          GetInfoValue(ByteString.copyFromUtf8(BitlapContext.globalConf.toJson))
+        case DbmsName =>
+          GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+        case DbmsVer =>
+          GetInfoValue(ByteString.copyFromUtf8(BitlapVersionInfo.getVersion))
+        case _ =>
+          throw BitlapSQLException("Unrecognized GetInfoType value: " + getInfoType.toString)
+      }
+    )
 }

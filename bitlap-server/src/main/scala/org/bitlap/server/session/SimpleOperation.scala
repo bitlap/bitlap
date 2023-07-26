@@ -18,7 +18,7 @@ import org.bitlap.network.serde.BitlapSerde
  *    梦境迷离
  *  @version 1.0,2021/12/3
  */
-final class MemoryOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
+final class SimpleOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
     extends Operation(parentSession, opType, hasResultSet)
     with BitlapSerde {
 

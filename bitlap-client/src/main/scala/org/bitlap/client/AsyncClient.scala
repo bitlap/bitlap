@@ -107,26 +107,6 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         .provideLayer(l)
     )
 
-  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .getDatabases(BGetDatabasesReq(Option(sessionHandle.toBSessionHandle()), pattern))
-        .map(t => new OperationHandle(t.getOperationHandle))
-        .provideLayer(l)
-    )
-
-  override def getTables(
-    sessionHandle: SessionHandle,
-    database: String,
-    pattern: String
-  ): ZIO[Any, Throwable, OperationHandle] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .getTables(BGetTablesReq(Option(sessionHandle.toBSessionHandle()), database, pattern))
-        .map(t => new OperationHandle(t.getOperationHandle))
-        .provideLayer(l)
-    )
-
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient
       .getLeader(BGetLeaderReq.of(requestId))

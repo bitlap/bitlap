@@ -60,10 +60,6 @@ trait DriverIO extends DriverX[Task]:
 
   def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema]
 
-  def getDatabases(sessionHandle: SessionHandle, pattern: String): Task[OperationHandle]
-
-  def getTables(sessionHandle: SessionHandle, database: String, pattern: String): Task[OperationHandle]
-
   def cancelOperation(opHandle: OperationHandle): Task[Unit]
 
   def closeOperation(opHandle: OperationHandle): Task[Unit]

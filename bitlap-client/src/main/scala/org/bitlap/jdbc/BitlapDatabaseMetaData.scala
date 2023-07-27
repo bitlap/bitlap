@@ -5,10 +5,12 @@ import java.sql.{ Array as _, * }
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.utils.JsonEx
+import org.bitlap.common.utils.{ JsonEx, StringEx }
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
+
+import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
 
 /** bitlap 数据库元数据
  *
@@ -356,9 +358,10 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet =
-    val stmt = client.getTables(session, Option(schemaPattern).getOrElse("%"), tableNamePattern)
-    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
+  ): ResultSet = {
+    given Connection = connection
+    sqlQ"show tables"._2 // TODO (fix me)
+  }
 
   override def getSchemas: ResultSet =
     getSchemas(null, null)
@@ -523,9 +526,10 @@ class BitlapDatabaseMetaData(
 
   override def getRowIdLifetime: RowIdLifetime = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  override def getSchemas(catalog: String, schemaPattern: String): ResultSet =
-    val stmt = client.getDatabases(session, Option(catalog).orElse(Option(schemaPattern)).getOrElse("%"))
-    BitlapQueryResultSet.builder().setClient(client).setStmtHandle(stmt).build()
+  override def getSchemas(catalog: String, schemaPattern: String): ResultSet = {
+    given Connection = connection
+    sqlQ"show databases"._2
+  }
 
   override def supportsStoredFunctionsUsingCallSyntax(): Boolean = throw new SQLFeatureNotSupportedException(
     "Method not supported"

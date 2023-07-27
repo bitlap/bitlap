@@ -90,14 +90,6 @@ final class DriverService extends DriverIO with LazyLogging:
       rs        <- operation.parentSession.getResultSetMetadata(opHandle)
     } yield rs).provide(SessionManager.live)
 
-  override def getDatabases(sessionHandle: SessionHandle, pattern: String): ZIO[Any, Throwable, OperationHandle] = ???
-
-  override def getTables(
-    sessionHandle: SessionHandle,
-    database: String,
-    pattern: String
-  ): ZIO[Any, Throwable, OperationHandle] = ???
-
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
     SessionManager
       .getOperation(opHandle)

@@ -7,7 +7,7 @@
     <artifactId>bitlap</artifactId>
 
     <groupId>org.bitlap</groupId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <name>bitlap</name>
@@ -58,6 +58,7 @@
 
     <properties>
         <!-- project settings -->
+        <revision>0.4.0-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <frontend.project.name>bitlap-server-ui</frontend.project.name>
@@ -86,7 +87,7 @@
         <!-- scala -->
         <scala.version>3.3.0</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.3.2+1-fea88b7c-SNAPSHOT</rolls.version>
+        <rolls.version>0.3.3+1-8d685d4b-SNAPSHOT</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.3</enumeratum.version>
@@ -461,6 +462,31 @@
                 <configuration>
                     <scmCommentPrefix>[ci skip]</scmCommentPrefix>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

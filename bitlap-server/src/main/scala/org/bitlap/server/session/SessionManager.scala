@@ -10,7 +10,6 @@ import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
@@ -96,7 +95,7 @@ final class SessionManager extends LazyLogging:
   ): Task[Session] =
     ZIO.attemptBlocking {
       SessionManager.sessionAddLock.synchronized {
-        val session = new MemorySession(
+        val session = new SimpleLocalSession(
           username,
           password,
           sessionConf,
@@ -126,58 +125,32 @@ final class SessionManager extends LazyLogging:
       opHandleSet.remove(i)
     }
     logger.info(
-      s"Close session [$sessionHandle], [${getOpenSessionCount}] sessions exists"
+      s"Close session [$sessionHandle], [${sessionStore.size}] sessions exists"
     )
   }
 
-  def getSession(sessionHandle: SessionHandle): Task[Session] = ZIO.attemptBlocking {
-    this.synchronized {
-      val session: Session = SessionManager.sessionAddLock.synchronized {
-        sessionStore.get(sessionHandle)
-      }
-      if session == null then {
-        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
-      }
-      refreshSession(sessionHandle, session)
-      session
+  def getSession(sessionHandle: SessionHandle): Task[Session] =
+    default.withLocalSession(sessionHandle) { session =>
+      ZIO.succeed(session)
     }
-  }
 
-  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ZIO.attemptBlocking {
-    this.synchronized {
-      val session: Session = SessionManager.sessionAddLock.synchronized {
-        sessionStore.get(sessionHandle)
-      }
-      if session == null then {
-        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
-      }
-      refreshSession(sessionHandle, session)
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
+    default.withLocalSession(sessionHandle) { session =>
       session.getInfo(getInfoType)
     }
-  }
 
-  def getOperation(operationHandle: OperationHandle): Task[Operation] = ZIO.attemptBlocking {
-    this.synchronized {
-      val op = operationStore.getOrElse(operationHandle, null)
-      if op == null then {
-        throw BitlapSQLException(s"Invalid OperationHandle: $operationHandle")
-      } else {
-        refreshSession(op.parentSession.sessionHandle, op.parentSession)
-        op.state match {
-          case OperationState.FinishedState => op
-          case _ =>
-            throw BitlapSQLException(s"Invalid OperationState: ${op.state}")
-        }
+  def getOperation(operationHandle: OperationHandle): Task[Operation] =
+    default.withOperation(operationHandle) { operation =>
+      operation.state match {
+        case OperationState.FinishedState => ZIO.succeed(operation)
+        case _ =>
+          ZIO.fail(InternalException(s"Invalid OperationState: ${operation.state}"))
       }
     }
-  }
-
-  private def getOpenSessionCount: Int =
-    sessionStore.size
 
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
     SessionManager.sessionAddLock.synchronized {
-      session.asInstanceOf[MemorySession]._lastAccessTime = System.currentTimeMillis()
+      session.asInstanceOf[SimpleLocalSession].lastAccessTime = System.currentTimeMillis()
       if sessionStore.containsKey(sessionHandle) then {
         sessionStore.put(sessionHandle, session)
       } else {
@@ -185,5 +158,37 @@ final class SessionManager extends LazyLogging:
       }
     }
   end refreshSession
+
+  trait SessionDSL[F[_]] {
+    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => F[A]): F[A]
+    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => F[A]): F[A]
+  }
+
+  // public session operation
+  lazy val default: SessionDSL[Task] = new SessionDSL[Task] {
+
+    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => Task[A]): Task[A] =
+      val op = operationStore.getOrElse(operationHandle, null)
+      if op == null then {
+        ZIO.fail(InternalException(s"Invalid OperationHandle: $operationHandle"))
+      } else {
+        refreshSession(op.parentSession.sessionHandle, op.parentSession)
+        effect(op)
+      }
+
+    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => Task[A]): Task[A] =
+      ZIO.attemptBlocking {
+        // TODO
+        SessionManager.sessionAddLock.synchronized {
+          val session = sessionStore.get(sessionHandle)
+          if session == null then {
+            ZIO.fail(InternalException(s"Invalid SessionHandle: $sessionHandle"))
+          } else {
+            refreshSession(sessionHandle, session)
+            effect(session)
+          }
+        }
+      }.flatten
+  }
 
 end SessionManager

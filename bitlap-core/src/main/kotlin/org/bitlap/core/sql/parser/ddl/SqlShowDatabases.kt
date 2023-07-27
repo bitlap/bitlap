@@ -2,6 +2,7 @@
 package org.bitlap.core.sql.parser.ddl
 
 import org.apache.calcite.DataContext
+import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.SqlWriter
@@ -17,7 +18,7 @@ import org.bitlap.core.sql.parser.BitlapSqlDdlNode
  * Created by IceMimosa
  * Date: 2021/8/25
  */
-class SqlShowDatabases(pos: SqlParserPos) : BitlapSqlDdlNode(pos, OPERATOR, emptyList()) {
+class SqlShowDatabases(pos: SqlParserPos, val pattern: SqlIdentifier?) : BitlapSqlDdlNode(pos, OPERATOR, emptyList()) {
 
     companion object {
         val OPERATOR = SqlSpecialOperator("SHOW DATABASES", SqlKind.OTHER)

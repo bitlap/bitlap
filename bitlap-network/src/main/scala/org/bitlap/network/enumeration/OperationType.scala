@@ -17,8 +17,6 @@ object OperationType extends IntEnum[OperationType]:
 
   case object UnknownOperation extends OperationType(0)
   case object ExecuteStatement extends OperationType(1)
-  case object GetSchemas       extends OperationType(2)
-  case object GetTables        extends OperationType(3)
 
   val values: IndexedSeq[OperationType] = findValues
 

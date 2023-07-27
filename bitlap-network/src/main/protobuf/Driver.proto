@@ -89,23 +89,6 @@ message BColumn {
   // TODO pb does not support inheritance?
   repeated string string_column = 1;
 }
-message BGetTablesReq {
-  BSessionHandle session_handle = 1;
-  string  database = 2;
-  string  pattern = 3;
-}
-
-message BGetTablesResp {
-  BOperationHandle operation_handle = 1;
-}
-message BGetDatabasesReq {
-  BSessionHandle session_handle = 1;
-  string  pattern = 2;
-}
-
-message BGetDatabasesResp {
-  BOperationHandle operation_handle = 1;
-}
 
 message BGetResultSetMetadataReq {
   BOperationHandle operation_handle = 1;
@@ -207,10 +190,6 @@ service DriverService {
   rpc ExecuteStatement (BExecuteStatementReq) returns (BExecuteStatementResp) {}
 
   rpc FetchResults (BFetchResultsReq) returns (BFetchResultsResp) {}
-
-  rpc GetDatabases (BGetDatabasesReq) returns (BGetDatabasesResp) {}
-
-  rpc GetTables (BGetTablesReq) returns (BGetTablesResp) {}
 
   rpc GetResultSetMetadata (BGetResultSetMetadataReq) returns (BGetResultSetMetadataResp) {}
 

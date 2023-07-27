@@ -89,27 +89,6 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
       )
       .mapBoth(errorApplyFunc, _.toBGetResultSetMetadataResp)
 
-  override def getDatabases(
-    request: BGetDatabasesReq,
-    context: RequestContext
-  ): IO[StatusException, BGetDatabasesResp] =
-    driverIO
-      .when(
-        BitlapContext.isLeader,
-        OperationMustOnLeaderException(),
-        _.getDatabases(new SessionHandle(request.getSessionHandle), request.pattern)
-      )
-      .mapBoth(errorApplyFunc, t => BGetDatabasesResp(Option(t.toBOperationHandle())))
-
-  override def getTables(request: BGetTablesReq, context: RequestContext): IO[StatusException, BGetTablesResp] =
-    driverIO
-      .when(
-        BitlapContext.isLeader,
-        OperationMustOnLeaderException(),
-        _.getTables(new SessionHandle(request.getSessionHandle), request.database, request.pattern)
-      )
-      .mapBoth(errorApplyFunc, t => BGetTablesResp(Option(t.toBOperationHandle())))
-
   override def getLeader(request: BGetLeaderReq, context: RequestContext): IO[StatusException, BGetLeaderResp] = {
     val leaderAddress = BitlapContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>

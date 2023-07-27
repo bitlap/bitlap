@@ -1,6 +1,8 @@
 /* Copyright (c) 2023 bitlap.org */
 package org.bitlap.common.utils
 
+import org.bitlap.common.exception.BitlapExceptions
+
 /**
  * Mail: chk19940609@gmail.com
  * Created by IceMimosa
@@ -13,9 +15,9 @@ object PreConditions {
      */
     @JvmStatic
     @JvmOverloads
-    fun <T> checkNotNull(o: T?, key: String = "Object", msg: String = "$key cannot be null."): T {
+    fun <T> checkNotNull(o: T?, key: String = "Object"): T {
         if (o == null) {
-            throw NullPointerException(msg)
+            throw BitlapExceptions.checkNotNullException(key)
         }
         return o
     }
@@ -25,9 +27,9 @@ object PreConditions {
      */
     @JvmStatic
     @JvmOverloads
-    fun checkNotBlank(str: String?, key: String = "string", msg: String = "$key cannot be null or blank."): String {
+    fun checkNotBlank(str: String?, key: String = "string"): String {
         if (str.isNullOrBlank()) {
-            throw IllegalArgumentException(msg)
+            throw BitlapExceptions.checkNotBlankException(key)
         }
         return str
     }
@@ -37,9 +39,9 @@ object PreConditions {
      */
     @JvmStatic
     @JvmOverloads
-    fun <T> checkNotEmpty(collection: Collection<T>?, key: String = "collection", msg: String = "$key cannot be empty."): Collection<T> {
+    fun <T> checkNotEmpty(collection: Collection<T>?, key: String = "collection"): Collection<T> {
         if (collection.isNullOrEmpty()) {
-            throw IllegalArgumentException(msg)
+            throw BitlapExceptions.checkNotEmptyException(key)
         }
         return collection
     }

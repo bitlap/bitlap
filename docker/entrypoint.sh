@@ -5,4 +5,5 @@
 
 sleep 5
 
-./bin/bitlap sql
+
+tail -500f logs/bitlap.log

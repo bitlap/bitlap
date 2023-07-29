@@ -26,11 +26,9 @@
 
 ## docker运行
 
-> tag就是版本号，如：0.4.0-SNAPSHOT
+> tag就是版本号，如：0.4.0-alpha1
 ```
-# 打包
-cd docker;sh docker.sh 0.4.0-SNAPSHOT
-# 运行 
-docker run --name bitlap:0.4.0-SNAPSHOT -dit -p 23333:23333 -p 24333:24333 -p 22333:22333  bitlap:0.4.0-SNAPSHOT
+# 打包、构建镜像、运行
+cd docker;sh deploy.sh 0.4.0-alpha1
 ```
 - 访问 `http://localhost:22333`

@@ -28,7 +28,7 @@
 
 > tag就是版本号，如：0.4.0-alpha1
 ```
-# 打包、构建镜像、运行
+# 打包、构建镜像、运行（默认不运行）
 cd docker;sh deploy.sh 0.4.0-alpha1
 ```
 - 访问 `http://localhost:22333`

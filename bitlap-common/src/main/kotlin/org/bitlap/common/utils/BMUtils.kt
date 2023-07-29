@@ -1,4 +1,6 @@
-/* Copyright (c) 2023 bitlap.org */
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.common.utils
 
 import org.bitlap.common.bitmap.BBM

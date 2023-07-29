@@ -1,4 +1,6 @@
-/* Copyright (c) 2023 bitlap.org */
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.spark
 
 import java.util.{ Map => JMap, Set => JSet }

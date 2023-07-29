@@ -1,4 +1,6 @@
-/* Copyright (c) 2023 bitlap.org */
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.cli
 
 /** bitlap命令行支持的命令

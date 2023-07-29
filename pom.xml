@@ -17,8 +17,8 @@
 
     <licenses>
         <license>
-            <name>MIT</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>Apache-2.0</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -411,7 +411,7 @@
                             <scalaMajorVersion>2.13</scalaMajorVersion>
                         </scalafmt>
                         <licenseHeader>
-                            <content>/* Copyright (c) 2023 bitlap.org */</content>
+                            <file>${user.dir}/license-header</file>
                             <delimiter>package</delimiter>
                         </licenseHeader>
                     </scala>
@@ -428,7 +428,7 @@
                         </ktlint>
 
                         <licenseHeader>
-                            <content>/* Copyright (c) 2023 bitlap.org */</content>
+                            <file>${user.dir}/license-header</file>
                         </licenseHeader>
                     </kotlin>
                 </configuration>

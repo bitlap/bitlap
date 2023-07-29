@@ -6,6 +6,14 @@
 4. Mac、Linux、Windows（不支持在Windows上读写数据）
 5. Docker
 
+## 演示
+
+![bitlap sql](./bitlap_sql.jpg)
+
+## 架构
+
+![](http://ice-img.dreamylost.cn/2021-08-01-165808.png)
+
 ## 模块概述
 
 ***核心模块依赖关系***

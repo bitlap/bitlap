@@ -1,46 +1,53 @@
-# bitlap
+<h1 align="center">Welcome to bitlap 👋</h1>
+<p>
+  <a href="https://github.com/bitlap/bitlap/actions/workflows/ci.yml" target="_blank">
+    <img alt="CI" src="https://github.com/bitlap/bitlap/actions/workflows/ci.yml/badge.svg?cacheSeconds=2592000" />
+  </a>
+  <a href="https://codecov.io/gh/bitlap/bitlap" target="_blank">
+    <img alt="Codecov" src="https://codecov.io/gh/bitlap/bitlap/branch/dev/graph/badge.svg?token=9XJ2LC2K8M&cacheSeconds=2592000" />
+  </a>
+  <a href="https://hub.docker.com/r/liguobin/bitlap/tags" target="_blank">
+    <img alt="Docker" src="https://img.shields.io/docker/v/liguobin/bitlap?cacheSeconds=2592000" />
+  </a>
+  <a href="https://opensource.org/licenses/Apache-2.0" target="_blank">
+    <img alt="License: Apache License 2.0" src="https://img.shields.io/badge/License-Apache License 2.0-yellow.svg" />
+  </a>
+</p>
 
-> 龟速开发中，感兴趣的可以star一下
+> A table schema-less OLAP Analytics Engine for Big Data.
 
-![CI][Badge-CI]  [![codecov][Badge-Codecov]][Link-Codecov]  [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/liguobin/bitlap)](https://hub.docker.com/r/liguobin/bitlap/tags)
+### 🏠 [Homepage](https://bitlap.org/)
+
+### ✨ [Demo](http://im.dreamylost.cn:18081)
+
+## Author
+
+👤 **IceMimosa**
+
+* Github: [@IceMimosa](https://github.com/IceMimosa)
+
+👤 **jxnu-liguobin**
+
+* Github: [@jxnu-liguobin](https://github.com/jxnu-liguobin)
+
+## Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/bitlap/bitlap/graphs/contributors"><img src="https://opencollective.com/bitlap-project/contributors.svg?width=890&button=false" /></a>
 
 
-## 架构
+## 🤝 Contributing
 
-![](http://ice-img.dreamylost.cn/2021-08-01-165808.png)
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/bitlap/bitlap/issues). You can also take a look at the [contributing guide](https://github.com/bitlap/bitlap/blob/dev/CONTRIBUTING.md).
 
-## 演示
+## Show your support
 
-![bitlap sql](./bitlap_sql.jpg)
+Give a ⭐️ if this project helped you!
 
-## 在线测试
+## 📝 License
 
-`http://im.dreamylost.cn:18081`
+Copyright © 2023 [bitlap](https://github.com/bitlap).<br />
+This project is [Apache License 2.0](https://opensource.org/licenses/Apache-2.0) licensed.
 
-## 如何贡献
-
-[CONTRIBUTING](./CONTRIBUTING.md)
-
-## 许可
-
-[LICENSE](./LICENSE)
-
-[Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
-
-[Badge-CI]: https://github.com/bitlap/bitlap/actions/workflows/ci.yml/badge.svg
-
-[Badge-Maven]: https://img.shields.io/maven-central/v/org.bitlap/bitlap
-
-[Badge-Discord]: https://img.shields.io/discord/968687999862841384
-
-[Badge-Codecov]: https://codecov.io/gh/bitlap/bitlap/branch/dev/graph/badge.svg?token=9XJ2LC2K8M
-
-[Badge-Snapshots]: https://img.shields.io/nexus/s/org.bitlap/bitlap-core?server=https%3A%2F%2Fs01.oss.sonatype.org
-
-[Link-Discord]: https://discord.com/invite/vp5stpz6eU
-
-[Link-Codecov]: https://codecov.io/gh/bitlap/bitlap
-
-[Link-Maven]: https://search.maven.org/search?q=g:%22org.bitlap%22%20AND%20a:%22bitlap%22
-
-[Link-Snapshots]: https://s01.oss.sonatype.org/content/repositories/snapshots/org/bitlap/
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_

@@ -90,7 +90,7 @@
         <!-- scala -->
         <scala.version>3.3.0</scala.version>
         <scala.binary.version>3</scala.binary.version>
-        <rolls.version>0.3.3+1-8d685d4b-SNAPSHOT</rolls.version>
+        <rolls.version>0.3.4</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
         <circe.version>0.14.5</circe.version>
         <enumeratum.version>1.7.3</enumeratum.version>

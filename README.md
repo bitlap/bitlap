@@ -1,3 +1,5 @@
+<div align="center"><img src="bitlap.png" center/></div>
+
 <h1 align="center">Welcome to bitlap 👋</h1>
 <p>
   <a href="https://github.com/bitlap/bitlap/actions/workflows/ci.yml" target="_blank">

@@ -37,7 +37,7 @@ jobs:
         working-directory: ./docker
       - name: Login to Docker Hub
         if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

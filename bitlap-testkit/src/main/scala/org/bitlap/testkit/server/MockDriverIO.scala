@@ -14,7 +14,7 @@ import com.google.protobuf.ByteString
 
 import zio.*
 
-/** bitlap RPC server implementation for testing
+/** Bitlap RPC server implementation for testing
  *
  *  使用固定的测试数据: simple_data.csv
  *  @author

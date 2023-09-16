@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 import com.github.javafaker.Faker
 
-/** bitlap Fake Data Creation Tool
+/** Bitlap Fake Data Creation Tool
  *
  *  @author
  *    梦境迷离

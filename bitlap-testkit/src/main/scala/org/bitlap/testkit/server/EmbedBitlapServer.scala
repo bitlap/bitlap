@@ -10,7 +10,7 @@ import org.bitlap.server.service.DriverGrpcService
 import zio.*
 import zio.ZIOAppArgs.getArgs
 
-/** bitlap embedded services include HTTP, GRPC, and Raft
+/** Bitlap embedded services include HTTP, GRPC, and Raft
  *
  *  @author
  *    梦境迷离

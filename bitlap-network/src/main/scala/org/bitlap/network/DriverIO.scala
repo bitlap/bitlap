@@ -4,13 +4,13 @@
 package org.bitlap.network
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.*
 
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-import zio.*
+import zio.{ Task, ZIO }
 
 /** Functional asynchronous RPC API, both for client and server.
  *

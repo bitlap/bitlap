@@ -10,7 +10,8 @@ import com.alipay.sofa.jraft.rpc.RpcRequestClosure
 import com.alipay.sofa.jraft.rpc.RpcRequestProcessor
 import com.google.protobuf.Message
 
-/** 编写raft rpc所需继承的抽象基类
+/** Writing abstract base classes for inheritance required by Raft RPC.
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/31

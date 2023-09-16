@@ -7,7 +7,10 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** 供JDBC使用的同步客户端，本身无逻辑，全部都委托给异步客户端[[org.bitlap.client.AsyncClient]]，但可以为其添加JDBC专属逻辑
+/** The synchronous client used by JDBC has no logic and is all delegated to the asynchronous client
+ *  [[org.bitlap.client.AsyncClient]],
+ *
+ *  but JDBC exclusive logic can be added to it.
  *
  *  @author
  *    梦境迷离

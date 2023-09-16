@@ -8,15 +8,15 @@ import org.bitlap.network.enumeration.*
 
 import com.google.protobuf.ByteString
 
-/** bitlap 数据模型，和数据传输模型（proto）的变换
- *  @author
+/** @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0
  */
 object models:
 
-  /** ADTs，所有类必须继承自此接口，继承类还必须提供toXX和fromXX方法
+  /** ADTs, all classes must inherit from this interface, and inheriting classes must also provide toXX and fromXX
+   *  methods
    */
   sealed trait Model
 

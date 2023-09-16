@@ -31,8 +31,8 @@ object TypeId extends IntEnum[TypeId]:
 
   val values: IndexedSeq[TypeId] = findValues
 
-  def toTypeId(bTypeId: BTypeId): TypeId =
-    TypeId.withValueOpt(bTypeId.value).getOrElse(Unspecified)
+  def toTypeId(typeId: BTypeId): TypeId =
+    TypeId.withValueOpt(typeId.value).getOrElse(Unspecified)
 
   def toBTypeId(typeId: TypeId): BTypeId =
     BTypeId.fromValue(typeId.value)

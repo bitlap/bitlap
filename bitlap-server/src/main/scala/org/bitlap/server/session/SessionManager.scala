@@ -23,7 +23,8 @@ import com.typesafe.scalalogging.LazyLogging
 
 import zio.{ System as _, ZIO, * }
 
-/** bitlap 会话管理器
+/** Bitlap session manager
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/11/20
@@ -43,7 +44,7 @@ object SessionManager extends LazyLogging:
 
   lazy val live: ULayer[SessionManager] = ZLayer.succeed(new SessionManager())
 
-  /** 启动会话监听，超时时清空会话，清空会话相关的操作缓存
+  /** Start session listening, clear session when timeout occurs, and clear session related operation cache
    */
   def startListener(): ZIO[SessionManager & BitlapServerConfiguration, Nothing, Unit] =
     logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")

@@ -23,7 +23,7 @@ import zio.http.codec.*
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
 
-/** bitlap http服务
+/** Bitlap HTTP service
  */
 object HttpServerEndpoint:
 
@@ -65,7 +65,7 @@ final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLiv
 
   private val staticApp: http.HttpApp[Any, Throwable] = Http.collectHttp[Request] {
     case Method.GET -> !! / "init" =>
-      // 使用初始化时，开启这个
+      // When using initialization, enable this
       val properties = new Properties()
       properties.put("bitlapconf:retries", "1")
       properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")

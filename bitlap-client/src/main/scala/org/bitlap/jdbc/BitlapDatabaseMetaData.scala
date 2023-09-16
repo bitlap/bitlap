@@ -14,7 +14,7 @@ import org.bitlap.network.serde.BitlapSerde
 
 import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
 
-/** bitlap 数据库元数据
+/** Bitlap database metadata
  *
  *  @author
  *    梦境迷离

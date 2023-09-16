@@ -15,7 +15,8 @@ import org.bitlap.server.BitlapContext
 
 import zio.*
 
-/** 包装kotlin配置，组成统一的Layer暴露出去
+/** Wrapping kotlin configuration, forming a unified layer exposed.
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2023/5/6

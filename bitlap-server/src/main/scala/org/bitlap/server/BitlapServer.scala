@@ -16,7 +16,8 @@ import zio.{ Duration as ZDuration, * }
 import zio.logging.LogFormat
 import zio.logging.backend.SLF4J
 
-/** bitlap 聚合服务
+/** Bitlap aggregation Services
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/19
@@ -25,7 +26,7 @@ object BitlapServer extends zio.ZIOAppDefault:
 
   private lazy val logger = Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
 
-  // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+  // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
     (for {
       args         <- getArgs

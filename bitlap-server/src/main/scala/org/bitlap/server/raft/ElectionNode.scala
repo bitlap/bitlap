@@ -19,7 +19,8 @@ import com.alipay.sofa.jraft.entity.PeerId
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory
 import com.alipay.sofa.jraft.util.internal.ThrowUtil
 
-/** raft 选主
+/** Raft selection
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28

@@ -13,7 +13,8 @@ import org.slf4j.*
 import com.alipay.sofa.jraft.{ Iterator as JRIterator, Status }
 import com.alipay.sofa.jraft.core.*
 
-/** raft状态机，暂未使用
+/** Raft state machine, not currently in use
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28

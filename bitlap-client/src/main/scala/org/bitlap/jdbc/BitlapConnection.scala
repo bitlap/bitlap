@@ -18,7 +18,7 @@ import org.bitlap.network.handles.*
 
 import bitlap.rolls.core.jdbc.{ columns, sqlQ, ResultSetX, TypeRow1 }
 
-/** bitlap Connection
+/** Bitlap connection
  *
  *  @author
  *    梦境迷离

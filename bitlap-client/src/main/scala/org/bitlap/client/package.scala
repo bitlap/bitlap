@@ -13,7 +13,7 @@ import org.bitlap.network.ServerAddress
 
 private val Separator = ":"
 
-/** 从字符串解析IP:PORT，返回[[org.bitlap.network.ServerAddress]]
+/** Parsing IP:PORT from String, returning [[org.bitlap.network.ServerAddress]].
  */
 extension (serverUri: String)
 
@@ -25,7 +25,8 @@ extension (serverUri: String)
   }
 end extension
 
-/** 从字符串解析Array(IP:PORT,IP:PORT,IP:PORT,...)，返回[[org.bitlap.network.ServerAddress]]的列表
+/** Parsing Array(IP:PORT,IP:PORT,IP:PORT,...) from String, returning a list of the
+ *  [[org.bitlap.network.ServerAddress]].
  */
 extension (serverPeers: Array[String])
 

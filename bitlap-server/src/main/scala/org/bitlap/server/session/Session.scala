@@ -12,7 +12,7 @@ import org.bitlap.network.models.*
 
 import zio.Task
 
-/** bitlap 会话
+/** Bitlap session
  *
  *  @author
  *    梦境迷离

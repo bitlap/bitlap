@@ -5,7 +5,8 @@ package org.bitlap.jdbc
 
 import scala.collection.immutable.ListMap
 
-/** bitlap 连接参数
+/** Bitlap connection parameters
+ *
  *  @author
  *    梦境迷离
  *  @since 2023/3/11

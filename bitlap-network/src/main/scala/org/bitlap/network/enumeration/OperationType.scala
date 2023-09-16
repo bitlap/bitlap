@@ -7,7 +7,8 @@ import org.bitlap.network.Driver.*
 
 import enumeratum.values.*
 
-/** bitlap客户端操作类型
+/** Bitlap client operation type
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/11/20
@@ -22,5 +23,5 @@ object OperationType extends IntEnum[OperationType]:
 
   val values: IndexedSeq[OperationType] = findValues
 
-  def toOperationType(bOperationType: BOperationType): OperationType =
-    OperationType.withValueOpt(bOperationType.value).getOrElse(UnknownOperation)
+  def toOperationType(operationType: BOperationType): OperationType =
+    OperationType.withValueOpt(operationType.value).getOrElse(UnknownOperation)

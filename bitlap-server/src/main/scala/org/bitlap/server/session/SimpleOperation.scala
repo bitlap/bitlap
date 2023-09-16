@@ -14,7 +14,7 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 
-/** bitlap 单机操作实现
+/** Bitlap operation implementation on a single machine
  *
  *  @author
  *    梦境迷离
@@ -32,7 +32,7 @@ final class SimpleOperation(parentSession: Session, opType: OperationType, hasRe
       val colType = TypeId.jdbc2Bitlap.getOrElse(
         metaData.getColumnType(it),
         TypeId.StringType
-      ) // TODO more 暂时不使用TypeId.Unspecified，避免报错
+      ) // TODO temporarily, do not use TypeId.Unspecified to avoid errors
       ColumnDesc(colName, colType)
     }
     // get row set

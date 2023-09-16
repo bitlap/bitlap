@@ -14,7 +14,7 @@ import scalapb.zio_grpc
 import scalapb.zio_grpc.*
 import zio.*
 
-/** bitlap grpc服务
+/** Bitlap GRPC service
  *
  *  @author
  *    梦境迷离

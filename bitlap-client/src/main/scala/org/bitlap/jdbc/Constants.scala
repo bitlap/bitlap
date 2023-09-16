@@ -3,7 +3,8 @@
  */
 package org.bitlap.jdbc
 
-/** bitlap 客户端的常量
+/** bitlap constants for clients
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/8/28

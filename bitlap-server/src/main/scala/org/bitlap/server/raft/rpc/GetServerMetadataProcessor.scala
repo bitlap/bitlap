@@ -15,7 +15,8 @@ import org.bitlap.server.config.BitlapServerConfiguration
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message
 
-/** 使用raft提供的rpc来获取服务自身元数据，提供给[[org.bitlap.server.service.DriverGrpcService.getLeader()]]使用
+/** Use the RPC provided by Raft to obtain the metadata of the service itself, and provide it to
+ *  [[org.bitlap.server.service.DriverGrpcService.getLeader()]].
  *
  *  @author
  *    梦境迷离

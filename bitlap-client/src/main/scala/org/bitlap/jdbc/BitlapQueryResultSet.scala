@@ -13,7 +13,8 @@ import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.network.models.OperationStatus
 
-/** bitlap 查询的结果集
+/** Bitlap result set of the query
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/6/12

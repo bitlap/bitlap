@@ -21,7 +21,8 @@ import com.google.protobuf.ByteString
 
 import zio.{ System as _, * }
 
-/** bitlap 单机会话实现
+/** Bitlap session implementation on a single machine
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2021/12/3

@@ -15,7 +15,7 @@ import io.grpc.*
 import scalapb.zio_grpc.RequestContext
 import zio.*
 
-/** RPC的服务端API实现，基于 zio-grpc,zio 2.0
+/** RPC server API implementation
  *
  *  @author
  *    梦境迷离
@@ -29,7 +29,7 @@ end DriverGrpcService
 
 final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverService[RequestContext]:
 
-  // 直接使用zio-grpc的Status表示错误 避免处理多重错误
+  // Directly using zio grpc's Status to represent errors and avoid handling multiple errors
   override def openSession(request: BOpenSessionReq, context: RequestContext): IO[StatusException, BOpenSessionResp] =
     driverIO
       .when(

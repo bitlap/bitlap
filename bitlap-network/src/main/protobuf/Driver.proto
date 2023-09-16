@@ -179,10 +179,6 @@ message BGetInfoValue {
 
 
 service DriverService {
-  /**
-   * TODO 除了这些底层driver RPC，还需一个bitlap rpc
-   */
-
   rpc OpenSession (BOpenSessionReq) returns (BOpenSessionResp) {}
 
   rpc CloseSession (BCloseSessionReq) returns (BCloseSessionResp) {}

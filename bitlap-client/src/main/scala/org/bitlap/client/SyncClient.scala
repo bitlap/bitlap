@@ -8,7 +8,8 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** 同步的RPC客户端，本身无逻辑，全部都委托给异步客户端 [[org.bitlap.client.AsyncClient]]
+/** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
+ *  [[org.bitlap.client.AsyncClient]].
  *
  *  @author
  *    梦境迷离

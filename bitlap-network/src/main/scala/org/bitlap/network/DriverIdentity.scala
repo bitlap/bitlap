@@ -6,7 +6,8 @@ package org.bitlap.network
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** 函数式同步RPC API，客户端和服务端通用，逻辑应委托给异步RPC[[org.bitlap.network.DriverIO]]，不应自己实现
+/** Functional synchronous RPC API, both for client and server, logic should be delegated to asynchronous RPC
+ *  [[org.bitlap.network.DriverIO]] and should not be implemented on its own.
  *
  *  @author
  *    梦境迷离

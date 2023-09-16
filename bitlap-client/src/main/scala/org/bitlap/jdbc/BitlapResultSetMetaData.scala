@@ -7,7 +7,8 @@ import java.sql.*
 
 import org.bitlap.network.enumeration.TypeId
 
-/** bitlap 结果集的元数据
+/** Bitlap result set metadata
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/6/12

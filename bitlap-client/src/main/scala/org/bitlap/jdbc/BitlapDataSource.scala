@@ -9,7 +9,8 @@ import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
 
-/** bitlap JDBC数据源，目前尚未实现鉴权和连接参数配置。
+/** Bitlap JDBC datasource has not yet implemented authentication and connection parameter configuration.
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/6/12

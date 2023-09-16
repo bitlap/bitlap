@@ -10,7 +10,7 @@ import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** bitlap Statement
+/** Bitlap statement
  *
  *  @author
  *    梦境迷离

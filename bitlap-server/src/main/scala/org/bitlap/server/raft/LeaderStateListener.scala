@@ -3,7 +3,8 @@
  */
 package org.bitlap.server.raft
 
-/** 监听状态机，暂未使用
+/** Monitoring state machine, not currently used
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28

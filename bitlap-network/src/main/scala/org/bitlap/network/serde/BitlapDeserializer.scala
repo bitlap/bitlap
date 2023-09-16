@@ -9,7 +9,8 @@ import java.sql.*
 import org.bitlap.network.NetworkException.DataFormatException
 import org.bitlap.network.enumeration.TypeId
 
-/** 字节数组反序列，尽可能兼容不同类型
+/** Byte array deserialization, compatible with different types as much as possible.
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,11/15/22
@@ -22,7 +23,7 @@ private[network] object BitlapDeserializer:
   private final val TRUE = 1
 
   private[network] def parser(typeId: TypeId) = typeId match
-    // 处理异常和零值
+    // Handling exceptions and zero values
     case TypeId.IntType       => intParser
     case TypeId.LongType      => longParser
     case TypeId.ShortType     => shortParser

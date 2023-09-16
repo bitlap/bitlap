@@ -3,7 +3,7 @@
  */
 package org.bitlap.cli
 
-/** bitlap命令行支持的命令
+/** Bitmap command line supported commands.
  *
  *  @author
  *    梦境迷离

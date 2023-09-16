@@ -9,7 +9,7 @@ import org.bitlap.network.NetworkException.IllegalStateException
 import enumeratum.values.*
 import izumi.reflect.dottyreflection.*
 
-/** bitlap客户端操作的状态
+/** Status of bitlap client operations
  *
  *  @author
  *    梦境迷离
@@ -32,8 +32,8 @@ object OperationState extends IntEnum[OperationState]:
 
   val values: IndexedSeq[OperationState] = findValues
 
-  def toOperationState(bOperationState: BOperationState): OperationState =
-    OperationState.withValueOpt(bOperationState.value).getOrElse(UnknownState)
+  def toOperationState(operationState: BOperationState): OperationState =
+    OperationState.withValueOpt(operationState.value).getOrElse(UnknownState)
 
   def toBOperationState(operationState: OperationState): BOperationState =
     BOperationState.fromValue(operationState.value)

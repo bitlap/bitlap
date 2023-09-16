@@ -61,7 +61,7 @@
         <!--   next version '0.4.0-alpha2' 
            update 'vars.VERSION' before modify 'revision': https://github.com/bitlap/bitlap/settings/variables/actions     
         -->
-        <revision>0.4.0-SNAPSHOT</revision>
+        <revision>0.4.0-alpha2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <frontend.project.name>bitlap-server-ui</frontend.project.name>

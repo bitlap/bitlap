@@ -5,7 +5,7 @@ package org.bitlap.cli
 
 import zio.*
 
-/** 基于zio-cli实现的命令行程序，内部基于sqlline。
+/** A command line program based on zio-cli implementation, internally based on sqlline.
  *
  *  @version zio 2.0
  */

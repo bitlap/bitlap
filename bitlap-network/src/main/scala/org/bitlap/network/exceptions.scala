@@ -9,9 +9,10 @@ import org.bitlap.common.exception.BitlapException
 
 import izumi.reflect.dottyreflection.*
 
-/** 网络层和服务层所有通用异常
+/** All common exceptions at the network and service layers.
  *
- *  异常必须继承自[[org.bitlap.common.exception.BitlapException]]
+ *  Exceptions must inherit from [[org.bitlap.common.exception.BitlapException]]
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/11/20

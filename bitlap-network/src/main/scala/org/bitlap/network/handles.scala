@@ -12,23 +12,15 @@ import org.bitlap.network.enumeration.OperationType
 
 import com.google.protobuf.ByteString
 
-/** 客户端操作的媒介（≈句柄）
- *
- *  @author
+/** @author
  *    梦境迷离
  *  @since 2021/11/20
  *  @version 1.0
  */
 object handles:
 
-  /** 抽象处理器
-   *
-   *  @param handleId
-   *    唯一ID
-   */
   sealed abstract class Handle(val handleId: HandleIdentifier = HandleIdentifier()):
 
-    // super不能直接引用handleId属性
     def getHandleId(): HandleIdentifier = handleId
 
     def this(bHandleIdentifier: BHandleIdentifier) =
@@ -48,12 +40,8 @@ object handles:
       if handleId != otherHandle.handleId then return false
       true
 
-  /** 统一标识符定义
-   */
   final case class HandleIdentifier(value: String = StringEx.uuid(true))
 
-  /** 会话处理器句柄
-   */
   final case class SessionHandle(override val handleId: HandleIdentifier) extends Handle(handleId):
 
     def this(bSessionHandle: BSessionHandle) =

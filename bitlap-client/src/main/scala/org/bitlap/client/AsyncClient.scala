@@ -16,7 +16,7 @@ import org.bitlap.network.models.*
 import io.grpc.*
 import zio.*
 
-/** 异步RPC客户端，基于zio-grpc实现
+/** Asynchronous RPC client, implemented based on zio grpc
  *
  *  @author
  *    梦境迷离
@@ -25,11 +25,13 @@ import zio.*
  */
 final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverIO:
 
-  /** 根据配置的服务集群，获取其leader，构造[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
+  /** Based on the configured service cluster, obtain its leader and construct
+   *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
    *
-   *  客户端使用[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]操作SQL，目前所有操作必须读基于leader。
+   *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
+   *  must be read based on the leader.
    *
-   *  TODO (当leader不存在时，client无法做任何操作)
+   *  TODO (When the leader does not exist, the client cannot perform any operations)
    */
   private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
     ZIO
@@ -42,7 +44,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         clientLayer(f.get.ip, f.get.port)
       }
 
-  /** 根据 IP:PORT 获取grpc channel，考虑leader转移，所以每次都将创建Layer
+  /** Obtain grpc channel based on IP:PORT, considering leader transfer, so Layer will be created every time.
    */
   private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = ZLayer.scoped {
     DriverServiceClient.scoped(

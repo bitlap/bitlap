@@ -9,7 +9,8 @@ import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.exception.BitlapException
 
-/** bitlap 客户端的SQL异常
+/** Bitlap SQL exception on client side
+ *
  *  @author
  *    梦境迷离
  *  @since 2021/11/20

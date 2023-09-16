@@ -4,15 +4,15 @@
 package org.bitlap.network
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.*
 
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-import zio.*
+import zio.{ Runtime, Task, Unsafe, ZIO }
 
-/** 函数式异步RPC API，客户端和服务端通用，基于 zio 2.0
+/** Functional asynchronous RPC API, both for client and server.
  *
  *  @author
  *    梦境迷离
@@ -21,7 +21,7 @@ import zio.*
 trait DriverIO extends DriverX[Task]:
   self =>
 
-  private lazy val timeout = Duration("30s")
+  private lazy val timeout = 30.seconds
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)
 

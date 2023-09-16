@@ -18,7 +18,7 @@ import scala.reflect.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 
-/** bitlap 抽象结果集
+/** Bitlap abstract result Set
  *  @author
  *    梦境迷离
  *  @since 2021/8/23

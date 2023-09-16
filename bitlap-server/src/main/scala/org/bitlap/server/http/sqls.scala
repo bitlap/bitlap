@@ -7,7 +7,7 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 import org.bitlap.common.utils.internal.DBTable
 
-/** Desc: sql 查询的数据封装
+/** Wrapping sql data for queries
  */
 final case class SqlInput(sql: String)
 

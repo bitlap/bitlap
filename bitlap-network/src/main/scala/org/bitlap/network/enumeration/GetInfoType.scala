@@ -30,8 +30,10 @@ object GetInfoType extends IntEnum[GetInfoType] {
 
   val values: IndexedSeq[GetInfoType] = findValues
 
-  def toGetInfoType(bGetInfoType: BGetInfoType): GetInfoType =
-    GetInfoType.withValueOpt(bGetInfoType.value).getOrElse(throw new Exception("Invalid GetInfoType"))
+  def toGetInfoType(getInfoType: BGetInfoType): GetInfoType =
+    GetInfoType
+      .withValueOpt(getInfoType.value)
+      .getOrElse(throw new IllegalArgumentException(s"Invalid GetInfoType: $getInfoType"))
 
   def toBGetInfoType(getInfoType: GetInfoType): BGetInfoType =
     BGetInfoType.fromValue(getInfoType.value)

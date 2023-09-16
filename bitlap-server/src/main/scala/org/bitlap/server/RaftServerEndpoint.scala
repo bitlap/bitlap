@@ -14,7 +14,8 @@ import com.alipay.sofa.jraft.option.NodeOptions
 
 import zio.{ Runtime as _, * }
 
-/** bitlap raft cluster和rpc服务
+/** Bitlap Raft cluster and RPC service
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/28

@@ -16,7 +16,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 import zio.*
 
-/** 异步RPC的服务端实现，基于 zio 2.0
+/** Server side implementation of asynchronous RPC
  *
  *  @author
  *    梦境迷离
@@ -29,7 +29,6 @@ end DriverService
 
 final class DriverService extends DriverIO with LazyLogging:
 
-  // 底层都基于ZIO，错误使用 IO.failed(new Exception)
   override def openSession(
     username: String,
     password: String,

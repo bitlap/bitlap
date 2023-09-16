@@ -19,7 +19,7 @@ class ServerSpec extends CSVUtils {
   Class.forName(classOf[org.bitlap.Driver].getName)
   given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
 
-  // 每个测试都会执行一次，需要修改！
+  // Each test will be executed once and needs to be modified!
   val server = new Thread {
     override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
   }
@@ -42,8 +42,8 @@ class ServerSpec extends CSVUtils {
   def dropTable(): Unit =
     sql"drop table $table cascade"
 
-  // 执行FakeDataUtilSpec 生成新的mock数据
-  // 在java 9以上运行时，需要JVM参数: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+  // Execute FakeDataUtilSpec to generate new mock data
+  // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   @Test
   def query_test1(): Unit = {
     val rs = sql"""

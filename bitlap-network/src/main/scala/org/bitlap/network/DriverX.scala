@@ -7,7 +7,7 @@ import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** 函数式RPC API，客户端和服务端通用
+/** Functional RPC API, both for client and server.
  *
  *  @author
  *    梦境迷离

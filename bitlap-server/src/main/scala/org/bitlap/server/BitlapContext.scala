@@ -19,7 +19,8 @@ import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl
 
 import zio.*
 
-/** bitlap 服务间上下文，用于grpc,http,raft数据依赖
+/** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/10/31

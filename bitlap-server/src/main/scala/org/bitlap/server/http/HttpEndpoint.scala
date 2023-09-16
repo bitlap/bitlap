@@ -15,7 +15,7 @@ import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.json.circe.jsonBody
 
-/** HTTP API 定义描述
+/** HTTP Endpoints description
  *
  *  @author
  *    梦境迷离
@@ -23,12 +23,12 @@ import sttp.tapir.json.circe.jsonBody
  */
 trait HttpEndpoint:
 
-  /** 自定义异常Schema
+  /** Custom Exception Schema
    */
   given Schema[NetworkException] =
     Schema[NetworkException](SchemaType.SProduct(Nil), Some(Schema.SName("NetworkException")))
 
-  /** 自定义异常编解码器
+  /** Custom exception codec
    */
   given exceptionCodec[A <: NetworkException]: JsonCodec[A] =
     implicitly[JsonCodec[io.circe.Json]].map(json =>
@@ -38,11 +38,11 @@ trait HttpEndpoint:
       }
     )(error => error.asJson)
 
-  /** 自定义异常序列化
+  /** Custom exception serialization
    */
   given encodeException[A <: NetworkException]: Encoder[A] = (_: A) => Json.Null
 
-  /** 自定义异常反序列化
+  /** Custom exception deserialization
    */
   given decodeException[A <: NetworkException]: Decoder[A] =
     (c: HCursor) =>
@@ -50,7 +50,7 @@ trait HttpEndpoint:
         msg <- c.get[String]("msg")
       } yield SQLExecutedException(msg = msg).asInstanceOf[A]
 
-  /** restful api描述: api/sql/run
+  /** restful api description: api/sql/run
    *
    *  req: [[org.bitlap.server.http.SqlInput]]
    *
@@ -62,9 +62,9 @@ trait HttpEndpoint:
       .errorOut(jsonBody[NetworkException])
       .out(jsonBody[SqlResult])
 
-  /** restful api描述: api/common/status
+  /** restful api description: api/common/status
    *
-   *  resp: 字符串
+   *  resp: String
    */
   lazy val statusEndpoint: PublicEndpoint[Unit, NetworkException, String, Any] =
     endpoint.get

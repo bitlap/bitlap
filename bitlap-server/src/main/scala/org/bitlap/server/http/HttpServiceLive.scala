@@ -15,7 +15,8 @@ import com.typesafe.scalalogging.LazyLogging
 import dotty.tools.dotc.ast.Trees.ApplyKind.Using
 import zio.*
 
-/** HTTP 具体逻辑实现
+/** HTTP Specific logic implementation
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2023/3/13

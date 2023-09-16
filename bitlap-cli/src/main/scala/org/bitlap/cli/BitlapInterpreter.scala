@@ -20,7 +20,8 @@ import zio.{ Console, System as ZSystem, * }
 import zio.cli.{ Command as ZioCliCommand, * }
 import zio.cli.HelpDoc.Span.text
 
-/** 基于zio-cli实现的命令行解释器
+/** A command line interpreter based on zio-cli implementation.
+ *
  *  @author
  *    梦境迷离
  *  @version 1.0,2022/4/24
@@ -34,7 +35,7 @@ trait BitlapInterpreter {
 
   val bitlapApp: CliApp[Console, IOException, Command] = CliApp.make(
     name = "Bitlap",
-    version = "0.4.0-alpha1",
+    version = "0.4.0-alpha2",
     summary = text("bitlap cli command."),
     command = bitlap
   ) {

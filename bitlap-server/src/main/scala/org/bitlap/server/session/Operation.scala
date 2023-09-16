@@ -16,7 +16,7 @@ import org.bitlap.network.models.*
 
 import com.typesafe.scalalogging.LazyLogging
 
-/** bitlap 操作
+/** Bitlap operation
  *
  *  @author
  *    梦境迷离

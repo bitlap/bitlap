@@ -2,7 +2,7 @@
 
 <h1 align="center">Welcome to bitlap 👋</h1>
 <p>
-  <a href="https://github.com/zio/zio/wiki/Project-Stages" target="_blank">
+  <a href="https://github.com/bitlap/bitlap/wiki/Project-Stages" target="_blank">
     <img alt="Project Status" src="https://img.shields.io/badge/Project%20Stage-Experimental-orange.svg" />
   </a>
   <a href="https://github.com/bitlap/bitlap/actions/workflows/ci.yml" target="_blank">

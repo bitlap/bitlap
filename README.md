@@ -2,6 +2,9 @@
 
 <h1 align="center">Welcome to bitlap 👋</h1>
 <p>
+  <a href="https://github.com/zio/zio/wiki/Project-Stages" target="_blank">
+    <img alt="Project Status" src="https://img.shields.io/badge/Project%20Stage-Experimental-orange.svg" />
+  </a>
   <a href="https://github.com/bitlap/bitlap/actions/workflows/ci.yml" target="_blank">
     <img alt="CI" src="https://github.com/bitlap/bitlap/actions/workflows/ci.yml/badge.svg?cacheSeconds=2592000" />
   </a>
@@ -9,7 +12,7 @@
     <img alt="Codecov" src="https://codecov.io/gh/bitlap/bitlap/branch/dev/graph/badge.svg?token=9XJ2LC2K8M&cacheSeconds=2592000" />
   </a>
   <a href="https://hub.docker.com/r/liguobin/bitlap/tags" target="_blank">
-    <img alt="Docker" src="https://img.shields.io/docker/pulls/liguobin/bitlap.svg" />
+    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/liguobin/bitlap.svg" />
   </a>
   <a href="https://opensource.org/licenses/Apache-2.0" target="_blank">
     <img alt="License: Apache License 2.0" src="https://img.shields.io/badge/License-Apache License 2.0-yellow.svg" />

@@ -1,15 +1,16 @@
-/** Copyright (C) 2023 bitlap.org .
+/**
+ * Copyright (C) 2023 bitlap.org .
  */
 package org.bitlap.core.storage
 
 import java.nio.ByteBuffer
+import java.util
 import java.util.Arrays
+
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.util.Utf8
 import org.apache.parquet.filter2.compat.FilterCompat
 import org.apache.parquet.filter2.predicate.FilterPredicate
-
-import java.util
 
 package object io {
 

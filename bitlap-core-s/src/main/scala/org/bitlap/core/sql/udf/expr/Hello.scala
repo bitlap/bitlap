@@ -3,28 +3,27 @@
  */
 package org.bitlap.core.sql.udf.expr
 
-import org.apache.calcite.sql.`type`.SqlReturnTypeInference
-import org.apache.calcite.sql.`type`.SqlTypeName
 import org.bitlap.core.sql.infer
 import org.bitlap.core.sql.udf.UDF1
 import org.bitlap.core.sql.udf.UDFNames
 
-/**
- * Hello UDF
+import org.apache.calcite.sql.`type`.SqlReturnTypeInference
+import org.apache.calcite.sql.`type`.SqlTypeName
+
+/** Hello UDF
  *
- * expression: hello(expr)
- * return: hello $expr
+ *  expression: hello(expr) return: hello $expr
  */
 class Hello extends UDF1[Any, String] {
 
-    override val name: String = UDFNames.hello
-    override val inputTypes: List[SqlTypeName] = List(SqlTypeName.ANY)
-    override val resultType: SqlReturnTypeInference = SqlTypeName.VARCHAR.infer()
+  override val name: String                       = UDFNames.hello
+  override val inputTypes: List[SqlTypeName]      = List(SqlTypeName.ANY)
+  override val resultType: SqlReturnTypeInference = SqlTypeName.VARCHAR.infer()
 
-    override def eval(input: Any): String = {
-        if (input == null) {
-            return null
-        }
-        return s"hello $input"
+  override def eval(input: Any): String = {
+    if (input == null) {
+      return null
     }
+    return s"hello $input"
+  }
 }

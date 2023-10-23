@@ -1,15 +1,14 @@
-/** Copyright (C) 2023 bitlap.org .
+/**
+ * Copyright (C) 2023 bitlap.org .
  */
 package org.bitlap.core.storage
+
+import java.util.List as JList
 
 import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.BitlapBatchIterator
 import org.bitlap.common.utils.PreConditions
-
-import java.util.List as JList
-
-
 
 /** Batch iterator for metric row
  */

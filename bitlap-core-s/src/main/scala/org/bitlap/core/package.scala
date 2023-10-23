@@ -1,9 +1,13 @@
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap
 
 package object core {
-  
+
   object extension {
-    extension[T] (o: T) {
+
+    extension [T](o: T) {
 
       def also(block: T => Unit): T = {
         block(o)
@@ -14,8 +18,9 @@ package object core {
         block(o)
       }
     }
-    
+
     extension [R <: AutoCloseable](rs: R) {
+
       def use[T](func: R => T): T = {
         try {
           func(rs)
@@ -34,7 +39,7 @@ package object core {
 
   @inline def elapsedWith[T](f: => T): (Long, T) = {
     val start = System.nanoTime()
-    val ret = f
+    val ret   = f
     ((System.nanoTime() - start) / 1000000L, ret)
   }
 }

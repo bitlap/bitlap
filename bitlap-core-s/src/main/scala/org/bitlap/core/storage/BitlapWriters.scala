@@ -3,13 +3,12 @@
  */
 package org.bitlap.core.storage
 
-/**
- * bitlap writers utils
+/** bitlap writers utils
  */
 object BitlapWriters {
 
-    // FileOutputFormat#getUniqueFile
-    def genUniqueFile(txId: String, name: String, extension: String): String = {
-        s"$name-$txId$extension"
-    }
+  // FileOutputFormat#getUniqueFile
+  def genUniqueFile(txId: String, name: String, extension: String): String = {
+    s"$name-$txId$extension"
+  }
 }

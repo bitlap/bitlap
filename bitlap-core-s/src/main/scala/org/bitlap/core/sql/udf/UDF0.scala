@@ -3,15 +3,13 @@
  */
 package org.bitlap.core.sql.udf
 
-/**
- * A generic interface for defining user-defined functions.
+/** A generic interface for defining user-defined functions.
  *
- * [R]: result type
+ *  [R]: result type
  */
 trait UDF0[R] extends UDF {
 
-    /**
-     * eval with no inputs.
-     */
-    def eval(): R
+  /** eval with no inputs.
+   */
+  def eval(): R
 }

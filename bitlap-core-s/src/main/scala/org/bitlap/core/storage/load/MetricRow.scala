@@ -1,4 +1,5 @@
-/** Copyright (C) 2023 bitlap.org .
+/**
+ * Copyright (C) 2023 bitlap.org .
  */
 package org.bitlap.core.storage.load
 

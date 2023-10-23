@@ -3,8 +3,7 @@
  */
 package org.bitlap.core.storage.load
 
-/**
- * if class has a metric key
+/** if class has a metric key
  */
 trait HasMetricKey {
   val metricKey: String

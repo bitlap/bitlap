@@ -3,10 +3,9 @@
  */
 package org.bitlap.core.sql
 
-/**
- * keywords in sql
+/** keywords in sql
  */
 object Keyword {
 
-    val TIME = "_time"
+  val TIME = "_time"
 }

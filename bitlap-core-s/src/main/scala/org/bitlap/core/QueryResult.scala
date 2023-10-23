@@ -5,7 +5,6 @@ package org.bitlap.core
 
 import java.sql.ResultSet
 
-/**
- * Desc: query result
+/** Desc: query result
  */
 case class QueryResult(data: ResultSet, currentSchema: String)

@@ -1,4 +1,5 @@
-/** Copyright (C) 2023 bitlap.org .
+/**
+ * Copyright (C) 2023 bitlap.org .
  */
 package org.bitlap.core.sql
 
@@ -31,7 +32,7 @@ object QueryContext {
   def get(): QueryContext = context.get()
 
   def reset() = context.remove()
-  
+
   def use[T](block: (QueryContext) => T): T = {
     try {
       reset()

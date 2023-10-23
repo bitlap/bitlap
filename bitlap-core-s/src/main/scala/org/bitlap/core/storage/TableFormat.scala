@@ -1,22 +1,25 @@
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.core.storage
 
-import org.apache.hadoop.fs.FileSystem
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.storage.io.BitlapParquetProvider
 
-/**
- * table format implemtation.
+import org.apache.hadoop.fs.FileSystem
+
+/** table format implemtation.
  */
 enum TableFormat(val name: String) {
-  /**
-   * default implementation
+
+  /** default implementation
    */
   case PARQUET extends TableFormat("parquet")
 
   def getProvider(table: Table, fs: FileSystem): TableFormatProvider = {
     name match
       case "parquet" => BitlapParquetProvider(table, fs)
-      case _ => throw NotImplementedError()
+      case _         => throw NotImplementedError()
   }
 }
 

@@ -6,17 +6,16 @@ package org.bitlap.core.sql
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.sql.SqlNode
 
-/**
- * sql plan
+/** sql plan
  */
 case class BitlapSqlPlan(
-    val statement: String,
-    val sqlNode: SqlNode,
-    val rel: RelNode,
-    val relOpt: RelNode // optimized rel
+  val statement: String,
+  val sqlNode: SqlNode,
+  val rel: RelNode,
+  val relOpt: RelNode // optimized rel
 ) {
 
-    def explain(): String = {
-        return this.relOpt.explain()
-    }
+  def explain(): String = {
+    return this.relOpt.explain()
+  }
 }

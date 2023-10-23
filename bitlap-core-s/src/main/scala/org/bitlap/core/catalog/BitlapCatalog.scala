@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.core.catalog
 
 import org.bitlap.core.catalog.metadata.Database

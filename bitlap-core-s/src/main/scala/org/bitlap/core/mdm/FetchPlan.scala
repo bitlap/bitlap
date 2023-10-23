@@ -5,33 +5,27 @@ package org.bitlap.core.mdm
 
 import org.bitlap.core.mdm.model.RowIterator
 
-/**
- * Fetch plan
+/** Fetch plan
  */
 trait FetchPlan {
 
-  /**
-   * sub plans
+  /** sub plans
    */
   val subPlans: List[FetchPlan]
 
-  /**
-   * if optimized for current plan
+  /** if optimized for current plan
    */
   var optimized: Boolean = false
 
-  /**
-   * execute current plan
+  /** execute current plan
    */
   def execute(context: FetchContext): RowIterator
 
-  /**
-   * execute plan graph
+  /** execute plan graph
    */
   def explain(depth: Int = 0): String
 
-  /**
-   * fetch data with computed fetcher.
+  /** fetch data with computed fetcher.
    */
   def withFetcher[R](context: FetchContext)(fetch: (Fetcher) => R): R = {
     return fetch(context.findBestFetcher(this))

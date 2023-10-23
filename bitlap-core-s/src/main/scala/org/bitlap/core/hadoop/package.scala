@@ -1,19 +1,22 @@
+/**
+ * Copyright (C) 2023 bitlap.org .
+ */
 package org.bitlap.core
+
+import scala.util.Using
+
+import org.bitlap.common.utils.JsonEx
+import org.bitlap.core.catalog.metadata.Table
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
-import org.bitlap.common.utils.JsonEx
-import org.bitlap.core.catalog.metadata.Table
-
-import scala.util.Using
 
 package object hadoop {
 
   extension (fs: FileSystem) {
 
-    /**
-     * Write bitlap table schema.
+    /** Write bitlap table schema.
      */
     def writeTable(tableDir: Path, table: Table): Boolean = {
       Using.resource(fs.create(Path(tableDir, ".table"), true)) { o =>
@@ -22,20 +25,18 @@ package object hadoop {
       return true
     }
 
-    /**
-     * Read bitlap table schema.
+    /** Read bitlap table schema.
      */
     def readTable(tableDir: Path): Table = {
-        return Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
-          JsonEx.jsonAs(in.readUTF(), classOf[Table])
-        }
+      return Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
+        JsonEx.jsonAs(in.readUTF(), classOf[Table])
+      }
     }
 
-    /**
-     * clone conf
+    /** clone conf
      */
     def newConf(): Configuration = {
-        return Configuration(fs.getConf)
+      return Configuration(fs.getConf)
     }
   }
 }

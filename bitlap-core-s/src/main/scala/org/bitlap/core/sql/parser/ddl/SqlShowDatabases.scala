@@ -3,34 +3,31 @@
  */
 package org.bitlap.core.sql.parser.ddl
 
-import org.apache.calcite.DataContext
-import org.apache.calcite.sql.{SqlIdentifier, SqlKind, SqlNode, SqlSpecialOperator, SqlWriter}
-import org.apache.calcite.sql.parser.SqlParserPos
-import org.apache.calcite.sql.`type`.SqlTypeName
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
-/**
- * Desc:
- *    Parse tree for `SHOW (DATABASES | SCHEMAS)` statement.
+import org.apache.calcite.DataContext
+import org.apache.calcite.sql.`type`.SqlTypeName
+import org.apache.calcite.sql.{ SqlIdentifier, SqlKind, SqlNode, SqlSpecialOperator, SqlWriter }
+import org.apache.calcite.sql.parser.SqlParserPos
+
+/** Desc: Parse tree for `SHOW (DATABASES | SCHEMAS)` statement.
  *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/8/25
+ *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/25
  */
-class SqlShowDatabases(override val _pos: SqlParserPos, val pattern: SqlIdentifier) extends BitlapSqlDdlNode(_pos, SqlShowDatabases.OPERATOR, List.empty[SqlNode]) {
+class SqlShowDatabases(override val _pos: SqlParserPos, val pattern: SqlIdentifier)
+    extends BitlapSqlDdlNode(_pos, SqlShowDatabases.OPERATOR, List.empty[SqlNode]) {
 
-    override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
-        writer.keyword("SHOW DATABASES")
-    }
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+    writer.keyword("SHOW DATABASES")
+  }
 
-    override val resultTypes: List[(String, SqlTypeName)]
-        = List(
-            "database_name" -> SqlTypeName.VARCHAR
-        )
+  override val resultTypes: List[(String, SqlTypeName)] = List(
+    "database_name" -> SqlTypeName.VARCHAR
+  )
 
-    override def operator(context: DataContext): List[Array[Any]] = {
-        return catalog.listDatabases().map { it => Array(it.name) }
-    }
+  override def operator(context: DataContext): List[Array[Any]] = {
+    return catalog.listDatabases().map { it => Array(it.name) }
+  }
 }
 
 object SqlShowDatabases {

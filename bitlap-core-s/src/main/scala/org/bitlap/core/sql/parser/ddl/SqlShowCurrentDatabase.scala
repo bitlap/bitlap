@@ -3,30 +3,29 @@
  */
 package org.bitlap.core.sql.parser.ddl
 
-import org.apache.calcite.DataContext
-import org.apache.calcite.sql.{SqlKind, SqlNode, SqlSpecialOperator}
-import org.apache.calcite.sql.parser.SqlParserPos
-import org.apache.calcite.sql.`type`.SqlTypeName
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
-/**
- *  Parse tree for `SHOW current_database` statement.
+import org.apache.calcite.DataContext
+import org.apache.calcite.sql.`type`.SqlTypeName
+import org.apache.calcite.sql.{ SqlKind, SqlNode, SqlSpecialOperator }
+import org.apache.calcite.sql.parser.SqlParserPos
+
+/** Parse tree for `SHOW current_database` statement.
  */
 class SqlShowCurrentDatabase(
-    override val _pos: SqlParserPos
-) extends BitlapSqlDdlNode(_pos, SqlShowCurrentDatabase.OPERATOR, List.empty[SqlNode]) {
+  override val _pos: SqlParserPos)
+    extends BitlapSqlDdlNode(_pos, SqlShowCurrentDatabase.OPERATOR, List.empty[SqlNode]) {
 
-    override val resultTypes: List[(String, SqlTypeName)]
-        = List(
-            "database_name" -> SqlTypeName.VARCHAR
-        )
+  override val resultTypes: List[(String, SqlTypeName)] = List(
+    "database_name" -> SqlTypeName.VARCHAR
+  )
 
-    override def operator(context: DataContext): List[Array[Any]] = {
-        return List(
-            Array(QueryContext.get().currentSchema) // must exist
-        )
-    }
+  override def operator(context: DataContext): List[Array[Any]] = {
+    return List(
+      Array(QueryContext.get().currentSchema) // must exist
+    )
+  }
 }
 
 object SqlShowCurrentDatabase {

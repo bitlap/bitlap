@@ -1,4 +1,5 @@
-/** Copyright (C) 2023 bitlap.org .
+/**
+ * Copyright (C) 2023 bitlap.org .
  */
 package org.bitlap.core.sql.rel
 
@@ -42,11 +43,11 @@ class BitlapProject(
     projects: JList[RexNode],
     rowType: RelDataType
   ): BitlapProject = {
-    return BitlapProject(getCluster, traitSet, getHints, input, projects, rowType, Collections.emptySet(), parent)
+    BitlapProject(getCluster, traitSet, getHints, input, projects, rowType, Collections.emptySet(), parent)
   }
 
   override def withHints(hintList: JList[RelHint]): RelNode = {
-    return BitlapProject(
+    BitlapProject(
       getCluster,
       getTraitSet,
       hintList,
@@ -59,14 +60,14 @@ class BitlapProject(
   }
 
   override def deepHashCode(): Int = {
-    return super.deepHashCode0()
+    super.deepHashCode0()
   }
 
   override def deepEquals(obj: Any): Boolean = {
-    return super.deepEquals0(obj)
+    super.deepEquals0(obj)
   }
 
   def copy(input: RelNode, rowType: RelDataType, projects: JList[RexNode]): BitlapProject = {
-    return BitlapProject(getCluster, traitSet, getHints, input, projects, rowType, parent)
+    BitlapProject(getCluster, traitSet, getHints, input, projects, rowType, parent)
   }
 }

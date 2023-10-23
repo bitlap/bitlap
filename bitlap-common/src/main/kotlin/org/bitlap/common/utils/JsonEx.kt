@@ -28,6 +28,11 @@ object JsonEx {
     }
 
     @JvmStatic
+    fun <T> String.jsonAs(clazz: Class<T>): T {
+        return gson.fromJson(this, clazz)
+    }
+
+    @JvmStatic
     fun String?.jsonAsMap(): Map<String, String> {
         if (this.isNullOrBlank()) return emptyMap()
         return gson.fromJson(this, object : TypeToken<Map<String, String>>() {}.type)

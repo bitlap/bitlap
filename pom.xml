@@ -54,6 +54,7 @@
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
         <module>bitlap-testkit</module>
+        <module>bitlap-core-s</module>
     </modules>
 
     <properties>
@@ -92,6 +93,7 @@
         <scala.binary.version>3</scala.binary.version>
         <rolls.version>0.3.3+1-8d685d4b-SNAPSHOT</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>
+        <scala.parallel.collection>1.0.4</scala.parallel.collection>
         <circe.version>0.14.6</circe.version>
         <enumeratum.version>1.7.3</enumeratum.version>
         <zio.version>2.0.16</zio.version>
@@ -169,6 +171,11 @@
             <groupId>com.typesafe.scala-logging</groupId>
             <artifactId>scala-logging_${scala.binary.version}</artifactId>
             <version>${scala.logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-parallel-collections_${scala.binary.version}</artifactId>
+            <version>${scala.parallel.collection}</version>
         </dependency>
 
         <!-- test  -->

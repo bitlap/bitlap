@@ -59,6 +59,7 @@ data class EventWithDimId(
 ) : Event {
 
     companion object {
+        @JvmStatic
         fun from(e: Event, withMetricValue: Boolean = true) =
             if (withMetricValue) {
                 EventWithDimId(e.time, e.entity, e.dimension, e.metric)

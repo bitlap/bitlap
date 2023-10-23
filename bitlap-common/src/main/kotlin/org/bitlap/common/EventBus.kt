@@ -27,8 +27,17 @@ open class EventBus(
     }
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified E : BitlapEvent> post(e: E): EventBus {
+    inline fun <reified E : BitlapEvent> postK(e: E): EventBus {
         this.subscribers[E::class.java]?.forEach {
+            executor.execute {
+                (it as BitlapSubscriber<E>).invoke(e)
+            }
+        }
+        return this
+    }
+
+    fun <E : BitlapEvent> post(e: E): EventBus {
+        this.subscribers[e.javaClass]?.forEach {
             executor.execute {
                 (it as BitlapSubscriber<E>).invoke(e)
             }

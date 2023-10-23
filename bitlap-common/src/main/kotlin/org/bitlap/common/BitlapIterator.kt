@@ -23,17 +23,20 @@ abstract class BitlapIterator<E> : Iterator<E>, Closeable {
     }
 
     companion object {
+        @JvmStatic
         fun <R> empty() = object : BitlapIterator<R>() {
             override fun next(): R = null!! // should never be here
             override fun hasNext(): Boolean = false
         }
 
+        @JvmStatic
         fun <R> of(rows: Iterable<R>) = object : BitlapIterator<R>() {
             private val it = rows.iterator()
             override fun next(): R = it.next()
             override fun hasNext(): Boolean = it.hasNext()
         }
 
+        @JvmStatic
         fun <R> batch(rows: Iterable<R>, batchSize: Int = 100) = object : BitlapBatchIterator<R>() {
             private val splits = rows.chunked(batchSize).iterator()
             override fun hasNext() = splits.hasNext() || super.hasNext()

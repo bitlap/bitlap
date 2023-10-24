@@ -33,7 +33,7 @@ object extension {
   }
 }
 
-inline def elapsed[T](f: => T): Long = this.elapsedWith(f)._1
+inline def elapsed[T](f: => T): Long = elapsedWith(f)._1
 
 inline def elapsedWith[T](f: => T): (Long, T) = {
   val start = System.nanoTime()

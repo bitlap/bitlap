@@ -33,7 +33,7 @@ class BitlapTableConverter extends AbsRelRule(classOf[BitlapTableScan], "BitlapT
       else
         BitlapSqlQueryMetricTable(oTable.table, rel.timeFilter, rel.pruneFilter)
 
-    return rel
+    rel
       .withTable(
         RelOptTableImpl.create(
           optTable.getRelOptSchema,

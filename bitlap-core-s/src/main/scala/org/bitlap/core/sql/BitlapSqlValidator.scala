@@ -24,7 +24,7 @@ class BitlapSqlValidator(
   private val queryContext = QueryContext.get()
 
   override def validate(topNode: SqlNode): SqlNode = {
-    return super.validate(topNode)
+    super.validate(topNode)
   }
 
   override def validateSelect(select: SqlSelect, targetRowType: RelDataType): Unit = {

@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
  */
 type TimeFilterFun = (Long) => Boolean
 
-case class PruneTimeFilterExpr(val name: String, val func: TimeFilterFun, val expr: String)
+case class PruneTimeFilterExpr(name: String, func: TimeFilterFun, expr: String)
 
 class PruneTimeFilter extends Serializable {
 
@@ -24,13 +24,13 @@ class PruneTimeFilter extends Serializable {
 
   /** merge conditions into one
    */
-  def mergeCondition(): TimeFilterFun = {
-    return i => {
+  def mergeCondition(): TimeFilterFun = { i =>
+    {
       this.conditions.map(_.func).forall(_(i))
     }
   }
 
   override def toString: String = {
-    return this.conditions.map(_.expr).toString
+    this.conditions.map(_.expr).toString
   }
 }

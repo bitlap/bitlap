@@ -29,14 +29,14 @@ class BitlapTableFilterScan(
     extends BitlapTableScan(cluster, traitSet, hints, table, _parent) {
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    return super
+    super
       .explainTerms(pw)
       .item("timeFilter", timeFilter)
       .item("pruneFilter", pruneFilter)
   }
 
   override def withHints(hintList: JList[RelHint]): RelNode = {
-    return BitlapTableFilterScan(
+    BitlapTableFilterScan(
       getCluster,
       getTraitSet,
       hintList,
@@ -49,7 +49,7 @@ class BitlapTableFilterScan(
   }
 
   override def withTable(table: RelOptTable): BitlapTableFilterScan = {
-    return BitlapTableFilterScan(
+    BitlapTableFilterScan(
       getCluster,
       getTraitSet,
       getHints,
@@ -62,6 +62,6 @@ class BitlapTableFilterScan(
   }
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode]): RelNode = {
-    return this
+    this
   }
 }

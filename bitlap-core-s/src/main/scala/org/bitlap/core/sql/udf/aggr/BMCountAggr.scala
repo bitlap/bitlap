@@ -25,28 +25,25 @@ class BMCountAggr extends UDAF[(Number, BM), Any, Number] {
 
   override def add(accumulator: (Number, BM), input: Any): (Number, BM) = {
     val (l, r) = accumulator
-    return input match {
-      case meta: RowValueMeta => {
+    input match {
+      case meta: RowValueMeta =>
         Long.box(l.longValue() + meta(1).longValue()) -> r
-      }
-      case bm: BM => {
+      case bm: BM =>
         l -> r.or(bm)
-      }
-      case _ => {
+      case _ =>
         throw IllegalArgumentException(s"Invalid input type: ${input.getClass}")
-      }
     }
   }
 
   override def merge(accumulator1: (Number, BM), accumulator2: (Number, BM)): (Number, BM) = {
     val (l1, r1) = accumulator1
     val (l2, r2) = accumulator2
-    return Long.box(l1.longValue() + l2.longValue()) -> (r1.or(r2))
+    Long.box(l1.longValue() + l2.longValue()) -> (r1.or(r2))
   }
 
   override def result(accumulator: (Number, BM)): Number = {
     val (l, r) = accumulator
     val result = r.getCount.toLong
-    return if (result != 0L) Long.box(result) else l
+    if (result != 0L) Long.box(result) else l
   }
 }

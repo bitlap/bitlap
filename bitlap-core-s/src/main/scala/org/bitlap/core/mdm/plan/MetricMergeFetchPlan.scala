@@ -30,7 +30,7 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
     if (this.subPlans.size == 1) {
       return this.subPlans.head.execute(context)
     }
-    val rowsSet = this.subPlans.map(_.execute(context)).toList // TODO: par
+    val rowsSet = this.subPlans.map(_.execute(context)) // TODO: par
 
     // reset key and value types from 0, 1, 2, ...
     val resultKeyTypes = this.getKeyTypes(rowsSet).zipWithIndex.map { case (dt, idx) =>
@@ -81,7 +81,7 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
       }
       offset += valueTypes.size
     }
-    return RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
+    RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
   }
 
   private def getKeyTypes(rowsSet: List[RowIterator]): List[DataType] = {
@@ -94,15 +94,15 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
       )
       a
     }
-    return rowsSet.head.getTypes(keyNames)
+    rowsSet.head.getTypes(keyNames)
   }
 
   private def getValueTypes(rowsSet: List[RowIterator]): List[DataType] = {
     PreConditions.checkNotEmpty(rowsSet.asJava)
-    return rowsSet.map { r => r.valueTypes }.reduce { case (a, b) => a ++ b }
+    rowsSet.map { r => r.valueTypes }.reduce { case (a, b) => a ++ b }
   }
 
   override def explain(depth: Int): String = {
-    return s"${" ".repeat(depth)}+- MetricMergeFetchPlan\n${this.subPlans.map(_.explain(depth + 2)).mkString("\n")}"
+    s"${" ".repeat(depth)}+- MetricMergeFetchPlan\n${this.subPlans.map(_.explain(depth + 2)).mkString("\n")}"
   }
 }

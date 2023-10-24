@@ -36,7 +36,7 @@ trait BitlapSqlDdlRel {
    */
   def rel(relBuilder: RelBuilder): RelNode = {
     val table = BitlapSqlDdlTable(this.resultTypes, this.operator)
-    return LogicalTableScan.create(
+    LogicalTableScan.create(
       relBuilder.getCluster,
       RelOptTableImpl.create(
         null,

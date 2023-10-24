@@ -34,11 +34,11 @@ class BitlapAggregate(
     groupSets: JList[ImmutableBitSet],
     aggCalls: JList[AggregateCall]
   ): Aggregate = {
-    return BitlapAggregate(getCluster, traitSet, getHints, input, groupSet, groupSets, aggCalls, parent)
+    BitlapAggregate(getCluster, traitSet, getHints, input, groupSet, groupSets, aggCalls, parent)
   }
 
   override def withHints(hintList: JList[RelHint]): RelNode = {
-    return BitlapAggregate(
+    BitlapAggregate(
       getCluster,
       getTraitSet,
       hintList,
@@ -51,10 +51,10 @@ class BitlapAggregate(
   }
 
   def withAggCalls(aggCalls: JList[AggregateCall]): BitlapAggregate = {
-    return BitlapAggregate(getCluster, getTraitSet, getHints, getInput, getGroupSet, getGroupSets, aggCalls, parent)
+    BitlapAggregate(getCluster, getTraitSet, getHints, getInput, getGroupSet, getGroupSets, aggCalls, parent)
   }
 
   def copy(input: RelNode, aggCalls: JList[AggregateCall]): BitlapAggregate = {
-    return BitlapAggregate(getCluster, getTraitSet, getHints, input, getGroupSet, getGroupSets, aggCalls, parent)
+    BitlapAggregate(getCluster, getTraitSet, getHints, input, getGroupSet, getGroupSets, aggCalls, parent)
   }
 }

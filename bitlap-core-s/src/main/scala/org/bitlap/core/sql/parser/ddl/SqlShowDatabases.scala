@@ -17,7 +17,7 @@ import org.apache.calcite.sql.parser.SqlParserPos
 class SqlShowDatabases(override val _pos: SqlParserPos, val pattern: SqlIdentifier)
     extends BitlapSqlDdlNode(_pos, SqlShowDatabases.OPERATOR, List.empty[SqlNode]) {
 
-  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int): Unit = {
     writer.keyword("SHOW DATABASES")
   }
 
@@ -26,7 +26,7 @@ class SqlShowDatabases(override val _pos: SqlParserPos, val pattern: SqlIdentifi
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return catalog.listDatabases().map { it => Array(it.name) }
+    catalog.listDatabases().map { it => Array(it.name) }
   }
 }
 

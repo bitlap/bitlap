@@ -34,7 +34,7 @@ class SqlDropTable(
     "result" -> SqlTypeName.BOOLEAN
   )
 
-  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int): Unit = {
     writer.keyword("DROP TABLE")
     if (_ifExists) {
       writer.keyword("IF EXISTS")
@@ -49,7 +49,7 @@ class SqlDropTable(
     } else {
       catalog.dropTable(splits.get(1), splits.get(0), ifExists, cascade)
     }
-    return List(Array(result))
+    List(Array(result))
   }
 }
 

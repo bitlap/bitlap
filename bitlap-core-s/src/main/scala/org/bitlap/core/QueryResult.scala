@@ -7,4 +7,4 @@ import java.sql.ResultSet
 
 /** Desc: query result
  */
-case class QueryResult(data: ResultSet, currentSchema: String)
+final case class QueryResult(data: ResultSet, currentSchema: String)

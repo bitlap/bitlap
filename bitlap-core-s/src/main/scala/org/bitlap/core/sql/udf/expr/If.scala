@@ -24,6 +24,6 @@ class If extends UDF3[Boolean, Any, Any, Any] {
     if (input1) {
       return input2
     }
-    return input3
+    input3
   }
 }

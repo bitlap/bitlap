@@ -5,9 +5,10 @@ package org.bitlap.core.sql.parser
 
 import java.util.List as JList
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import org.bitlap.core.BitlapContext
+import org.bitlap.core.catalog.BitlapCatalog
 
 import org.apache.calcite.sql.SqlDrop
 import org.apache.calcite.sql.SqlNode
@@ -24,8 +25,8 @@ abstract class BitlapSqlDdlDropNode(
     extends SqlDrop(op, _pos, _ifExists)
     with BitlapSqlDdlRel {
 
-  protected val catalog = BitlapContext.catalog
+  protected val catalog: BitlapCatalog = BitlapContext.catalog
 
-  override def getOperator(): SqlOperator       = this.op
-  override def getOperandList(): JList[SqlNode] = this.operands.asJava
+  override def getOperator: SqlOperator       = this.op
+  override def getOperandList: JList[SqlNode] = this.operands.asJava
 }

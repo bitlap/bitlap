@@ -14,8 +14,8 @@ class ValidRule extends AbsRelRule(classOf[BitlapNode], "ValidRule") {
 
   override def convert0(_rel: RelNode, call: RelOptRuleCall): RelNode = {
     _rel match {
-      case rel: BitlapTableScan => {
-        val table   = rel.getOTable()
+      case rel: BitlapTableScan =>
+        val table   = rel.getOTable
         val dimCols = table.analyzer.getFilterColNames
         // check time filter
         if (!dimCols.contains(Keyword.TIME)) {
@@ -28,8 +28,8 @@ class ValidRule extends AbsRelRule(classOf[BitlapNode], "ValidRule") {
             s"Query must contain at least one aggregation metric, aggregation column must be specified"
           )
         }
-      }
+      case _ =>
     }
-    return _rel
+    _rel
   }
 }

@@ -24,8 +24,6 @@ import org.apache.calcite.plan.hep.HepPlanner
 import org.apache.calcite.plan.hep.HepProgramBuilder
 import org.apache.calcite.plan.volcano.VolcanoPlanner
 import org.apache.calcite.prepare.CalciteCatalogReader
-import org.apache.calcite.prepare.PlannerImpl
-import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rex.RexBuilder
 import org.apache.calcite.runtime.Hook
 import org.apache.calcite.schema.SchemaPlus
@@ -53,12 +51,11 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
         ctx.originalPlan = it
       }
     }
-    return _sqlNode match {
-      case sqlNode: BitlapSqlDdlRel => {
+    _sqlNode match {
+      case sqlNode: BitlapSqlDdlRel =>
         val rel = sqlNode.rel(RelBuilder.create(config))
         BitlapSqlPlan(statement, sqlNode, rel, rel)
-      }
-      case sqlNode => {
+      case sqlNode =>
         // 1. validate sql plan
         val validator = this.buildValidator(config)
         val sqlNodeV  = validator.validate(sqlNode)
@@ -103,7 +100,6 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
           hepPlanner.findBestExp()
         }
         BitlapSqlPlan(statement, sqlNode, root.rel, relNode)
-      }
     }
   }
 
@@ -127,7 +123,7 @@ class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
       connConfig
     )
 
-    return BitlapSqlValidator(
+    BitlapSqlValidator(
       config.getOperatorTable,
       catalogReader,
       sqlValidatorConfig

@@ -27,7 +27,7 @@ class MetricFetchPlan(
       "",
       s"MetricFetchPlan's metrics $metrics must have only one metric type ${metricType.getName}"
     )
-    return withFetcher(context) { fetcher =>
+    withFetcher(context) { fetcher =>
       dimension match {
         case null =>
           fetcher.fetchMetrics(
@@ -50,6 +50,6 @@ class MetricFetchPlan(
   }
 
   override def explain(depth: Int): String = {
-    return s"${" ".repeat(depth)}+- MetricFetchPlan (metrics: $metrics, metricType: ${metricType.getSimpleName}, dimension: $dimension, timeFilter: $timeFilter, pushedFilter: $pushedFilter)"
+    s"${" ".repeat(depth)}+- MetricFetchPlan (metrics: $metrics, metricType: ${metricType.getSimpleName}, dimension: $dimension, timeFilter: $timeFilter, pushedFilter: $pushedFilter)"
   }
 }

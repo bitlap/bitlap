@@ -10,7 +10,5 @@ abstract class DataType extends Serializable {
   val name: String
   val idx: Int
 
-  override def toString: String = {
-    return s"$name#$idx"
-  }
+  override def toString: String = s"$name#$idx"
 }

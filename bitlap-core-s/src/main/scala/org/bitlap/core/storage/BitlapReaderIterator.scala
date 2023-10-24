@@ -20,22 +20,22 @@ open class BitlapReaderIterator[R](private val reader: BitlapReader[R], private 
 
   override def nextBatch(): JList[R] = {
     this.checkOpen()
-    return this.reader.read(limit).asJava
+    this.reader.read(limit).asJava
   }
 
-  override def hasNext(): Boolean = {
+  override def hasNext: Boolean = {
     this.checkOpen()
     val has = this.reader.hasNext || super.hasNext
     // auto close
     if (!has) {
       this.close()
     }
-    return has
+    has
   }
 
   override def next(): R = {
     this.checkOpen()
-    return super.next()
+    super.next()
   }
 
   override def close(): Unit = {

@@ -23,16 +23,13 @@ class BMSumAggr extends UDAF[Number, Any, Number] {
   override def init(): Number = 0.0
 
   override def add(accumulator: Number, input: Any): Number = {
-    return input match {
-      case meta: RowValueMeta => {
+    input match {
+      case meta: RowValueMeta =>
         accumulator.doubleValue() + meta(2).doubleValue()
-      }
-      case cbm: CBM => {
+      case cbm: CBM =>
         accumulator.doubleValue() + cbm.getCount
-      }
-      case _ => {
+      case _ =>
         throw IllegalArgumentException(s"Invalid input type: ${input.getClass}")
-      }
     }
   }
 

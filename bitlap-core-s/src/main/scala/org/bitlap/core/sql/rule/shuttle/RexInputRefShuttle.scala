@@ -11,8 +11,8 @@ class RexInputRefShuttle private (val call: RexNode) extends RexShuttle {
 
   private val refs = scala.collection.mutable.Set[RexInputRef]()
 
-  def getInputRefs(): List[RexInputRef] = {
-    return refs.toList
+  def getInputRefs: List[RexInputRef] = {
+    refs.toList
   }
 
   private def init(): RexInputRefShuttle = {
@@ -22,7 +22,7 @@ class RexInputRefShuttle private (val call: RexNode) extends RexShuttle {
 
   override def visitInputRef(inputRef: RexInputRef): RexNode = {
     refs.add(inputRef)
-    return super.visitInputRef(inputRef)
+    super.visitInputRef(inputRef)
   }
 
 }
@@ -30,6 +30,6 @@ class RexInputRefShuttle private (val call: RexNode) extends RexShuttle {
 object RexInputRefShuttle {
 
   def of(call: RexNode): RexInputRefShuttle = {
-    return RexInputRefShuttle(call).init()
+    RexInputRefShuttle(call).init()
   }
 }

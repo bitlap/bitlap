@@ -38,27 +38,24 @@ class BitlapRelConverter extends AbsRelRule(classOf[RelNode], "BitlapRelConverte
     if (rel != root) {
       return rel
     }
-    return this.convert00(rel, call)
+    this.convert00(rel, call)
   }
 
   private def convert00(_rel: RelNode, call: RelOptRuleCall): RelNode = {
-    return _rel match {
+    _rel match {
       // has been converted
-      case rel: BitlapNode => {
+      case rel: BitlapNode =>
         rel
-      }
-      case rel: HepRelVertex => {
+      case rel: HepRelVertex =>
         // next parent should be HepRelVertex's parent and next level should be current level, because it's a wrapper
         rel.also { it =>
           Reflect.on(it).call("replaceRel", this.convert00(it.getCurrentRel, call))
         }
-      }
-      case rel: LogicalSort => {
+      case rel: LogicalSort =>
         this.convert00(rel.getInput, call).injectParent { it =>
           BitlapSort(rel.getCluster, rel.getTraitSet, it, rel.getCollation, rel.offset, rel.fetch)
         }
-      }
-      case rel: LogicalAggregate => {
+      case rel: LogicalAggregate =>
         this.convert00(rel.getInput, call).injectParent { it =>
           BitlapAggregate(
             rel.getCluster,
@@ -70,44 +67,35 @@ class BitlapRelConverter extends AbsRelRule(classOf[RelNode], "BitlapRelConverte
             rel.getAggCallList
           )
         }
-      }
-      case rel: LogicalProject => {
+      case rel: LogicalProject =>
         this.convert00(rel.getInput, call).injectParent { it =>
           new BitlapProject(rel.getCluster, rel.getTraitSet, rel.getHints, it, rel.getProjects, rel.getRowType)
         }
-      }
-      case rel: LogicalFilter => {
+      case rel: LogicalFilter =>
         this.convert00(rel.getInput, call).injectParent { it =>
           BitlapFilter(rel.getCluster, rel.getTraitSet, it, rel.getCondition, rel.getVariablesSet)
         }
-      }
-      case rel: LogicalUnion => {
+      case rel: LogicalUnion =>
         val union = BitlapUnion(rel.getCluster, rel.getTraitSet, rel.getInputs, rel.all)
         rel.getInputs.asScala.map { i =>
           this.convert00(i, call).injectParent { _ =>
             union
           }
         }.head
-      }
-      case rel: LogicalTableScan => {
+      case rel: LogicalTableScan =>
         BitlapTableScan(rel.getCluster, rel.getTraitSet, rel.getHints, rel.getTable)
-      }
-      case rel: LogicalValues => {
+      case rel: LogicalValues =>
         BitlapValues(rel.getCluster, rel.getTraitSet, rel.getRowType, rel.getTuples)
-      }
-      case _ => {
+      case _ =>
         _rel match {
-          case rel: SingleRel => {
+          case rel: SingleRel =>
             this.convert00(rel.getInput, call).injectParent { it =>
               rel.replaceInput(0, it)
               rel
             }
-          }
-          case rel => {
+          case rel =>
             throw IllegalArgumentException(s"Invalid converted rel node: ${rel.getDigest}")
-          }
         }
-      }
     }
   }
 }

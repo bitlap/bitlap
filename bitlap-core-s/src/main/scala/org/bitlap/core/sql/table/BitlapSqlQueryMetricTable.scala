@@ -10,7 +10,6 @@ import scala.jdk.CollectionConverters._
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.plan.PendingFetchPlan
-import org.bitlap.core.sql.MDColumnAnalyzer
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PruneTimeFilter
 
@@ -30,7 +29,7 @@ class BitlapSqlQueryMetricTable(
     if (projects == null) {
       return Linq4j.emptyEnumerable()
     }
-    return this.scan(root, projects)
+    this.scan(root, projects)
   }
 
   private def scan(root: DataContext, projects: Array[Int]): Enumerable[Array[Any]] = {
@@ -46,6 +45,6 @@ class BitlapSqlQueryMetricTable(
     // execute the plan
     val rows = bestPlan.execute(fetchContext)
 
-    return Linq4j.asEnumerable(rows.toRows(projections).asJava)
+    Linq4j.asEnumerable(rows.toRows(projections).asJava)
   }
 }

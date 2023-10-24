@@ -33,7 +33,7 @@ class SqlCreateDatabase(
       _ifNotExists
     ) {
 
-  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int): Unit = {
     writer.keyword("CREATE DATABASE")
     if (ifNotExists) {
       writer.keyword("IF NOT EXISTS")
@@ -46,12 +46,12 @@ class SqlCreateDatabase(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return List(
+    List(
       Array(catalog.createDatabase(name.getSimple, ifNotExists))
     )
   }
 }
 
 object SqlCreateDatabase {
-  val OPERATOR = SqlSpecialOperator("CREATE DATABASE", SqlKind.CREATE_SCHEMA)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("CREATE DATABASE", SqlKind.CREATE_SCHEMA)
 }

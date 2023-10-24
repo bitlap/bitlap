@@ -17,6 +17,6 @@ import org.apache.calcite.rex.RexNode
 class BitlapSqlQueryEmptyTable(override val table: Table) extends BitlapSqlQueryTable(table) {
 
   override def scan(root: DataContext, filters: JList[RexNode], projects: Array[Int]): Enumerable[Array[Any]] = {
-    return Linq4j.emptyEnumerable()
+    Linq4j.emptyEnumerable()
   }
 }

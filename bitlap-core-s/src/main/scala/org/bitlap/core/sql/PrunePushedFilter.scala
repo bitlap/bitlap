@@ -12,11 +12,11 @@ import scala.collection.mutable.ListBuffer
 type PushedFilterFun = (String) => Boolean
 
 case class PrunePushedFilterExpr(
-  val name: String,
-  val op: FilterOp,
-  val values: List[String],
-  val func: PushedFilterFun,
-  val expr: String)
+  name: String,
+  op: FilterOp,
+  values: List[String],
+  func: PushedFilterFun,
+  expr: String)
 
 class PrunePushedFilter extends Serializable {
 
@@ -39,10 +39,10 @@ class PrunePushedFilter extends Serializable {
     this
   }
 
-  def getNames(): Set[String]                      = this.conditions.map(_.name).toSet
-  def getConditions(): List[PrunePushedFilterExpr] = this.conditions.toList
+  def getNames: Set[String]                      = this.conditions.map(_.name).toSet
+  def getConditions: List[PrunePushedFilterExpr] = this.conditions.toList
 
-  override def toString(): String = {
-    return this.conditions.map(_.expr).toString()
+  override def toString: String = {
+    this.conditions.map(_.expr).toString()
   }
 }

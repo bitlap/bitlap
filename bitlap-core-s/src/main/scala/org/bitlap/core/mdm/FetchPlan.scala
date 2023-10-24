@@ -28,6 +28,6 @@ trait FetchPlan {
   /** fetch data with computed fetcher.
    */
   def withFetcher[R](context: FetchContext)(fetch: (Fetcher) => R): R = {
-    return fetch(context.findBestFetcher(this))
+    fetch(context.findBestFetcher(this))
   }
 }

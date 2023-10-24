@@ -28,7 +28,7 @@ class BitlapParquetWriter[T](
   private val output: Path,
   private val schema: Schema,
   private val rowGroupSize: Long,
-  private val rowConvert: (T) => GenericRecord)
+  private val rowConvert: T => GenericRecord)
     extends BitlapWriter[T] {
 
   private val conf = fs.newConf()
@@ -53,7 +53,7 @@ class BitlapParquetWriter[T](
   }
 
   override def write(row: T): Unit = {
-    throw BitlapException("BitlapMetricWriter stream write is not supported.")
+    throw BitlapException(s"BitlapMetricWriter stream write is not supported.")
   }
 
   private def initWriter(): Unit = {

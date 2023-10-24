@@ -31,12 +31,12 @@ object QueryContext {
 
   def get(): QueryContext = context.get()
 
-  def reset() = context.remove()
+  private def reset(): Unit = context.remove()
 
   def use[T](block: (QueryContext) => T): T = {
     try {
       reset()
-      return block(get())
+      block(get())
     } finally {
       reset()
     }

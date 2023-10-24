@@ -29,14 +29,14 @@ class BitlapTableScan(
 
   var converted: Boolean = false
 
-  def getOTable(): BitlapSqlQueryTable = {
+  def getOTable: BitlapSqlQueryTable = {
     this.table.asInstanceOf[RelOptTableImpl].table().asInstanceOf[BitlapSqlQueryTable]
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     super
       .explainTerms(pw)
-      .item("class", getOTable().getClass.getSimpleName)
+      .item("class", getOTable.getClass.getSimpleName)
   }
 
   override def withHints(hintList: JList[RelHint]): RelNode = {

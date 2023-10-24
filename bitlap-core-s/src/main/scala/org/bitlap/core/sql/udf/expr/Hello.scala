@@ -24,6 +24,6 @@ class Hello extends UDF1[Any, String] {
     if (input == null) {
       return null
     }
-    return s"hello $input"
+    s"hello $input"
   }
 }

@@ -51,10 +51,10 @@ class SqlLoadData(
         it.writeCsv(fs.open(p))
       }
     }
-    return List(Array(true))
+    List(Array(true))
   }
 }
 
 object SqlLoadData {
-  val OPERATOR = SqlSpecialOperator("LOAD DATA", SqlKind.OTHER)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("LOAD DATA", SqlKind.OTHER)
 }

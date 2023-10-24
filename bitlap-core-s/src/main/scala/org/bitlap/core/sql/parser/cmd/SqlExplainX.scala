@@ -26,7 +26,7 @@ class SqlExplainX(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return stmt match {
+    stmt match {
       case _: SqlSelect => {
         val plan = BitlapContext.sqlPlanner.parse(stmt.toString)
         List(Array(plan.explain()))
@@ -39,5 +39,5 @@ class SqlExplainX(
 }
 
 object SqlExplainX {
-  val OPERATOR = SqlSpecialOperator("EXPLAIN", SqlKind.OTHER)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("EXPLAIN", SqlKind.OTHER)
 }

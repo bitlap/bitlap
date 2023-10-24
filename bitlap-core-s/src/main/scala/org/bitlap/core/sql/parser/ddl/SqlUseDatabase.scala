@@ -32,7 +32,7 @@ class SqlUseDatabase(
     }
     val db = catalog.getDatabase(database.getSimple)
     this.useDatabase = db.name
-    return List(Array(db.name))
+    List(Array(db.name))
   }
 }
 

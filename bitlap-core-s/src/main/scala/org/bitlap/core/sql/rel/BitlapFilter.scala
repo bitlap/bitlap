@@ -27,11 +27,11 @@ class BitlapFilter(
     with BitlapNode {
 
   override def copy(traitSet: RelTraitSet, input: RelNode, condition: RexNode): Filter = {
-    return BitlapFilter(cluster, traitSet, input, condition, variablesSet, parent)
+    BitlapFilter(cluster, traitSet, input, condition, variablesSet, parent)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    return super
+    super
       .explainTerms(pw)
       .itemIf("variablesSet", variablesSet, !variablesSet.isEmpty)
   }
@@ -42,10 +42,10 @@ class BitlapFilter(
   }
 
   override def deepHashCode(): Int = {
-    return Objects.hash(deepHashCode0(), variablesSet)
+    Objects.hash(deepHashCode0(), variablesSet)
   }
 
   override def getVariablesSet: JSet[CorrelationId] = {
-    return variablesSet
+    variablesSet
   }
 }

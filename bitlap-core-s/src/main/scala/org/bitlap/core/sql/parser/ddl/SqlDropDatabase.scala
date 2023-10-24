@@ -17,8 +17,6 @@ import org.apache.calcite.sql.parser.SqlParserPos
 /** Desc: Parse tree for `DROP (DATABASE | SCHEMA) IF EXISTS database_name` statement.
  *
  *  see [org.apache.calcite.sql.ddl.SqlDropSchema], you can also use [org.apache.calcite.sql.ddl.SqlDdlNodes]
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/25
  */
 class SqlDropDatabase(
   override val _pos: SqlParserPos,
@@ -32,7 +30,7 @@ class SqlDropDatabase(
       _ifExists
     ) {
 
-  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int): Unit = {
     writer.keyword("DROP DATABASE")
     if (_ifExists) {
       writer.keyword("IF EXISTS")
@@ -45,7 +43,7 @@ class SqlDropDatabase(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return List(
+    List(
       Array(catalog.dropDatabase(name.getSimple, ifExists, cascade))
     )
   }

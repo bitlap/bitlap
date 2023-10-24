@@ -3,9 +3,10 @@
  */
 package org.bitlap.core.sql.udf
 
+import java.util
 import java.util.concurrent.ConcurrentHashMap
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.sql.udf.aggr.BMCountAggr
@@ -52,7 +53,7 @@ object FunctionRegistry {
    */
   def register(func: UDF*): this.type = {
     func.foreach(f => register(f.name, f))
-    return this
+    this
   }
 
   def register(name: String, func: UDF): this.type = {
@@ -100,7 +101,7 @@ object FunctionRegistry {
           )
         )
     }
-    return this
+    this
   }
 
   /** register function from lambda
@@ -141,10 +142,10 @@ object FunctionRegistry {
       )
     )
 
-    return this
+    this
   }
 
-  def sqlFunctions()            = this.functions.values
-  def getFunction(name: String) = this.functions.get(name)
-  def contains(name: String)    = this.functions.containsKey(name)
+  def sqlFunctions()                         = this.functions.values
+  def getFunction(name: String): SqlFunction = this.functions.get(name)
+  def contains(name: String): Boolean        = this.functions.containsKey(name)
 }

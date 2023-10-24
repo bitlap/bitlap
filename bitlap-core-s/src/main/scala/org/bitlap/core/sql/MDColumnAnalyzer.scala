@@ -79,23 +79,21 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
         }
       }
     }
-    return cols.toMap
+    cols.toMap
   }
 
   private def getColumnName(_node: SqlNode): List[MDColumn] = {
-    return _node match {
-      case node: SqlIdentifier => {
+    _node match {
+      case node: SqlIdentifier =>
         if (node.isStar) {
           throw IllegalArgumentException(s"It is forbidden to query * from ${table.database}.${table.name}")
         }
         List(MDColumn(node.names.asScala.last, DimensionCol))
-      }
-      case node: SqlBasicCall => {
+      case node: SqlBasicCall =>
         node.getOperator match {
-          case _: SqlAsOperator => {
+          case _: SqlAsOperator =>
             getColumnName(node.getOperandList.asScala.head)
-          }
-          case _: SqlAggFunction => {
+          case _: SqlAggFunction =>
             node.getOperandList.asScala
               .flatMap(getColumnName)
               .map { it =>
@@ -104,15 +102,11 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
                   .withAgg(operator -> Option(node.getFunctionQuantifier).map(_.toValue).getOrElse(""))
               }
               .toList
-          }
-          case _ => {
+          case _ =>
             node.getOperandList.asScala.flatMap(getColumnName).toList
-          }
         }
-      }
-      case node: SqlNodeList => {
+      case node: SqlNodeList =>
         node.getList.asScala.filter(_ != null).flatMap(getColumnName).toList
-      }
       case node: SqlLiteral => List.empty[MDColumn]
       case node             => throw IllegalArgumentException(s"Illegal node: $node")
     }
@@ -138,7 +132,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     // 1) distinct aggregation: true
     // 2) sum, count aggregation: false
     if (dimensions.isEmpty) {
-      if (metric.isDistinct()) {
+      if (metric.isDistinct) {
         return true
       }
       return false
@@ -148,7 +142,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     // 1) dimension is complex expression
     // 2) dimension is not in group by
     val hasNoPureDims = this.mdColumns.exists { it => it.`type` == DimensionCol && !it.pure }
-    if (hasNoPureDims && metric.isDistinct()) {
+    if (hasNoPureDims && metric.isDistinct) {
       return true
     }
     false
@@ -178,19 +172,19 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
 
     //  materialize & Cartesian Product
     if (this.shouldCartesian()) {
-      if (metric.isSum()) {
+      if (metric.isSum) {
         return if (cartesianBase) DataTypeCBM(metricName, -1) else DataTypeBBM(metricName, -1)
       }
-      if (metric.isDistinct()) {
+      if (metric.isDistinct) {
         return DataTypeRBM(metricName, -1)
       }
     }
 
     // materialize & not Cartesian Product
-    if (metric.isSum() && metric.isDistinct()) {
+    if (metric.isSum && metric.isDistinct) {
       return DataTypeCBM(metricName, -1)
     }
-    if (metric.isDistinct()) {
+    if (metric.isDistinct) {
       return DataTypeRBM(metricName, -1)
     }
     throw IllegalArgumentException(s"Invalid input metric type, metric is $metric")

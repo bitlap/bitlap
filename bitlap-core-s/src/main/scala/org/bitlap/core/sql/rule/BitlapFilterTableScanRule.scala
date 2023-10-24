@@ -110,7 +110,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
       override def visitCall(call: RexCall): RexNode = {
         call.getKind match {
           case k if k == SqlKind.OR => throw new NotImplementedError("OR expression is not supported now.") // TODO
-          case k if k == SqlKind.AND => {
+          case k if k == SqlKind.AND =>
             val operands = ListBuffer[RexNode]().also { it => visitList(call.operands, it.toList.asJava) }
               .filter(_ != null)
             if (operands.size == 2) {
@@ -118,15 +118,14 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
             } else {
               operands.headOption.orNull
             }
-          }
           // x (=, <>, >, >=, <, <=) xxx
           // x in (xx, xxx, ...)
           // x between xx and xxx
-          case k if k == SqlKind.COMPARISON || k == SqlKind.SEARCH => {
+          case k if k == SqlKind.COMPARISON || k == SqlKind.SEARCH =>
             val left  = call.operands.get(0)
             val right = call.operands.get(1)
             (left, right) match {
-              case _: (RexInputRef, RexLiteral) | _: (RexLiteral, RexInputRef) => {
+              case _: (RexInputRef, RexLiteral) | _: (RexLiteral, RexInputRef) =>
                 val (_ref, _refValue) = if (left.isInstanceOf[RexInputRef]) left -> right else right -> left
                 val ref               = _ref.asInstanceOf[RexInputRef]
                 val refValue          = _refValue.asInstanceOf[RexLiteral]
@@ -149,9 +148,8 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
                   )
                 }
                 null
-              }
-              case _ => {
-                val refs = RexInputRefShuttle.of(call).getInputRefs()
+              case _ =>
+                val refs = RexInputRefShuttle.of(call).getInputRefs
                 if (refs.size == 1) {
                   val inputField = fieldIndexMap(refs.head.getIndex)
                   if (timeField == inputField) {
@@ -167,9 +165,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
                 } else {
                   call
                 }
-              }
             }
-          }
           // x is [not] null
           case k if k == SqlKind.IS_NULL || k == SqlKind.IS_NOT_NULL => throw NotImplementedError("TODO")
           // x like xxx
@@ -188,7 +184,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
     inputField: RelDataTypeField,
     rowType: RelDataType,
     builder: RexBuilder
-  ): (T) => Boolean = {
+  ): T => Boolean = {
     // reset field index to 0
     val filter = RexUtil.apply(
       Mappings.target(
@@ -210,7 +206,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
 
   private def getLiteralValue(literal: RexLiteral, op: String): (List[String], FilterOp) = {
     literal.getValue match {
-      case _: Sarg[_] => {
+      case _: Sarg[_] =>
         val values   = ListBuffer[NlsString]()
         var filterOp = FilterOp.EQUALS
         RangeSets.forEach(
@@ -268,7 +264,6 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
           }
         )
         values.map(_.getValue).toList -> filterOp
-      }
       case _ =>
         List(literal.getValueAs(classOf[String])) -> FilterOp.from(op)
     }

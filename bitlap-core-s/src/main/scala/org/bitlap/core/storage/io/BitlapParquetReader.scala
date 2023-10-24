@@ -27,20 +27,20 @@ class BitlapParquetReader[T](
   private val schema: Schema,
   private val requestedProjection: Schema,
   private val filter: FilterCompat.Filter,
-  private val rowConvert: (GenericRecord) => T)
+  private val rowConvert: GenericRecord => T)
     extends BitlapReader[T] {
 
   private val conf                                 = fs.newConf()
   private val inputsIt                             = inputs.iterator
   private var currentRow: T                        = _
-  private var currentRows: mutable.ArrayDeque[T]   = new mutable.ArrayDeque()
+  private val currentRows: mutable.ArrayDeque[T]   = new mutable.ArrayDeque()
   private var reader: ParquetReader[GenericRecord] = _
 
   override def read(): T = {
     if (hasNext()) {
       return next()
     }
-    return null.asInstanceOf[T]
+    null.asInstanceOf[T]
   }
 
   override def read(limit: Int): List[T] = {
@@ -50,7 +50,7 @@ class BitlapParquetReader[T](
       result += next()
       count += 1
     }
-    return result.toList
+    result.toList
   }
 
   override def hasNext(): Boolean = {
@@ -67,11 +67,11 @@ class BitlapParquetReader[T](
       raw = this.reader.read()
     }
     initReader()
-    return this.reader != null && hasNext()
+    this.reader != null && hasNext()
   }
 
   override def next(): T = {
-    return this.currentRows.removeLast()
+    this.currentRows.removeLast()
   }
 
   private def initReader(): Unit = {

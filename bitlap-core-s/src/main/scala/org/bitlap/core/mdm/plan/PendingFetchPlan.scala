@@ -25,6 +25,6 @@ class PendingFetchPlan(
   }
 
   override def explain(depth: Int): String = {
-    return s"${" ".repeat(depth)}+- PendingFetchPlan"
+    s"${" ".repeat(depth)}+- PendingFetchPlan"
   }
 }

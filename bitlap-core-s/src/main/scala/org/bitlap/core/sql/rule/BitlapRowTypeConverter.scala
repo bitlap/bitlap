@@ -31,24 +31,21 @@ class BitlapRowTypeConverter extends AbsRelRule(classOf[BitlapNode], "BitlapRowT
     if (parent != null || !hasAnyType(rel.getRowType)) {
       return rel
     }
-    return this.convert00(rel, call)
+    this.convert00(rel, call)
   }
 
   private def convert00(_rel: RelNode, call: RelOptRuleCall): RelNode = {
-    return _rel match {
-      case rel: HepRelVertex => {
+    _rel match {
+      case rel: HepRelVertex =>
         this.convert00(rel.getCurrentRel, call)
-      }
-      case rel if !hasAnyType(rel.getRowType) => {
+      case rel if !hasAnyType(rel.getRowType) =>
         rel.getInputs.asScala.zipWithIndex.foreach { case (n, i) =>
           rel.replaceInput(i, this.convert00(n, call))
         }
         rel
-      }
-      case rel: BitlapProject => {
+      case rel: BitlapProject =>
         this.convertProjectType(rel, this.convert00(rel.getInput, call))
-      }
-      case rel: BitlapAggregate => {
+      case rel: BitlapAggregate =>
         val i = this.convert00(rel.getInput, call)
         val agg = rel.getAggCallList.asScala.map { it =>
           AggregateCall.create(
@@ -67,24 +64,20 @@ class BitlapRowTypeConverter extends AbsRelRule(classOf[BitlapNode], "BitlapRowT
           )
         }
         rel.copy(i, agg.asJava)
-      }
-      case rel => {
+      case rel =>
         rel.getInputs.asScala.zipWithIndex.foreach { case (n, i) =>
           rel.replaceInput(i, this.convert00(n, call))
         }
         rel
-      }
     }
   }
 
   private def hasAnyType(rowType: RelDataType): Boolean = {
-    return rowType match {
-      case _: BasicSqlType => {
+    rowType match {
+      case _: BasicSqlType =>
         rowType.getSqlTypeName.name().toUpperCase() == "ANY"
-      }
-      case _ => {
+      case _ =>
         rowType.getFieldList.asScala.exists(_.getType.getSqlTypeName.name().toUpperCase() == "ANY")
-      }
     }
   }
 
@@ -105,7 +98,7 @@ class BitlapRowTypeConverter extends AbsRelRule(classOf[BitlapNode], "BitlapRowT
                 RexInputRef.of(inputRef.getIndex, inputRowType)
               else
                 inputRef
-            return super.visitInputRef(newRef)
+            super.visitInputRef(newRef)
           }
         })
       if (hasAnyType(rt.getType) && refIndex.nonEmpty) {
@@ -115,6 +108,6 @@ class BitlapRowTypeConverter extends AbsRelRule(classOf[BitlapNode], "BitlapRowT
       }
       newProject
     }
-    return rel.copy(newInput, builder.build(), newProjects.asJava)
+    rel.copy(newInput, builder.build(), newProjects.asJava)
   }
 }

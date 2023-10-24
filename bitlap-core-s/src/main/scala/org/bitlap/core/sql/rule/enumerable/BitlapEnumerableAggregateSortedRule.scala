@@ -6,14 +6,9 @@ package org.bitlap.core.sql.rule.enumerable
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.rule.AbsRelRule
 
-import org.apache.calcite.adapter.enumerable.EnumerableConvention
-import org.apache.calcite.adapter.enumerable.EnumerableRules
-import org.apache.calcite.adapter.enumerable.EnumerableSortedAggregate
-import org.apache.calcite.plan.Convention
-import org.apache.calcite.plan.RelOptRule
-import org.apache.calcite.plan.RelOptRuleCall
-import org.apache.calcite.rel.RelCollations
-import org.apache.calcite.rel.RelNode
+import org.apache.calcite.adapter.enumerable.{ EnumerableConvention, EnumerableSortedAggregate }
+import org.apache.calcite.plan.{ Convention, RelOptRule, RelOptRuleCall }
+import org.apache.calcite.rel.{ RelCollations, RelNode }
 import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core.Aggregate
 import org.apache.calcite.util.ImmutableIntList
@@ -32,8 +27,7 @@ class BitlapEnumerableAggregateSortedRule extends AbsRelRule(BitlapEnumerableAgg
     if (!Aggregate.isSimple(agg)) {
       return null
     }
-    val inputTraits = rel
-      .getCluster()
+    val inputTraits = rel.getCluster
       .traitSet()
       .replace(EnumerableConvention.INSTANCE)
       .replace(
@@ -42,12 +36,12 @@ class BitlapEnumerableAggregateSortedRule extends AbsRelRule(BitlapEnumerableAgg
     val selfTraits = inputTraits.replace(
       RelCollations.of(ImmutableIntList.identity(agg.getGroupSet.cardinality()))
     )
-    return EnumerableSortedAggregate(
-      rel.getCluster(),
+    EnumerableSortedAggregate(
+      rel.getCluster,
       selfTraits,
       RelOptRule.convert(agg.getInput, inputTraits),
       agg.getGroupSet,
-      agg.getGroupSets(),
+      agg.getGroupSets,
       agg.getAggCallList
     )
   }
@@ -55,7 +49,7 @@ class BitlapEnumerableAggregateSortedRule extends AbsRelRule(BitlapEnumerableAgg
 
 object BitlapEnumerableAggregateSortedRule {
 
-  val CONFIG = ConverterRule.Config.INSTANCE
+  val CONFIG: ConverterRule.Config = ConverterRule.Config.INSTANCE
     .withConversion(
       classOf[BitlapAggregate],
       Convention.NONE,

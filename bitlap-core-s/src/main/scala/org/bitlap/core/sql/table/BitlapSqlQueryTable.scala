@@ -44,7 +44,7 @@ class BitlapSqlQueryTable(val table: Table) extends AbstractTable with Projectab
         builder.add(it, SqlTypeName.VARCHAR).nullable(true)
       }
     }
-    return builder.build()
+    builder.build()
   }
 
   override def scan(root: DataContext, filters: JList[RexNode], projects: Array[Int]): Enumerable[Array[Any]] = {
@@ -52,7 +52,7 @@ class BitlapSqlQueryTable(val table: Table) extends AbstractTable with Projectab
   }
 
   override def scan(root: DataContext): Enumerable[Array[Any]] = {
-    return this.scan(root, Collections.emptyList(), null)
+    this.scan(root, Collections.emptyList(), null)
   }
 
 }

@@ -24,7 +24,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
    */
   def findBestPlan(): FetchPlan = {
     this.bestPlan = oPlan match {
-      case p: PendingFetchPlan => {
+      case p: PendingFetchPlan =>
         val dimensions = p.analyzer.getDimensionColNamesWithoutTime
         dimensions.size match {
           // one or no other dimension
@@ -33,7 +33,6 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
           // two or more other dimensions
           case _ => this.planWithOtherDims(dimensions, p)
         }
-      }
       case _ => oPlan
     }
     this.bestPlan
@@ -45,7 +44,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
   private def planWithNoOrOneOtherDim(dimension: String, plan: PendingFetchPlan): FetchPlan = {
     val metricParts     = this.getMetricParts(plan.analyzer, true)
     val dimensionFilter = plan.pushedFilter.filter(dimension)
-    return MetricMergeFetchPlan(
+    MetricMergeFetchPlan(
       metricParts.map { case (m, types) =>
         new MetricFetchPlan(plan.timeFilter, types, m, dimension, dimensionFilter)
       }.toList
@@ -55,8 +54,9 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
   /** Merge metrics with more than one dimensions
    *
    *  TODO should find best cartesian base here, use first one currently. For example:
-   *    1. split into parts of a given size 2. or split into parts with CBO 3. or (merge metric -> mertic dim) or (merge
-   *       dim -> merge metric)
+   *    - split into parts of a given size
+   *    - or split into parts with CBO
+   *    - or (merge metric -> mertic dim) or (merge dim -> merge metric)
    */
   private def planWithOtherDims(dimensions: List[String], plan: PendingFetchPlan): FetchPlan = {
     val timeFilter   = plan.timeFilter
@@ -75,7 +75,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
       }
       MetricMergeDimFetchPlan(ps)
     }
-    return MetricMergeDimFetchPlan(subPlans.toList)
+    MetricMergeDimFetchPlan(subPlans.toList)
   }
 
   private def getMetricParts(analyzer: MDColumnAnalyzer, cartesianBase: Boolean)
@@ -88,6 +88,6 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
   /** find best data fetcher
    */
   def findBestFetcher(plan: FetchPlan): Fetcher = {
-    return LocalFetcher(this)
+    LocalFetcher(this)
   }
 }

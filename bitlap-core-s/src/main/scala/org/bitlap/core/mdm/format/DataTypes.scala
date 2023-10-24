@@ -15,23 +15,23 @@ object DataTypes {
   /** infer data type with input class [type]
    */
   def from(`type`: Class[_], name: String, idx: Int): DataType = {
-    return this.from0(`type`, name, idx)._1
+    this.from0(`type`, name, idx)._1
   }
 
   /** get data type default value
    */
   def defaultValue(`type`: Class[_]): Any = {
-    return this.from0(`type`, "", 0)._2
+    this.from0(`type`, "", 0)._2
   }
 
   /** reset data type index
    */
   def resetIndex(dataType: DataType, idx: Int): DataType = {
-    return this.from0(dataType.getClass, dataType.name, idx)._1
+    this.from0(dataType.getClass, dataType.name, idx)._1
   }
 
   private def from0(`type`: Class[_], name: String, idx: Int): (DataType, Any) = {
-    return `type` match {
+    `type` match {
       case c if c == classOf[DataTypeLong] || c == classOf[Long] || c == classOf[java.lang.Long] =>
         DataTypeLong(name, idx) -> 0L
       case c if c == classOf[DataTypeString] || c == classOf[String] => DataTypeString(name, idx) -> ""

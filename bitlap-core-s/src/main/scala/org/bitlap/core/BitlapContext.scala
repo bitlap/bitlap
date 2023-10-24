@@ -13,8 +13,8 @@ import org.apache.hadoop.conf.Configuration
  */
 object BitlapContext {
 
-  val bitlapConf = BitlapConf()
-  val hadoopConf = Configuration() // TODO (merge bitlap.hadoop.xxx)
+  val bitlapConf: BitlapConf    = BitlapConf()
+  val hadoopConf: Configuration = Configuration() // TODO (merge bitlap.hadoop.xxx)
 
   lazy val eventBus: EventBus = {
     val e = EventBus()

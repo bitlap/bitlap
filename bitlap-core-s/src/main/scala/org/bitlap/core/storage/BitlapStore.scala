@@ -27,7 +27,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
 
   private val tablePath = Path(table.path)
 
-  private var fs: FileSystem = {
+  private val fs: FileSystem = {
     val _fs = tablePath.getFileSystem(hadoopConf)
     _fs.setWriteChecksum(false)
     _fs.setVerifyChecksum(false)
@@ -52,7 +52,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
     if (!fs.exists(metricDimDataPath)) {
       fs.mkdirs(metricDimDataPath)
     }
-    return this
+    this
   }
 
   /** Store metric [rows] with time [tm] as provided data file format.
@@ -101,7 +101,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       metrics,
       List("mk", "t", "meta")
     )
-    return BitlapReaderIterator(reader, readMetricBatchSize)
+    BitlapReaderIterator(reader, readMetricBatchSize)
   }
 
   def queryBBM(timeFilter: PruneTimeFilter, metrics: List[String]): BitlapIterator[MetricRow] = {
@@ -111,7 +111,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       metrics,
       List("mk", "t", "e")
     )
-    return BitlapReaderIterator(reader, readMetricBatchSize)
+    BitlapReaderIterator(reader, readMetricBatchSize)
   }
 
   def queryCBM(timeFilter: PruneTimeFilter, metrics: List[String]): BitlapIterator[MetricRow] = {
@@ -121,7 +121,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       metrics,
       List("mk", "t", "m")
     )
-    return BitlapReaderIterator(reader, readMetricBatchSize)
+    BitlapReaderIterator(reader, readMetricBatchSize)
   }
 
   /** query metric dimension rows
@@ -140,7 +140,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       dimension,
       dimensionFilter
     )
-    return BitlapReaderIterator(reader, readMetricDimBatchSize)
+    BitlapReaderIterator(reader, readMetricDimBatchSize)
   }
 
   def queryBBM(
@@ -157,7 +157,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       dimension,
       dimensionFilter
     )
-    return BitlapReaderIterator(reader, readMetricDimBatchSize)
+    BitlapReaderIterator(reader, readMetricDimBatchSize)
   }
 
   def queryCBM(
@@ -174,7 +174,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       dimension,
       dimensionFilter
     )
-    return BitlapReaderIterator(reader, readMetricDimBatchSize)
+    BitlapReaderIterator(reader, readMetricDimBatchSize)
   }
 
   override def close(): Unit = {}

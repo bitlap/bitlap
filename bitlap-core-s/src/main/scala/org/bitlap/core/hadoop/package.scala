@@ -22,13 +22,13 @@ package object hadoop {
       Using.resource(fs.create(Path(tableDir, ".table"), true)) { o =>
         o.writeUTF(JsonEx.json(table))
       }
-      return true
+      true
     }
 
     /** Read bitlap table schema.
      */
     def readTable(tableDir: Path): Table = {
-      return Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
+      Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
         JsonEx.jsonAs(in.readUTF(), classOf[Table])
       }
     }
@@ -36,7 +36,7 @@ package object hadoop {
     /** clone conf
      */
     def newConf(): Configuration = {
-      return Configuration(fs.getConf)
+      Configuration(fs.getConf)
     }
   }
 }

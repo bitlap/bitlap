@@ -6,13 +6,9 @@ package org.bitlap.core.sql.rule.enumerable
 import org.bitlap.core.sql.rel.BitlapAggregate
 import org.bitlap.core.sql.rule.AbsRelRule
 
-import org.apache.calcite.adapter.enumerable.EnumerableAggregate
-import org.apache.calcite.adapter.enumerable.EnumerableConvention
-import org.apache.calcite.adapter.enumerable.EnumerableRules
-import org.apache.calcite.plan.RelOptRule
-import org.apache.calcite.plan.RelOptRuleCall
-import org.apache.calcite.rel.InvalidRelException
-import org.apache.calcite.rel.RelNode
+import org.apache.calcite.adapter.enumerable.{ EnumerableAggregate, EnumerableConvention }
+import org.apache.calcite.plan.{ RelOptRule, RelOptRuleCall }
+import org.apache.calcite.rel.{ InvalidRelException, RelNode }
 
 /** Convert BitlapAggregate to enumerable rule.
  *
@@ -25,19 +21,19 @@ class BitlapEnumerableAggregateRule extends AbsRelRule(classOf[BitlapAggregate],
 
   override def convert0(rel: RelNode, call: RelOptRuleCall): RelNode = {
     val agg      = rel.asInstanceOf[BitlapAggregate]
-    val traitSet = rel.getCluster().traitSet().replace(EnumerableConvention.INSTANCE)
-    return try {
+    val traitSet = rel.getCluster.traitSet().replace(EnumerableConvention.INSTANCE)
+    try {
       EnumerableAggregate(
-        rel.getCluster(),
+        rel.getCluster,
         traitSet,
         RelOptRule.convert(agg.getInput, traitSet),
         agg.getGroupSet,
-        agg.getGroupSets(),
+        agg.getGroupSets,
         agg.getAggCallList
       )
     } catch {
       case e: InvalidRelException =>
-        log.debug(e.toString())
+        log.debug(e.toString)
         null
     }
   }

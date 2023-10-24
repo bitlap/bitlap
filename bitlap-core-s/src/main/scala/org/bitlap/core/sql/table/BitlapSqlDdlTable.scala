@@ -20,7 +20,7 @@ import org.apache.calcite.sql.`type`.SqlTypeName
  */
 class BitlapSqlDdlTable(
   val rowTypes: List[(String, SqlTypeName)],
-  val operator: (DataContext) => List[Array[Any]])
+  val operator: DataContext => List[Array[Any]])
     extends AbstractTable()
     with ScannableTable {
 
@@ -31,6 +31,6 @@ class BitlapSqlDdlTable(
   }
 
   override def scan(root: DataContext): Enumerable[Array[Any]] = {
-    return Linq4j.asEnumerable(this.operator(root).asJava)
+    Linq4j.asEnumerable(this.operator(root).asJava)
   }
 }

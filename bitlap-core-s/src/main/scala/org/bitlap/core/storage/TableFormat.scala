@@ -24,5 +24,5 @@ enum TableFormat(val name: String) {
 }
 
 object TableFormat {
-  def fromTable(table: Table) = TableFormat.valueOf(table.getTableFormat)
+  def fromTable(table: Table): TableFormat = TableFormat.valueOf(table.getTableFormat)
 }

@@ -7,7 +7,6 @@ import org.bitlap.core.sql.rel.BitlapSort
 import org.bitlap.core.sql.rel.BitlapUnion
 
 import org.apache.calcite.adapter.enumerable.EnumerableMergeUnionRule
-import org.apache.calcite.adapter.enumerable.EnumerableRules
 
 /** Convert merged BitlapUnion to enumerable rule.
  *
@@ -20,7 +19,7 @@ class BitlapEnumerableUnionMergeRule extends EnumerableMergeUnionRule(BitlapEnum
 
 object BitlapEnumerableUnionMergeRule {
 
-  val CONFIG = EnumerableMergeUnionRule.Config.DEFAULT_CONFIG
+  val CONFIG: EnumerableMergeUnionRule.Config = EnumerableMergeUnionRule.Config.DEFAULT_CONFIG
     .withDescription("BitlapEnumerableUnionMergeRule")
     .withOperandSupplier(b0 =>
       b0.operand(classOf[BitlapSort]).oneInput(b1 => b1.operand(classOf[BitlapUnion]).anyInputs())

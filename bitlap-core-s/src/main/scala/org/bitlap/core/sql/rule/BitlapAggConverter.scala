@@ -46,11 +46,10 @@ class BitlapAggConverter extends AbsRelRule(classOf[BitlapAggregate], "BitlapAgg
       var `type`   = it.getType
       var distinct = it.isDistinct
       val func = aggFunc match {
-        case _: SqlSumAggFunction | _: SqlSumEmptyIsZeroAggFunction => {
+        case _: SqlSumAggFunction | _: SqlSumEmptyIsZeroAggFunction =>
           `type` = typeFactory.createSqlType(SqlTypeName.DOUBLE)
           FunctionRegistry.getFunction(UDFNames.bm_sum_aggr).asInstanceOf[SqlAggFunction]
-        }
-        case _: SqlCountAggFunction => {
+        case _: SqlCountAggFunction =>
           if (it.isDistinct) {
             `type` = typeFactory.createSqlType(SqlTypeName.BIGINT)
             distinct = false
@@ -59,17 +58,14 @@ class BitlapAggConverter extends AbsRelRule(classOf[BitlapAggregate], "BitlapAgg
             `type` = typeFactory.createSqlType(SqlTypeName.BIGINT)
             FunctionRegistry.getFunction(UDFNames.bm_count_aggr).asInstanceOf[SqlAggFunction]
           }
-        }
-        case _: SqlMinMaxAggFunction | _: SqlAbstractGroupFunction => {
+        case _: SqlMinMaxAggFunction | _: SqlAbstractGroupFunction =>
           aggFunc
-        }
-        case _ => {
+        case _ =>
           if (FunctionRegistry.contains(aggFunc.getName)) {
             aggFunc
           } else {
             throw IllegalArgumentException(s"${aggFunc.getName} aggregate function is not supported.")
           }
-        }
       }
       AggregateCall.create(
         func,
@@ -84,14 +80,14 @@ class BitlapAggConverter extends AbsRelRule(classOf[BitlapAggregate], "BitlapAgg
         it.name
       )
     }
-    return rel.withAggCalls(aggCalls.asJava)
+    rel.withAggCalls(aggCalls.asJava)
   }
 
   private def hasSecondAggregate(rel: RelNode, inputs: Boolean = false): Boolean = {
     if (rel.isInstanceOf[BitlapAggregate] && inputs) {
       return true
     }
-    return rel.getInputs.asScala.map(_.clean()).filter(_ != null).exists { it => this.hasSecondAggregate(it, true) }
+    rel.getInputs.asScala.map(_.clean()).filter(_ != null).exists { it => this.hasSecondAggregate(it, true) }
   }
 }
 

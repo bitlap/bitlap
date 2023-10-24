@@ -22,7 +22,7 @@ class DateFormat extends UDF2[Any, String, String] {
   override val resultType: SqlReturnTypeInference = SqlTypeName.VARCHAR.infer()
 
   override def eval(input1: Any, input2: String): String = {
-    return input1 match {
+    input1 match {
       case null => null
       case _    => DateTime(input1).toString(input2)
     }

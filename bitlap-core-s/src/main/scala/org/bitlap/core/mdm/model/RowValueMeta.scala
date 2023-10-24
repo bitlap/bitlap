@@ -30,7 +30,7 @@ open class RowValueMeta extends Serializable {
     this
   }
   def add(v0: Number, v1: Number, v2: Number): RowValueMeta = this.add0(v0).add1(v1).add2(v2)
-  def add(v: RowValueMeta)                                  = this.add0(v(0)).add1(v(1)).add2(v(2))
+  def add(v: RowValueMeta): RowValueMeta                    = this.add0(v(0)).add1(v(1)).add2(v(2))
 
   def apply(idx: Int): Number = {
     PreConditions.checkExpression(idx >= 0 && idx <= 2)
@@ -59,6 +59,6 @@ open class RowValueMeta extends Serializable {
 }
 
 object RowValueMeta {
-  def empty()                            = RowValueMeta()
-  def of(v0: Long, v1: Long, v2: Double) = RowValueMeta().add0(v0).add1(v1).add2(v2)
+  def empty(): RowValueMeta                            = RowValueMeta()
+  def of(v0: Long, v1: Long, v2: Double): RowValueMeta = RowValueMeta().add0(v0).add1(v1).add2(v2)
 }

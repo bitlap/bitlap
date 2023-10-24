@@ -58,7 +58,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
    *  if [ifNotExists] is false, exception will be thrown when [Database] exists, otherwise ignored.
    */
   override def createDatabase(name: String, ifNotExists: Boolean): Boolean = {
-    val cleanName = PreConditions.checkNotBlank(name, "database").trim().toLowerCase()
+    val cleanName = cleanDatabaseName(name)
     if (cleanName == Database.DEFAULT_DATABASE) {
       throw BitlapException(s"Unable to create default database, it's built-in.")
     }
@@ -71,7 +71,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     }
     fs.mkdirs(p)
     eventBus.post(DatabaseCreateEvent(Database(cleanName)))
-    return true
+    true
   }
 
   /** Drop [Database] with [name].
@@ -80,7 +80,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
    *  set true, it will drop all tables in the database.
    */
   override def dropDatabase(name: String, ifExists: Boolean, cascade: Boolean): Boolean = {
-    val cleanName = PreConditions.checkNotBlank(name, "database").trim().toLowerCase()
+    val cleanName = cleanDatabaseName(name)
     if (cleanName == Database.DEFAULT_DATABASE) {
       throw BitlapException(s"Unable to drop default database, it's built-in.")
     }
@@ -99,17 +99,17 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
         throw BitlapException(s"Unable to drop database $cleanName, it does not exist.")
       }
     }
-    return false
+    false
   }
 
   /** Rename database name.
    */
   override def renameDatabase(from: String, to: String): Boolean = {
-    val cleanFrom = PreConditions.checkNotBlank(from, "database").trim().toLowerCase()
+    val cleanFrom = cleanDatabaseName(from)
     if (cleanFrom == Database.DEFAULT_DATABASE) {
       throw BitlapException(s"Unable to rename default database, it's built-in.")
     }
-    val cleanTo = PreConditions.checkNotBlank(to, "database").trim().toLowerCase()
+    val cleanTo = cleanDatabaseName(to)
     if (cleanTo == Database.DEFAULT_DATABASE) {
       throw BitlapException(s"Unable to rename to default database, it's built-in.")
     }
@@ -128,26 +128,26 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
   /** Get [Database].
    */
   override def getDatabase(name: String): Database = {
-    val cleanName = PreConditions.checkNotBlank(name, "database").trim().toLowerCase()
+    val cleanName = cleanDatabaseName(name)
     val p         = Path(dataPath, cleanName)
     if (!fs.exists(p)) {
       throw BitlapException(s"Unable to get database $cleanName, it does not exist.")
     }
-    return Database(cleanName)
+    Database(cleanName)
   }
 
   /** Check if [name] is a valid database name.
    */
   override def databaseExists(name: String): Boolean = {
-    val cleanName = PreConditions.checkNotBlank(name, "database").trim().toLowerCase()
+    val cleanName = cleanDatabaseName(name)
     val p         = Path(dataPath, cleanName)
-    return fs.exists(p)
+    fs.exists(p)
   }
 
   /** List all [Database], it also contains [Database.DEFAULT_DATABASE]
    */
   override def listDatabases(): List[Database] = {
-    return fs.listStatus(dataPath).filter(_.isDirectory).map(d => Database(d.getPath.getName)).toList
+    fs.listStatus(dataPath).filter(_.isDirectory).map(d => Database(d.getPath.getName)).toList
   }
 
   /** create [Table] with [name] in the [database].
@@ -155,8 +155,8 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
    *  if [ifNotExists] is false, exception will be thrown when [Table] exists, otherwise ignore.
    */
   override def createTable(name: String, database: String, ifNotExists: Boolean): Boolean = {
-    val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
-    val cleanName   = PreConditions.checkNotBlank(name, "table").trim().toLowerCase()
+    val cleanDBName = cleanDatabaseName(database)
+    val cleanName   = cleanTableName(name)
     val tm          = System.currentTimeMillis()
     val tableDir    = Path(dataPath, s"$cleanDBName/$cleanName")
     val table = Table(
@@ -190,8 +190,8 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     ifExists: Boolean,
     cascade: Boolean
   ): Boolean = {
-    val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
-    val cleanName   = PreConditions.checkNotBlank(name, "table").trim().toLowerCase()
+    val cleanDBName = cleanDatabaseName(database)
+    val cleanName   = cleanTableName(name)
     val tableDir    = Path(dataPath, s"$cleanDBName/$cleanName")
     val exists      = fs.exists(tableDir)
     if (exists) {
@@ -208,30 +208,38 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
         throw BitlapException(s"Unable to drop table $cleanDBName.$cleanName, it does not exist.")
       }
     }
-    return false
+    false
   }
 
   /** get [Table] with [name] in the [database].
    */
   override def getTable(name: String, database: String): Table = {
-    val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
-    val cleanName   = PreConditions.checkNotBlank(name, "table").trim().toLowerCase()
+    val cleanDBName = cleanDatabaseName(database)
+    val cleanName   = cleanTableName(name)
     val tableDir    = Path(dataPath, s"$cleanDBName/$cleanName")
     if (!fs.exists(tableDir)) {
       throw BitlapException(s"Table $cleanDBName.$cleanName does not exist.")
     }
-    return fs.readTable(tableDir)
+    fs.readTable(tableDir)
   }
 
   /** List all [Table] in the [database].
    */
   override def listTables(database: String): List[Table] = {
-    val cleanDBName = PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
+    val cleanDBName = cleanDatabaseName(database)
     val dbDir       = Path(dataPath, cleanDBName)
-    return fs
+    fs
       .listStatus(dbDir) // TODO: par
       .filter(_.isDirectory)
       .map(d => fs.readTable(d.getPath))
       .toList
+  }
+
+  private def cleanDatabaseName(database: String): String = {
+    PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
+  }
+
+  private def cleanTableName(tableName: String): String = {
+    PreConditions.checkNotBlank(tableName, "table").trim().toLowerCase()
   }
 }

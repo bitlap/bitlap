@@ -34,7 +34,7 @@ class SqlShowTables(
       Option(database).map(_.getSimple).getOrElse(""),
       QueryContext.get().currentSchema
     )
-    return catalog.listTables(currentSchema).map { it =>
+    catalog.listTables(currentSchema).map { it =>
       Array(it.database, it.name, it.createTime)
     }
   }

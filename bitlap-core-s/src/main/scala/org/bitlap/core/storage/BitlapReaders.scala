@@ -27,17 +27,17 @@ object BitlapReaders {
       .filter(f => projections.contains(f.name()))
       .map(f => Schema.Field(f.name(), f.schema(), f.doc(), f.defaultVal(), f.order()))
       .asJava
-    return Schema.createRecord(schema.getName, schema.getDoc, schema.getNamespace, schema.isError, fields)
+    Schema.createRecord(schema.getName, schema.getDoc, schema.getNamespace, schema.isError, fields)
   }
 
   /** make parquet eq/in filter
    */
   def makeParquetFilter(column: String, value: String): FilterPredicate = {
-    return this.makeParquetFilterAnd(List(column -> List(value)))
+    this.makeParquetFilterAnd(List(column -> List(value)))
   }
 
   def makeParquetFilter(column: String, value: List[String]): FilterPredicate = {
-    return this.makeParquetFilterAnd(List(column -> value))
+    this.makeParquetFilterAnd(List(column -> value))
   }
 
   def makeParquetFilterAnd(pairs: List[(String, List[String])]): FilterPredicate = {
@@ -52,20 +52,20 @@ object BitlapReaders {
         this.makeParquetColumnFilter(p2._1, p2._2)
       )
     }
-    return expr
+    expr
   }
 
   private def makeParquetColumnFilter(column: String, values: List[String]): FilterPredicate = {
     if (values.size == 1) {
       return FilterApi.eq(FilterApi.binaryColumn(column), Binary.fromString(values.head))
     }
-    return FilterApi.in(FilterApi.binaryColumn(column), values.map(Binary.fromString).toSet.asJava)
+    FilterApi.in(FilterApi.binaryColumn(column), values.map(Binary.fromString).toSet.asJava)
   }
 
   /** make parquet filter from [PrunePushedFilter]
    */
   def makeParquetFilterFromPrunePushedFilter(filter: PrunePushedFilter, column: String): FilterPredicate = {
-    val conditions = filter.getConditions()
+    val conditions = filter.getConditions
     if (conditions.isEmpty) {
       return null
     }
@@ -76,19 +76,18 @@ object BitlapReaders {
         this.makeParquetFilterFromPrunePushedFilter(it, column)
       )
     }
-    return expr
+    expr
   }
 
   private def makeParquetFilterFromPrunePushedFilter(expr: PrunePushedFilterExpr, column: String): FilterPredicate = {
     val columnExpr = FilterApi.binaryColumn(column)
-    return expr.op match {
-      case FilterOp.EQUALS => {
+    expr.op match {
+      case FilterOp.EQUALS =>
         if (expr.values.size == 1) {
           FilterApi.eq(columnExpr, Binary.fromString(expr.values.head))
         } else {
           FilterApi.in(columnExpr, expr.values.map(Binary.fromString).toSet.asJava)
         }
-      }
 
       case FilterOp.NOT_EQUALS =>
         if (expr.values.size == 1) {

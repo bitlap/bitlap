@@ -22,7 +22,7 @@ class SqlShowCurrentDatabase(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return List(
+    List(
       Array(QueryContext.get().currentSchema) // must exist
     )
   }

@@ -29,9 +29,9 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
     if (this.subPlans.size == 1) {
       return this.subPlans.last.execute(context)
     }
-    val rowsSet = this.subPlans.map(_.execute(context)).toList // TODO: par
+    val rowsSet = this.subPlans.map(_.execute(context)) // TODO: par
 
-    return rowsSet.reduce { case (rs1, rs2) => merge0(rs1, rs2) }
+    rowsSet.reduce { case (rs1, rs2) => merge0(rs1, rs2) }
   }
 
   private def merge0(rs1: RowIterator, rs2: RowIterator): RowIterator = {
@@ -74,7 +74,7 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
     val buffer = rows2.rows.asScala.toList.groupBy(_(0))
     for (r1 <- rows1.asScala) {
       val keys1   = r1.getByTypes(rows1.keyTypes)
-      val tmValue = keys1(0)
+      val tmValue = keys1.head
       if (buffer.contains(tmValue)) {
         for (r2 <- buffer(tmValue)) {
           val keys2 = r2.getByTypes(rows2.keyTypes)
@@ -96,10 +96,10 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
         results(rKeys) = Row((rKeys ++ cells).toArray)
       }
     }
-    return RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
+    RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
   }
 
   override def explain(depth: Int): String = {
-    return s"${" ".repeat(depth)}+- MetricMergeDimFetchPlan\n${this.subPlans.map(_.explain(depth + 2)).mkString("\n")}"
+    s"${" ".repeat(depth)}+- MetricMergeDimFetchPlan\n${this.subPlans.map(_.explain(depth + 2)).mkString("\n")}"
   }
 }

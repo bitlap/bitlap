@@ -26,7 +26,7 @@ class QueryExecution(
 
   def execute(): QueryResult = {
     try {
-      return QueryContext.use { ctx =>
+      QueryContext.use { ctx =>
         ctx.runtimeConf = runtimeConf
         ctx.currentSchema = currentSchema
         ctx.statement = statement
@@ -43,11 +43,12 @@ class QueryExecution(
     val plan      = planner.parse(statement)
     val result    = RelRunners.run(plan.relOpt).executeQuery()
     // some special operations
-    plan.sqlNode match
+    plan.sqlNode match {
       case node: SqlUseDatabase =>
         useSchema = node.useDatabase
       case _ =>
+    }
 
-    return QueryResult(result, useSchema)
+    QueryResult(result, useSchema)
   }
 }

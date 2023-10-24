@@ -31,7 +31,7 @@ class SqlCreateTable(
       _ifNotExists
     ) {
 
-  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int) = {
+  override def unparse(writer: SqlWriter, leftPrec: Int, rightPrec: Int): Unit = {
     writer.keyword("CREATE TABLE")
     if (ifNotExists) {
       writer.keyword("IF NOT EXISTS")
@@ -50,7 +50,7 @@ class SqlCreateTable(
     } else {
       catalog.createTable(splits.get(1), splits.get(0), ifNotExists)
     }
-    return List(Array(result))
+    List(Array(result))
   }
 }
 

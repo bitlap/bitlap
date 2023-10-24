@@ -26,10 +26,10 @@ class SqlRunExample(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    return List(Array(s"hello $exampleString"))
+    List(Array(s"hello $exampleString"))
   }
 }
 
 object SqlRunExample {
-  val OPERATOR = SqlSpecialOperator("RUN EXAMPLE", SqlKind.OTHER)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("RUN EXAMPLE", SqlKind.OTHER)
 }

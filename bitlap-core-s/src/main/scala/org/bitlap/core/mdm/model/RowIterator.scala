@@ -18,24 +18,24 @@ class RowIterator(
     extends BitlapIterator[Row] {
 
   private val dataTypes = keyTypes ++ valueTypes
-  private val dtNameMap = dataTypes.groupBy(_.name).map(kv => kv._1 -> kv._2.head).toMap
+  private val dtNameMap = dataTypes.groupBy(_.name).map(kv => kv._1 -> kv._2.head)
 
-  override def hasNext(): Boolean = {
-    return this.rows.hasNext()
+  override def hasNext: Boolean = {
+    this.rows.hasNext
   }
 
   override def next(): Row = {
-    return this.rows.next()
+    this.rows.next()
   }
 
   /** get types for input strings.
    */
   def getTypes(names: List[String]): List[DataType] = {
-    return names.map(n => this.dtNameMap(n))
+    names.map(n => this.dtNameMap(n))
   }
 
   def getType(name: String): DataType = {
-    return this.dtNameMap(name)
+    this.dtNameMap(name)
   }
 
   /** get array result
@@ -56,10 +56,10 @@ class RowIterator(
         }
       }
     }
-    return Iterable.from(rs)
+    Iterable.from(rs)
   }
 }
 
 object RowIterator {
-  def empty() = RowIterator(BitlapIterator.empty(), List.empty[DataType], List.empty[DataType])
+  def empty(): RowIterator = RowIterator(BitlapIterator.empty(), List.empty[DataType], List.empty[DataType])
 }

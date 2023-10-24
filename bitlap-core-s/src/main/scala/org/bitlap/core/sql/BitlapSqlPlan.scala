@@ -9,13 +9,13 @@ import org.apache.calcite.sql.SqlNode
 /** sql plan
  */
 case class BitlapSqlPlan(
-  val statement: String,
-  val sqlNode: SqlNode,
-  val rel: RelNode,
-  val relOpt: RelNode // optimized rel
+  statement: String,
+  sqlNode: SqlNode,
+  rel: RelNode,
+  relOpt: RelNode // optimized rel
 ) {
 
   def explain(): String = {
-    return this.relOpt.explain()
+    this.relOpt.explain()
   }
 }

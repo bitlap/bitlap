@@ -7,7 +7,6 @@ import org.bitlap.core.sql.rel.BitlapUnion
 import org.bitlap.core.sql.rule.AbsRelRule
 
 import org.apache.calcite.adapter.enumerable.EnumerableConvention
-import org.apache.calcite.adapter.enumerable.EnumerableRules
 import org.apache.calcite.adapter.enumerable.EnumerableUnion
 import org.apache.calcite.plan.RelOptRule
 import org.apache.calcite.plan.RelOptRuleCall
@@ -26,10 +25,10 @@ class BitlapEnumerableUnionRule extends AbsRelRule(classOf[BitlapUnion], "Bitlap
 
   override def convert0(rel: RelNode, call: RelOptRuleCall): RelNode = {
     val union     = rel.asInstanceOf[Union]
-    val traitSet  = rel.getCluster().traitSet().replace(EnumerableConvention.INSTANCE)
+    val traitSet  = rel.getCluster.traitSet().replace(EnumerableConvention.INSTANCE)
     val newInputs = Util.transform(union.getInputs, (it: RelNode) => RelOptRule.convert(it, traitSet))
-    return EnumerableUnion(
-      rel.getCluster(),
+    EnumerableUnion(
+      rel.getCluster,
       traitSet,
       newInputs,
       union.all

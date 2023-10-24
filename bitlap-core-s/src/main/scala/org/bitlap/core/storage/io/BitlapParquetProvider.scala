@@ -38,7 +38,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
   import BitlapParquetProvider._
 
   override def getMetricWriter(output: Path): BitlapWriter[MetricRow] = {
-    return BitlapParquetWriter(
+    BitlapParquetWriter(
       fs,
       output,
       METRIC_SCHEMA,
@@ -56,7 +56,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
   }
 
   override def getMetricDimWriter(output: Path): BitlapWriter[MetricDimRow] = {
-    return BitlapParquetWriter(
+    BitlapParquetWriter(
       fs,
       output,
       METRIC_DIM_SCHEMA,
@@ -84,7 +84,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
     val inputs              = this.listFilePath(dataPath, timeFunc)
     val metricFilter        = BitlapReaders.makeParquetFilter("mk", metrics)
     val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_SCHEMA, projections)
-    return BitlapParquetReader(
+    BitlapParquetReader(
       fs,
       inputs,
       METRIC_SCHEMA,
@@ -110,7 +110,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
     val inputs              = this.listFilePath(dataPath, timeFunc)
     val metricFilter        = BitlapReaders.makeParquetFilter("mk", metrics)
     val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_SCHEMA, projections)
-    return BitlapParquetReader(
+    BitlapParquetReader(
       fs,
       inputs,
       METRIC_SCHEMA,
@@ -143,7 +143,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
     val inputs              = this.listFilePath(dataPath, timeFunc)
     val filter              = this.getMetricDimFilter(metrics, dimension, dimensionFilter)
     val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_DIM_SCHEMA, projections)
-    return BitlapParquetReader(
+    BitlapParquetReader(
       fs,
       inputs,
       METRIC_DIM_SCHEMA,
@@ -171,7 +171,7 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
     val inputs              = this.listFilePath(dataPath, timeFunc)
     val filter              = this.getMetricDimFilter(metrics, dimension, dimensionFilter)
     val requestedProjection = BitlapReaders.makeAvroSchema(METRIC_DIM_SCHEMA, projections)
-    return BitlapParquetReader(
+    BitlapParquetReader(
       fs,
       inputs,
       METRIC_DIM_SCHEMA,
@@ -207,12 +207,12 @@ class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extend
     if (dimFilter != null) {
       filter = FilterApi.and(filter, dimFilter)
     }
-    return filter
+    filter
   }
 
   // TODO (get partitions)
   private def listFilePath(dataPath: Path, timeFunc: TimeFilterFun): List[Path] = {
-    return fs
+    fs
       .listStatus(dataPath)
       .filter(it => it.isDirectory && timeFunc(it.getPath.getName.split("=")(1).toLong))
       .flatMap(filePath => fs.listStatus(filePath.getPath, HiddenFileFilter.INSTANCE).map(_.getPath))

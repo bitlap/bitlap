@@ -16,13 +16,13 @@ class ValidRule extends AbsRelRule(classOf[BitlapNode], "ValidRule") {
     _rel match {
       case rel: BitlapTableScan => {
         val table   = rel.getOTable()
-        val dimCols = table.analyzer.getFilterColNames()
+        val dimCols = table.analyzer.getFilterColNames
         // check time filter
         if (!dimCols.contains(Keyword.TIME)) {
           throw IllegalArgumentException(s"Query must contain ${Keyword.TIME} filter")
         }
         // check metrics
-        val metricCols = table.analyzer.getMetricColNames()
+        val metricCols = table.analyzer.getMetricColNames
         if (metricCols.isEmpty) {
           throw IllegalArgumentException(
             s"Query must contain at least one aggregation metric, aggregation column must be specified"

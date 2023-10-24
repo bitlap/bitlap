@@ -34,10 +34,10 @@ class BitlapSqlQueryTable(val table: Table) extends AbstractTable with Projectab
    */
   override def getRowType(typeFactory: RelDataTypeFactory): RelDataType = {
     val builder = typeFactory.builder()
-    analyzer.getMetricColNames().foreach { it =>
+    analyzer.getMetricColNames.foreach { it =>
       builder.add(it, SqlTypeName.ANY).nullable(true)
     }
-    analyzer.getDimensionColNames().foreach { it =>
+    analyzer.getDimensionColNames.foreach { it =>
       if (it == Keyword.TIME) {
         builder.add(it, SqlTypeName.BIGINT)
       } else {

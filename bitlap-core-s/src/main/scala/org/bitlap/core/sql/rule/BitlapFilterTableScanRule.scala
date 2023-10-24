@@ -43,9 +43,9 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
 
   override def convert0(_rel: RelNode, call: RelOptRuleCall): RelNode = {
     val rel = _rel.asInstanceOf[BitlapFilter]
-    return rel.getInput.clean() match {
+    rel.getInput.clean() match {
       case _: BitlapTableFilterScan => rel // has been converted
-      case scan: BitlapTableScan => {
+      case scan: BitlapTableScan =>
         val relBuilder = call.builder()
         val rexBuilder = RexBuilder(relBuilder.getTypeFactory)
         val projects   = scan.identity()
@@ -91,7 +91,6 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
             rel.copy(rel.getTraitSet, inputScan, unPruneFilter)
           }
         }
-      }
       case _ => rel
     }
   }
@@ -109,7 +108,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
 
     val unPruneFilter = filter.accept(new RexShuttle() {
       override def visitCall(call: RexCall): RexNode = {
-        return call.getKind match {
+        call.getKind match {
           case k if k == SqlKind.OR => throw new NotImplementedError("OR expression is not supported now.") // TODO
           case k if k == SqlKind.AND => {
             val operands = ListBuffer[RexNode]().also { it => visitList(call.operands, it.toList.asJava) }
@@ -137,7 +136,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
                   timeFilter.add(
                     inputField.getName,
                     resolveFilter(call, inputField, rowType, rexBuilder),
-                    call.toString().replace("$" + inputField.getIndex, inputField.getName)
+                    call.toString.replace("$" + inputField.getIndex, inputField.getName)
                   )
                 } else {
                   val (values, op) = getLiteralValue(refValue, call.getKind.sql.toLowerCase())
@@ -146,7 +145,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
                     op,
                     values,
                     resolveFilter(call, inputField, rowType, rexBuilder),
-                    call.toString().replace("$" + inputField.getIndex, inputField.getName)
+                    call.toString.replace("$" + inputField.getIndex, inputField.getName)
                   )
                 }
                 null
@@ -159,7 +158,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
                     timeFilter.add(
                       inputField.getName,
                       resolveFilter(call, inputField, rowType, rexBuilder),
-                      call.toString().replace("$" + inputField.getIndex, inputField.getName)
+                      call.toString.replace("$" + inputField.getIndex, inputField.getName)
                     )
                     null
                   } else {
@@ -179,7 +178,7 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
         }
       }
     })
-    return (timeFilter, pruneFilter, unPruneFilter)
+    (timeFilter, pruneFilter, unPruneFilter)
   }
 
   /** resolve time filter to normal function
@@ -201,66 +200,67 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
     )
     // convert to normal function
     val executor = RexExecutorImpl.getExecutable(builder, List(filter).asJava, rowType).getFunction
-    return { (it: T) =>
+
+    (it: T) => {
       // why inputRecord? see DataContextInputGetter
       val input = DataContexts.of(Map("inputRecord" -> Array(it.asInstanceOf[Any])).asJava)
-      (executor.apply(input).asInstanceOf[Array[_]]).head.asInstanceOf[Boolean]
+      executor.apply(input).asInstanceOf[Array[_]].head.asInstanceOf[Boolean]
     }
   }
 
   private def getLiteralValue(literal: RexLiteral, op: String): (List[String], FilterOp) = {
-    return literal.getValue match {
+    literal.getValue match {
       case _: Sarg[_] => {
         val values   = ListBuffer[NlsString]()
         var filterOp = FilterOp.EQUALS
         RangeSets.forEach(
-          (literal.getValue.asInstanceOf[Sarg[NlsString]]).rangeSet,
+          literal.getValue.asInstanceOf[Sarg[NlsString]].rangeSet,
           new RangeSets.Consumer[NlsString] {
-            override def all() = throw IllegalStateException("Illegal compare all.")
-            override def atLeast(lower: NlsString) = {
+            override def all(): Unit = throw IllegalStateException("Illegal compare all.")
+            override def atLeast(lower: NlsString): Unit = {
               values += lower
               filterOp = FilterOp.GREATER_EQUALS_THAN
             }
 
-            override def atMost(upper: NlsString) = {
+            override def atMost(upper: NlsString): Unit = {
               values += upper
               filterOp = FilterOp.LESS_EQUALS_THAN
             }
 
-            override def greaterThan(lower: NlsString) = {
+            override def greaterThan(lower: NlsString): Unit = {
               values += lower
               filterOp = FilterOp.GREATER_THAN
             }
 
-            override def lessThan(upper: NlsString) = {
+            override def lessThan(upper: NlsString): Unit = {
               values += upper
               filterOp = FilterOp.LESS_THAN
             }
 
-            override def singleton(value: NlsString) = {
+            override def singleton(value: NlsString): Unit = {
               values += value
               filterOp = FilterOp.EQUALS
             }
 
-            override def closed(lower: NlsString, upper: NlsString) = {
+            override def closed(lower: NlsString, upper: NlsString): Unit = {
               values += lower
               values += upper
               filterOp = FilterOp.CLOSED
             }
 
-            override def closedOpen(lower: NlsString, upper: NlsString) = {
+            override def closedOpen(lower: NlsString, upper: NlsString): Unit = {
               values += lower
               values += upper
               filterOp = FilterOp.CLOSED_OPEN
             }
 
-            override def openClosed(lower: NlsString, upper: NlsString) = {
+            override def openClosed(lower: NlsString, upper: NlsString): Unit = {
               values += lower
               values += upper
               filterOp = FilterOp.OPEN_CLOSED
             }
 
-            override def open(lower: NlsString, upper: NlsString) = {
+            override def open(lower: NlsString, upper: NlsString): Unit = {
               values += lower
               values += upper
               filterOp = FilterOp.OPEN

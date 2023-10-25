@@ -66,8 +66,8 @@ final class SimpleOperation(parentSession: Session, opType: OperationType, hasRe
     super.setState(OperationState.RunningState)
     try {
       val execution = new QueryExecution(statement, parentSession.currentSchema).execute()
-      parentSession.currentSchema = execution.getCurrentSchema // reset current schema
-      cache.put(opHandle, mapTo(execution.getData))
+      parentSession.currentSchema = execution.currentSchema // reset current schema
+      cache.put(opHandle, mapTo(execution.data))
       super.setState(OperationState.FinishedState)
     } catch {
       case e: Exception =>

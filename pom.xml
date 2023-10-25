@@ -54,7 +54,6 @@
         <module>bitlap-cli</module>
         <module>bitlap-spark3</module>
         <module>bitlap-testkit</module>
-        <module>bitlap-core-s</module>
     </modules>
 
     <properties>
@@ -85,7 +84,6 @@
         <kotlin.version>1.8.20</kotlin.version>
         <kotlinx.coroutines.version>1.7.2</kotlinx.coroutines.version>
         <kotlin.logging.version>3.0.5</kotlin.logging.version>
-        <kotlin.csv.version>1.9.2</kotlin.csv.version>
         <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->

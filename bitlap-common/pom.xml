@@ -47,21 +47,6 @@
             <artifactId>disruptor</artifactId>
             <version>${disruptor.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.doyaaaaaken</groupId>
-            <artifactId>kotlin-csv-jvm</artifactId>
-            <version>${kotlin.csv.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jetbrains.kotlinx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <build>

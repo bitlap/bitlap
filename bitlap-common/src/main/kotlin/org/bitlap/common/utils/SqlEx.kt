@@ -15,6 +15,7 @@ object SqlEx {
     /**
      * print sql result beautifully
      */
+    @JvmStatic
     fun ResultSet.toTable(): DBTable {
         return DBTablePrinter.from(this)
     }

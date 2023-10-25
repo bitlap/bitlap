@@ -18,11 +18,11 @@ class DDLTest extends BaseLocalFsTest with SqlChecker {
     assertThrows[BitlapException] { sql(s"create database $testDB") }
     sql(s"create database if not exists $testDB") shouldEqual List(List(false))
     // show
-    sql(s"show databases").result should contain(DEFAULT_DATABASE)
-    sql(s"show databases").result should contain(testDB)
+    sql(s"show databases").result should contain(List(DEFAULT_DATABASE))
+    sql(s"show databases").result should contain(List(testDB))
     // drop
     sql(s"drop database $testDB") shouldEqual List(List(true))
-    sql(s"show databases").result should not contain (testDB)
+    sql(s"show databases").result should not contain List(testDB)
     assertThrows[BitlapException] { sql(s"drop database $testDB") }
     sql(s"drop database if exists $testDB") shouldEqual List(List(false))
   }

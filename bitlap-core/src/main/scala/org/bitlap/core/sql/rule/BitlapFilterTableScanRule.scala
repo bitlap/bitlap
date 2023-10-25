@@ -3,10 +3,12 @@
  */
 package org.bitlap.core.sql.rule
 
+import java.util
+
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 
-import org.bitlap.core.extension._
+import org.bitlap.core.extension.*
 import org.bitlap.core.sql.FilterOp
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
@@ -111,8 +113,8 @@ class BitlapFilterTableScanRule extends AbsRelRule(classOf[BitlapFilter], "Bitla
         call.getKind match {
           case k if k == SqlKind.OR => throw new NotImplementedError("OR expression is not supported now.") // TODO
           case k if k == SqlKind.AND =>
-            val operands = ListBuffer[RexNode]().also { it => visitList(call.operands, it.toList.asJava) }
-              .filter(_ != null)
+            val list     = new util.ArrayList[RexNode]()
+            val operands = list.also { it => visitList(call.operands, it) }.asScala.filter(_ != null)
             if (operands.size == 2) {
               rexBuilder.makeCall(call.op, operands.asJava)
             } else {

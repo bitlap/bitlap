@@ -17,7 +17,7 @@ class ExplainTest extends BaseLocalFsTest with SqlChecker {
         List(
           "BitlapAggregate(group=[{}], cvv=[bm_count($0)], cpv=[bm_count($1)])\n" +
             "  BitlapProject(vv=[$1], pv=[$0])\n" +
-            "    BitlapTableFilterScan(table=[[$db, $table]], class=[BitlapSqlQueryMetricTable], timeFilter=[[=(_time, 100)]], pruneFilter=[[]])\n"
+            s"    BitlapTableFilterScan(table=[[$db, $table]], class=[BitlapSqlQueryMetricTable], timeFilter=[[=(_time, 100)]], pruneFilter=[[]])\n"
         )
       )
     )

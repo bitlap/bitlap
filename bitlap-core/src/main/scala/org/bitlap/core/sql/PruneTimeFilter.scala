@@ -31,6 +31,6 @@ class PruneTimeFilter extends Serializable {
   }
 
   override def toString: String = {
-    this.conditions.map(_.expr).toString
+    this.conditions.map(_.expr).mkString("[", ",", "]")
   }
 }

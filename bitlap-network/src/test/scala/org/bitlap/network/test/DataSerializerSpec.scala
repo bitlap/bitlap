@@ -9,16 +9,15 @@ import java.sql.{ Date, Time, Timestamp }
 import org.bitlap.network.enumeration.TypeId
 import org.bitlap.network.serde.BitlapSerde
 
-import org.junit.Test
+import org.scalatest.funsuite.AnyFunSuite
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/11/15
  */
-class DataSerializerSpec extends BitlapSerde:
+class DataSerializerSpec extends AnyFunSuite with BitlapSerde:
 
-  @Test
-  def testSerializeJavaInt(): Unit =
+  test("testSerializeJavaInt") {
     val s = serialize(Integer.valueOf(100))
 
     val buffer           = new ByteArrayOutputStream()
@@ -29,9 +28,10 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Int](TypeId.IntType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getInt == d1)
+  }
 
-  @Test
-  def testSerializeInt(): Unit =
+  test("testSerializeInt") {
+
     val s = serialize(100)
 
     val buffer           = new ByteArrayOutputStream()
@@ -42,9 +42,10 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Int](TypeId.IntType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getInt == d1)
+  }
 
-  @Test
-  def testSerializeLong(): Unit =
+  test("testSerializeLong") {
+
     val s = serialize(100L)
 
     val buffer           = new ByteArrayOutputStream()
@@ -55,9 +56,10 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Long](TypeId.LongType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1)
+  }
 
-  @Test
-  def testSerializeShort(): Unit =
+  test("testSerializeShort") {
+
     val s                = serialize(100.toShort)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -67,9 +69,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Short](TypeId.ShortType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getShort() == d1)
+  }
 
-  @Test
-  def testSerializeDouble(): Unit =
+  test("testSerializeDouble") {
     val s                = serialize(100d)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -79,9 +81,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Double](TypeId.DoubleType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getDouble == d1)
+  }
 
-  @Test
-  def testSerializeFloat(): Unit =
+  test("testSerializeFloat") {
     val s                = serialize(100f)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -91,9 +93,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Float](TypeId.FloatType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getFloat == d1)
+  }
 
-  @Test
-  def testSerializeTimestamp(): Unit =
+  test("testSerializeTimestamp") {
     val time             = new Timestamp(System.currentTimeMillis())
     val s                = serialize(time)
     val buffer           = new ByteArrayOutputStream()
@@ -104,9 +106,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Timestamp](TypeId.TimestampType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
 
-  @Test
-  def testSerializeTime(): Unit =
+  test("testSerializeTime") {
     val time             = new Time(System.currentTimeMillis())
     val s                = serialize(time)
     val buffer           = new ByteArrayOutputStream()
@@ -117,9 +119,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Time](TypeId.TimeType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
 
-  @Test
-  def testSerializeDate(): Unit =
+  test("testSerializeDate") {
     val time             = new Date(System.currentTimeMillis())
     val s                = serialize(time)
     val buffer           = new ByteArrayOutputStream()
@@ -130,9 +132,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Date](TypeId.DateType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
 
-  @Test
-  def testSerializeDateCanBeLong(): Unit =
+  test("testSerializeDateCanBeLong") {
     val time             = new Date(System.currentTimeMillis())
     val s                = serialize(time)
     val buffer           = new ByteArrayOutputStream()
@@ -143,9 +145,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Long](TypeId.DateType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1)
+  }
 
-  @Test
-  def testSerializeTimestampCanBeString(): Unit =
+  test("testSerializeTimestampCanBeString") {
     val time             = new Timestamp(System.currentTimeMillis())
     val s                = serialize(time)
     val buffer           = new ByteArrayOutputStream()
@@ -156,9 +158,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[String](TypeId.TimestampType, buffer.toByteArray)
 
     assert(new Timestamp((s.asReadOnlyByteBuffer().getLong)).toString == d1)
+  }
 
-  @Test
-  def testSerializeString(): Unit =
+  test("testSerializeString") {
     import java.nio.charset.Charset
     val s                = serialize("test_database_811656")
     val buffer           = new ByteArrayOutputStream()
@@ -169,9 +171,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[String](TypeId.StringType, buffer.toByteArray)
 
     assert(s"${new String(s.toByteArray, Charset.forName("utf8"))}" == d1)
+  }
 
-  @Test
-  def testSerializeIntCanBeString(): Unit =
+  test("testSerializeIntCanBeString") {
     val s = serialize(100)
 
     val buffer           = new ByteArrayOutputStream()
@@ -182,9 +184,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[String](TypeId.IntType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getInt == d1.toInt)
+  }
 
-  @Test
-  def testSerializeLongCanBeDate(): Unit =
+  test("testSerializeLongCanBeDate") {
     val date = new Date(System.currentTimeMillis())
     val s    = serialize(date)
 
@@ -196,9 +198,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Date](TypeId.DateType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getLong == d1.getTime)
+  }
 
-  @Test
-  def testSerializeBooleanCanBeInt(): Unit =
+  test("testSerializeBooleanCanBeInt") {
     val s                = serialize(true)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -208,9 +210,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[Boolean](TypeId.BooleanType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().get() == 1 && d1)
+  }
 
-  @Test
-  def testSerializeBooleanCanBeString(): Unit =
+  test("testSerializeBooleanCanBeString") {
     val s                = serialize(true)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -220,9 +222,9 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[String](TypeId.BooleanType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().get() == 1 && d1 == "true")
+  }
 
-  @Test
-  def testSerializeShortCanBeString(): Unit =
+  test("testSerializeShortCanBeString") {
     val s                = serialize(100.toShort)
     val buffer           = new ByteArrayOutputStream()
     val dataOutputStream = new DataOutputStream(buffer)
@@ -232,3 +234,4 @@ class DataSerializerSpec extends BitlapSerde:
     val d1 = deserialize[String](TypeId.ShortType, buffer.toByteArray)
 
     assert(s.asReadOnlyByteBuffer().getShort() == d1.toShort)
+  }

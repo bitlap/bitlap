@@ -31,9 +31,9 @@ trait SqlChecker {
   def checkRows(statement: String, rows: List[List[Any]], session: SqlSession = SqlSession()): Unit = {
     val result = sql(statement, session).result
     try {
-      result.size shouldBe rows.size
+      assert(result.size == rows.size)
       result.zip(rows).foreach { case (r1, r2) =>
-        r1.size shouldBe r2.size
+        assert(r1.size == r2.size)
         r1.zip(r2).foreach { case (v1, v2) =>
           v1 shouldBe v2
         }

@@ -33,6 +33,7 @@ jobs:
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
 
       - name: Docker Build
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
         run: bash deploy.sh ${{ vars.VERSION }}
         working-directory: ./docker
       - name: Login to Docker Hub

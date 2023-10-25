@@ -53,7 +53,7 @@ open class RowValueMeta extends Serializable {
   }
 
   override def toString: String = {
-    return s"[v0=${this(0)}, v1=${this(1)}, v2=${this(2)}]"
+    s"[v0=${this(0)}, v1=${this(1)}, v2=${this(2)}]"
   }
 
 }

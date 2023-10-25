@@ -6,12 +6,13 @@ package org.bitlap.jdbc
 import scala.collection.immutable.ListMap
 
 import org.junit.Test
+import org.scalatest.funsuite.AnyFunSuite
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2022/10/24
  */
-class JdbcUriParamsSpec:
+class JdbcUriParamsSpec extends AnyFunSuite:
 
   def shouldEquals[T, R](actual: => R, expect: => T): Unit =
     if !expect.equals(actual) then
@@ -21,8 +22,7 @@ class JdbcUriParamsSpec:
           |""".stripMargin)
       assert(false)
 
-  @Test
-  def testUriParse(): Unit =
+  test("testUriParse") {
     val url1 = "jdbc:bitlap://host1:port1,host2:port2,host3:port3/;k1=v1?k2=v2"
     val url2 = "jdbc:bitlap://host1:port1,host2:port2,host3:port3/db;k1=v1?k2=v2"
     val url3 = "jdbc:bitlap://host1:port1,host2:port2,host3:port3?k2=v2"
@@ -55,3 +55,4 @@ class JdbcUriParamsSpec:
 
     val params5 = Utils.parseUri(url5)
     shouldEquals(params5.bitlapConfs, ListMap("initFile" -> "1sql", "retries" -> "3"))
+  }

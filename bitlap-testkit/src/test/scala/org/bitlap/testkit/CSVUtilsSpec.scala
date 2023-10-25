@@ -10,8 +10,9 @@ import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.testkit.server.MockDriverIO
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.scalatest.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should
 
 /** csv test
  *
@@ -19,25 +20,19 @@ import org.junit.Test
  *    梦境迷离
  *  @version 1.0,2022/4/27
  */
-class CSVUtilsSpec extends CSVUtils {
+class CSVUtilsSpec extends AnyFunSuite with CSVUtils with should.Matchers {
 
-  @Test
-  def testCsvConvert1(): Unit = {
+  test("testCsvConvert1") {
     val csv = readClasspathCSVData("simple_data.csv")
     println(csv.headOption)
-    assertEquals(
-      "Some(Metric(1666195200,14,List(Dimension(os,Windows 8), Dimension(city,西安)),pv,712739626))",
-      csv.headOption.toString
-    )
-
-    val tmp = new File("simple_data.csv")
+    val tmp = new File("./bitlap-testkit/target/simple_data.csv")
     val ret = writeCSVData(tmp, csv)
     assert(ret)
     tmp.delete()
+    csv.headOption.toString shouldEqual "Some(Metric(1666195200,14,List(Dimension(os,Windows 8), Dimension(city,西安)),pv,712739626))"
   }
 
-  @Test
-  def testMockDriverIO(): Unit = {
+  test("testMockDriverIO") {
     val driverIO = new MockDriverIO()
     val ret      = driverIO.fetchResults(OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>
@@ -52,9 +47,6 @@ class CSVUtilsSpec extends CSVUtils {
       BitlapSerde.deserialize[String](TypeId.StringType, head(3)),
       BitlapSerde.deserialize[Long](TypeId.LongType, head(4))
     )
-    assertEquals(
-      value,
-      List(1666195200, 14, "Windows 8", "pv", 712739626)
-    )
+    value shouldEqual List(1666195200, 14, "Windows 8", "pv", 712739626)
   }
 }

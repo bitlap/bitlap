@@ -43,6 +43,6 @@ class PrunePushedFilter extends Serializable {
   def getConditions: List[PrunePushedFilterExpr] = this.conditions.toList
 
   override def toString: String = {
-    this.conditions.map(_.expr).toString()
+    this.conditions.map(_.expr).mkString("[", ",", "]")
   }
 }

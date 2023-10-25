@@ -5,6 +5,8 @@ package org.bitlap.testkit
 
 import java.io.*
 
+import scala.util.Using
+
 import bitlap.rolls.csv.*
 import bitlap.rolls.csv.CSVUtils.*
 
@@ -21,16 +23,16 @@ trait CSVUtils {
     override val hasColIndex: Boolean = false
   }
 
-  def readCSVData(file: File): List[Metric] =
+  def checkCSVData(file: File)(expect: List[Metric] => Boolean): Boolean =
     val (metadata, metrics) = CSVUtils.readCSV(
-      FileName(file.getName)
+      FileName(file.getPath)
     ) { line =>
       line
         .into[Metric]
         .withFieldComputed(_.dimensions, dims => StringUtils.asClasses(dims)((k, v) => Dimension(k, v)))
         .decode
     }
-    metrics.toList
+    expect(metrics.toList)
 
   def readClasspathCSVData(file: String): List[Metric] =
     val (metadata, metrics) = CSVUtils.readCSV(
@@ -44,10 +46,11 @@ trait CSVUtils {
     metrics.toList
 
   def writeCSVData(file: File, metrics: List[Metric]): Boolean =
-    val status = CSVUtils.writeCSV(file, metrics) { m =>
+    if (file.exists()) file.delete() else file.createNewFile()
+    val res = CSVUtils.writeCSV(file, metrics) { m =>
       m.into
         .withFieldComputed(_.dimensions, dims => StringUtils.asString(dims.map(f => f.key -> f.value).toList))
         .encode
     }
-    status
+    res
 }

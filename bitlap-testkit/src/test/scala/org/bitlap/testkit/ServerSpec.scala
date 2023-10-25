@@ -8,10 +8,13 @@ import java.sql.*
 import org.bitlap.testkit.server.*
 
 import org.junit.*
+import org.scalatest.{ BeforeAndAfterAll, Inspectors }
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should
 
 import bitlap.rolls.core.jdbc.*
 
-class ServerSpec extends CSVUtils {
+class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers with Inspectors with CSVUtils {
 
   private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
   private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
@@ -24,8 +27,7 @@ class ServerSpec extends CSVUtils {
     override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
   }
 
-  @Before
-  def startServer(): Unit = {
+  override protected def beforeAll(): Unit = {
     server.setDaemon(true)
     server.start()
     Thread.sleep(3000L)
@@ -38,14 +40,9 @@ class ServerSpec extends CSVUtils {
     sql"load data 'classpath:simple_data.csv' overwrite table $table"
   }
 
-  @After
-  def dropTable(): Unit =
-    sql"drop table $table cascade"
-
   // Execute FakeDataUtilSpec to generate new mock data
   // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-  @Test
-  def query_test1(): Unit = {
+  test("queryTest1") {
     val rs = sql"""
        select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
        from $table

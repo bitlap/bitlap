@@ -136,7 +136,7 @@ object FunctionRegistry {
           inputTypes.map(_.getSqlTypeName.getFamily).toList.asJava,
           { _ => inputTypes.toList.asJava },
           { i => s"$i" },
-          { i => true }
+          { _ => true }
         ),
         ScalarFunctionImpl.createUnsafe(method)
       )

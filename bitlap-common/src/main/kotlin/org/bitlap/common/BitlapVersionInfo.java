@@ -2,10 +2,6 @@ package org.bitlap.common;
 
 import com.typesafe.config.*;
 
-/**
- * @author 梦境迷离
- * @version 1.0, 2023/3/18
- */
 public class BitlapVersionInfo {
 
     private static String version;

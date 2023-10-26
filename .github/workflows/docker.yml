@@ -39,7 +39,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-
+    needs: [ build ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -63,7 +63,7 @@ jobs:
   
   ci:
     runs-on: ubuntu-latest
-    needs: [ build, publish ]
+    needs: [ publish ]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

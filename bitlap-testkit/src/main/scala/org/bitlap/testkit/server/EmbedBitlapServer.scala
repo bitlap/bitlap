@@ -25,7 +25,7 @@ import zio.ZIOAppArgs.getArgs
 /** Bitlap embedded services include HTTP, GRPC, and Raft
  */
 
-object EmbedBitlapServer extends zio.ZIOAppDefault {
+object EmbedBitlapServer extends ZIOAppDefault {
 
   override def run =
     (for {

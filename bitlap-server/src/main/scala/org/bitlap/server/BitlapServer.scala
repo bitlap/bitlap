@@ -30,7 +30,7 @@ import zio.logging.backend.SLF4J
 
 /** Bitlap aggregation Services
  */
-object BitlapServer extends zio.ZIOAppDefault:
+object BitlapServer extends ZIOAppDefault:
 
   private lazy val logger = Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
 

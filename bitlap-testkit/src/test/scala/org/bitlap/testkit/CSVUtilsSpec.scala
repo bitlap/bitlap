@@ -33,7 +33,7 @@ class CSVUtilsSpec extends AnyFunSuite with CSVUtils with should.Matchers {
   test("testCsvConvert1") {
     val csv = readClasspathCSVData("simple_data.csv")
     println(csv.headOption)
-    val tmp = new File("./bitlap-testkit/target/simple_data.csv")
+    val tmp = new File("./simple_data.csv")
     val ret = writeCSVData(tmp, csv)
     assert(ret)
     tmp.delete()

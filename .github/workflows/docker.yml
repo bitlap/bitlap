@@ -24,14 +24,6 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      - name: Cache the Maven packages to speed up build
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
       - name: Docker Build
         if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
         run: bash deploy.sh ${{ vars.VERSION }}

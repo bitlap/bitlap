@@ -23,13 +23,6 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      - name: Cache the Maven packages to speed up build
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
       - name: Checking Code Style
         run: ./mvnw spotless:check
 

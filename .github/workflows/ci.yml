@@ -13,7 +13,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -28,16 +27,27 @@ jobs:
 
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
+        
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          cache: 'maven'
 
       - name: Test
         run: ./mvnw -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
 
       - name: Upload test coverage report
-        run: bash <(curl -s https://codecov.io/bash)
+        run: bash <(curl -s https://codecov.io/bash)        
   
   ci:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build, test]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"

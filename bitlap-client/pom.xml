@@ -57,7 +57,6 @@
                 <artifactId>scala-maven-plugin</artifactId>
                 <configuration>
                     <args>
-                        <arg>-Ywarn-unused</arg>
                         <arg>-Yretain-trees</arg>
                     </args>
                 </configuration>

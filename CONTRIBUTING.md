@@ -26,7 +26,7 @@
 | bitlap-client    | scala 3.x、zio-grpc                | JDBC 和 Client 实现                    |
 | bitlap-network   | scala 3.x、zio 2.x                 | 网络 IO 抽象                            |
 | bitlap-server    | scala 3.x、jraft、zio-grpc、zio-http | RPC server 实现、raft 集成实现、HTTP API 实现 |
-| bitlap-core      | kotlin、calcite、parquet            | SQL解析、优化、任务、存储实现                    |
+| bitlap-core      | scala 3.x、calcite、parquet         | SQL解析、优化、任务、存储实现                    |
 | bitlap-spark3    | scala 2.13.x、spark 3.x            | 与 spark3 集成                         |
 | bitlap-common    | kotlin、 RoaringBitmap             | 公共模块、bitmap 封装                      |
 | bitlap-testkit   | scala 3.x、javafaker、rolls         | 测试工具和集成测试模块                         |

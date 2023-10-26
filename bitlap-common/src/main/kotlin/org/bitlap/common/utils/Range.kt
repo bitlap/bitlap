@@ -6,11 +6,7 @@ package org.bitlap.common.utils
 import java.io.Serializable
 
 /**
- * Desc: Range utils, reference to guava Range.
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/6/17
+ * Range utils, reference to guava Range.
  */
 open class Range<C : Comparable<C>>(val lower: LeftCut<C>, val upper: RightCut<C>) : Serializable {
 

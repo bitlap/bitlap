@@ -6,14 +6,12 @@ package org.bitlap.core.utils
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /** json extension utils
  */
 object JsonUtil {
 
-  val mapper: ObjectMapper = ObjectMapper()
+  lazy val mapper: ObjectMapper = ObjectMapper()
     .registerModule(com.fasterxml.jackson.module.scala.DefaultScalaModule)
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 

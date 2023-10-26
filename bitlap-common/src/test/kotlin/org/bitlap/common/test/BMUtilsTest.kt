@@ -7,13 +7,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import org.bitlap.common.utils.BMUtils
 
-/**
- * Desc:
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/3/5
- */
 class BMUtilsTest : StringSpec({
 
     "test min multiply to int" {

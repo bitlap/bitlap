@@ -6,13 +6,10 @@ package org.bitlap.common.data
 import java.io.Serializable
 
 /**
- * Desc: Common event.
+ * Common event.
  *
  * In user behavior analysis, each user action can be abstracted into an event stream
  *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/7/8
  */
 interface Event : Serializable {
     val time: Long

@@ -29,7 +29,7 @@ import org.apache.parquet.filter2.predicate.FilterPredicate
 import org.apache.parquet.hadoop.ParquetWriter
 import org.apache.parquet.hadoop.util.HiddenFileFilter
 
-/** Desc: Implementation of parquet table format
+/** Implementation of parquet table format
  */
 class BitlapParquetProvider(val table: Table, private val fs: FileSystem) extends TableFormatProvider {
 

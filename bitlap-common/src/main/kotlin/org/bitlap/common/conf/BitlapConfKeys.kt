@@ -8,11 +8,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Desc: bitlap conf keys
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2023/6/27
+ * bitlap conf keys
  */
 object BitlapConfKeys {
 

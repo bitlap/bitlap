@@ -14,9 +14,7 @@ import org.apache.calcite.schema.ScannableTable
 import org.apache.calcite.schema.impl.AbstractTable
 import org.apache.calcite.sql.`type`.SqlTypeName
 
-/** Desc: table for ddl operation
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/9/4
+/** table for ddl operation
  */
 class BitlapSqlDdlTable(
   val rowTypes: List[(String, SqlTypeName)],

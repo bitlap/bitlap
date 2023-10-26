@@ -10,7 +10,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
 import org.apache.spark.sql.sources.InsertableRelation
 
-/** Desc: V1 writer for Bitlap spark data
+/** V1 writer for Bitlap spark data
  */
 class BitlapInsertableRelation(val writeInfo: LogicalWriteInfo, val options: BitlapOptions) extends InsertableRelation {
 

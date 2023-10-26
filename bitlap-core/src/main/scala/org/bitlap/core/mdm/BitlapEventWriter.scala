@@ -8,6 +8,7 @@ import java.io.{ Closeable, InputStream, InputStreamReader, Serializable }
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
+import scala.util.control.NonFatal
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
@@ -32,7 +33,7 @@ import org.apache.commons.csv.{ CSVFormat, CSVParser }
 import org.apache.hadoop.conf.Configuration
 import org.slf4j.LoggerFactory
 
-/** bitlap mdm [Event] writer
+/** bitlap mdm [[Event]] writer
  */
 class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Serializable with Closeable {
 
@@ -163,7 +164,7 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
     try {
       this.store.close()
     } catch {
-      case e =>
+      case NonFatal(e) =>
         log.error(s"Error when closing BitlapWriter, cause: ", e)
     }
   }

@@ -6,11 +6,7 @@ package org.bitlap.common.conf
 import org.bitlap.common.BitlapConf
 
 /**
- * Desc: Key for [org.bitlap.common.BitlapConf]
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/5/28
+ * Key for [[org.bitlap.common.BitlapConf]]
  */
 inline fun <reified T> BitlapConfKey(key: String, defaultValue: T? = null): BitlapConfKey<T> {
     return BitlapConfKey(key, defaultValue, T::class.java).also {

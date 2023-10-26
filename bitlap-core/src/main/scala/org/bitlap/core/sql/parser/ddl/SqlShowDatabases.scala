@@ -10,9 +10,7 @@ import org.apache.calcite.sql.`type`.SqlTypeName
 import org.apache.calcite.sql.{ SqlIdentifier, SqlKind, SqlNode, SqlSpecialOperator, SqlWriter }
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: Parse tree for `SHOW (DATABASES | SCHEMAS)` statement.
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/25
+/** Parse tree for `SHOW (DATABASES | SCHEMAS)` statement.
  */
 class SqlShowDatabases(override val _pos: SqlParserPos, val pattern: SqlIdentifier)
     extends BitlapSqlDdlNode(_pos, SqlShowDatabases.OPERATOR, List.empty[SqlNode]) {

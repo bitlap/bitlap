@@ -15,7 +15,7 @@ import org.apache.parquet.filter2.predicate.FilterApi
 import org.apache.parquet.filter2.predicate.FilterPredicate
 import org.apache.parquet.io.api.Binary
 
-/** Desc: bitlap reader utils
+/** bitlap reader utils
  */
 object BitlapReaders {
 

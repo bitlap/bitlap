@@ -7,11 +7,7 @@ import org.bitlap.common.utils.Range
 import org.joda.time.DateTime
 
 /**
- * Desc: Time range utils, startTime and endTime must be specified.
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/6/21
+ * Time range utils, startTime and endTime must be specified.
  */
 class TimeRange private constructor(lower: LeftCut<DateTime>, upper: RightCut<DateTime>) : Range<DateTime>(lower, upper) {
 

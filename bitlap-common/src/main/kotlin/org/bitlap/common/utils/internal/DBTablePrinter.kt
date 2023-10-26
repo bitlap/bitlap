@@ -9,10 +9,7 @@ import java.sql.ResultSet
 import java.sql.Types
 
 /**
- * Desc: Java ResultSet Printer, refer to https://github.com/htorun/dbtableprinter
- *
- * Created by IceMimosa
- * Date: 2022/10/24
+ * Java ResultSet Printer, refer to [[https://github.com/htorun/dbtableprinter]]
  */
 object DBTablePrinter {
 

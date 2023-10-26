@@ -7,11 +7,7 @@ import java.io.ObjectInput
 import java.io.ObjectOutput
 
 /**
- * Desc: Abstract of [BM]
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/21
+ * Abstract of [BM]
  */
 abstract class AbsBM : BM {
 

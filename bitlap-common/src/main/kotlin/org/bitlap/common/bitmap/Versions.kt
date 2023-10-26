@@ -4,11 +4,7 @@
 package org.bitlap.common.bitmap
 
 /**
- * Desc: Bitmap's serializer versions
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/26
+ * Bitmap's serializer versions
  */
 object Versions {
     const val RBM_VERSION_V1: Int = 1001

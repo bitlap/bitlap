@@ -15,8 +15,6 @@ import org.apache.calcite.sql.SqlNode
 import org.apache.calcite.sql.SqlOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/7/28
- */
 abstract class BitlapSqlDdlCreateNode(
   val _pos: SqlParserPos,
   override val op: SqlOperator,

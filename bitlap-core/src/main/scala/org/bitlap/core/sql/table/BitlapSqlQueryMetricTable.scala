@@ -31,9 +31,8 @@ class BitlapSqlQueryMetricTable(
     if (projects == null) {
       // return Linq4j.emptyEnumerable()
       val rowType = super.getRowType(root.getTypeFactory)
-      return this.scan(root, ImmutableIntList.identity(rowType.getFieldCount).toIntArray)
-    }
-    this.scan(root, projects)
+      this.scan(root, ImmutableIntList.identity(rowType.getFieldCount).toIntArray)
+    } else this.scan(root, projects)
   }
 
   private def scan(root: DataContext, projects: Array[Int]): Enumerable[Array[Any]] = {

@@ -14,9 +14,7 @@ import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: Parse tree for `SHOW (TABLES | DATASOURCES) [IN schema_name]` statement.
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/25
+/** Parse tree for `SHOW (TABLES | DATASOURCES) [IN schema_name]` statement.
  */
 class SqlShowTables(
   override val _pos: SqlParserPos,

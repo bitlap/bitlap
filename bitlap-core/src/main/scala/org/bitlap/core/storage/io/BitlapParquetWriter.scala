@@ -21,7 +21,7 @@ import org.apache.parquet.hadoop.ParquetWriter
 import org.apache.parquet.hadoop.metadata.CompressionCodecName
 import org.apache.parquet.hadoop.util.HadoopOutputFile
 
-/** Desc: bitlap mdm model writer implemented by parquet
+/** bitlap mdm model writer implemented by parquet
  */
 class BitlapParquetWriter[T](
   private val fs: FileSystem,

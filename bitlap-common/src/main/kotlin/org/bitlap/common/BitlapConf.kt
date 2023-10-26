@@ -13,9 +13,9 @@ import java.io.Serializable
 import kotlin.time.Duration
 
 /**
- * Desc: Bitlap core configuration.
+ * Bitlap core configuration.
  *
- * [BitlapConfKey] is designed as follows, and the priority is the same as below:
+ * [[BitlapConfKey] is designed as follows, and the priority is the same as below:
  *   1. with `sys` to get value from java system properties, default is `bitlap.${name}`
  *   2. with `env` to get value from OS environment variables, default is `BITLAP_${upper_trans_dot(name)}`
  *   3. with `name` to get value from `bitlap.conf` configuration

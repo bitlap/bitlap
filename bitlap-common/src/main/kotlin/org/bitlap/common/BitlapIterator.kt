@@ -6,11 +6,7 @@ package org.bitlap.common
 import java.io.Closeable
 
 /**
- * Desc: Common iterator
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/7/14
+ * Common iterator
  */
 abstract class BitlapIterator<E> : Iterator<E>, Closeable {
 

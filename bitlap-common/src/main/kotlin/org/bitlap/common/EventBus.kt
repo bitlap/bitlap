@@ -9,7 +9,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 /**
- * Desc: Event Bus system.
+ * Event Bus system.
  */
 
 interface BitlapEvent

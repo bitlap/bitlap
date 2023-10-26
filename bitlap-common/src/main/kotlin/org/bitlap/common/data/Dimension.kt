@@ -4,11 +4,7 @@
 package org.bitlap.common.data
 
 /**
- * Desc: Common dimension in [Event]
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/7/8
+ * Common dimension in [[Event]]
  */
 data class Dimension(private val pairs: Map<String, String> = emptyMap()) {
 

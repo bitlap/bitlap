@@ -14,7 +14,7 @@ import org.apache.calcite.sql.SqlSelect
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: explain a sql query
+/** explain a sql query
  */
 class SqlExplainX(
   override val _pos: SqlParserPos,

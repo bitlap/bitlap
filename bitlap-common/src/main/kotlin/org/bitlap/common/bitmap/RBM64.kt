@@ -12,11 +12,7 @@ import java.io.DataInputStream
 import java.nio.ByteBuffer
 
 /**
- * Desc: 64 bit for RBM
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/5/21
+ * 64 bit for RBM
  */
 open class RBM64 : AbsBM {
 

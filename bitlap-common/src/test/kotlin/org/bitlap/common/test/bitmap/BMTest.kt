@@ -14,11 +14,7 @@ import org.bitlap.common.test.utils.BMTestUtils
 import java.nio.ByteBuffer
 
 /**
- * Desc: [org.bitlap.common.bitmap.BM] Test
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/12/4
+ * [[org.bitlap.common.bitmap.BM]] Test
  */
 class BMTest : StringSpec({
     val log = logger { }

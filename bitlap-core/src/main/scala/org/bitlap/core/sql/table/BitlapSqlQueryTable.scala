@@ -21,9 +21,7 @@ import org.apache.calcite.schema.ScannableTable
 import org.apache.calcite.schema.impl.AbstractTable
 import org.apache.calcite.sql.`type`.SqlTypeName
 
-/** Desc: common bitlap table
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/9/12
+/** common bitlap table
  */
 class BitlapSqlQueryTable(val table: Table) extends AbstractTable with ProjectableFilterableTable with ScannableTable {
 

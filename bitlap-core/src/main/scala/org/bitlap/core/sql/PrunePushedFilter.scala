@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
  */
 type PushedFilterFun = (String) => Boolean
 
-case class PrunePushedFilterExpr(
+final case class PrunePushedFilterExpr(
   name: String,
   op: FilterOp,
   values: List[String],

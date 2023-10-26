@@ -19,7 +19,7 @@ import org.apache.parquet.filter2.compat.FilterCompat
 import org.apache.parquet.hadoop.ParquetReader
 import org.apache.parquet.hadoop.util.HadoopInputFile
 
-/** Desc: bitlap metric writer implemented by parquet
+/** bitlap metric writer implemented by parquet
  */
 class BitlapParquetReader[T](
   private val fs: FileSystem,

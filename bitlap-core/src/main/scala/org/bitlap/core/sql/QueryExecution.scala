@@ -7,15 +7,13 @@ import scala.jdk.CollectionConverters._
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.*
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.QueryResult
 import org.bitlap.core.sql.parser.ddl.SqlUseDatabase
 
 import org.apache.calcite.tools.RelRunners
 
-/** Desc: Execution for each query
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/6
+/** Execution for each query
  */
 class QueryExecution(
   private val statement: String,
@@ -49,6 +47,6 @@ class QueryExecution(
       case _ =>
     }
 
-    QueryResult(result, useSchema)
+    DefaultQueryResult(result, useSchema)
   }
 }

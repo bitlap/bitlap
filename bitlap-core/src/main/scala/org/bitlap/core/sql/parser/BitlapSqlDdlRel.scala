@@ -16,8 +16,6 @@ import org.apache.calcite.tools.RelBuilder
 
 import com.google.common.collect.ImmutableList
 
-/** Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/7/28
- */
 trait BitlapSqlDdlRel {
 
   /** sql operator

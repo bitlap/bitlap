@@ -10,9 +10,9 @@ import org.bitlap.core.catalog.metadata.Table
 // TODO (Add event status, exception, and etc.)
 
 // database
-case class DatabaseCreateEvent(database: Database) extends BitlapEvent
-case class DatabaseDeleteEvent(database: Database) extends BitlapEvent
+final case class DatabaseCreateEvent(database: Database) extends BitlapEvent
+final case class DatabaseDeleteEvent(database: Database) extends BitlapEvent
 
 // table
-case class TableCreateEvent(table: Table) extends BitlapEvent
-case class TableDeleteEvent(table: Table) extends BitlapEvent
+final case class TableCreateEvent(table: Table) extends BitlapEvent
+final case class TableDeleteEvent(table: Table) extends BitlapEvent

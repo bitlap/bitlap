@@ -4,7 +4,7 @@
 package org.bitlap.common.exception
 
 /**
- * Desc: Common bitlap throwable
+ * Common bitlap throwable
  */
 interface BitlapThrowable {
 

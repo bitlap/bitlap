@@ -39,14 +39,9 @@ object FunctionRegistry {
 
   {
     // UDF
-    register(Hello())
-    register(If())
-    register(DateFormat())
-
+    register(Hello(), If(), DateFormat())
     // udaf
-    register(BMSumAggr())
-    register(BMCountAggr())
-    register(BMCountDistinctAggr())
+    register(BMSumAggr(), BMCountAggr(), BMCountDistinctAggr())
   }
 
   /** register user defined functions and aggregate functions

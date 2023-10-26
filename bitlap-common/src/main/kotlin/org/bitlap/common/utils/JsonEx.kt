@@ -7,11 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 /**
- * Desc: json extension utils
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/4/12
+ * json extension utils
  */
 object JsonEx {
 

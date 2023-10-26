@@ -14,7 +14,7 @@ import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.SqlWriter
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: Parse tree for `DROP (DATABASE | SCHEMA) IF EXISTS database_name` statement.
+/** Parse tree for `DROP (DATABASE | SCHEMA) IF EXISTS database_name` statement.
  *
  *  see [org.apache.calcite.sql.ddl.SqlDropSchema], you can also use [org.apache.calcite.sql.ddl.SqlDdlNodes]
  */

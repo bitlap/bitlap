@@ -15,14 +15,10 @@ import java.nio.ByteBuffer
 import kotlin.math.max
 
 /**
- * Desc:
- *   Build from [bitlap RoaringBitmap](https://github.com/bitlap/RoaringBitmap/)
+ * Build from bitlap RoaringBitmap
+ * @see https://github.com/bitlap/RoaringBitmap/
  *
  * RBM number: support: 0, 1, ..., 2147483647, -2147483648, -2147483647,..., -1
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/16
  */
 open class RBM : AbsBM {
 

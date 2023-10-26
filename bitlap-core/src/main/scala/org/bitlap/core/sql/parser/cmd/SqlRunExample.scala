@@ -12,9 +12,7 @@ import org.apache.calcite.sql.SqlLiteral
 import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: run example, this is an example, will be removed in future versions.
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/7/28
+/** run example, this is an example, will be removed in future versions.
  */
 class SqlRunExample(
   override val _pos: SqlParserPos,

@@ -5,7 +5,7 @@ package org.bitlap.core.catalog.metadata
 
 /** Database metadata
  */
-case class Database(private val _name: String) {
+final case class Database(private val _name: String) {
   val name: String = _name.toLowerCase()
 }
 

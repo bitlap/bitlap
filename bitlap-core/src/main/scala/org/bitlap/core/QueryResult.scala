@@ -5,6 +5,8 @@ package org.bitlap.core
 
 import java.sql.ResultSet
 
-/** Desc: query result
+/** query result
  */
-final case class QueryResult(data: ResultSet, currentSchema: String)
+sealed trait QueryResult
+
+final case class DefaultQueryResult(data: ResultSet, currentSchema: String) extends QueryResult

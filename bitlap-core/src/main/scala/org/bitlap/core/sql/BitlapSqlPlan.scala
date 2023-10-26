@@ -8,7 +8,7 @@ import org.apache.calcite.sql.SqlNode
 
 /** sql plan
  */
-case class BitlapSqlPlan(
+final case class BitlapSqlPlan(
   statement: String,
   sqlNode: SqlNode,
   rel: RelNode,

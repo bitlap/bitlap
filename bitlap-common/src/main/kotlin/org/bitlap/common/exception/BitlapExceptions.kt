@@ -4,7 +4,7 @@
 package org.bitlap.common.exception
 
 /**
- * Desc: bitlap exceptions builder
+ * bitlap exceptions builder
  */
 object BitlapExceptions {
 

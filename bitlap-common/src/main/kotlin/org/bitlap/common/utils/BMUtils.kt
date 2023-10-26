@@ -15,11 +15,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Desc: [BM] Utils
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/21
+ * [BM] Utils
  */
 object BMUtils {
 

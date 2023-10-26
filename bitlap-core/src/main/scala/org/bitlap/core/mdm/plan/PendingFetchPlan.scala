@@ -10,7 +10,7 @@ import org.bitlap.core.sql.MDColumnAnalyzer
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.PruneTimeFilter
 
-/** Desc: Pending fetch plan to be analyzed
+/** Pending fetch plan to be analyzed
  */
 class PendingFetchPlan(
   val table: Table,

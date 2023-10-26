@@ -13,11 +13,7 @@ import java.io.DataOutputStream
 import java.nio.ByteBuffer
 
 /**
- * Desc: Bucket Bitmap
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/16
+ * Bucket Bitmap
  */
 
 class BBM : AbsBM {
@@ -25,7 +21,7 @@ class BBM : AbsBM {
     val container = hashMapOf<Int, RBM>()
 
     /**
-     * get unique bitmap from [container]
+     * get unique bitmap from [[container]]
      */
     private var _rbm = RBM()
 
@@ -103,7 +99,7 @@ class BBM : AbsBM {
     override fun getCount(): Double = getLongCount().toDouble()
     override fun getLongCount(): Long = container.values.fold(0) { cnt, r -> cnt + r.getLongCount() }
     override fun getSizeInBytes(): Long {
-        /** see [getBytes] */
+        /** see [[getBytes]] */
         return container.values.fold(Int.SIZE_BYTES.toLong()) { size, r ->
             size + r.getSizeInBytes() + 2 + // ref
                 Int.SIZE_BYTES + // mapKey
@@ -305,7 +301,7 @@ class BBM : AbsBM {
     }
 
     /**
-     * Check BBM if only contains [MAGIC_BUCKET]
+     * Check BBM if only contains [[MAGIC_BUCKET]]
      */
     private fun isMagic(): Boolean {
         if (!container.containsKey(MAGIC_BUCKET)) {

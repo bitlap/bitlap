@@ -7,7 +7,7 @@ import java.io.Serializable
 
 import org.bitlap.core.mdm.format.DataType
 
-/** Desc: common row for fetcher
+/** common row for fetcher
  */
 class Row(val data: Array[Any]) extends Serializable {
 

@@ -14,11 +14,9 @@ import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.SqlWriter
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: Parse tree for `CREATE (DATABASE | SCHEMA) IF NOT EXISTS database_name` statement.
+/** Parse tree for `CREATE (DATABASE | SCHEMA) IF NOT EXISTS database_name` statement.
  *
  *  see [org.apache.calcite.sql.ddl.SqlCreateSchema], you can also use [org.apache.calcite.sql.ddl.SqlDdlNodes]
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/23
  */
 class SqlCreateDatabase(
   override val _pos: SqlParserPos,

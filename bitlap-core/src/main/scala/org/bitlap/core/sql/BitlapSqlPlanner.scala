@@ -33,9 +33,7 @@ import org.apache.calcite.sql2rel.SqlToRelConverter
 import org.apache.calcite.tools.FrameworkConfig
 import org.apache.calcite.tools.RelBuilder
 
-/** Desc: link [PlannerImpl]
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/9/13
+/** link [PlannerImpl]
  */
 class BitlapSqlPlanner(private val catalog: BitlapCatalog) {
 

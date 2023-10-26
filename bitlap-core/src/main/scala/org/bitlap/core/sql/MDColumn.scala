@@ -14,7 +14,7 @@ import org.apache.calcite.sql.SqlAggFunction
 
 /** Analyse metric & dimension model from sql select node
  */
-case class MDColumn(name: String, `type`: ColumnType) {
+final case class MDColumn(name: String, `type`: ColumnType) {
 
   var project: Boolean = false
   var filter: Boolean  = false

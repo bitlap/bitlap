@@ -7,14 +7,14 @@ import scala.collection.mutable
 
 /** Table metadata
  */
-case class Table(
-  val database: String,
-  val name: String,
-  val createTime: Long = System.currentTimeMillis(),
+final case class Table(
+  database: String,
+  name: String,
+  createTime: Long = System.currentTimeMillis(),
   var updateTime: Long = System.currentTimeMillis(),
-  val props: mutable.Map[String, String] = mutable.Map(),
+  props: mutable.Map[String, String] = mutable.Map(),
   // other fields
-  val path: String) {
+  path: String) {
 
   import Table._
 

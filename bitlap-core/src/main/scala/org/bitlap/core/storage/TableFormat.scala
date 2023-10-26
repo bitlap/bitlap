@@ -8,7 +8,7 @@ import org.bitlap.core.storage.io.BitlapParquetProvider
 
 import org.apache.hadoop.fs.FileSystem
 
-/** table format implemtation.
+/** table format implementation.
  */
 enum TableFormat(val name: String) {
 

@@ -6,15 +6,15 @@ package org.bitlap.core.storage.load
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
 
-/** Desc: One row for metric data model with one dimension.
+/** One row for metric data model with one dimension.
  */
-case class MetricDimRow(
-  val tm: Long,
+final case class MetricDimRow(
+  tm: Long,
   override val metricKey: String,
-  val dimensionKey: String,
-  val dimension: String,
-  val metric: CBM,
-  val entity: BBM,
+  dimensionKey: String,
+  dimension: String,
+  metric: CBM,
+  entity: BBM,
   var metadata: MetricDimRowMeta)
     extends HasMetricKey {
 
@@ -37,12 +37,12 @@ case class MetricDimRow(
 
 }
 
-case class MetricDimRowMeta(
-  val tm: Long,
+final case class MetricDimRowMeta(
+  tm: Long,
   override val metricKey: String,
-  val dimensionKey: String,
-  val dimension: String,
-  val entityUniqueCount: Long = 0,
-  val entityCount: Long = 0,
-  val metricCount: Double = 0.0)
+  dimensionKey: String,
+  dimension: String,
+  entityUniqueCount: Long = 0,
+  entityCount: Long = 0,
+  metricCount: Double = 0.0)
     extends HasMetricKey

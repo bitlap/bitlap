@@ -16,7 +16,7 @@ import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.hadoop.fs.Path
 
-/** Desc: load data into table
+/** load data into table
  */
 class SqlLoadData(
   override val _pos: SqlParserPos,

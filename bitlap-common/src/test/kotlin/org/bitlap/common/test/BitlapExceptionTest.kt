@@ -10,7 +10,7 @@ import org.bitlap.common.exception.BitlapIllegalArgumentException
 import org.bitlap.common.exception.BitlapNullPointerException
 
 /**
- * Desc: test bitlap exceptions
+ * test bitlap exceptions
  */
 class BitlapExceptionTest : StringSpec({
 

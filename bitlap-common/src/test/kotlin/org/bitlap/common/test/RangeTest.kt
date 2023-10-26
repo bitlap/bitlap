@@ -8,11 +8,7 @@ import io.kotest.matchers.shouldBe
 import org.bitlap.common.utils.Range
 
 /**
- * Desc: [Range] test
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2021/6/21
+ * [[Range]] test
  */
 class RangeTest : StringSpec({
 

@@ -12,8 +12,6 @@ import org.apache.calcite.sql.SqlSelect
 import org.apache.calcite.sql.validate.SqlValidator
 import org.apache.calcite.sql.validate.SqlValidatorImpl
 
-/** Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/9/10
- */
 class BitlapSqlValidator(
   val _opTab: SqlOperatorTable,
   val _catalogReader: CalciteCatalogReader,

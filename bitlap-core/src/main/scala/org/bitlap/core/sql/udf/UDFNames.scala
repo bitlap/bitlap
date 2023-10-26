@@ -3,10 +3,6 @@
  */
 package org.bitlap.core.sql.udf
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2022/11/24
- */
 object UDFNames {
 
   // common

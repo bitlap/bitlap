@@ -19,10 +19,6 @@ import org.apache.calcite.sql.parser.bitlap.BitlapSqlParserImpl
 import org.apache.calcite.sql.util.SqlOperatorTables
 import org.apache.calcite.tools.{ FrameworkConfig, Frameworks }
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2022/11/11
- */
 object SqlParserUtil {
 
   private val parserConfig =
@@ -58,13 +54,12 @@ object SqlParserUtil {
     val listSqlOperatorTable = SqlOperatorTables.of(FunctionRegistry.sqlFunctions())
     // val listSqlOperatorTable = ListSqlOperatorTable()
     // FunctionRegistry.sqlFunctions().forEach { f => listSqlOperatorTable.add(f) }
-    val config: FrameworkConfig = Frameworks
+    Frameworks
       .newConfigBuilder()
       .parserConfig(parserConfig)
       .defaultSchema(schema)
       .traitDefs(ConventionTraitDef.INSTANCE, RelDistributionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE)
       .operatorTable(SqlOperatorTables.chain(listSqlOperatorTable, SqlStdOperatorTable.instance()))
       .build()
-    config
   }
 }

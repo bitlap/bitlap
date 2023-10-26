@@ -14,9 +14,7 @@ import org.apache.calcite.sql.SqlSpecialOperator
 import org.apache.calcite.sql.SqlWriter
 import org.apache.calcite.sql.parser.SqlParserPos
 
-/** Desc: Parse tree for `DROP (TABLE | DATASOURCE) IF EXISTS table_name` statement.
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/25
+/** Parse tree for `DROP (TABLE | DATASOURCE) IF EXISTS table_name` statement.
  */
 class SqlDropTable(
   override val _pos: SqlParserPos,

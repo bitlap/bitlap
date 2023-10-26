@@ -34,9 +34,13 @@
 
 ## docker运行
 
-> tag就是版本号，如：0.4.0-alpha1
+> $tag就是版本号，如：0.4.0-alpha1
 ```
 # 打包、构建镜像、运行（默认不运行）
-cd docker;sh deploy.sh 0.4.0-alpha1
+cd docker;sh deploy.sh $tag
+# 运行
+docker run --name bitlap-$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333  liguobin/bitlap:$tag
 ```
-- 访问 `http://localhost:22333`
+访问 `http://localhost:22333`
+
+也可以使用打包好的 [镜像](https://hub.docker.com/r/liguobin/bitlap/tags)

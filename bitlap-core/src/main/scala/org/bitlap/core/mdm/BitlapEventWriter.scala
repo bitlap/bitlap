@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2023 bitlap.org .
+/*
+ * Copyright 2020-2023 IceMimosa, jxnu-liguobin and the Bitlap Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.bitlap.core.mdm
 
@@ -8,6 +20,7 @@ import java.io.{ Closeable, InputStream, InputStreamReader, Serializable }
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
+import scala.util.control.NonFatal
 
 import org.bitlap.common.bitmap.BBM
 import org.bitlap.common.bitmap.CBM
@@ -32,7 +45,7 @@ import org.apache.commons.csv.{ CSVFormat, CSVParser }
 import org.apache.hadoop.conf.Configuration
 import org.slf4j.LoggerFactory
 
-/** bitlap mdm [Event] writer
+/** bitlap mdm [[Event]] writer
  */
 class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Serializable with Closeable {
 
@@ -163,7 +176,7 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
     try {
       this.store.close()
     } catch {
-      case e =>
+      case NonFatal(e) =>
         log.error(s"Error when closing BitlapWriter, cause: ", e)
     }
   }

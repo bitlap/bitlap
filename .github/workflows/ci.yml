@@ -15,16 +15,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v2
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '11'
           cache: 'maven'
+
+      - name: Cache the Maven packages to speed up build
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
 
       - name: Checking Code Style
         run: ./mvnw spotless:check
@@ -32,44 +36,16 @@ jobs:
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
 
-      - name: Docker Build
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        run: bash deploy.sh ${{ vars.VERSION }}
-        working-directory: ./docker
-      - name: Login to Docker Hub
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Docker Push
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ vars.VERSION }}
-  
-  
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: '11'
-          cache: 'maven'
-
-      # because there are some error tests      
       - name: Test
-        run: ./mvnw -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' clean test
+        run: ./mvnw -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
 
       - name: Upload test coverage report
         run: bash <(curl -s https://codecov.io/bash)
+  
   ci:
     runs-on: ubuntu-latest
-    needs: [ build, test]
+    needs: [ build ]
     steps:
       - name: Aggregate outcomes
-        run: echo "build succeeded"        
+        run: echo "build succeeded"
+

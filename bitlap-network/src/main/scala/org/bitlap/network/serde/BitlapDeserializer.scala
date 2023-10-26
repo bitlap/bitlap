@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2023 bitlap.org .
+/*
+ * Copyright 2020-2023 IceMimosa, jxnu-liguobin and the Bitlap Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.bitlap.network.serde
 
@@ -10,10 +22,6 @@ import org.bitlap.network.NetworkException.DataFormatException
 import org.bitlap.network.enumeration.TypeId
 
 /** Byte array deserialization, compatible with different types as much as possible.
- *
- *  @author
- *    梦境迷离
- *  @version 1.0,11/15/22
  */
 private[network] sealed trait BitlapDeserializer:
   def parse[T](readOnlyByteBuffer: ByteBuffer, targetType: TypeId, realType: TypeId): T

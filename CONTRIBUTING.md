@@ -8,7 +8,7 @@
 
 ## 演示
 
-![bitlap sql](./bitlap_sql.jpg)
+![bitlap sql](docs/bitlap_sql.jpg)
 
 ## 架构
 
@@ -18,7 +18,7 @@
 
 ***核心模块依赖关系***
 
-![](./bitlap-structure.png)
+![](docs/bitlap-structure.png)
 
 | 模块               | 技术栈                               | 说明                                  |
 |------------------|-----------------------------------|-------------------------------------|

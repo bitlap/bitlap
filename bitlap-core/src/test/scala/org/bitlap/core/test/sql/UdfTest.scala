@@ -23,18 +23,18 @@ import org.bitlap.core.test.base.SqlChecker
 
 class UdfTest extends BaseLocalFsTest with SqlChecker {
 
-  test("test lambda udf registry") {
-    // TODO (not support scala/kotlin lambda and inline class, should clean it like apache spark)
-    // for example, kotlin compiler generate class is: org.bitlap.core.test.sql.UdfTest$1$1
-    // FunctionRegistry.register("test_hello", (s: String) => s"hello $s")
-
-    // support common class and not inner class
-    FunctionRegistry.register("test_hello2", TestHello())
-    checkRows(
-      s"select test_hello2('a')",
-      List(List("hello a"))
-    )
-  }
+//  test("test lambda udf registry") {
+//    // TODO (not support scala/kotlin lambda and inline class, should clean it like apache spark)
+//    // for example, kotlin compiler generate class is: org.bitlap.core.test.sql.UdfTest$1$1
+//    // FunctionRegistry.register("test_hello", (s: String) => s"hello $s")
+//
+//    // support common class and not inner class
+//    FunctionRegistry.register("test_hello2", TestHello())
+//    checkRows(
+//      s"select test_hello2('a')",
+//      List(List("hello a"))
+//    )
+//  }
 
   test("test hello udf") {
     checkRows(

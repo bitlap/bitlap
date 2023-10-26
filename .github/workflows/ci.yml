@@ -47,4 +47,5 @@ jobs:
     needs: [ build ]
     steps:
       - name: Aggregate outcomes
-        run: echo "build succeeded"        
+        run: echo "build succeeded"
+

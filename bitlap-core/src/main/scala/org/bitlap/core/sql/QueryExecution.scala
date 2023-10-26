@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2023 bitlap.org .
+/*
+ * Copyright 2020-2023 IceMimosa, jxnu-liguobin and the Bitlap Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.bitlap.core.sql
 
@@ -7,15 +19,13 @@ import scala.jdk.CollectionConverters._
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.*
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.QueryResult
 import org.bitlap.core.sql.parser.ddl.SqlUseDatabase
 
 import org.apache.calcite.tools.RelRunners
 
-/** Desc: Execution for each query
- *
- *  Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/8/6
+/** Execution for each query
  */
 class QueryExecution(
   private val statement: String,
@@ -49,6 +59,6 @@ class QueryExecution(
       case _ =>
     }
 
-    QueryResult(result, useSchema)
+    DefaultQueryResult(result, useSchema)
   }
 }

@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2023 bitlap.org .
+/*
+ * Copyright 2020-2023 IceMimosa, jxnu-liguobin and the Bitlap Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.bitlap.common.bitmap
 
@@ -13,11 +25,7 @@ import java.io.DataOutputStream
 import java.nio.ByteBuffer
 
 /**
- * Desc: Bucket Bitmap
- *
- * Mail: chk19940609@gmail.com
- * Created by IceMimosa
- * Date: 2020/11/16
+ * Bucket Bitmap
  */
 
 class BBM : AbsBM {
@@ -25,7 +33,7 @@ class BBM : AbsBM {
     val container = hashMapOf<Int, RBM>()
 
     /**
-     * get unique bitmap from [container]
+     * get unique bitmap from [[container]]
      */
     private var _rbm = RBM()
 
@@ -103,7 +111,7 @@ class BBM : AbsBM {
     override fun getCount(): Double = getLongCount().toDouble()
     override fun getLongCount(): Long = container.values.fold(0) { cnt, r -> cnt + r.getLongCount() }
     override fun getSizeInBytes(): Long {
-        /** see [getBytes] */
+        /** see [[getBytes]] */
         return container.values.fold(Int.SIZE_BYTES.toLong()) { size, r ->
             size + r.getSizeInBytes() + 2 + // ref
                 Int.SIZE_BYTES + // mapKey
@@ -305,7 +313,7 @@ class BBM : AbsBM {
     }
 
     /**
-     * Check BBM if only contains [MAGIC_BUCKET]
+     * Check BBM if only contains [[MAGIC_BUCKET]]
      */
     private fun isMagic(): Boolean {
         if (!container.containsKey(MAGIC_BUCKET)) {

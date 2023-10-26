@@ -1,0 +1,69 @@
+name: docker
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        uses: actions/setup-java@v1
+        with:
+          distribution: 'adopt'
+          java-version: 11
+          cache: 'maven'
+
+      - name: Cache the Maven packages to speed up build
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Docker Build
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        run: bash deploy.sh ${{ vars.VERSION }}
+        working-directory: ./docker
+
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        uses: actions/setup-java@v1
+        with:
+          distribution: 'adopt'
+          java-version: 11
+          cache: 'maven'
+
+      - name: Login to Docker Hub
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Push
+        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ vars.VERSION }}
+  
+  ci:
+    runs-on: ubuntu-latest
+    needs: [ build, publish ]
+    steps:
+      - name: Aggregate outcomes
+        run: echo "build succeeded"        

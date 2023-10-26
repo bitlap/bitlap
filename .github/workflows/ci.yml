@@ -31,7 +31,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: setup-java-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-          
+          restore-keys: setup-java-${{ runner.os }}-maven-          
 
       - name: Checking Code Style
         run: ./mvnw spotless:check

@@ -381,8 +381,16 @@
                 <configuration>
                     <excludes>
                         <exclude>**/org/apache/calcite/**/*.class</exclude>
-                        <exclude>**/org/bitlap/network/RpcProtos.class</exclude>
                         <exclude>**/org/bitlap/network/Driver/*.class</exclude>
+
+                        <exclude>**/org/bitlap/network/RpcProtos.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressResp.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressResp$Builder.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressReq.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressReq$Builder.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressResp$1.class</exclude>
+                        <exclude>**/org/bitlap/network/GetServerAddressReq$1.class</exclude>
+                        
                     </excludes>
                 </configuration>
                 <executions>

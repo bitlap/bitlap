@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: setup-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-          
 
       - name: Checking Code Style
@@ -57,7 +57,7 @@ jobs:
   
   ci:
     runs-on: ubuntu-latest
-    needs: [ build]
+    needs: [ build ]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

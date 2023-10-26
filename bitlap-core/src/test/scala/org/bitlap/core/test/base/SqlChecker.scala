@@ -16,15 +16,16 @@
 package org.bitlap.core.test.base
 
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.utils.SqlEx
 import org.bitlap.common.utils.SqlEx.toTable
 import org.bitlap.common.utils.internal.DBTable
+import org.bitlap.core.DefaultQueryResult
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.core.sql.QueryExecution
 
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 /** Some sql check utils
  */
@@ -33,7 +34,7 @@ trait SqlChecker {
   /** execute sql statement
    */
   def sql(statement: String, session: SqlSession = SqlSession()): SqlResult = {
-    val rs = QueryExecution(statement, session.currentSchema).execute()
+    val rs = QueryExecution(statement, session.currentSchema).execute().asInstanceOf[DefaultQueryResult]
     session.currentSchema = rs.currentSchema
     SqlResult(statement, SqlEx.toTable(rs.data))
   }

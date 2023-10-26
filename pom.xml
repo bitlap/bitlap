@@ -380,8 +380,9 @@
                 <version>0.8.10</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/org/bitlap/network/driver/proto/**/*.class</exclude>
-                        <exclude>**/org/bitlap/network/driver/service/**/*.class</exclude>
+                        <exclude>**/org/apache/calcite/**/*.class</exclude>
+                        <exclude>**/org/bitlap/network/RpcProtos.class</exclude>
+                        <exclude>**/org/bitlap/network/Driver/*.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -41,7 +41,7 @@
                 <configuration>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <junitxml>.</junitxml>
-                    <filereports>WDF ClientTestSuite.txt</filereports>
+                    <filereports>WDF TestSuite.txt</filereports>
                 </configuration>
                 <executions>
                     <execution>

@@ -123,7 +123,7 @@
                 <configuration>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <junitxml>.</junitxml>
-                    <filereports>WDF NetworkTestSuite.txt</filereports>
+                    <filereports>WDF TestSuite.txt</filereports>
                 </configuration>
                 <executions>
                     <execution>

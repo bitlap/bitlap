@@ -38,5 +38,9 @@ end extension
 extension (serverPeers: Array[String])
 
   def asServerAddresses: List[ServerAddress] =
-    serverPeers.filter(_.nonEmpty).map(_.asServerAddress).toList
+    serverPeers.collect {
+      case add if add.nonEmpty => add.asServerAddress
+    }.toList
+  end asServerAddresses
+
 end extension

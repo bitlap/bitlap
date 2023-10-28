@@ -27,8 +27,8 @@ import org.apache.parquet.filter2.predicate.FilterPredicate
 extension (predicate: FilterPredicate) {
 
   def compact(): FilterCompat.Filter = {
-    if (predicate == null) return FilterCompat.NOOP
-    FilterCompat.get(predicate)
+    if (predicate == null) FilterCompat.NOOP
+    else FilterCompat.get(predicate)
   }
 }
 

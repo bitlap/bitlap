@@ -38,7 +38,8 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
    *
-   *  TODO (When the leader does not exist, the client cannot perform any operations)
+   *  TODO (When the leader does not exist, the client cannot perform any operations) cache leader address and add heart
+   *  between leader
    */
   private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
     ZIO

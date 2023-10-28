@@ -50,8 +50,8 @@ abstract class AbsRelRule(config: ConverterRule.Config) extends ConverterRule(co
 
   protected def hasTableScanNode(rel: RelNode): Boolean = {
     if (rel.isInstanceOf[TableScan]) {
-      return true
-    }
-    rel.getInputs.asScala.map(_.clean()).filter(_ != null).exists(this.hasTableScanNode)
+      true
+    } else
+      rel.getInputs.asScala.map(_.clean()).filter(_ != null).exists(this.hasTableScanNode)
   }
 }

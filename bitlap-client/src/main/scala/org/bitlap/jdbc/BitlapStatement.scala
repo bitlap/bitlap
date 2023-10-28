@@ -118,7 +118,7 @@ class BitlapStatement(
 
   override def setMaxRows(max: Int): Unit =
     checkConnection("setMaxRows")
-    if max < 0 then throw new SQLException("max must be >= 0")
+    if max < 0 then throw new BitlapSQLException("max must be >= 0")
     maxRows = max
 
   override def setEscapeProcessing(enable: Boolean): Unit = throw new SQLFeatureNotSupportedException(
@@ -141,7 +141,7 @@ class BitlapStatement(
       case e: SQLException =>
         throw e
       case e: Exception =>
-        throw new SQLException("Failed to cancel statement", "08S01", e)
+        throw BitlapSQLException("Failed to cancel statement", cause = Option(e))
 
     isCancelled = true
 
@@ -254,7 +254,7 @@ class BitlapStatement(
     checkConnection("setFetchSize")
     if rows > 0 then fetchSize = rows
     else if rows == 0 then fetchSize = 50
-    else throw new SQLException("Fetch size must be greater or equal to 0")
+    else throw BitlapSQLException("Fetch size must be greater or equal to 0")
 
   override def getFetchSize(): Int =
     checkConnection("getFetchSize")

@@ -15,6 +15,8 @@
  */
 package org.bitlap.core.catalog.impl
 
+import scala.jdk.CollectionConverters.*
+
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.conf.BitlapConfKeys
@@ -28,12 +30,12 @@ import org.bitlap.core.event.DatabaseCreateEvent
 import org.bitlap.core.event.DatabaseDeleteEvent
 import org.bitlap.core.event.TableCreateEvent
 import org.bitlap.core.event.TableDeleteEvent
-import org.bitlap.core.hadoop._
+import org.bitlap.core.hadoop.*
 import org.bitlap.core.storage.TableFormat
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.FileSystem
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{ FileSystem, LocatedFileStatus, Path }
+import org.apache.hadoop.hdfs.protocol.HdfsNamedFileStatus
 
 /** Impl for Catalog, using dfs to manage catalog metadata.
  */
@@ -159,7 +161,9 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
   /** List all [Database], it also contains [Database.DEFAULT_DATABASE]
    */
   override def listDatabases(): List[Database] = {
-    fs.listStatus(dataPath).filter(_.isDirectory).map(d => Database(d.getPath.getName)).toList
+    fs.collectM(dataPath)(_.isDirectory) { (fs, status) =>
+      Database(status.getPath.getName)
+    }
   }
 
   /** create [Table] with [name] in the [database].
@@ -186,9 +190,9 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     } else if (exists) {
       throw BitlapException(s"Unable to create table $cleanDBName.$cleanName, it already exists.")
     }
-    val result = fs.writeTable(tableDir, table)
-    eventBus.post(TableCreateEvent(table))
-    result
+    fs.writeTable(tableDir, table) {
+      eventBus.post(TableCreateEvent(table))
+    }
   }
 
   /** Drop [Table] with [name] in the [database].
@@ -240,11 +244,10 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
   override def listTables(database: String): List[Table] = {
     val cleanDBName = cleanDatabaseName(database)
     val dbDir       = Path(dataPath, cleanDBName)
-    fs
-      .listStatus(dbDir) // TODO: par
-      .filter(_.isDirectory)
-      .map(d => fs.readTable(d.getPath))
-      .toList
+    // TODO: par
+    fs.collectM(dbDir)(_.isDirectory) { (_, status) =>
+      fs.readTable(status.getPath)
+    }
   }
 
   private def cleanDatabaseName(database: String): String = {

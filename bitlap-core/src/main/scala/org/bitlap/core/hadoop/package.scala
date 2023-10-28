@@ -13,42 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.core
+package org.bitlap.core.hadoop
 
+import scala.reflect.ClassTag
 import scala.util.Using
 
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.utils.JsonUtil
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.FileSystem
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{ FileStatus, FileSystem, LocatedFileStatus, Path }
+import org.apache.hadoop.hdfs.protocol.HdfsNamedFileStatus
 
-package object hadoop {
+extension (fs: FileSystem) {
 
-  extension (fs: FileSystem) {
-
-    /** Write bitlap table schema.
-     */
-    def writeTable(tableDir: Path, table: Table): Boolean = {
-      Using.resource(fs.create(Path(tableDir, ".table"), true)) { o =>
-        o.writeUTF(JsonUtil.json(table))
-      }
-      true
+  /** Write bitlap table schema.
+   */
+  def writeTable[A](tableDir: Path, table: Table)(effect: => A = {}): Boolean = {
+    Using.resource(fs.create(Path(tableDir, ".table"), true)) { o =>
+      o.writeUTF(JsonUtil.json(table))
     }
+    effect
+    true
+  }
 
-    /** Read bitlap table schema.
-     */
-    def readTable(tableDir: Path): Table = {
-      Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
-        JsonUtil.jsonAs(in.readUTF(), classOf[Table])
-      }
-    }
-
-    /** clone conf
-     */
-    def newConf(): Configuration = {
-      Configuration(fs.getConf)
+  /** Read bitlap table schema.
+   */
+  def readTable(tableDir: Path): Table = {
+    Using.resource(fs.open(Path(tableDir, ".table"))) { in =>
+      JsonUtil.jsonAs(in.readUTF(), classOf[Table])
     }
   }
+
+  /** clone conf
+   */
+  def newConf(): Configuration = {
+    Configuration(fs.getConf)
+  }
 }
+
+extension (fs: FileSystem)
+
+  def collectM[A: ClassTag](dbDir: Path)(a: FileStatus => Boolean)(effect: (FileSystem, FileStatus) => A): List[A] = {
+    fs.listStatus(dbDir)
+      .collect {
+        case status: HdfsNamedFileStatus if a(status) => effect.apply(fs, status)
+        case status: LocatedFileStatus if a(status)   => effect.apply(fs, status)
+      }
+      .toList
+  }

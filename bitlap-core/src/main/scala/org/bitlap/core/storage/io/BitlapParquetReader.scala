@@ -50,9 +50,9 @@ class BitlapParquetReader[T](
 
   override def read(): T = {
     if (hasNext()) {
-      return next()
-    }
-    null.asInstanceOf[T]
+      next()
+    } else
+      null.asInstanceOf[T]
   }
 
   override def read(limit: Int): List[T] = {

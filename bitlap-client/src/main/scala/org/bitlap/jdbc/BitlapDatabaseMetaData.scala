@@ -369,7 +369,7 @@ class BitlapDatabaseMetaData(
     types: Array[String]
   ): ResultSet = {
     given Connection = connection
-    sqlQ"show tables"._2 // TODO (fix me)
+    sqlQ"show tables"._2
   }
 
   override def getSchemas: ResultSet =

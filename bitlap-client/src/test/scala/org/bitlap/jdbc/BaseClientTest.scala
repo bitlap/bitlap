@@ -24,4 +24,4 @@ abstract class BaseClientTest
     with BeforeAndAfterAll
     with should.Matchers
     with Inspectors
-    with BeforeAndAfterEach {}
+    with BeforeAndAfterEach

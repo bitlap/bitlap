@@ -161,7 +161,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
   /** List all [Database], it also contains [Database.DEFAULT_DATABASE]
    */
   override def listDatabases(): List[Database] = {
-    fs.collectM(dataPath)(_.isDirectory) { (fs, status) =>
+    fs.collectStatus(dataPath, _.isDirectory) { (fs, status) =>
       Database(status.getPath.getName)
     }
   }
@@ -245,7 +245,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val cleanDBName = cleanDatabaseName(database)
     val dbDir       = Path(dataPath, cleanDBName)
     // TODO: par
-    fs.collectM(dbDir)(_.isDirectory) { (_, status) =>
+    fs.collectStatus(dbDir, _.isDirectory) { (_, status) =>
       fs.readTable(status.getPath)
     }
   }

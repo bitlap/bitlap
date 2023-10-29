@@ -29,7 +29,7 @@ extension (fs: FileSystem) {
 
   /** Write bitlap table schema.
    */
-  def writeTable[A](tableDir: Path, table: Table)(effect: => A = {}): Boolean = {
+  def writeTable[A](tableDir: Path, table: Table)(effect: => A): Boolean = {
     Using.resource(fs.create(Path(tableDir, ".table"), true)) { o =>
       o.writeUTF(JsonUtil.json(table))
     }
@@ -54,11 +54,11 @@ extension (fs: FileSystem) {
 
 extension (fs: FileSystem)
 
-  def collectM[A: ClassTag](dbDir: Path)(a: FileStatus => Boolean)(effect: (FileSystem, FileStatus) => A): List[A] = {
+  def collectStatus[A: ClassTag](dbDir: Path, a: FileStatus => Boolean)(effect: (FileSystem, FileStatus) => A)
+    : List[A] = {
     fs.listStatus(dbDir)
       .collect {
-        case status: HdfsNamedFileStatus if a(status) => effect.apply(fs, status)
-        case status: LocatedFileStatus if a(status)   => effect.apply(fs, status)
+        case status: FileStatus if a(status) => effect.apply(fs, status)
       }
       .toList
   }

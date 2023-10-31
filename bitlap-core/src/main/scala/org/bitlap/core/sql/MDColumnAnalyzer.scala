@@ -124,16 +124,29 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
     }
   }
 
-  def getMetricColNames: List[String]    = this.mdColumns.filter(_.`type` == MetricCol).map(_.name).distinct
-  def getDimensionColNames: List[String] = this.mdColumns.filter(_.`type` == DimensionCol).map(_.name).distinct
-  def getFilterColNames: List[String]    = this.mdColumns.filter(_.filter).map(_.name).distinct
-  def getDimensionColNamesWithoutTime: List[String] = this.getDimensionColNames.filter(_ != Keyword.TIME)
+  // TODO lazy ?
+  def metricColNames: List[String] =
+    this.mdColumns.collect {
+      case c if c.`type` == MetricCol => c.name
+    }.distinct
+
+  def dimensionColNames: List[String] =
+    this.mdColumns.collect {
+      case c if c.`type` == DimensionCol => c.name
+    }.distinct
+
+  def filterColNames: List[String] =
+    this.mdColumns.collect {
+      case c if c.filter => c.name
+    }.distinct
+
+  def dimensionColNamesWithoutTime: List[String] = this.dimensionColNames.filter(_ != Keyword.TIME)
 
   /** check if one metric should materialize
    */
   def shouldMaterialize(metricName: String): Boolean = {
     val metric     = this.mdColumnMap(metricName)
-    val dimensions = this.getDimensionColNames
+    val dimensions = this.dimensionColNames
 
     // check whether the metric is Cartesian Product
     if (this.shouldCartesian()) {
@@ -164,7 +177,7 @@ class MDColumnAnalyzer(val table: Table, val select: SqlSelect) {
    */
   def shouldCartesian(): Boolean = {
     // there are more than or equal to 2 dimensions except time
-    val noTimeDims = this.getDimensionColNamesWithoutTime
+    val noTimeDims = this.dimensionColNamesWithoutTime
     if (noTimeDims.size >= 2) {
       return true
     }

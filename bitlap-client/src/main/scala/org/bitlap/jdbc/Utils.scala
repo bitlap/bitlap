@@ -35,8 +35,6 @@ object Utils:
     val connParams = new JdbcConnectionParams
     if !uri.startsWith(URL_PREFIX) then
       throw BitlapJdbcUriParseException(s"Bad URL format: Missing prefix " + URL_PREFIX)
-    if uri.equalsIgnoreCase(URL_PREFIX) then return connParams
-
     val dummyAuthorityString = "dummyhost:00000"
     val suppliedAuthorities  = getAuthorities(uri)
     println("Supplied authorities: " + suppliedAuthorities)
@@ -115,19 +113,17 @@ object Utils:
       } do
         line = line.trim
         if line.nonEmpty then
-          if line.startsWith("#") || line.startsWith("--") then {
-            // TODO (continue is not supported)
-          } else
+          if !line.startsWith("#") && !line.startsWith("--") then {
             line = line.concat(" ")
             sb.append(line)
+          }
       initSqlList = getInitSql(sb.toString)
     catch
       case e: IOException =>
-        throw new IOException(e)
+        throw new BitlapSQLException(msg = "Invalid sql syntax in initFile", cause = Option(e))
     finally if br != null then br.close()
     initSqlList
 
-  // TODO functional style
   private def getInitSql(sbLine: String): List[String] =
     val sqlArray    = sbLine.toCharArray
     val initSqlList = new JArrayList[String]

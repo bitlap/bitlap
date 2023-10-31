@@ -37,7 +37,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
   def findBestPlan(): FetchPlan = {
     this.bestPlan = oPlan match {
       case p: PendingFetchPlan =>
-        val dimensions = p.analyzer.getDimensionColNamesWithoutTime
+        val dimensions = p.analyzer.dimensionColNamesWithoutTime
         dimensions.size match {
           // one or no other dimension
           case 0 | 1 => this.planWithNoOrOneOtherDim(dimensions.headOption.orNull, p)
@@ -92,7 +92,7 @@ class FetchContext(val table: Table, private val oPlan: FetchPlan) extends Seria
 
   private def getMetricParts(analyzer: MDColumnAnalyzer, cartesianBase: Boolean)
     : Map[Class[_ <: DataType], List[DataType]] = {
-    analyzer.getMetricColNames
+    analyzer.metricColNames
       .map(it => analyzer.materializeType(it, cartesianBase))
       .groupBy(_.getClass)
   }

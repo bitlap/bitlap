@@ -48,8 +48,8 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
 
   private def merge0(rs1: RowIterator, rs2: RowIterator): RowIterator = {
     // check key types should be different
-    val keyTypes1 = rs1.keyTypes.map(_.name).filter(_ != Keyword.TIME)
-    val keyTypes2 = rs2.keyTypes.map(_.name).filter(_ != Keyword.TIME)
+    val keyTypes1 = rs1.keyTypes.collect { case key if key.name != Keyword.TIME => key.name }
+    val keyTypes2 = rs2.keyTypes.collect { case key if key.name != Keyword.TIME => key.name }
     PreConditions.checkExpression(
       keyTypes1.intersect(keyTypes2).isEmpty,
       "",

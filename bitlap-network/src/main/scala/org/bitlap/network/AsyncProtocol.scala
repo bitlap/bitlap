@@ -42,10 +42,12 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
   def sync[T](action: PMonad => Task[T]): T =
     try {
       val future = Unsafe.unsafe { implicit rt =>
-        Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, Throwable, T]])
+        Runtime.default.unsafe.runToFuture(action(this))
       }
       Await.result(future, timeout)
-    } catch case NonFatal(e) => throw InternalException("Failed to run ZIO effect", Option(e))
+    } catch
+      case NonFatal(e) =>
+        throw InternalException(":Failed to run ZIO effect", Option(e))
 
   def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: PMonad => Task[A])
     : Task[A] =

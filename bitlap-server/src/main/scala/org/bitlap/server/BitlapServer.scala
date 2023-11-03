@@ -54,6 +54,7 @@ object BitlapServer extends ZIOAppDefault:
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
+      _ <- ZIO.serviceWithZIO[ServerNodeContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
     } yield ())
       .provide(
@@ -67,6 +68,7 @@ object BitlapServer extends ZIOAppDefault:
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapServerConfiguration.live,
+        ServerNodeContext.live,
         logger
       )
       .fold(

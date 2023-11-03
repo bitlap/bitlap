@@ -23,7 +23,6 @@ import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.network.ServerAddress
-import org.bitlap.server.BitlapContext
 
 import zio.*
 
@@ -32,7 +31,7 @@ import zio.*
 object BitlapServerConfiguration:
 
   lazy val live: ZLayer[Any, Nothing, BitlapServerConfiguration] = ZLayer.make[BitlapServerConfiguration](
-    ZLayer.succeed(BitlapContext.globalConf),
+    ZLayer.succeed(org.bitlap.core.BitlapContext.bitlapConf),
     ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapServerConfiguration(underlayConf))
   )
   lazy val testLive: ZLayer[Any, Nothing, BitlapServerConfiguration] = live

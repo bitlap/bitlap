@@ -28,7 +28,6 @@ import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
-import org.bitlap.server.BitlapContext
 import org.bitlap.server.config.BitlapServerConfiguration
 
 import com.typesafe.scalalogging.LazyLogging

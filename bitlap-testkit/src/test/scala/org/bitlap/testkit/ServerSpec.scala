@@ -17,7 +17,7 @@ package org.bitlap.testkit
 
 import java.sql.*
 
-import org.bitlap.testkit.server.*
+import org.bitlap.testkit.*
 
 import org.junit.*
 import org.scalatest.{ BeforeAndAfterAll, Inspectors }
@@ -42,7 +42,7 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
   override protected def beforeAll(): Unit = {
     server.setDaemon(true)
     server.start()
-    Thread.sleep(3000L)
+    Thread.sleep(5000L)
 
     initTable()
   }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.testkit.server
+package org.bitlap.testkit
 
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.*

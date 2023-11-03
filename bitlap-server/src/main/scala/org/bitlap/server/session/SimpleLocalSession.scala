@@ -27,7 +27,6 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.server.BitlapContext
 
 import com.google.protobuf.ByteString
 
@@ -53,7 +52,7 @@ final class SimpleLocalSession(
 
   override def lastAccessTime_=(time: Long): Unit = _lastAccessTime = time
 
-  override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
+  override def sessionConf: BitlapConf = org.bitlap.core.BitlapContext.bitlapConf.clone(_sessionConf.asJava)
 
   override def currentSchema: String = _currentSchema
 
@@ -180,7 +179,7 @@ final class SimpleLocalSession(
         case ServerName =>
           GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
         case ServerConf =>
-          GetInfoValue(ByteString.copyFromUtf8(BitlapContext.globalConf.toJson))
+          GetInfoValue(ByteString.copyFromUtf8(org.bitlap.core.BitlapContext.bitlapConf.toJson))
         case DbmsName =>
           GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
         case DbmsVer =>

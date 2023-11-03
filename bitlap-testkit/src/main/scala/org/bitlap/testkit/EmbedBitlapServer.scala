@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.testkit.server
+package org.bitlap.testkit
 
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.service.DriverGrpcService
+import org.bitlap.testkit.MockAsyncProtocol
 
 import zio.*
 import zio.ZIOAppArgs.getArgs
@@ -40,6 +41,7 @@ object EmbedBitlapServer extends ZIOAppDefault {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
+      _ <- ZIO.serviceWithZIO[ServerNodeContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join))
     } yield ())
       .provide(
@@ -49,7 +51,8 @@ object EmbedBitlapServer extends ZIOAppDefault {
         MockAsyncProtocol.live,
         ZIOAppArgs.empty,
         DriverGrpcService.live,
-        BitlapServerConfiguration.testLive
+        BitlapServerConfiguration.testLive,
+        ServerNodeContext.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

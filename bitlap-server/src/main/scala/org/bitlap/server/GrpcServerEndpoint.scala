@@ -35,10 +35,9 @@ object GrpcServerEndpoint:
 
   def service(
     args: List[String]
-  ): ZIO[DriverGrpcService with Scope with GrpcServerEndpoint, Throwable, Unit] =
+  ): ZIO[DriverGrpcService with Scope with GrpcServerEndpoint with ServerNodeContext, Throwable, Unit] =
     (for {
       _ <- Console.printLine(s"Grpc Server started")
-      _ <- BitlapContext.fillRpc(DriverService.liveInstance)
       _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
       _ <- ZIO.never
     } yield ())
@@ -55,8 +54,8 @@ final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
         .addFromEnvironment[ZDriverService[RequestContext]]
     )
 
-  def runGrpcServer(): URIO[Any, ExitCode] = ZLayer
-    .make[Server](
+  private def runGrpcServer(): URIO[ServerNodeContext, ExitCode] = ZLayer
+    .makeSome[ServerNodeContext, Server](
       serverLayer,
       DriverGrpcService.live,
       DriverService.live

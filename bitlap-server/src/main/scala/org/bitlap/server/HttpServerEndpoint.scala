@@ -92,7 +92,7 @@ final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLiv
       indexHtml
   }
 
-  def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
+  private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
       .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
       .flatMap(port => Console.printLine(s"HTTP Server started at port:$port")) *> ZIO.never)

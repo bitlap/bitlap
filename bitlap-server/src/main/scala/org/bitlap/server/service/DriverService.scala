@@ -31,8 +31,7 @@ import zio.*
 /** Server side implementation of asynchronous RPC
  */
 object DriverService:
-  private[server] lazy val liveInstance: DriverService = new DriverService
-  lazy val live: ULayer[AsyncProtocol]                 = ZLayer.succeed(liveInstance)
+  lazy val live: ULayer[AsyncProtocol] = ZLayer.succeed(new DriverService)
 end DriverService
 
 final class DriverService extends AsyncProtocol with LazyLogging:

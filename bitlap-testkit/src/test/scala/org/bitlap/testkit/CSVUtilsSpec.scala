@@ -20,7 +20,6 @@ import java.io.File
 import org.bitlap.network.enumeration.{ OperationType, TypeId }
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.testkit.server.MockAsyncProtocol
 
 import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuite

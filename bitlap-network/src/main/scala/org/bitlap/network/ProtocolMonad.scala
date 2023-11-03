@@ -24,13 +24,13 @@ import org.bitlap.network.models.*
 trait ProtocolMonad[F[_]]:
   self =>
 
-  type Monad = self.type
+  type PMonad = self.type
 
   def pure[A](a: A): F[A]
 
-  def map[A, B](fa: Monad => F[A])(f: A => B): F[B]
+  def map[A, B](fa: PMonad => F[A])(f: A => B): F[B]
 
-  def flatMap[A, B](fa: Monad => F[A])(f: A => F[B]): F[B]
+  def flatMap[A, B](fa: PMonad => F[A])(f: A => F[B]): F[B]
 
   def openSession(
     username: String,

@@ -35,11 +35,11 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)
 
-  override def map[A, B](fa: Monad => Task[A])(f: A => B): Task[B] = fa(this).map(f)
+  override def map[A, B](fa: PMonad => Task[A])(f: A => B): Task[B] = fa(this).map(f)
 
-  override def flatMap[A, B](fa: Monad => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
+  override def flatMap[A, B](fa: PMonad => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T](action: Monad => Task[T]): T =
+  def sync[T](action: PMonad => Task[T]): T =
     try {
       val future = Unsafe.unsafe { implicit rt =>
         Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, Throwable, T]])
@@ -47,7 +47,7 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
       Await.result(future, timeout)
     } catch case NonFatal(e) => throw InternalException("Failed to run ZIO effect", Option(e))
 
-  def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: Monad => Task[A])
+  def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: PMonad => Task[A])
     : Task[A] =
     ZIO
       .whenZIO(predicate)

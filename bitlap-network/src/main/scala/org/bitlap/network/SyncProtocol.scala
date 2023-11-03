@@ -26,9 +26,9 @@ trait SyncProtocol extends ProtocolMonad[Identity]:
 
   def pure[A](a: A): Identity[A] = a
 
-  def map[A, B](fa: Monad => Identity[A])(f: A => B): Identity[B] = f(fa(this))
+  def map[A, B](fa: PMonad => Identity[A])(f: A => B): Identity[B] = f(fa(this))
 
-  def flatMap[A, B](fa: Monad => Identity[A])(f: A => Identity[B]): Identity[B] = f(fa(this))
+  def flatMap[A, B](fa: PMonad => Identity[A])(f: A => Identity[B]): Identity[B] = f(fa(this))
 
   def openSession(
     username: String,

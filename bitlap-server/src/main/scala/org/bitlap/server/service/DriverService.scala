@@ -32,10 +32,10 @@ import zio.*
  */
 object DriverService:
   private[server] lazy val liveInstance: DriverService = new DriverService
-  lazy val live: ULayer[DriverIO]                      = ZLayer.succeed(liveInstance)
+  lazy val live: ULayer[AsyncProtocol]                 = ZLayer.succeed(liveInstance)
 end DriverService
 
-final class DriverService extends DriverIO with LazyLogging:
+final class DriverService extends AsyncProtocol with LazyLogging:
 
   override def openSession(
     username: String,

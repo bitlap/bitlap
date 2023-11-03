@@ -15,4 +15,15 @@
  */
 package org.bitlap.testkit
 
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2023/11/3
+ */
+final case class Metric(
+  time: Long,
+  entity: Int,
+  dimensions: List[Dimension],
+  name: String,
+  value: Long)
+
 final case class Dimension(key: String, value: String)

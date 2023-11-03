@@ -15,40 +15,46 @@
  */
 package org.bitlap.network
 
+import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-/** Functional synchronous RPC API, both for client and server, logic should be delegated to asynchronous RPC
- *  [[org.bitlap.network.DriverIO]] and should not be implemented on its own.
+/** Functional RPC API, both for client and server.
  */
-trait DriverIdentity extends DriverX[Identity]:
+trait ProtocolMonad[F[_]]:
   self =>
 
-  def pure[A](a: A): Identity[A] = a
+  type Monad = self.type
 
-  def map[A, B](fa: self.type => Identity[A])(f: A => B): Identity[B] = f(fa(this))
+  def pure[A](a: A): F[A]
 
-  def flatMap[A, B](fa: self.type => Identity[A])(f: A => Identity[B]): Identity[B] = f(fa(this))
+  def map[A, B](fa: Monad => F[A])(f: A => B): F[B]
+
+  def flatMap[A, B](fa: Monad => F[A])(f: A => F[B]): F[B]
 
   def openSession(
     username: String,
     password: String,
     configuration: Map[String, String]
-  ): Identity[SessionHandle]
+  ): F[SessionHandle]
 
-  def closeSession(sessionHandle: SessionHandle): Identity[Unit]
+  def closeSession(sessionHandle: SessionHandle): F[Unit]
 
   def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String]
-  ): Identity[OperationHandle]
+  ): F[OperationHandle]
 
-  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults]
+  def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): F[FetchResults]
 
-  def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema]
+  def getResultSetMetadata(opHandle: OperationHandle): F[TableSchema]
 
-  def cancelOperation(opHandle: OperationHandle): Identity[Unit]
+  def cancelOperation(opHandle: OperationHandle): F[Unit]
 
-  def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus]
+  def closeOperation(opHandle: OperationHandle): F[Unit]
+
+  def getOperationStatus(opHandle: OperationHandle): F[OperationStatus]
+
+  def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): F[GetInfoValue]

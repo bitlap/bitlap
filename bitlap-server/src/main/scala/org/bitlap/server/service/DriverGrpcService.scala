@@ -31,15 +31,15 @@ import zio.*
  */
 object DriverGrpcService:
 
-  lazy val live: ZLayer[DriverIO, Nothing, DriverGrpcService] =
-    ZLayer.fromFunction((driverIO: DriverIO) => new DriverGrpcService(driverIO))
+  lazy val live: ZLayer[AsyncProtocol, Nothing, DriverGrpcService] =
+    ZLayer.fromFunction((asyncProtocol: AsyncProtocol) => new DriverGrpcService(asyncProtocol))
 end DriverGrpcService
 
-final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverService[RequestContext]:
+final class DriverGrpcService(private val asyncProtocol: AsyncProtocol) extends ZDriverService[RequestContext]:
 
   // Directly using zio grpc's Status to represent errors and avoid handling multiple errors
   override def openSession(request: BOpenSessionReq, context: RequestContext): IO[StatusException, BOpenSessionResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -56,7 +56,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def closeSession(request: BCloseSessionReq, context: RequestContext)
     : IO[StatusException, BCloseSessionResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -66,7 +66,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def executeStatement(request: BExecuteStatementReq, context: RequestContext)
     : IO[StatusException, BExecuteStatementResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -81,7 +81,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def fetchResults(request: BFetchResultsReq, context: RequestContext)
     : IO[StatusException, BFetchResultsResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -91,7 +91,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq, context: RequestContext)
     : IO[StatusException, BGetResultSetMetadataResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -118,7 +118,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
     request: BCancelOperationReq,
     context: RequestContext
   ): IO[StatusException, BCancelOperationResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -128,7 +128,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def getOperationStatus(request: BGetOperationStatusReq, context: RequestContext)
     : IO[StatusException, BGetOperationStatusResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -138,7 +138,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
 
   override def closeOperation(request: BCloseOperationReq, context: RequestContext)
     : IO[StatusException, BCloseOperationResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),
@@ -147,7 +147,7 @@ final class DriverGrpcService(private val driverIO: DriverIO) extends ZDriverSer
       .mapBoth(errorApplyFunc, _ => BCloseOperationResp())
 
   override def getInfo(request: BGetInfoReq, context: RequestContext): IO[StatusException, BGetInfoResp] =
-    driverIO
+    asyncProtocol
       .when(
         BitlapContext.isLeader,
         OperationMustOnLeaderException(),

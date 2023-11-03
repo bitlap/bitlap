@@ -15,8 +15,8 @@
  */
 package org.bitlap.server
 
+import org.bitlap.network.AsyncProtocol
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
-import org.bitlap.network.DriverIO
 import org.bitlap.server.config.BitlapServerConfiguration
 import org.bitlap.server.service.*
 

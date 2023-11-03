@@ -30,11 +30,11 @@ import zio.*
  *
  *  data: simple_data.csv
  */
-object MockDriverIO {
-  lazy val live: ULayer[DriverIO] = ZLayer.succeed(new MockDriverIO())
+object MockAsyncProtocol {
+  lazy val live: ULayer[AsyncProtocol] = ZLayer.succeed(new MockAsyncProtocol())
 }
 
-final class MockDriverIO extends DriverIO with CSVUtils {
+final class MockAsyncProtocol extends AsyncProtocol with CSVUtils {
 
   val metrics: Seq[Metric] = readClasspathCSVData("simple_data.csv")
 

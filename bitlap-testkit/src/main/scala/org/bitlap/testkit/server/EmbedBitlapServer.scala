@@ -46,7 +46,7 @@ object EmbedBitlapServer extends ZIOAppDefault {
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
         Scope.default,
-        MockDriverIO.live,
+        MockAsyncProtocol.live,
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapServerConfiguration.testLive

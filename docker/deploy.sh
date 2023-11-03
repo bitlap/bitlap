@@ -46,8 +46,8 @@ if [[ $? -eq 0 ]]; then
   echo "===============  🎉 build image successfully !!!  ======================="
   echo "=============================================================================="
   
-  # 运行server，运行交互式sql（阻止容器退出）
-#  docker run --name bitlap-$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333  liguobin/bitlap:$tag
+  # 运行server
+  docker run --name bitlap-$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333  liguobin/bitlap:$tag
   echo "===============  🎉 bitlap_server running successfully !!!  ======================="
 fi
 pwd

@@ -31,14 +31,14 @@ import zio.*
  */
 object DriverGrpcService:
 
-  lazy val live: ZLayer[AsyncProtocol with ServerNodeContext, Nothing, DriverGrpcService] =
-    ZLayer.fromFunction((asyncProtocol: AsyncProtocol, serverNodeContext: ServerNodeContext) =>
+  lazy val live: ZLayer[AsyncProtocol with BitlapNodeContext, Nothing, DriverGrpcService] =
+    ZLayer.fromFunction((asyncProtocol: AsyncProtocol, serverNodeContext: BitlapNodeContext) =>
       new DriverGrpcService(asyncProtocol, serverNodeContext)
     )
 
 end DriverGrpcService
 
-final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNodeContext: ServerNodeContext)
+final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNodeContext: BitlapNodeContext)
     extends ZDriverService[RequestContext]:
 
   // Directly using zio grpc's Status to represent errors and avoid handling multiple errors

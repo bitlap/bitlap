@@ -41,7 +41,7 @@ object EmbedBitlapServer extends ZIOAppDefault {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[ServerNodeContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join))
     } yield ())
       .provide(
@@ -51,8 +51,8 @@ object EmbedBitlapServer extends ZIOAppDefault {
         MockAsyncProtocol.live,
         ZIOAppArgs.empty,
         DriverGrpcService.live,
-        BitlapServerConfiguration.testLive,
-        ServerNodeContext.live
+        BitlapConfiguration.testLive,
+        BitlapNodeContext.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

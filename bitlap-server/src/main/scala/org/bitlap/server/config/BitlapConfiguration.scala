@@ -28,17 +28,17 @@ import zio.*
 
 /** Wrapping kotlin configuration, forming a unified layer exposed.
  */
-object BitlapServerConfiguration:
+object BitlapConfiguration:
 
-  lazy val live: ZLayer[Any, Nothing, BitlapServerConfiguration] = ZLayer.make[BitlapServerConfiguration](
+  lazy val live: ZLayer[Any, Nothing, BitlapConfiguration] = ZLayer.make[BitlapConfiguration](
     ZLayer.succeed(org.bitlap.core.BitlapContext.bitlapConf),
-    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapServerConfiguration(underlayConf))
+    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapConfiguration(underlayConf))
   )
-  lazy val testLive: ZLayer[Any, Nothing, BitlapServerConfiguration] = live
+  lazy val testLive: ZLayer[Any, Nothing, BitlapConfiguration] = live
 
-end BitlapServerConfiguration
+end BitlapConfiguration
 
-final case class BitlapServerConfiguration(underlayConf: BitlapConf):
+final case class BitlapConfiguration(underlayConf: BitlapConf):
 
   val startTimeout = Duration.create(underlayConf.get(BitlapConfKeys.NODE_START_TIMEOUT))
 
@@ -70,4 +70,4 @@ final case class BitlapServerConfiguration(underlayConf: BitlapConf):
     Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS)
   )
 
-end BitlapServerConfiguration
+end BitlapConfiguration

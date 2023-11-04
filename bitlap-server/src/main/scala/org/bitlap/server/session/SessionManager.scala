@@ -28,11 +28,11 @@ import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
-import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.config.BitlapConfiguration
 
 import com.typesafe.scalalogging.LazyLogging
 
-import zio.{ System as _, ZIO, * }
+import zio.{ System as _, * }
 
 /** Bitlap session manager
  */
@@ -52,11 +52,11 @@ object SessionManager extends LazyLogging:
 
   /** Start session listening, clear session when timeout occurs, and clear session related operation cache
    */
-  def startListener(): ZIO[SessionManager & BitlapServerConfiguration, Nothing, Unit] =
+  def startListener(): ZIO[SessionManager & BitlapConfiguration, Nothing, Unit] =
     logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
     val current = System.currentTimeMillis
     for {
-      sessionConfig <- ZIO.serviceWith[BitlapServerConfiguration](_.sessionConfig)
+      sessionConfig <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
       sessionTimeout = sessionConfig.timeout.toMillis
       _ <- ZIO
         .foreach(sessionStore.values().asScala) { session =>

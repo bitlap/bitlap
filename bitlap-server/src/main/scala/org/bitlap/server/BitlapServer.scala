@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.*
 
-import org.bitlap.client.{ AsyncClient, ClientConfig }
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
 import org.bitlap.server.service.*
@@ -42,7 +41,7 @@ object BitlapServer extends ZIOAppDefault:
       t1           <- RaftServerEndpoint.service(args.toList).fork
       t2           <- GrpcServerEndpoint.service(args.toList).fork
       t3           <- HttpServerEndpoint.service(args.toList).fork
-      serverConfig <- ZIO.serviceWith[BitlapServerConfiguration](_.sessionConfig)
+      serverConfig <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
       _ <- SessionManager
         .startListener()
         .repeat(Schedule.fixed(ZDuration.fromScala(serverConfig.interval)))
@@ -55,7 +54,7 @@ object BitlapServer extends ZIOAppDefault:
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[ServerNodeContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
     } yield ())
       .provide(
@@ -68,8 +67,8 @@ object BitlapServer extends ZIOAppDefault:
         Scope.default,
         ZIOAppArgs.empty,
         DriverGrpcService.live,
-        BitlapServerConfiguration.live,
-        ServerNodeContext.live,
+        BitlapConfiguration.live,
+        BitlapNodeContext.live,
         logger
       )
       .fold(

@@ -21,7 +21,7 @@ import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.network.{ GetServerAddressReq, GetServerAddressResp }
-import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.config.BitlapConfiguration
 
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message

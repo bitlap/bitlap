@@ -33,8 +33,8 @@ import zio.*
 
 /** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
  */
-final case class ServerNodeContext(
-  config: BitlapServerConfiguration,
+final case class BitlapNodeContext(
+  config: BitlapConfiguration,
   grpcStarted: Promise[Throwable, Boolean],
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
@@ -77,7 +77,7 @@ final case class ServerNodeContext(
 
   def getLeaderAddress(): Task[ServerAddress] =
     (for {
-      config <- ZIO.service[BitlapServerConfiguration]
+      config <- ZIO.service[BitlapConfiguration]
       peers      = config.raftConfig.initialServerAddressList
       groupId    = config.raftConfig.groupId
       timeout    = config.raftConfig.timeout
@@ -114,20 +114,20 @@ final case class ServerNodeContext(
             throw LeaderNotFoundException("Cannot find a leader address")
           else ServerAddress(re.getIp, re.getPort)
         }
-    } yield server).provideLayer(BitlapServerConfiguration.live)
+    } yield server).provideLayer(BitlapConfiguration.live)
 }
 
-object ServerNodeContext:
+object BitlapNodeContext:
 
-  lazy val live: ZLayer[BitlapServerConfiguration, Nothing, ServerNodeContext] = ZLayer.fromZIO {
+  lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapNodeContext] = ZLayer.fromZIO {
     for {
       grpcStart        <- Promise.make[Throwable, Boolean]
       raftStart        <- Promise.make[Throwable, Boolean]
       cliClientService <- Ref.make(new CliClientServiceImpl)
       node             <- Ref.make(Option.empty[Node])
       client           <- Ref.make(Option.empty[AsyncClient])
-      config           <- ZIO.service[BitlapServerConfiguration]
-    } yield ServerNodeContext(config, grpcStart, raftStart, cliClientService, node, client)
+      config           <- ZIO.service[BitlapConfiguration]
+    } yield BitlapNodeContext(config, grpcStart, raftStart, cliClientService, node, client)
   }
 
-end ServerNodeContext
+end BitlapNodeContext

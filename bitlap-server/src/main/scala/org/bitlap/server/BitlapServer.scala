@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.*
 
+import org.bitlap.client.{ AsyncClient, ClientConfig }
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpServiceLive
 import org.bitlap.server.service.*

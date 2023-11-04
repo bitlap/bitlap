@@ -40,9 +40,16 @@ end BitlapServerConfiguration
 
 final case class BitlapServerConfiguration(underlayConf: BitlapConf):
 
-  val grpcConfig: BitlapGrpcConfig = BitlapGrpcConfig(
-    underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress.port
-  )
+  val startTimeout = Duration.create(underlayConf.get(BitlapConfKeys.NODE_START_TIMEOUT))
+
+  val grpcConfig: BitlapGrpcConfig = {
+    val addr = underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress
+    BitlapGrpcConfig(
+      addr.ip,
+      addr.port,
+      underlayConf.get(BitlapConfKeys.NODE_CLIENT_PEERS)
+    )
+  }
 
   val raftConfig: BitlapRaftConfig = BitlapRaftConfig(
     underlayConf.get(BitlapConfKeys.NODE_RAFT_DIR),

@@ -15,6 +15,8 @@
  */
 package org.bitlap.server
 
+import org.bitlap.client.AsyncClient
+import org.bitlap.client.ClientConfig
 import org.bitlap.network.AsyncProtocol
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
 import org.bitlap.server.config.BitlapServerConfiguration
@@ -35,10 +37,21 @@ object GrpcServerEndpoint:
 
   def service(
     args: List[String]
-  ): ZIO[DriverGrpcService with Scope with GrpcServerEndpoint with ServerNodeContext, Throwable, Unit] =
+  ): ZIO[
+    DriverGrpcService with Scope with GrpcServerEndpoint with ServerNodeContext with BitlapServerConfiguration,
+    Throwable,
+    Unit
+  ] =
     (for {
-      _ <- Console.printLine(s"Grpc Server started")
-      _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
+      _      <- Console.printLine(s"Grpc Server started")
+      config <- ZIO.service[BitlapServerConfiguration]
+      _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
+      client <- AsyncClient
+        .make(
+          ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
+        )
+        .build
+      _ <- ZIO.serviceWithZIO[ServerNodeContext](_.setClient(client.get))
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)

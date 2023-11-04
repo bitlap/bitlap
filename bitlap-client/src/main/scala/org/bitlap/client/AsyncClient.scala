@@ -160,3 +160,10 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
+
+object AsyncClient {
+
+  def make(conf: ClientConfig): ULayer[AsyncClient] = ZLayer.succeed(
+    new AsyncClient(conf.serverPeers.toArray, conf.props)
+  )
+}

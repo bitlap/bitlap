@@ -34,16 +34,36 @@ import zio.*
 /** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
  */
 final case class ServerNodeContext(
+  config: BitlapServerConfiguration,
   grpcStarted: Promise[Throwable, Boolean],
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
-  nodeRef: Ref[Option[Node]]) {
+  nodeRef: Ref[Option[Node]],
+  clientRef: Ref[Option[AsyncClient]]) {
+
+  private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
   def start(): ZIO[Any, Throwable, Boolean] = grpcStarted.succeed(true) && raftStarted.succeed(true)
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
 
-  def setNode(_node: Node): ZIO[Any, NetworkException, Boolean] =
+  def setClient(client: AsyncClient): ZIO[Any, Throwable, Unit] =
+    grpcStarted.await.timeout(refTimeout) *> clientRef.set(Option(client))
+
+  def getClient: ZIO[Any, Throwable, AsyncClient] =
+    grpcStarted.await.timeout(refTimeout) *>
+      clientRef.get.someOrFail(
+        InternalException("Cannot find a AsyncClient instance")
+      )
+
+  def getNode: ZIO[Any, Throwable, Node] =
+    raftStarted.await.timeout(refTimeout) *> nodeRef.get.someOrFail(
+      InternalException("Cannot find a Node instance")
+    )
+
+  def getCliClientService: UIO[CliClientServiceImpl] = cliClientServiceRef.get
+
+  def setNode(_node: Node): ZIO[Any, Throwable, Boolean] =
     for {
       _   <- nodeRef.set(Option(_node))
       cli <- cliClientServiceRef.get
@@ -57,10 +77,11 @@ final case class ServerNodeContext(
 
   def getLeaderAddress(): Task[ServerAddress] =
     (for {
-      conf             <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.initialServerAddressList)
-      groupId          <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.groupId)
-      timeout          <- ZIO.serviceWith[BitlapServerConfiguration](c => c.raftConfig.timeout)
-      grpcConfig       <- ZIO.serviceWith[BitlapServerConfiguration](c => c.grpcConfig)
+      config <- ZIO.service[BitlapServerConfiguration]
+      peers      = config.raftConfig.initialServerAddressList
+      groupId    = config.raftConfig.groupId
+      timeout    = config.raftConfig.timeout
+      grpcConfig = config.grpcConfig
       cliClientService <- cliClientServiceRef.get
       _node            <- nodeRef.get
       server <- ZIO
@@ -70,11 +91,8 @@ final case class ServerNodeContext(
           }
         }
         .someOrElse {
-          if cliClientService == null then {
-            throw LeaderNotFoundException("Cannot find a raft CliClientService instance")
-          }
           val rt = RouteTable.getInstance
-          rt.updateConfiguration(groupId, conf)
+          rt.updateConfiguration(groupId, peers)
           val success: Boolean = rt.refreshLeader(cliClientService, groupId, timeout.toMillis.toInt).isOk
           val leader = if success then {
             rt.selectLeader(groupId)
@@ -101,13 +119,15 @@ final case class ServerNodeContext(
 
 object ServerNodeContext:
 
-  lazy val live: ZLayer[Any, Nothing, ServerNodeContext] = ZLayer.fromZIO {
+  lazy val live: ZLayer[BitlapServerConfiguration, Nothing, ServerNodeContext] = ZLayer.fromZIO {
     for {
       grpcStart        <- Promise.make[Throwable, Boolean]
       raftStart        <- Promise.make[Throwable, Boolean]
       cliClientService <- Ref.make(new CliClientServiceImpl)
       node             <- Ref.make(Option.empty[Node])
-    } yield ServerNodeContext(grpcStart, raftStart, cliClientService, node)
+      client           <- Ref.make(Option.empty[AsyncClient])
+      config           <- ZIO.service[BitlapServerConfiguration]
+    } yield ServerNodeContext(config, grpcStart, raftStart, cliClientService, node, client)
   }
 
 end ServerNodeContext

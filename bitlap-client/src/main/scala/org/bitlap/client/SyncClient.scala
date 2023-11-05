@@ -23,7 +23,7 @@ import org.bitlap.network.models.*
 /** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
  *  [[org.bitlap.client.AsyncClient]].
  */
-final class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverIdentity:
+final class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncProtocol:
 
   private lazy val delegateClient = new AsyncClient(serverPeers, props)
 
@@ -55,10 +55,6 @@ final class SyncClient(serverPeers: Array[String], props: Map[String, String]) e
 
   override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateClient.sync {
     _.getResultSetMetadata(opHandle)
-  }
-
-  def getLeader(requestId: String): Identity[ServerAddress] = delegateClient.sync {
-    _.getLeader(requestId)
   }
 
   override def cancelOperation(opHandle: OperationHandle): Identity[Unit] =

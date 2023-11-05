@@ -19,7 +19,6 @@ import java.io.*
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
 
-import org.bitlap.server.BitlapContext
 import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
 
 import org.apache.commons.io.FileUtils
@@ -76,7 +75,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
     if !serverId.parse(opts.serverAddress) then
       throw new IllegalArgumentException("Fail to parse serverId: " + opts.serverAddress)
     val rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverId.getEndpoint)
-    rpcServer.registerProcessor(new GetServerMetadataProcessor(null, BitlapContext.globalConf))
+    rpcServer.registerProcessor(new GetServerMetadataProcessor(null, org.bitlap.core.BitlapContext.bitlapConf))
     this.raftGroupService = new RaftGroupService(groupId, serverId, nodeOpts, rpcServer)
     this.node = this.raftGroupService.start
     if this.node != null then this.started = true

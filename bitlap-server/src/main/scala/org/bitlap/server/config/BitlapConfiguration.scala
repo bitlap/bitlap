@@ -23,27 +23,33 @@ import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.network.ServerAddress
-import org.bitlap.server.BitlapContext
 
 import zio.*
 
 /** Wrapping kotlin configuration, forming a unified layer exposed.
  */
-object BitlapServerConfiguration:
+object BitlapConfiguration:
 
-  lazy val live: ZLayer[Any, Nothing, BitlapServerConfiguration] = ZLayer.make[BitlapServerConfiguration](
-    ZLayer.succeed(BitlapContext.globalConf),
-    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapServerConfiguration(underlayConf))
+  lazy val live: ZLayer[Any, Nothing, BitlapConfiguration] = ZLayer.make[BitlapConfiguration](
+    ZLayer.succeed(org.bitlap.core.BitlapContext.bitlapConf),
+    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapConfiguration(underlayConf))
   )
-  lazy val testLive: ZLayer[Any, Nothing, BitlapServerConfiguration] = live
+  lazy val testLive: ZLayer[Any, Nothing, BitlapConfiguration] = live
 
-end BitlapServerConfiguration
+end BitlapConfiguration
 
-final case class BitlapServerConfiguration(underlayConf: BitlapConf):
+final case class BitlapConfiguration(underlayConf: BitlapConf):
 
-  val grpcConfig: BitlapGrpcConfig = BitlapGrpcConfig(
-    underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress.port
-  )
+  val startTimeout = Duration.create(underlayConf.get(BitlapConfKeys.NODE_START_TIMEOUT))
+
+  val grpcConfig: BitlapGrpcConfig = {
+    val addr = underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress
+    BitlapGrpcConfig(
+      addr.ip,
+      addr.port,
+      underlayConf.get(BitlapConfKeys.NODE_CLIENT_PEERS)
+    )
+  }
 
   val raftConfig: BitlapRaftConfig = BitlapRaftConfig(
     underlayConf.get(BitlapConfKeys.NODE_RAFT_DIR),
@@ -64,4 +70,4 @@ final case class BitlapServerConfiguration(underlayConf: BitlapConf):
     Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS)
   )
 
-end BitlapServerConfiguration
+end BitlapConfiguration

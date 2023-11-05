@@ -17,39 +17,46 @@ package org.bitlap.network
 
 import scala.concurrent.Await
 import scala.concurrent.duration.*
+import scala.util.control.NonFatal
 
+import org.bitlap.network.NetworkException.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-import zio.{ Runtime, Task, Unsafe, ZIO }
+import zio.{ Runtime, Task, UIO, Unsafe, ZIO }
 
 /** Functional asynchronous RPC API, both for client and server.
  */
-trait DriverIO extends DriverX[Task]:
+trait AsyncProtocol extends ProtocolMonad[Task]:
   self =>
 
   private lazy val timeout = 30.seconds
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)
 
-  override def map[A, B](fa: self.type => Task[A])(f: A => B): Task[B] = fa(this).map(f)
+  override def map[A, B](fa: PMonad => Task[A])(f: A => B): Task[B] = fa(this).map(f)
 
-  override def flatMap[A, B](fa: self.type => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
+  override def flatMap[A, B](fa: PMonad => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T, E <: Throwable, Z <: ZIO[?, ?, ?]](
-    action: self.type => Z
-  ): T =
-    try
+  def sync[T](action: PMonad => Task[T]): T =
+    try {
       val future = Unsafe.unsafe { implicit rt =>
-        Runtime.default.unsafe.runToFuture(action(this).asInstanceOf[ZIO[Any, E, T]])
+        Runtime.default.unsafe.runToFuture(action(this))
       }
       Await.result(future, timeout)
-    catch case e: Throwable => throw e
+    } catch
+      case NonFatal(e) =>
+        throw InternalException(s"${e.getLocalizedMessage}", Option(e))
 
-  def when[A, E <: Throwable](predicate: => Boolean, exception: => E, fa: self.type => Task[A]): Task[A] =
-    if predicate then fa(this)
-    else ZIO.fail(exception)
+  def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: PMonad => Task[A])
+    : Task[A] =
+    ZIO
+      .whenZIO(predicate)
+      .apply {
+        fa(this)
+      }
+      .someOrFail(exception)
 
   def openSession(
     username: String,

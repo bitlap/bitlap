@@ -61,6 +61,18 @@ object BitlapConfKeys {
         .validator(Validators.NOT_BLANK)
 
     @JvmField
+    val NODE_CLIENT_PEERS = BitlapConfKey<String>("bitlap.node.clientPeers")
+        .sys("bitlap.node.clientPeers")
+        .env("BITLAP_NODE_CLIENT_PEERS")
+        .validator(Validators.NOT_BLANK)
+
+    @JvmField
+    val NODE_START_TIMEOUT = BitlapConfKey<String>("bitlap.node.startTimeout")
+        .sys("bitlap.node.startTimeout")
+        .env("BITLAP_NODE_START_TIMEOUT")
+        .validator(Validators.NOT_BLANK)
+
+    @JvmField
     val NODE_RAFT_DIR = BitlapConfKey<String>("bitlap.node.raft.dir")
         .sys("bitlap.node.raft.dir")
         .env("BITLAP_NODE_RAFT_DIR")

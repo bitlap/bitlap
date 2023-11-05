@@ -30,7 +30,14 @@ import zio.*
 
 /** Asynchronous RPC client, implemented based on zio grpc
  */
-final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends DriverIO:
+final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncProtocol:
+
+  assert(serverPeers.length > 0)
+
+  private val addr = serverPeers.asServerAddresses
+
+  private val leaderRef: UIO[Ref[ZIO[Scope, Throwable, DriverServiceClient]]] =
+    Ref.make(clientLayer(addr.head.ip, addr.head.port))
 
   /** Based on the configured service cluster, obtain its leader and construct
    *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
@@ -41,46 +48,53 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
    *  TODO (When the leader does not exist, the client cannot perform any operations) cache leader address and add heart
    *  between leader
    */
-  private def leaderClientLayer: ZIO[Any, Throwable, Layer[Throwable, DriverServiceClient]] =
-    ZIO
-      .foreach(serverPeers.asServerAddresses) { address =>
-        getLeader(StringEx.uuid(true)).provideLayer(clientLayer(address.ip, address.port))
+  private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] = ZLayer.scoped {
+    for {
+      c <- ZIO.foreach(serverPeers.asServerAddresses) { address =>
+        val layer = clientLayer(address.ip, address.port)
+        leaderRef.flatMap { ref =>
+          getLeader(StringEx.uuid(true)).provideLayer(ZLayer.scoped((layer))).onExit {
+            case Exit.Success(value) if value.isDefined =>
+              ref.set(layer)
+            case _ =>
+              ZIO.unit
+          }
+        }
       }
-      .map(_.find(_.isDefined).flatten)
-      .map { f =>
-        if f.isEmpty then throw BitlapSQLException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}")
-        clientLayer(f.get.ip, f.get.port)
-      }
+      live <- ZIO
+        .when(c.flatMap(_.toList).nonEmpty) {
+          leaderRef.flatMap(_.get)
+        }
+        .someOrFail(BitlapSQLException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+      client <- live
+    } yield client
+
+  }
 
   /** Obtain grpc channel based on IP:PORT, considering leader transfer, so Layer will be created every time.
    */
-  private def clientLayer(ip: String, port: Int): Layer[Throwable, DriverServiceClient] = ZLayer.scoped {
+  private def clientLayer(ip: String, port: Int): ZIO[Scope, Throwable, DriverServiceClient] =
     DriverServiceClient.scoped(
       scalapb.zio_grpc.ZManagedChannel(builder =
         ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[?]]
       )
     )
-  }.orDie
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String]
   ): ZIO[Any, Throwable, SessionHandle] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .openSession(BOpenSessionReq(username, password, props ++ configuration))
-        .map(r => new SessionHandle(r.getSessionHandle))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .openSession(BOpenSessionReq(username, password, props ++ configuration))
+      .map(r => new SessionHandle(r.getSessionHandle))
+      .provideLayer(leaderClientLayer)
 
   override def closeSession(sessionHandle: handles.SessionHandle): ZIO[Any, Throwable, Unit] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
-        .unit
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
+      .unit
+      .provideLayer(leaderClientLayer)
 
   override def executeStatement(
     sessionHandle: handles.SessionHandle,
@@ -88,36 +102,30 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
     queryTimeout: Long,
     confOverlay: Map[String, String]
   ): ZIO[Any, Throwable, OperationHandle] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .executeStatement(
-          BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), props ++ confOverlay, queryTimeout)
-        )
-        .map(r => new OperationHandle(r.getOperationHandle))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .executeStatement(
+        BExecuteStatementReq(statement, Some(sessionHandle.toBSessionHandle()), props ++ confOverlay, queryTimeout)
+      )
+      .map(r => new OperationHandle(r.getOperationHandle))
+      .provideLayer(leaderClientLayer)
 
   override def fetchResults(
     opHandle: OperationHandle,
     maxRows: Int = 50,
     fetchType: Int = 1
   ): ZIO[Any, Throwable, FetchResults] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .fetchResults(
-          BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)
-        )
-        .map(r => FetchResults.fromBFetchResultsResp(r))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .fetchResults(
+        BFetchResultsReq(Some(opHandle.toBOperationHandle()), maxRows, fetchType)
+      )
+      .map(r => FetchResults.fromBFetchResultsResp(r))
+      .provideLayer(leaderClientLayer)
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
-        .map(t => TableSchema.fromBGetResultSetMetadataResp(t))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
+      .map(t => TableSchema.fromBGetResultSetMetadataResp(t))
+      .provideLayer(leaderClientLayer)
 
   private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient
@@ -131,33 +139,32 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .catchAll(_ => ZIO.none)
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .unit
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
+      .unit
+      .provideLayer(leaderClientLayer)
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
-        .map(t => OperationStatus.fromBGetOperationStatusResp(t))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
+      .map(t => OperationStatus.fromBGetOperationStatusResp(t))
+      .provideLayer(leaderClientLayer)
 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
-        .unit
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
+      .unit
+      .provideLayer(leaderClientLayer)
 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
-    leaderClientLayer.flatMap(l =>
-      DriverServiceClient
-        .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
-        .map(t => GetInfoValue.fromBGetInfoResp(t))
-        .provideLayer(l)
-    )
+    DriverServiceClient
+      .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
+      .map(t => GetInfoValue.fromBGetInfoResp(t))
+      .provideLayer(leaderClientLayer)
+
+object AsyncClient {
+
+  def make(conf: ClientConfig): ULayer[AsyncClient] = ZLayer.succeed(
+    new AsyncClient(conf.serverPeers.toArray, conf.props)
+  )
+}

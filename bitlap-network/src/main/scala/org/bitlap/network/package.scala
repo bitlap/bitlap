@@ -13,6 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.testkit
+package org.bitlap.network
 
-final case class Dimension(key: String, value: String)
+import com.typesafe.scalalogging.LazyLogging
+
+import io.grpc.*
+
+type Identity[T] = T
+
+private[bitlap] final case class ServerAddress(ip: String, port: Int)
+
+lazy val errorApplyFunc: Throwable => StatusException = {
+  case net: NetworkException =>
+    // error message is `code:description`
+    new StatusException(Status.fromThrowable(net).withDescription(net.msg))
+  case ex => new StatusException(Status.fromThrowable(ex))
+}
+
+extension [R <: AutoCloseable](r: R) def use[T](func: R => T): T = scala.util.Using.resource(r)(func)
+
+end extension

@@ -40,7 +40,7 @@ final class HttpServiceLive extends LazyLogging:
   val properties = new Properties()
   properties.put("bitlapconf:retries", "3")
 
-  final val DEFAULT_URL = "jdbc:bitlap://localhost:23333/default"
+  private final val DEFAULT_URL = "jdbc:bitlap://localhost:23333/default"
 
   def execute(sql: String): SqlResult =
     ScalaUtils.resource(DriverManager.getConnection(DEFAULT_URL, properties)) { conn =>

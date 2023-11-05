@@ -20,7 +20,6 @@ import java.io.File
 import org.bitlap.network.enumeration.{ OperationType, TypeId }
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.testkit.server.MockDriverIO
 
 import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuite
@@ -30,7 +29,7 @@ import org.scalatest.matchers.should
  */
 class CSVUtilsSpec extends AnyFunSuite with CSVUtils with should.Matchers {
 
-  test("testCsvConvert1") {
+  test("test CSVUtils") {
     val csv = readClasspathCSVData("simple_data.csv")
     println(csv.headOption)
     val tmp = new File("./simple_data.csv")
@@ -40,9 +39,9 @@ class CSVUtilsSpec extends AnyFunSuite with CSVUtils with should.Matchers {
     csv.headOption.toString shouldEqual "Some(Metric(1666195200,14,List(Dimension(os,Windows 8), Dimension(city,西安)),pv,712739626))"
   }
 
-  test("testMockDriverIO") {
-    val driverIO = new MockDriverIO()
-    val ret      = driverIO.fetchResults(OperationHandle(OperationType.ExecuteStatement), 50, 1)
+  test("test MockAsyncProtocol") {
+    val asyncProtocol = new MockAsyncProtocol()
+    val ret           = asyncProtocol.fetchResults(OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>
       zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()
     }

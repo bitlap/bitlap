@@ -178,7 +178,7 @@ class BitlapStatement(
       stmtHandle = client.executeStatement(sessHandle, sql, queryTimeout)
       if stmtHandle == null || !stmtHandle.hasResultSet then return false
     catch
-      case ex: Throwable =>
+      case ex: Throwable => // TODO: get error msg, mapping it by code
         throw BitlapSQLException(s"${ex.getLocalizedMessage}")
 
     val status = waitForOperationToComplete()

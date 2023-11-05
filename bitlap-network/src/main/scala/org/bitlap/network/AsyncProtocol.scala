@@ -47,7 +47,7 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
       Await.result(future, timeout)
     } catch
       case NonFatal(e) =>
-        throw InternalException(":Failed to run ZIO effect", Option(e))
+        throw InternalException(s"${e.getLocalizedMessage}", Option(e))
 
   def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: PMonad => Task[A])
     : Task[A] =

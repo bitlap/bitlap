@@ -71,20 +71,12 @@
         <log4j.version>2.17.1</log4j.version>
         <bitmap.version>1.0.1.0</bitmap.version>
         <joor.version>0.9.15</joor.version>
-        <config4k.version>0.6.0</config4k.version>
-        <gson.version>2.10.1</gson.version>
+        <config.version>1.4.3</config.version>
         <joda.version>2.12.5</joda.version>
         <disruptor.version>3.4.4</disruptor.version>
         <netty.version>4.1.77.Final</netty.version>
         <protobuf.version>3.22.2</protobuf.version>
         <grpc.netty.version>1.47.0</grpc.netty.version>
-
-        <!-- kotlin -->
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlin.version>1.8.20</kotlin.version>
-        <kotlinx.coroutines.version>1.7.2</kotlinx.coroutines.version>
-        <kotlin.logging.version>3.0.5</kotlin.logging.version>
-        <kotest.version>5.6.2</kotest.version>
 
         <!-- scala -->
         <scala.version>3.3.1</scala.version>
@@ -131,33 +123,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>${kotlinx.coroutines.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.microutils</groupId>
-            <artifactId>kotlin-logging-jvm</artifactId>
-            <version>${kotlin.logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <!-- scala -->
-        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala3-library_${scala.binary.version}</artifactId>
             <version>${scala.version}</version>
@@ -177,26 +142,13 @@
             <artifactId>scala-parallel-collections_${scala.binary.version}</artifactId>
             <version>${scala.parallel.collection}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
 
         <!-- test  -->
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.kotest</groupId>
-            <artifactId>kotest-runner-junit5-jvm</artifactId>
-            <version>${kotest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.kotest</groupId>
-            <artifactId>kotest-assertions-core-jvm</artifactId>
-            <version>${kotest.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.binary.version}</artifactId>
@@ -267,51 +219,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- kotlin  -->
-                <plugin>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>${kotlin.version}</version>
-                    <configuration>
-                        <args>
-                            <arg>-Xuse-k2</arg>
-                            <arg>-Xuse-ir</arg>
-                            <arg>-Xskip-prerelease-check</arg>
-                        </args>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>compile</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirs>
-                                    <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                                    <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                                    <sourceDir>${project.build.directory}/generated-sources</sourceDir>
-                                </sourceDirs>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>test-compile</id>
-                            <phase>test-compile</phase>
-                            <goals>
-                                <goal>test-compile</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirs>
-                                    <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                                    <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                                    <sourceDir>${project.build.directory}/generated-test-sources</sourceDir>
-                                </sourceDirs>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <!-- scala -->
-                
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
                     <artifactId>scala-maven-plugin</artifactId>
@@ -441,22 +348,6 @@
                             <delimiter>package</delimiter>
                         </licenseHeader>
                     </scala>
-
-                    <!--   依赖下载问题 暂不加Java的   -->
-                    <kotlin>
-                        <includes>
-                            <include>src/main/kotlin/**/*.kt</include>
-                            <include>src/test/kotlin/**/*.kt</include>
-                        </includes>
-
-                        <ktlint>
-                            <version>0.43.2</version> <!-- optional -->
-                        </ktlint>
-
-                        <licenseHeader>
-                            <file>${user.dir}/license-header</file>
-                        </licenseHeader>
-                    </kotlin>
                 </configuration>
             </plugin>
             <plugin>

@@ -26,7 +26,7 @@ import org.bitlap.network.ServerAddress
 
 import zio.*
 
-/** Wrapping kotlin configuration, forming a unified layer exposed.
+/** Wrapping configuration, forming a unified layer exposed.
  */
 object BitlapConfiguration:
 

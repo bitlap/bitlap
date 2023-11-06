@@ -20,8 +20,6 @@ import java.util.UUID
 
 import scala.util.control.Breaks.{ break, breakable }
 
-/** Mail: chk19940609@gmail.com Created by IceMimosa Date: 2021/4/30
- */
 object StringEx {
 
   extension (str: String) {

@@ -28,25 +28,25 @@ import scala.util.{ Failure, Success, Try }
  */
 
 trait BitlapEvent
-type BitlapSubscriber[E] = E => Unit
+type BitlapSubscriber[A] = A => Unit
 
 class EventBus(val executor: ExecutorService = Executors.newWorkStealingPool()) extends LifeCycleWrapper {
   private val subscribers = ConcurrentHashMap[Class[_ <: BitlapEvent], ListBuffer[BitlapSubscriber[_]]]()
 
-  def subscribe[E <: BitlapEvent](subscriber: BitlapSubscriber[E])(implicit classTag: ClassTag[E]): EventBus = {
+  def subscribe[A <: BitlapEvent](subscriber: BitlapSubscriber[A])(implicit classTag: ClassTag[A]): EventBus = {
     val subscribers = this.subscribers
       .computeIfAbsent(classTag.runtimeClass.asInstanceOf[Class[_ <: BitlapEvent]], { _ => ListBuffer() })
     subscribers += subscriber.asInstanceOf[BitlapSubscriber[_]]
     this
   }
 
-  def post[E <: BitlapEvent](e: E): EventBus = {
+  def post[A <: BitlapEvent](event: A): EventBus = {
 
-    Option(this.subscribers.get(e.getClass)) match {
+    Option(this.subscribers.get(event.getClass)) match {
       case Some(subs) =>
         subs.foreach { sub =>
           executor.execute(() => {
-            sub.asInstanceOf[BitlapSubscriber[E]].apply(e)
+            sub.asInstanceOf[BitlapSubscriber[A]].apply(event)
           })
         }
       case None =>

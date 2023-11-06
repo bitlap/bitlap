@@ -139,6 +139,7 @@ object DBTablePrinter {
             if (value.length > maxStringColWidth) {
               value = value.substring(0, maxStringColWidth - 3) + "..."
             }
+          case _ =>
         }
         // Adjust the column width
         c.width = if (value.length > c.width) value.length else c.width

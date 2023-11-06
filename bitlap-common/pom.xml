@@ -21,19 +21,14 @@
             <version>${bitmap.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.config4k</groupId>
-            <artifactId>config4k</artifactId>
-            <version>${config4k.version}</version>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>${config.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>joor</artifactId>
             <version>${joor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -50,7 +45,6 @@
             <artifactId>disruptor</artifactId>
             <version>${disruptor.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

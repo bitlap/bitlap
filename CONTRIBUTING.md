@@ -1,10 +1,9 @@
 ## 构建环境
 
 1. Scala 3.x、Scala 2.13.x
-2. Kotlin 1.8.x
-3. Java 11+ （Amazon Corretto JDK 11 或 Open JDK 17）
-4. Mac、Linux、Windows（不支持在Windows上读写数据）
-5. Docker
+2. Java 11+ （Amazon Corretto JDK 11 或 Open JDK 17）
+3. Mac、Linux、Windows（不支持在Windows上读写数据）
+4. Docker
 
 ## 演示
 
@@ -28,7 +27,7 @@
 | bitlap-server    | scala 3.x、jraft、zio-grpc、zio-http | RPC server 实现、raft 集成实现、HTTP API 实现 |
 | bitlap-core      | scala 3.x、calcite、parquet         | SQL解析、优化、任务、存储实现                    |
 | bitlap-spark3    | scala 2.13.x、spark 3.x            | 与 spark3 集成                         |
-| bitlap-common    | kotlin、 RoaringBitmap             | 公共模块、bitmap 封装                      |
+| bitlap-common    | scala 3.x、 RoaringBitmapX         | 公共模块、bitmap 封装                      |
 | bitlap-testkit   | scala 3.x、javafaker、rolls         | 测试工具和集成测试模块                         |
 | bitlap-server-ui | scala 3.x、javafaker、rolls         | 可视化 SQL 执行页面 UI                     |
 

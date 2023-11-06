@@ -17,7 +17,6 @@ package org.bitlap.jdbc
 
 import scala.collection.immutable.ListMap
 
-import org.junit.Test
 import org.scalatest.funsuite.AnyFunSuite
 
 class JdbcUriParamsSpec extends AnyFunSuite:

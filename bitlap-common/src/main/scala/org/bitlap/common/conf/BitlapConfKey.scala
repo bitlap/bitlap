@@ -26,7 +26,7 @@ import org.bitlap.common.extension.*
  */
 class BitlapConfKey[T: ClassTag](val key: String, val defaultValue: T = null) {
 
-  val typ: Class[_] = classTag[T].runtimeClass
+  val `type`: Class[_] = classTag[T].runtimeClass
 
   {
     BitlapConfKey.cache.put(key, this)
@@ -80,7 +80,7 @@ class BitlapConfKey[T: ClassTag](val key: String, val defaultValue: T = null) {
   def overWritable(o: Boolean): BitlapConfKey[T] = this.also { it => it.overWritable = o }
 
   override def toString: String =
-    s"BitlapConfKey(key='$key', defaultValue=$defaultValue, type=${typ.getName}, sys='$sys', env='$env', desc='$desc', version='$version')"
+    s"BitlapConfKey(key='$key', defaultValue=$defaultValue, type=${`type`.getName}, sys='$sys', env='$env', desc='$desc', version='$version')"
 }
 
 object BitlapConfKey {

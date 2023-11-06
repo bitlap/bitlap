@@ -19,7 +19,7 @@ import java.io.Closeable
 
 /** Common iterator
  */
-abstract class BitlapIterator[E] extends Iterator[E] with Closeable {
+abstract class BitlapIterator[+A] extends Iterator[A] with Closeable {
 
   protected def initialize(): Unit = {
     // ignore
@@ -51,25 +51,26 @@ object BitlapIterator {
   }
 }
 
-abstract class BitlapBatchIterator[E] extends BitlapIterator[E] {
+abstract class BitlapBatchIterator[+A] extends BitlapIterator[A] {
 
-  private var count         = 0
-  private var index         = 0
-  private var rows: List[E] = _
+  private var count              = 0
+  private var index              = 0
+  private var rows: List[_ <: A] = _
 
-  protected def nextBatch(): List[E]
+  protected def nextBatch(): List[A]
 
   override def hasNext(): Boolean = {
     rows != null && index < rows.size
   }
 
-  override def next(): E = {
+  override def next(): A = {
     if (rows == null || index >= rows.size) {
       rows = this.nextBatch()
       index = 0
     }
+    val row = rows(index)
     count += 1
     index += 1
-    rows(index)
+    row
   }
 }

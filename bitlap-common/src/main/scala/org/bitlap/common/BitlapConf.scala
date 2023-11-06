@@ -31,14 +31,14 @@ import com.typesafe.config.{ ConfigFactory, ConfigParseOptions, ConfigResolveOpt
  *
  *  [[BitlapConfKey]] is designed as follows, and the priority is the same as below:
  *
- *    - \1. with `sys` to get value from java system properties, default is `bitlap.${name}`
- *    - 2. with `env` to get value from OS environment variables, default is `BITLAP_${upper_trans_dot(name)}`
- *    - 3. with `name` to get value from `bitlap.conf` configuration
- *    - 4. `default` value
- *    - 5. value `data type`
- *    - 6. value `validator`
- *    - 7. conf key `version`
- *    - 8. ......
+ *    - with `sys` to get value from java system properties, default is `bitlap.${name}`
+ *    - with `env` to get value from OS environment variables, default is `BITLAP_${upper_trans_dot(name)}`
+ *    - with `name` to get value from `bitlap.conf` configuration
+ *    - `default` value
+ *    - value `data type`
+ *    - value `validator`
+ *    - conf key `version`
+ *    - ......
  */
 class BitlapConf(conf: Map[String, String] = Map.empty) extends Serializable {
 
@@ -65,21 +65,16 @@ class BitlapConf(conf: Map[String, String] = Map.empty) extends Serializable {
     }
 
     // load java system properties
-    System.getProperties.asScala
-      .filter(_._1.startsWith("bitlap."))
-      .foreach { case (key, value) =>
+    System.getProperties.asScala.collect {
+      case (key, value) if key.startsWith("bitlap.") =>
         map.addOne(key -> value)
-      }
+    }
+
     // load OS environment variablesR
-    System
-      .getenv()
-      .asScala
-      .filter(_._1.startsWith("BITLAP_"))
-      .foreach { case (key, value) =>
-        map addOne (
-          key.replace("_", ".").toLowerCase -> value
-        )
-      }
+    System.getenv().asScala.collect {
+      case (key, value) if key.startsWith("BITLAP_") =>
+        map.addOne(key.replace("_", ".").toLowerCase -> value)
+    }
     map.result()
   }
 
@@ -119,7 +114,7 @@ class BitlapConf(conf: Map[String, String] = Map.empty) extends Serializable {
     val result = this.props.get(confKey.key).map(_.trim) match {
       case None => confKey.defaultBy(this)
       case Some(value) =>
-        (confKey.typ match {
+        (confKey.`type` match {
           case c if c == classOf[String]                                     => value
           case c if c == classOf[Byte] || c == classOf[java.lang.Byte]       => value.toByteOption.orNull
           case c if c == classOf[Short] || c == classOf[java.lang.Short]     => value.toShortOption.orNull
@@ -130,7 +125,7 @@ class BitlapConf(conf: Map[String, String] = Map.empty) extends Serializable {
           case c if c == classOf[Char] || c == classOf[java.lang.Character]  => value.headOption.orNull
           case c if c == classOf[Boolean] || c == classOf[java.lang.Boolean] => value.toBooleanOption.orNull
           case c if c == classOf[Duration]                                   => Duration(value)
-          case _ => throw IllegalArgumentException(s"Illegal value type: ${confKey.typ}")
+          case _ => throw IllegalArgumentException(s"Illegal value type: ${confKey.`type`}")
         }).asInstanceOf[T]
     }
 

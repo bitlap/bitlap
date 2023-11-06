@@ -45,7 +45,7 @@ class EventBusTest extends AnyFunSuite with should.Matchers {
         count.addAndGet(it.i)
       }
 
-    (0 to 1000).par.foreach { i =>
+    (0 until 1000).par.foreach { i =>
       eventBus
         .post(TestEvent1())
         .post(TestEvent2(i + 1))

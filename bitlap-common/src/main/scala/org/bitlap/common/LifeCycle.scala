@@ -96,10 +96,6 @@ abstract class LifeCycleThread(val name: String, val daemon: Boolean) extends Li
   }
 
   def join(): Unit = {
-    try {
-      this.thread.join()
-    } catch {
-      case _: Throwable => // ignore
-    }
+    this.thread.join()
   }
 }

@@ -20,8 +20,8 @@ import java.sql.DriverManager
 import java.util.Properties
 
 import org.bitlap.network.NetworkException.SQLExecutedException
+import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.config.BitlapHttpConfig
-import org.bitlap.server.config.BitlapServerConfiguration
 import org.bitlap.server.http.*
 
 import io.circe.generic.auto.*
@@ -39,8 +39,8 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  lazy val live: ZLayer[BitlapServerConfiguration with HttpServiceLive, Nothing, HttpServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapServerConfiguration, httpServiceLive: HttpServiceLive) =>
+  lazy val live: ZLayer[BitlapConfiguration with HttpServiceLive, Nothing, HttpServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapConfiguration, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
 
@@ -49,8 +49,7 @@ object HttpServerEndpoint:
 
 end HttpServerEndpoint
 
-final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLive: HttpServiceLive)
-    extends HttpEndpoint:
+final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
 
   Class.forName(classOf[org.bitlap.Driver].getCanonicalName)
 
@@ -92,7 +91,7 @@ final class HttpServerEndpoint(config: BitlapServerConfiguration, httpServiceLiv
       indexHtml
   }
 
-  def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
+  private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
       .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
       .flatMap(port => Console.printLine(s"HTTP Server started at port:$port")) *> ZIO.never)

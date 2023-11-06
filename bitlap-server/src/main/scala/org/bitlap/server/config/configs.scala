@@ -19,7 +19,12 @@ import scala.concurrent.duration.Duration
 
 /** gRPC Configurations
  */
-private[config] final case class BitlapGrpcConfig(port: Int)
+private[config] final case class BitlapGrpcConfig(host: String, port: Int, clientPeers: String) {
+
+  def getSplitPeers: List[String] = {
+    clientPeers.split(',').toList
+  }
+}
 
 /** HTTP Configurations
  */

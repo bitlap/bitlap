@@ -27,7 +27,7 @@ final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] 
 
 final case class SqlColumn(name: String)
 final case class SqlRow(cells: Map[String, String] = Map.empty)
-final case class SqlResult(data: SqlData, resultCode: Int, errorMessage: String = "Unknown Error")
+final case class SqlResult(data: SqlData, resultCode: Int, errorMessage: String = "")
 
 object SqlData:
 

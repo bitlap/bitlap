@@ -15,9 +15,11 @@
  */
 package org.bitlap.server
 
+import org.bitlap.client.AsyncClient
+import org.bitlap.client.ClientConfig
+import org.bitlap.network.AsyncProtocol
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
-import org.bitlap.network.DriverIO
-import org.bitlap.server.config.BitlapServerConfiguration
+import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.service.*
 
 import io.grpc.ServerBuilder
@@ -30,23 +32,33 @@ import zio.*
  */
 object GrpcServerEndpoint:
 
-  lazy val live: ZLayer[BitlapServerConfiguration, Nothing, GrpcServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapServerConfiguration) => new GrpcServerEndpoint(config))
+  lazy val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapConfiguration) => new GrpcServerEndpoint(config))
 
   def service(
     args: List[String]
-  ): ZIO[DriverGrpcService with Scope with GrpcServerEndpoint, Throwable, Unit] =
+  ): ZIO[
+    DriverGrpcService with Scope with GrpcServerEndpoint with BitlapNodeContext with BitlapConfiguration,
+    Throwable,
+    Unit
+  ] =
     (for {
-      _ <- Console.printLine(s"Grpc Server started")
-      _ <- BitlapContext.fillRpc(DriverService.liveInstance)
-      _ <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
+      _      <- Console.printLine(s"Grpc Server started")
+      config <- ZIO.service[BitlapConfiguration]
+      _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
+      client <- AsyncClient
+        .make(
+          ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
+        )
+        .build
+      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setClient(client.get))
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
 
 end GrpcServerEndpoint
 
-final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
+final class GrpcServerEndpoint(val config: BitlapConfiguration):
 
   private val serverLayer =
     ServerLayer.fromServiceList(
@@ -55,8 +67,8 @@ final class GrpcServerEndpoint(val config: BitlapServerConfiguration):
         .addFromEnvironment[ZDriverService[RequestContext]]
     )
 
-  def runGrpcServer(): URIO[Any, ExitCode] = ZLayer
-    .make[Server](
+  private def runGrpcServer(): URIO[BitlapNodeContext, ExitCode] = ZLayer
+    .makeSome[BitlapNodeContext, Server](
       serverLayer,
       DriverGrpcService.live,
       DriverService.live

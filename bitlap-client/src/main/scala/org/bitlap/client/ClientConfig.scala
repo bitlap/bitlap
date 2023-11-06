@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap
+package org.bitlap.client
 
-import com.typesafe.scalalogging.LazyLogging
-
-import io.grpc.*
-
-package object network extends LazyLogging:
-
-  type Identity[T] = T
-
-  lazy val errorApplyFunc: Throwable => StatusException = (ex: Throwable) =>
-    new StatusException(Status.fromThrowable(ex))
-
-  extension [R <: AutoCloseable](r: R) def use[T](func: R => T): T = scala.util.Using.resource(r)(func)
-
-  end extension
-
-end network
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2023/11/4
+ */
+final case class ClientConfig(
+  props: Map[String, String],
+  serverPeers: List[String])

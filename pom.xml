@@ -98,7 +98,7 @@
         <zio.grpc.version>0.6.0-rc5</zio.grpc.version>
         <zio-cli.version>0.5.0</zio-cli.version>
         <scalapb.version>0.11.14</scalapb.version>
-        <jupiter.version>5.9.3</jupiter.version>
+        <jupiter.version>5.10.1</jupiter.version>
         <tapir.version>1.8.3</tapir.version>
         <zio.http.version>3.0.0-RC1</zio.http.version>
         <zio.logging.version>2.1.14</zio.logging.version>

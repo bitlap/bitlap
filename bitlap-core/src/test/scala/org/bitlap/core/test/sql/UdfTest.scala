@@ -68,10 +68,10 @@ class UdfTest extends BaseLocalFsTest with SqlChecker {
       // List(List("20230101", "2023-01-01 00:00:00", "20230101", "2023-01-01 00:00:00"))
       List(
         List(
-          DateEx.time(1672502400000L).toString("yyyyMMdd"),
-          DateEx.time(1672502400000L).toString("yyyy-MM-dd HH:mm:ss"),
-          DateEx.time("2023-01-01").toString("yyyyMMdd"),
-          DateEx.time("2023-01-01T00:00:00.000+08:00").toString("yyyy-MM-dd HH:mm:ss")
+          1672502400000L.time().toString("yyyyMMdd"),
+          1672502400000L.time().toString("yyyy-MM-dd HH:mm:ss"),
+          "2023-01-01".time().toString("yyyyMMdd"),
+          "2023-01-01T00:00:00.000+08:00".time().toString("yyyy-MM-dd HH:mm:ss")
         )
       )
     )

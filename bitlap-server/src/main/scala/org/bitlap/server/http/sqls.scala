@@ -34,15 +34,15 @@ object SqlData:
   def empty: SqlData = SqlData(Seq.empty, Seq.empty)
 
   def fromDBTable(table: DBTable): SqlData = {
-    if table == null || table.getColumns.isEmpty then return SqlData()
-    val columns = table.getColumns.asScala.map(_.getLabel).map(SqlColumn.apply).toSeq
-    val rows    = table.getColumns.asScala.map(_.getValues)
-    val headRow = rows.head.asScala
+    if table == null || table.columns.isEmpty then return SqlData()
+    val columns = table.columns.map(_.label).map(SqlColumn.apply)
+    val rows    = table.columns.map(_.values)
+    val headRow = rows.head
     if headRow == null || headRow.isEmpty then {
       return SqlData(columns)
     }
     val sqlRows = headRow.indices.map { i =>
-      val rs    = rows.map(_.get(i))
+      val rs    = rows.map(_(i))
       val cells = rs.zipWithIndex.map { case (r, i) => columns(i).name -> r }.toMap
       SqlRow(cells)
     }

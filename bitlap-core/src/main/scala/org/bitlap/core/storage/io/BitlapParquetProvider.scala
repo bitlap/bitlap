@@ -15,8 +15,7 @@
  */
 package org.bitlap.core.storage.io
 
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.utils.JsonUtil
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.PrunePushedFilter
 import org.bitlap.core.sql.TimeFilterFun
@@ -24,12 +23,13 @@ import org.bitlap.core.storage.BitlapReader
 import org.bitlap.core.storage.BitlapReaders
 import org.bitlap.core.storage.BitlapWriter
 import org.bitlap.core.storage.TableFormatProvider
-import org.bitlap.core.storage.io.*
+import org.bitlap.core.storage.io
 import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.utils.JsonUtil
+import org.bitlap.roaringbitmap.x.BBM
+import org.bitlap.roaringbitmap.x.CBM
 
 import org.apache.avro.Schema
 import org.apache.avro.SchemaBuilder

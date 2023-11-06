@@ -15,7 +15,7 @@
  */
 package org.bitlap.core.sql.rule
 
-import org.bitlap.core.extension._
+import org.bitlap.common.extension._
 import org.bitlap.core.sql.rel.BitlapTableFilterScan
 import org.bitlap.core.sql.rel.BitlapTableScan
 import org.bitlap.core.sql.table.BitlapSqlQueryEmptyTable

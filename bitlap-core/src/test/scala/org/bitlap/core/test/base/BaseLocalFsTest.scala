@@ -47,7 +47,7 @@ trait BaseLocalFsTest extends AnyFunSuite with BeforeAndAfterAll with should.Mat
     }
     // set bitlap properties
     conf = BitlapContext.bitlapConf
-    conf.set(BitlapConfKeys.ROOT_DIR.getKey, workPath.toString, true)
+    conf.set(BitlapConfKeys.ROOT_DIR.key, workPath.toString, true)
   }
 
   override protected def afterAll(): Unit = {

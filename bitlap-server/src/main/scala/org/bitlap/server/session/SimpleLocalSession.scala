@@ -38,7 +38,7 @@ import zio.{ System as _, * }
 final class SimpleLocalSession(
   val username: String,
   val password: String,
-  _sessionConf: scala.collection.Map[String, String],
+  _sessionConf: Map[String, String],
   val sessionManager: SessionManager,
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
@@ -53,7 +53,7 @@ final class SimpleLocalSession(
 
   override def lastAccessTime_=(time: Long): Unit = _lastAccessTime = time
 
-  override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf.asJava)
+  override def sessionConf: BitlapConf = BitlapContext.globalConf.clone(_sessionConf)
 
   override def currentSchema: String = _currentSchema
 

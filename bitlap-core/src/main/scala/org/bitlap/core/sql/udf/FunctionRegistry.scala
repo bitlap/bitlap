@@ -129,7 +129,7 @@ object FunctionRegistry {
     val method = if (methods.length == 1) {
       methods.head
     } else {
-      methods.find(m => m.getReturnType != classOf[Object] || m.getReturnType == classOf[Any]).getOrElse(methods.head)
+      methods.find(m => m.getReturnType != classOf[Object] || m.getReturnType != classOf[Any]).getOrElse(methods.head)
     }
     val inputTypes = method.getParameterTypes.map(typeFactory.createJavaType)
     functions.put(
@@ -152,7 +152,7 @@ object FunctionRegistry {
     this
   }
 
-  def sqlFunctions()                         = this.functions.values
-  def getFunction(name: String): SqlFunction = this.functions.get(name)
-  def contains(name: String): Boolean        = this.functions.containsKey(name)
+  def sqlFunctions(): util.Collection[SqlFunction] = this.functions.values
+  def getFunction(name: String): SqlFunction       = this.functions.get(name)
+  def contains(name: String): Boolean              = this.functions.containsKey(name)
 }

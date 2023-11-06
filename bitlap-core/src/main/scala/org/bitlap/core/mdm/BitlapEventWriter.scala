@@ -22,15 +22,16 @@ import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.CBM
+import org.bitlap.common.*
 import org.bitlap.common.data.Dimension
 import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.EventWithDimId
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.utils.StringEx
+import org.bitlap.common.extension.*
+import org.bitlap.common.utils.{ JsonUtil, StringEx }
+import org.bitlap.common.utils.StringEx._
 import org.bitlap.core.*
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.QueryContext
@@ -39,7 +40,8 @@ import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.core.utils.JsonUtil
+import org.bitlap.roaringbitmap.x.BBM
+import org.bitlap.roaringbitmap.x.CBM
 
 import org.apache.commons.csv.{ CSVFormat, CSVParser }
 import org.apache.hadoop.conf.Configuration
@@ -74,15 +76,15 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
   /** write mdm events from csv
    */
   def writeCsv(input: InputStream): Unit = {
-    val headers = Event.getSchema.asScala.map(_.getFirst)
+    val headers = Event.schema.map(_._1)
     val parser  = new CSVParser(new InputStreamReader(input), CSVFormat.DEFAULT.withFirstRecordAsHeader)
     val events  = ListBuffer[Event]()
     for (row <- parser.asScala) {
-      if (row.values().forall(!StringEx.nullOrBlank(_))) {
+      if (row.values().forall(!_.nullOrBlank)) {
         events += Event.of(
           row.get(0).toLong,
           Entity(row.get(1).toInt, "ENTITY"),
-          new Dimension(JsonUtil.jsonAsMap(row.get(2)).asJava),
+          Dimension(JsonUtil.jsonAsMap(row.get(2))),
           Metric(row.get(3), row.get(4).toDouble)
         )
       }
@@ -91,23 +93,23 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
   }
 
   private def write0(events: List[Event]): Unit = {
-    events.groupBy(_.getTime).foreach { case (time, rs) =>
+    events.groupBy(_.time).foreach { case (time, rs) =>
       // 1. agg metric
-      val singleRows = rs.groupBy { it => (it.getEntity, it.getDimension, it.getMetric.getKey) }.map {
+      val singleRows = rs.groupBy { it => (it.entity, it.dimension, it.metric.key) }.map {
         case ((entity, dimension, metricKey), groupRows) =>
-          new EventWithDimId(time, entity, dimension, new Metric(metricKey, groupRows.map(_.getMetric.getValue).sum), 0)
+          new EventWithDimId(time, entity, dimension, new Metric(metricKey, groupRows.map(_.metric.value).sum), 0)
       }.toList
       // 2. identify sort id for dimensions for each entity + metric
-      val cleanRows = singleRows.groupBy { it => s"${it.getEntity}${it.getMetric.getKey}" }.flatMap { case (_, sRows) =>
+      val cleanRows = singleRows.groupBy { it => s"${it.entity}${it.metric.key}" }.flatMap { case (_, sRows) =>
         val temps   = mutable.Map[String, Int]()
         var counter = 0
 
-        sRows.sortBy(-_.getMetric.getValue).map { sRow =>
-          val dim = sRow.getDimension.toString()
+        sRows.sortBy(-_.metric.value).map { sRow =>
+          val dim = sRow.dimension.toString
           if (temps.contains(dim)) {
-            sRow.setDimId(temps(dim))
+            sRow.dimId = temps(dim)
           } else {
-            sRow.setDimId(counter)
+            sRow.dimId = counter
             temps(dim) = counter
             counter += 1
           }
@@ -115,13 +117,13 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
         }
       }
       // store metrics
-      val metricRows = cleanRows.groupBy { it => (it.getEntity.getKey, it.getMetric.getKey) }.map {
-        case ((entityKey, metricKey), groupRows) =>
+      val metricRows =
+        cleanRows.groupBy { it => (it.entity.key, it.metric.key) }.map { case ((entityKey, metricKey), groupRows) =>
           val bbm = BBM()
           val cbm = CBM()
           groupRows.foreach { gr =>
-            bbm.add(gr.getDimId, gr.getEntity.getId)
-            cbm.add(gr.getDimId, gr.getEntity.getId, gr.getMetric.getValue.toLong) // // TODO double support
+            bbm.add(gr.dimId, gr.entity.id)
+            cbm.add(gr.dimId, gr.entity.id, gr.metric.value.toLong) // // TODO double support
           }
           MetricRow(
             time,
@@ -130,23 +132,23 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
             bbm,
             MetricRowMeta(time, metricKey, bbm.getCountUnique, bbm.getLongCount, cbm.getCount)
           )
-      }.toList
+        }.toList
       store.storeMetric(time, metricRows)
 
       // store metric with one dimension
       val metricDimRows = cleanRows.flatMap { r =>
-        r.getDimension.getDimensions.asScala.map { case (key, value) =>
-          r.copy(r.getTime, r.getEntity, new Dimension(Map(key -> value).asJava), r.getMetric, r.getDimId)
+        r.dimension.dimensions.map { case (key, value) =>
+          r.copy(r.time, r.entity, Dimension(Map(key -> value)), r.metric, r.dimId)
         }
-      }.groupBy { it => (it.getEntity.getKey, it.getMetric.getKey, it.getDimension.firstPair()) }.map {
+      }.groupBy { it => (it.entity.key, it.metric.key, it.dimension.firstPair()) }.map {
         case ((entityKey, metricKey, dimension), groupRows) =>
-          val dk  = dimension.getFirst
-          val d   = dimension.getSecond
+          val dk  = dimension._1
+          val d   = dimension._2
           val bbm = BBM()
           val cbm = CBM()
           groupRows.foreach { gr =>
-            bbm.add(gr.getDimId, gr.getEntity.getId)
-            cbm.add(gr.getDimId, gr.getEntity.getId, gr.getMetric.getValue.toLong) // // TODO double support
+            bbm.add(gr.dimId, gr.entity.id)
+            cbm.add(gr.dimId, gr.entity.id, gr.metric.value.toLong) // // TODO double support
           }
           MetricDimRow(
             time,
@@ -165,13 +167,13 @@ class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Ser
     }
   }
 
-  private def checkOpen() = {
+  private def checkOpen(): Unit = {
     if (closed) {
       throw BitlapException(s"BitlapWriter has been closed.")
     }
   }
 
-  override def close() = {
+  override def close(): Unit = {
     closed = true
     try {
       this.store.close()

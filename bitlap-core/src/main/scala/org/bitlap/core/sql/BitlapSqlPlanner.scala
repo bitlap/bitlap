@@ -17,8 +17,8 @@ package org.bitlap.core.sql
 
 import scala.jdk.CollectionConverters._
 
+import org.bitlap.common.extension._
 import org.bitlap.core.catalog.BitlapCatalog
-import org.bitlap.core.extension._
 import org.bitlap.core.sql.parser.BitlapSqlDdlRel
 import org.bitlap.core.sql.rule.ENUMERABLE_RULES
 import org.bitlap.core.sql.rule.RULES

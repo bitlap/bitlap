@@ -15,15 +15,13 @@
  */
 package org.bitlap.core.test.sql
 
-import scala.jdk.CollectionConverters._
-
 import org.bitlap.common.data.Dimension
 import org.bitlap.common.data.Entity
 import org.bitlap.common.data.Event
 import org.bitlap.common.data.Metric
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.extension._
 import org.bitlap.core.BitlapContext
-import org.bitlap.core.extension._
 import org.bitlap.core.mdm.BitlapEventWriter
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
@@ -340,16 +338,16 @@ class QueryTest extends BaseLocalFsTest with SqlChecker {
     writer.use { it =>
       it.write(
         List(
-          Event.of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("vv", 1.0)),
-          Event.of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("pv", 2.0)),
+          Event.of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("vv", 1.0)),
+          Event.of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("pv", 2.0)),
           Event
-            .of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Windows").asJava), Metric("vv", 1.0)),
+            .of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Windows")), Metric("vv", 1.0)),
           Event
-            .of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Windows").asJava), Metric("pv", 3.0)),
-          Event.of(time, Entity(2, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("vv", 1.0)),
-          Event.of(time, Entity(2, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("pv", 5.0)),
-          Event.of(time, Entity(3, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("vv", 1.0)),
-          Event.of(time, Entity(3, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac").asJava), Metric("pv", 2.0))
+            .of(time, Entity(1, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Windows")), Metric("pv", 3.0)),
+          Event.of(time, Entity(2, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("vv", 1.0)),
+          Event.of(time, Entity(2, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("pv", 5.0)),
+          Event.of(time, Entity(3, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("vv", 1.0)),
+          Event.of(time, Entity(3, "ENTITY"), Dimension(Map("city" -> "北京", "os" -> "Mac")), Metric("pv", 2.0))
         )
       )
     }

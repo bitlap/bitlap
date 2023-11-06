@@ -17,8 +17,8 @@ package org.bitlap.core.sql
 
 import scala.collection.mutable
 
+import org.bitlap.common.extension._
 import org.bitlap.common.utils.PreConditions
-import org.bitlap.core.extension.*
 
 import org.apache.calcite.sql.`fun`.SqlCountAggFunction
 import org.apache.calcite.sql.`fun`.SqlSumAggFunction

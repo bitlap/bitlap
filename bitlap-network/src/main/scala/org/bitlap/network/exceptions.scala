@@ -19,14 +19,15 @@ import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.exception.BitlapException
 
-import izumi.reflect.dottyreflection.*
-
 /** All common exceptions at the network and service layers.
  *
  *  Exceptions must inherit from [[org.bitlap.common.exception.BitlapException]]
  */
-sealed abstract class NetworkException(val code: Int = -1, val msg: String, val cause: Option[Throwable] = None)
-    extends BitlapException(if msg == null then "" else msg, Map.empty[String, String].asJava, cause.orNull)
+sealed abstract class NetworkException(
+  val code: Int = -1,
+  val msg: String,
+  override val cause: Option[Throwable] = None)
+    extends BitlapException(if msg == null then "" else msg, Map.empty[String, String], cause)
     with Product
 
 object NetworkException:

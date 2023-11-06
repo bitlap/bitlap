@@ -18,7 +18,7 @@ package org.bitlap.server.session
 import java.util.Date
 import java.util.concurrent.*
 
-import scala.collection.*
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala

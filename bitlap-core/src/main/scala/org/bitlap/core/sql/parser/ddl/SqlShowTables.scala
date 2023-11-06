@@ -15,7 +15,7 @@
  */
 package org.bitlap.core.sql.parser.ddl
 
-import org.bitlap.common.utils.StringEx
+import org.bitlap.common.utils.StringEx._
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
@@ -40,10 +40,12 @@ class SqlShowTables(
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {
-    val currentSchema = StringEx.blankOr(
-      Option(database).map(_.getSimple).getOrElse(""),
-      QueryContext.get().currentSchema
-    )
+    val currentSchema = Option(database)
+      .map(_.getSimple)
+      .getOrElse("")
+      .blankOr(
+        QueryContext.get().currentSchema
+      )
     catalog.listTables(currentSchema).map { it =>
       Array(it.database, it.name, it.createTime)
     }

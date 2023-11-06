@@ -15,13 +15,9 @@
  */
 package org.bitlap.core.mdm.plan
 
-import java.util
-
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.BitlapIterator
-import org.bitlap.common.bitmap.BM
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.FetchPlan
@@ -30,6 +26,7 @@ import org.bitlap.core.mdm.format.DataTypes
 import org.bitlap.core.mdm.model.Row
 import org.bitlap.core.mdm.model.RowIterator
 import org.bitlap.core.mdm.model.RowValueMeta
+import org.bitlap.roaringbitmap.x.BM
 
 /** Merge metrics with same dimensions into a single row
  */
@@ -59,7 +56,7 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
       // get actual types from inputs
       val keyTypes   = rs.getTypes(resultKeyTypes.map(_.name))
       val valueTypes = rs.valueTypes
-      rs.rows.asScala.foreach { row =>
+      rs.rows.foreach { row =>
         val keys = keyTypes.map(dt => row(dt))
         if (results.contains(keys)) {
           val r = results(keys)
@@ -93,11 +90,11 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
       }
       offset += valueTypes.size
     }
-    RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
+    RowIterator(BitlapIterator.of(results.values), resultKeyTypes, resultValueTypes)
   }
 
   private def getKeyTypes(rowsSet: List[RowIterator]): List[DataType] = {
-    PreConditions.checkNotEmpty(rowsSet.asJava)
+    PreConditions.checkNotEmpty(rowsSet)
     val keyNames = rowsSet.map { r => r.keyTypes.map(_.name).sorted }.reduce { case (a, b) =>
       PreConditions.checkExpression(
         a == b,
@@ -110,7 +107,7 @@ class MetricMergeFetchPlan(override val subPlans: List[FetchPlan]) extends Fetch
   }
 
   private def getValueTypes(rowsSet: List[RowIterator]): List[DataType] = {
-    PreConditions.checkNotEmpty(rowsSet.asJava)
+    PreConditions.checkNotEmpty(rowsSet)
     rowsSet.map { r => r.valueTypes }.reduce { case (a, b) => a ++ b }
   }
 

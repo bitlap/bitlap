@@ -25,7 +25,7 @@ import org.bitlap.cli.interactive.BitlapSqlApplication
 import org.bitlap.cli.interactive.BitlapSqlLineProperty.BitlapPrompt
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
-import org.bitlap.common.utils.StringEx
+import org.bitlap.common.utils.StringEx._
 
 import sqlline.*
 import zio.{ Console, System as ZSystem, * }
@@ -36,8 +36,7 @@ import zio.cli.HelpDoc.Span.text
  */
 trait BitlapInterpreter {
 
-  def sqlBuild: List[String] => String = (args: List[String]) =>
-    StringEx.trimMargin(args.map(_.trim).mkString(" "), '"', '\'')
+  def sqlBuild: List[String] => String = (args: List[String]) => args.map(_.trim).mkString(" ").trimMargin('"', '\'')
 
   import BitlapInterpreter.bitlap
 
@@ -70,7 +69,7 @@ trait BitlapInterpreter {
       classOf[BitlapSqlApplication].getCanonicalName
     )
     val defaultSql = sqlBuild(sql.args)
-    if !StringEx.nullOrBlank(defaultSql) then {
+    if !defaultSql.nullOrBlank then {
       sqlArgs ++= Array("-e", defaultSql)
     }
     // sql line REPL or execute sql directly

@@ -64,8 +64,8 @@ class SqlResult(private val statement: String, private val table: DBTable) {
 
   lazy val result: List[List[Any]] = {
     val rs = ListBuffer[List[Any]]()
-    (0 until table.getRowCount).foreach { r =>
-      rs += table.getColumns.asScala.map(_.getTypeValues.get(r)).toList
+    (0 until table.rowCount).foreach { r =>
+      rs += table.columns.map(_.typeValues(r))
     }
     rs.toList
   }

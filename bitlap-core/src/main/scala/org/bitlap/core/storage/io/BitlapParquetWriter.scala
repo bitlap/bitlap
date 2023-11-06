@@ -44,7 +44,7 @@ class BitlapParquetWriter[T](
     extends BitlapWriter[T] {
 
   private val conf = fs.newConf()
-  private val txId = StringEx.blankOr(QueryContext.get().queryId, StringEx.uuid(true))
+  private val txId = QueryContext.get().queryId.blankOr(StringEx.uuid(true))
 
   private val outputFile =
     Path(output, BitlapWriters.genUniqueFile(txId, "mdm", s"${CompressionCodecName.SNAPPY.getExtension}.parquet"))

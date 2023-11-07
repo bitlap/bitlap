@@ -19,4 +19,4 @@ package org.bitlap.common.data
  *
  *  [[key]: DEVICE, USER, etc. [[id]]: identify of this entity, current only support int type
  */
-case class Entity(val id: Int, val key: String = "ENTITY")
+case class Entity(id: Int, key: String = "ENTITY")

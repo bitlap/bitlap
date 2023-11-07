@@ -45,32 +45,45 @@ object BitlapIterator {
   }
 
   def batch[R](rows: Iterable[R], batchSize: Int = 100): BitlapBatchIterator[R] = new BitlapBatchIterator[R] {
-    private val splits                = rows.grouped(batchSize).iterator
-    override def hasNext(): Boolean   = splits.hasNext || super.hasNext()
-    override def nextBatch(): List[R] = splits.next.toList
+    private val splits                    = rows.grouped(batchSize).iterator
+    override def nextBatch(): Iterator[R] = if (splits.hasNext) splits.next().iterator else null
   }
 }
 
 abstract class BitlapBatchIterator[+A] extends BitlapIterator[A] {
 
-  private var count              = 0
-  private var index              = 0
-  private var rows: List[_ <: A] = _
+  private var count                  = 0
+  private var end                    = false
+  private var rows: Iterator[_ <: A] = _
 
-  protected def nextBatch(): List[A]
+  /** @return
+   *    null if there is no next batch
+   */
+  protected def nextBatch(): Iterator[A]
 
   override def hasNext(): Boolean = {
-    rows != null && index < rows.size
+    this.initBatch()
+    rows != null && rows.hasNext
   }
 
   override def next(): A = {
-    if (rows == null || index >= rows.size) {
-      rows = this.nextBatch()
-      index = 0
+    this.initBatch()
+    if (rows != null && rows.hasNext) {
+      count += 1
+      val row = rows.next()
+      if (!rows.hasNext) {
+        rows = null
+        this.initBatch()
+      }
+      return row
     }
-    val row = rows(index)
-    count += 1
-    index += 1
-    row
+    throw new NoSuchElementException()
+  }
+
+  private def initBatch(): Unit = {
+    if (rows == null && !end) {
+      rows = this.nextBatch()
+      if (rows == null) end = true
+    }
   }
 }

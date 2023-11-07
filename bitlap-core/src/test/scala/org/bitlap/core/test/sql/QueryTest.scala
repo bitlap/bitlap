@@ -102,13 +102,13 @@ class QueryTest extends BaseLocalFsTest with SqlChecker {
     checkRows(
       s"""
          |select
-         |                  sum(vv) vv, sum(pv) pv
-         |                from (
-         |                  select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv
-         |                  from $db.$table
-         |                  where _time = 100
-         |                  group by _time
-         |                ) t
+         |  sum(vv) vv, sum(pv) pv
+         |from (
+         |  select sum(vv) as vv, sum(pv) as pv, _time, count(distinct pv) as uv
+         |  from $db.$table
+         |  where _time = 100
+         |  group by _time
+         |) t
          |""".stripMargin,
       List(List(4, 12))
     )

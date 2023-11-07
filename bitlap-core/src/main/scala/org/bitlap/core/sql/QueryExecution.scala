@@ -42,8 +42,7 @@ class QueryExecution(
       }
     } catch {
       case e: BitlapException => throw e
-      case e if e != null     => throw new BitlapException(statement, Map.empty[String, String], Some(e))
-      case e                  => throw new BitlapException(statement, Map.empty[String, String], None)
+      case e                  => throw new BitlapException(statement, Map.empty[String, String], Option(e))
     }
   }
 

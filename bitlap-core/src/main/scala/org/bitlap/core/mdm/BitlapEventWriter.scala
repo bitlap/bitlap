@@ -23,25 +23,16 @@ import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 import org.bitlap.common.*
-import org.bitlap.common.data.Dimension
-import org.bitlap.common.data.Entity
-import org.bitlap.common.data.Event
-import org.bitlap.common.data.EventWithDimId
-import org.bitlap.common.data.Metric
+import org.bitlap.common.data.*
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.extension.*
 import org.bitlap.common.utils.{ JsonUtil, StringEx }
-import org.bitlap.common.utils.StringEx._
+import org.bitlap.common.utils.StringEx.*
 import org.bitlap.core.*
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.storage.BitlapStore
-import org.bitlap.core.storage.load.MetricDimRow
-import org.bitlap.core.storage.load.MetricDimRowMeta
-import org.bitlap.core.storage.load.MetricRow
-import org.bitlap.core.storage.load.MetricRowMeta
-import org.bitlap.roaringbitmap.x.BBM
-import org.bitlap.roaringbitmap.x.CBM
+import org.bitlap.core.storage.load.{ MetricDimRow, MetricDimRowMeta, MetricRow, MetricRowMeta }
+import org.bitlap.roaringbitmap.x.{ BBM, CBM }
 
 import org.apache.commons.csv.{ CSVFormat, CSVParser }
 import org.apache.hadoop.conf.Configuration

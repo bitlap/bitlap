@@ -43,9 +43,7 @@ class SqlShowTables(
     val currentSchema = Option(database)
       .map(_.getSimple)
       .getOrElse("")
-      .blankOr(
-        QueryContext.get().currentSchema
-      )
+      .blankOr(QueryContext.get().currentSchema)
     catalog.listTables(currentSchema).map { it =>
       Array(it.database, it.name, it.createTime)
     }

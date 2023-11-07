@@ -19,6 +19,9 @@ import java.util.{ Collections, Map as JavaMap }
 
 import scala.jdk.CollectionConverters._
 
+/** @see
+ *    https://stackoverflow.com/questions/318239/how-do-i-set-environment-variables-from-java/7201825#7201825
+ */
 def withEnvironment(key: String, value: String)(block: => Unit): Unit = {
   withEnvironment(Map(key -> value))(block)
 }

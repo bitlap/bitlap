@@ -26,7 +26,7 @@ import org.bitlap.network.ServerAddress
 
 import zio.*
 
-/** Wrapping kotlin configuration, forming a unified layer exposed.
+/** Wrapping configuration, forming a unified layer exposed.
  */
 object BitlapConfiguration:
 
@@ -62,7 +62,7 @@ final case class BitlapConfiguration(underlayConf: BitlapConf):
   val httpConfig: BitlapHttpConfig =
     BitlapHttpConfig(
       underlayConf.get(BitlapConfKeys.NODE_HTTP_HOST).asServerAddress.port,
-      underlayConf.get[Integer](BitlapConfKeys.NODE_HTTP_THREADS)
+      underlayConf.get[Int](BitlapConfKeys.NODE_HTTP_THREADS)
     )
 
   val sessionConfig: BitlapSessionConfig = BitlapSessionConfig(

@@ -19,7 +19,7 @@ import java.sql.{ Array as _, * }
 
 import org.bitlap.client.BitlapClient
 import org.bitlap.common.BitlapConf
-import org.bitlap.common.utils.{ JsonEx, StringEx }
+import org.bitlap.common.utils.{ JsonUtil, StringEx }
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde
@@ -62,7 +62,7 @@ class BitlapDatabaseMetaData(
 
   def getDatabaseConf: BitlapConf = {
     val result = client.getInfo(session, GetInfoType.ServerConf).value
-    new BitlapConf(JsonEx.jsonAsMap(deserialize[String](TypeId.StringType, result)))
+    new BitlapConf(JsonUtil.jsonAsMap(deserialize[String](TypeId.StringType, result)))
   }
 
   override def getDriverName: String = Constants.NAME

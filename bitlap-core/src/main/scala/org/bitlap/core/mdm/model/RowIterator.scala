@@ -15,10 +15,8 @@
  */
 package org.bitlap.core.mdm.model
 
-import scala.jdk.CollectionConverters._
-
 import org.bitlap.common.BitlapIterator
-import org.bitlap.core.extension._
+import org.bitlap.common.extension._
 import org.bitlap.core.mdm.format.DataType
 
 /** Iterator for [Row] with row type.
@@ -61,7 +59,7 @@ class RowIterator(
             s"Input projections $projections contain a column that is not in current dataTypes $dataTypes."
           )
     }
-    val rs = this.rows.asScala.map { row =>
+    val rs = this.rows.map { row =>
       Array.fill[Any](pTypes.size)(null).also { arr =>
         pTypes.zipWithIndex.foreach { (c, i) =>
           arr(i) = row(c.idx)

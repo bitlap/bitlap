@@ -15,15 +15,10 @@
  */
 package org.bitlap.core.mdm.fetch
 
-import scala.jdk.CollectionConverters._
-
 import org.bitlap.common.BitlapIterator
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.CBM
-import org.bitlap.common.bitmap.RBM
+import org.bitlap.common.extension._
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.catalog.metadata.Table
-import org.bitlap.core.extension._
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.Fetcher
 import org.bitlap.core.mdm.MDContainer
@@ -45,6 +40,9 @@ import org.bitlap.core.storage.load.MetricDimRow
 import org.bitlap.core.storage.load.MetricDimRowMeta
 import org.bitlap.core.storage.load.MetricRow
 import org.bitlap.core.storage.load.MetricRowMeta
+import org.bitlap.roaringbitmap.x.BBM
+import org.bitlap.roaringbitmap.x.CBM
+import org.bitlap.roaringbitmap.x.RBM
 
 /** Fetch results from local jvm.
  */
@@ -62,7 +60,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
     val container = metricType match {
       case c if c == classOf[DataTypeRowValueMeta] =>
         MDContainer[MetricRowMeta, RowValueMeta](1).also { container =>
-          store.queryMeta(timeFilter, metrics).asScala.foreach { row =>
+          store.queryMeta(timeFilter, metrics).foreach { row =>
             container.put(
               row.tm,
               row,
@@ -73,7 +71,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeRBM] =>
         MDContainer[MetricRow, RBM](1).also { container =>
-          store.queryBBM(timeFilter, metrics).asScala.foreach { row =>
+          store.queryBBM(timeFilter, metrics).foreach { row =>
             container.put(
               row.tm,
               row,
@@ -84,7 +82,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeBBM] =>
         MDContainer[MetricRow, BBM](1).also { container =>
-          store.queryBBM(timeFilter, metrics).asScala.foreach { row =>
+          store.queryBBM(timeFilter, metrics).foreach { row =>
             container.put(
               row.tm,
               row,
@@ -95,7 +93,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeCBM] =>
         MDContainer[MetricRow, CBM](1).also { container =>
-          store.queryCBM(timeFilter, metrics).asScala.foreach { row =>
+          store.queryCBM(timeFilter, metrics).foreach { row =>
             container.put(
               row.tm,
               row,
@@ -110,7 +108,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
     // make to flat rows
     val flatRows = container.flatRows(metrics) { () => DataTypes.defaultValue(metricType) }
     RowIterator(
-      BitlapIterator.of(flatRows.asJava),
+      BitlapIterator.of(flatRows),
       List(DataTypeLong(Keyword.TIME, 0)),
       metrics.zipWithIndex.map { case (m, i) => DataTypes.from(metricType, m, i + 1) }
     )
@@ -130,7 +128,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
     val container = metricType match {
       case c if c == classOf[DataTypeRowValueMeta] =>
         MDContainer[MetricDimRowMeta, RowValueMeta](2).also { container =>
-          store.queryMeta(timeFilter, metrics, dimension, dimensionFilter).asScala.foreach { row =>
+          store.queryMeta(timeFilter, metrics, dimension, dimensionFilter).foreach { row =>
             container.put(
               List(row.tm, row.dimension),
               row,
@@ -141,7 +139,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeRBM] =>
         MDContainer[MetricDimRow, RBM](2).also { container =>
-          store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asScala.foreach { row =>
+          store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).foreach { row =>
             container.put(
               List(row.tm, row.dimension),
               row,
@@ -152,7 +150,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeBBM] =>
         MDContainer[MetricDimRow, BBM](2).also { container =>
-          store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).asScala.foreach { row =>
+          store.queryBBM(timeFilter, metrics, dimension, dimensionFilter).foreach { row =>
             container.put(
               List(row.tm, row.dimension),
               row,
@@ -163,7 +161,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
         }
       case c if c == classOf[DataTypeCBM] =>
         MDContainer[MetricDimRow, CBM](2).also { container =>
-          store.queryCBM(timeFilter, metrics, dimension, dimensionFilter).asScala.foreach { row =>
+          store.queryCBM(timeFilter, metrics, dimension, dimensionFilter).foreach { row =>
             container.put(
               List(row.tm, row.dimension),
               row,
@@ -177,7 +175,7 @@ class LocalFetcher(val context: FetchContext) extends Fetcher {
     // make to flat rows
     val flatRows = container.flatRows(metrics) { () => DataTypes.defaultValue(metricType) }
     RowIterator(
-      BitlapIterator.of(flatRows.asJava),
+      BitlapIterator.of(flatRows),
       List(
         DataTypeLong(Keyword.TIME, 0),
         DataTypeString(dimension, 1)

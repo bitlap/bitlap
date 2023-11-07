@@ -20,7 +20,7 @@ import java.util
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 
-import org.bitlap.core.extension.*
+import org.bitlap.common.extension.*
 import org.bitlap.core.sql.FilterOp
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter

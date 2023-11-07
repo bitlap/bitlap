@@ -15,7 +15,7 @@
  */
 package org.bitlap.spark.udf
 
-import org.bitlap.common.bitmap.CBM
+import org.bitlap.roaringbitmap.x.CBM
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult

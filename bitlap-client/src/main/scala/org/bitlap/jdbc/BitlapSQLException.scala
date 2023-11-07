@@ -30,5 +30,5 @@ final case class BitlapSQLException(
   cause: Option[Throwable] = None)
     extends SQLException(msg, state, code, cause.orNull)
 
-final case class BitlapJdbcUriParseException(msg: String, cause: Option[Throwable] = None)
-    extends BitlapException(msg, Map.empty[String, String].asJava, cause.orNull)
+final case class BitlapJdbcUriParseException(msg: String, override val cause: Option[Throwable] = None)
+    extends BitlapException(msg, Map.empty[String, String], cause)

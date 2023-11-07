@@ -15,12 +15,12 @@
  */
 package org.bitlap.core.sql.udf.aggr
 
-import org.bitlap.common.bitmap.BM
-import org.bitlap.common.bitmap.RBM
 import org.bitlap.core.mdm.model.RowValueMeta
 import org.bitlap.core.sql.infer
 import org.bitlap.core.sql.udf.UDAF
 import org.bitlap.core.sql.udf.UDFNames
+import org.bitlap.roaringbitmap.x.BM
+import org.bitlap.roaringbitmap.x.RBM
 
 import org.apache.calcite.sql.`type`.SqlReturnTypeInference
 import org.apache.calcite.sql.`type`.SqlTypeName

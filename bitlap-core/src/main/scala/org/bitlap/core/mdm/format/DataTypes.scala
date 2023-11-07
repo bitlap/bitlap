@@ -15,10 +15,10 @@
  */
 package org.bitlap.core.mdm.format
 
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.CBM
-import org.bitlap.common.bitmap.RBM
 import org.bitlap.core.mdm.model.RowValueMeta
+import org.bitlap.roaringbitmap.x.BBM
+import org.bitlap.roaringbitmap.x.CBM
+import org.bitlap.roaringbitmap.x.RBM
 
 /** [DataType] tools
  */

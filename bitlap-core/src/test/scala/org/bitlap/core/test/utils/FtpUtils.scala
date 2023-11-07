@@ -18,7 +18,7 @@ package org.bitlap.core.test.utils
 import java.net.ServerSocket
 import java.util.Collections
 
-import org.bitlap.core.extension.*
+import org.bitlap.common.extension._
 
 import org.apache.ftpserver.FtpServer
 import org.apache.ftpserver.FtpServerFactory

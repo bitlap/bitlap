@@ -16,11 +16,8 @@
 package org.bitlap.core.mdm.plan
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
 
 import org.bitlap.common.BitlapIterator
-import org.bitlap.common.bitmap.BM
-import org.bitlap.common.utils.BMUtils
 import org.bitlap.common.utils.PreConditions
 import org.bitlap.core.mdm.FetchContext
 import org.bitlap.core.mdm.FetchPlan
@@ -29,6 +26,8 @@ import org.bitlap.core.mdm.format.DataTypes
 import org.bitlap.core.mdm.model.Row
 import org.bitlap.core.mdm.model.RowIterator
 import org.bitlap.core.sql.Keyword
+import org.bitlap.roaringbitmap.x.BM
+import org.bitlap.roaringbitmap.x.BMUtils
 
 /** Merge metrics with different dimensions into a single row
  */
@@ -83,8 +82,8 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
 
     // let rows2 as Join Build Table
     // TODO (consider sort merge join)
-    val buffer = rows2.rows.asScala.toList.groupBy(_(0))
-    for (r1 <- rows1.asScala) {
+    val buffer = rows2.rows.toList.groupBy(_(0))
+    for (r1 <- rows1) {
       val keys1   = r1.getByTypes(rows1.keyTypes)
       val tmValue = keys1.head
       if (buffer.contains(tmValue)) {
@@ -108,7 +107,7 @@ class MetricMergeDimFetchPlan(override val subPlans: List[FetchPlan]) extends Fe
         results(rKeys) = Row((rKeys ++ cells).toArray)
       }
     }
-    RowIterator(BitlapIterator.of(results.values.asJava), resultKeyTypes, resultValueTypes)
+    RowIterator(BitlapIterator.of(results.values), resultKeyTypes, resultValueTypes)
   }
 
   override def explain(depth: Int): String = {

@@ -18,7 +18,6 @@ package org.bitlap.server.session
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
 import org.bitlap.core.catalog.metadata.Database
@@ -37,7 +36,7 @@ import zio.{ System as _, * }
 final class SimpleLocalSession(
   val username: String,
   val password: String,
-  _sessionConf: scala.collection.Map[String, String],
+  _sessionConf: Map[String, String],
   val sessionManager: SessionManager,
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
@@ -52,7 +51,7 @@ final class SimpleLocalSession(
 
   override def lastAccessTime_=(time: Long): Unit = _lastAccessTime = time
 
-  override def sessionConf: BitlapConf = org.bitlap.core.BitlapContext.bitlapConf.clone(_sessionConf.asJava)
+  override def sessionConf: BitlapConf = org.bitlap.core.BitlapContext.bitlapConf.clone(_sessionConf)
 
   override def currentSchema: String = _currentSchema
 

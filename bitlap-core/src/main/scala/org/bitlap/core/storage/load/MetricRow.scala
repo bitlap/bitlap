@@ -15,8 +15,8 @@
  */
 package org.bitlap.core.storage.load
 
-import org.bitlap.common.bitmap.BBM
-import org.bitlap.common.bitmap.CBM
+import org.bitlap.roaringbitmap.x.BBM
+import org.bitlap.roaringbitmap.x.CBM
 
 /** One row for metric data model.
  */

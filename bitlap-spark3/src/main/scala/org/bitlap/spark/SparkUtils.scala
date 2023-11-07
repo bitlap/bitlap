@@ -31,15 +31,15 @@ object SparkUtils {
   /** get spark valid input schema
    */
   def validSchema: StructType = {
-    val fields = Event.getSchema.asScala.map { p =>
-      val typ = p.getSecond match {
+    val fields = Event.schema.map { p =>
+      val typ = p._2 match {
         case "int" | "integer" => IntegerType
         case "long" | "bigint" => LongType
         case "double"          => DoubleType
         case "string"          => StringType
-        case _                 => throw new IllegalArgumentException("Unknown type: " + p.getSecond)
+        case _                 => throw new IllegalArgumentException("Unknown type: " + p._2)
       }
-      StructField(p.getFirst, typ)
+      StructField(p._1, typ)
     }
     StructType(fields.toList)
   }

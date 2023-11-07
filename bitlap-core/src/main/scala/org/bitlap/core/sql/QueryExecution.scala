@@ -15,8 +15,6 @@
  */
 package org.bitlap.core.sql
 
-import scala.jdk.CollectionConverters._
-
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.*
@@ -44,7 +42,7 @@ class QueryExecution(
       }
     } catch {
       case e: BitlapException => throw e
-      case e                  => throw new BitlapException(statement, Map.empty[String, String].asJava, e)
+      case e                  => throw new BitlapException(statement, Map.empty[String, String], Option(e))
     }
   }
 

@@ -15,10 +15,6 @@
  */
 package org.bitlap.core.storage
 
-import java.util.List as JList
-
-import scala.jdk.CollectionConverters.*
-
 import org.bitlap.common.BitlapBatchIterator
 import org.bitlap.common.utils.PreConditions
 
@@ -30,14 +26,18 @@ open class BitlapReaderIterator[R](private val reader: BitlapReader[R], private 
   @volatile
   private var closed = false
 
-  override def nextBatch(): JList[R] = {
+  override def nextBatch(): Iterator[R] = {
     this.checkOpen()
-    this.reader.read(limit).asJava
+    if (this.reader.hasNext) {
+      this.reader.read(limit).iterator
+    } else {
+      null
+    }
   }
 
-  override def hasNext: Boolean = {
+  override def hasNext(): Boolean = {
     this.checkOpen()
-    val has = this.reader.hasNext || super.hasNext
+    val has = super.hasNext()
     // auto close
     if (!has) {
       this.close()

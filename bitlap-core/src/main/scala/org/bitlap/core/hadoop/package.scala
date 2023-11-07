@@ -18,8 +18,8 @@ package org.bitlap.core.hadoop
 import scala.reflect.ClassTag
 import scala.util.Using
 
+import org.bitlap.common.utils.JsonUtil
 import org.bitlap.core.catalog.metadata.Table
-import org.bitlap.core.utils.JsonUtil
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileStatus, FileSystem, LocatedFileStatus, Path }

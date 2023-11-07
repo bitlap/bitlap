@@ -19,7 +19,7 @@ import java.io.Closeable
 
 import org.bitlap.common.BitlapIterator
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.utils.DateEx
+import org.bitlap.common.utils.DateEx._
 import org.bitlap.core.catalog.metadata.Table
 import org.bitlap.core.sql.Keyword
 import org.bitlap.core.sql.PrunePushedFilter
@@ -74,7 +74,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       return
     }
     // get output path
-    val date   = DateEx.utc(tm)
+    val date   = tm.utc
     val output = Path(metricDataPath, s"${Keyword.TIME}=${date.getMillis}")
 
     // write rows in one batch
@@ -92,7 +92,7 @@ class BitlapStore(val table: Table, val hadoopConf: Configuration) extends Close
       return
     }
     // get output path
-    val date   = DateEx.utc(tm)
+    val date   = tm.utc
     val output = Path(metricDimDataPath, s"${Keyword.TIME}=${date.getMillis}")
 
     // write rows in one batch

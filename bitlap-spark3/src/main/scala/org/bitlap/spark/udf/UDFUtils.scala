@@ -17,8 +17,7 @@ package org.bitlap.spark.udf
 
 import scala.collection.mutable
 
-import org.bitlap.common.bitmap.{ BBM, CBM, RBM }
-import org.bitlap.common.utils.BMUtils
+import org.bitlap.roaringbitmap.x.{ BBM, BMUtils, CBM, RBM }
 
 import org.apache.commons.lang3.{ ClassUtils, StringUtils }
 

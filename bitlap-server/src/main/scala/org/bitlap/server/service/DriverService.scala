@@ -18,7 +18,6 @@ package org.bitlap.server.service
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.jdbc.Constants
 import org.bitlap.network.*
-import org.bitlap.network.NetworkException.SQLExecutedException
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
@@ -70,14 +69,11 @@ final class DriverService extends AsyncProtocol with LazyLogging:
           )
         catch {
           case bitlapException: BitlapException =>
-            logger.error(s"Invalid SQL syntax: $statement", bitlapException)
-            throw SQLExecutedException(
-              s"Invalid SQL syntax: ${bitlapException.getCause.getLocalizedMessage}",
-              Option(bitlapException)
-            )
+            logger.error(s"Internal Error: $statement", bitlapException)
+            throw bitlapException
           case e: Throwable =>
-            logger.error(s"Invalid SQL: $statement", e)
-            throw SQLExecutedException(s"Invalid SQL: ${e.getLocalizedMessage}", Option(e))
+            logger.error(s"Unknown Error: $statement", e)
+            throw BitlapException(s"Unknown Error: ${e.getLocalizedMessage}", cause = Option(e))
         }
       }
       .provide(SessionManager.live)

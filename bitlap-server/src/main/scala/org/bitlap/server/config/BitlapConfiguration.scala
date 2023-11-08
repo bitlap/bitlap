@@ -21,9 +21,7 @@ import scala.concurrent.duration.Duration
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
-import org.bitlap.network.ServerAddress
-import org.bitlap.network.protocol.*
-import org.bitlap.network.protocol.impl.*
+import org.bitlap.network.*
 
 import zio.*
 

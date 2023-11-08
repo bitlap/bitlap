@@ -24,6 +24,14 @@ class BitlapException(
     extends Exception(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
+object BitlapException {
+
+  def unapply(arg: BitlapException): Option[(String, Map[String, String], Option[Throwable])] =
+    arg match
+      case null => None
+      case _    => Some(arg.errorKey, arg.parameters, arg.cause)
+}
+
 class BitlapRuntimeException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
@@ -64,4 +72,11 @@ class BitlapIOException(
   override val parameters: Map[String, String] = Map.empty,
   val cause: Option[Throwable] = None)
     extends IOException(errorKey.formatErrorMessage(parameters), cause.orNull)
+    with BitlapThrowable
+
+final case class DataFormatException(
+  override val errorKey: String,
+  override val parameters: Map[String, String] = Map.empty,
+  cause: Option[Throwable] = None)
+    extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable

@@ -19,8 +19,7 @@ import java.util.concurrent.Executor
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.conf.BitlapConfKeys
-import org.bitlap.network.{ GetServerAddressReq, GetServerAddressResp }
-import org.bitlap.network.protocol.impl.*
+import org.bitlap.network.*
 import org.bitlap.server.config.BitlapConfiguration
 
 import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }

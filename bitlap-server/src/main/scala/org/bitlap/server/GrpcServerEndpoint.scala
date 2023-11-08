@@ -15,10 +15,10 @@
  */
 package org.bitlap.server
 
+import org.bitlap.network.ClientConfig
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
 import org.bitlap.network.protocol.AsyncProtocol
 import org.bitlap.network.protocol.impl.Async
-import org.bitlap.network.protocol.impl.ClientConfig
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.service.*
 
@@ -51,7 +51,7 @@ object GrpcServerEndpoint:
           ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
         )
         .build
-      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setClient(client.get))
+      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setProtocolImpl(client.get))
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)

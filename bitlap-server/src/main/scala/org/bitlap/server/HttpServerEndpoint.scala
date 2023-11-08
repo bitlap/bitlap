@@ -19,7 +19,7 @@ import java.io.IOException
 import java.sql.DriverManager
 import java.util.Properties
 
-import org.bitlap.network.NetworkException.SQLExecutedException
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http.*
@@ -57,7 +57,7 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
     val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
     ZIO
       .attempt(httpServiceLive.execute(sqlInput.sql))
-      .mapError(f => SQLExecutedException(msg = "Unknown Error", cause = Option(f)))
+      .mapError(f => BitlapException("Unknown Error", cause = Option(f)))
   }
 
   private lazy val statusServerEndpoint: ZServerEndpoint[Any, Any] =

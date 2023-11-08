@@ -17,10 +17,10 @@ package org.bitlap.jdbc
 
 import java.sql.*
 
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.network.protocol.impl.BitlapClient
 
 /** Bitlap statement
  */

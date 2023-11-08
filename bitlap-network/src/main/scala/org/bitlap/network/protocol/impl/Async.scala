@@ -15,16 +15,16 @@
  */
 package org.bitlap.network.protocol.impl
 
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
 import org.bitlap.network.Driver.ZioDriver.DriverServiceClient
-import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.enumeration.GetInfoType.toBGetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.network.protocol.AsyncProtocol
+import org.bitlap.network.protocol.*
 
 import io.grpc.*
 import zio.*
@@ -66,7 +66,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
         .when(c.flatMap(_.toList).nonEmpty) {
           leaderRef.flatMap(_.get)
         }
-        .someOrFail(InternalException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+        .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
       client <- live
     } yield client
 

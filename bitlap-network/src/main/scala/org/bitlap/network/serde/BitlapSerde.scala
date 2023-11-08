@@ -24,7 +24,7 @@ import scala.annotation.implicitNotFound
 import scala.reflect.*
 import scala.util.Using
 
-import org.bitlap.network.NetworkException.*
+import org.bitlap.common.exception.DataFormatException
 import org.bitlap.network.enumeration.TypeId
 import org.bitlap.network.serde.BitlapDeserializer.parser
 
@@ -62,7 +62,7 @@ object BitlapSerde:
         case TypeId.StringType =>
           new String(byteString.toByteArray, Charset.forName("utf8"))
         case TypeId.Unspecified =>
-          throw DataFormatException(msg = s"Incompatible type for realType:$realType, targetType:$targetType")
+          throw DataFormatException(s"Incompatible type for realType:$realType, targetType:$targetType")
         case _ => parser(realType).parse[T](readOnlyByteBuffer, targetType, realType)
 
       r.asInstanceOf[T]
@@ -98,7 +98,7 @@ object BitlapSerde:
         case i: String =>
           val chs = i.getBytes(Charset.forName("utf8"))
           d.write(chs)
-        case i => throw DataFormatException(msg = s"Unsupported data:$i")
+        case i => throw DataFormatException(s"Unsupported data:$i")
       d.flush()
     }
     ByteString.copyFrom(buffer.toByteArray)

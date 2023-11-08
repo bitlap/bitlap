@@ -15,8 +15,8 @@
  */
 package org.bitlap.network.enumeration
 
+import org.bitlap.common.exception.BitlapIllegalStateException
 import org.bitlap.network.Driver.*
-import org.bitlap.network.NetworkException.IllegalStateException
 
 import enumeratum.values.*
 import izumi.reflect.dottyreflection.*
@@ -60,7 +60,7 @@ object OperationState extends IntEnum[OperationState]:
           case CanceledState =>
           case ClosedState   =>
           case TimeoutState  => ()
-          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
+          case _ => throw BitlapIllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
 
       case PendingState =>
         newState match
@@ -70,7 +70,7 @@ object OperationState extends IntEnum[OperationState]:
           case ErrorState    =>
           case ClosedState   =>
           case TimeoutState  => ()
-          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
+          case _ => throw BitlapIllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
 
       case RunningState =>
         newState match
@@ -79,11 +79,11 @@ object OperationState extends IntEnum[OperationState]:
           case ErrorState    =>
           case ClosedState   =>
           case TimeoutState  => ()
-          case _ => throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
+          case _ => throw BitlapIllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
 
       case FinishedState                         =>
       case CanceledState                         =>
       case TimeoutState                          =>
       case ErrorState if ClosedState == newState => ()
       case _ =>
-        throw IllegalStateException(s"Illegal Operation state transition from $oldState to $newState")
+        throw BitlapIllegalStateException(s"Illegal Operation state transition from $oldState to $newState")

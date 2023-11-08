@@ -15,10 +15,10 @@
  */
 package org.bitlap.server.service
 
+import org.bitlap.common.exception.BitlapIllegalArgumentException
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
 import org.bitlap.network.Driver.ZioDriver.ZDriverService
-import org.bitlap.network.NetworkException.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.protocol.AsyncProtocol
@@ -39,15 +39,14 @@ object DriverGrpcService:
 
 end DriverGrpcService
 
-final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNodeContext: BitlapNodeContext)
+final class DriverGrpcService(private val async: AsyncProtocol, serverNodeContext: BitlapNodeContext)
     extends ZDriverService[RequestContext]:
 
   // Directly using zio grpc's Status to represent errors and avoid handling multiple errors
   override def openSession(request: BOpenSessionReq, context: RequestContext): IO[StatusException, BOpenSessionResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.openSession(request.username, request.password, request.configuration)
       )
       .mapBoth(
@@ -61,20 +60,18 @@ final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNo
 
   override def closeSession(request: BCloseSessionReq, context: RequestContext)
     : IO[StatusException, BCloseSessionResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.closeSession(new SessionHandle(request.getSessionHandle))
       )
       .mapBoth(errorApplyFunc, _ => BCloseSessionResp())
 
   override def executeStatement(request: BExecuteStatementReq, context: RequestContext)
     : IO[StatusException, BExecuteStatementResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.executeStatement(
           new SessionHandle(request.getSessionHandle),
           request.statement,
@@ -86,20 +83,18 @@ final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNo
 
   override def fetchResults(request: BFetchResultsReq, context: RequestContext)
     : IO[StatusException, BFetchResultsResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.fetchResults(new OperationHandle(request.getOperationHandle), request.maxRows.toInt, request.fetchType)
       )
       .mapBoth(errorApplyFunc, _.toBFetchResultsResp)
 
   override def getResultSetMetadata(request: BGetResultSetMetadataReq, context: RequestContext)
     : IO[StatusException, BGetResultSetMetadataResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.getResultSetMetadata(new OperationHandle(request.getOperationHandle))
       )
       .mapBoth(errorApplyFunc, _.toBGetResultSetMetadataResp)
@@ -108,7 +103,7 @@ final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNo
     val leaderAddress = serverNodeContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
-        ZIO.fail(LeaderNotFoundException(s"Invalid ip:port for requestId: ${request.requestId}"))
+        ZIO.fail(BitlapIllegalArgumentException(s"Invalid ip:port for requestId: ${request.requestId}"))
       } else {
         ZIO.succeed(ld)
       }
@@ -123,39 +118,35 @@ final class DriverGrpcService(private val asyncProtocol: AsyncProtocol, serverNo
     request: BCancelOperationReq,
     context: RequestContext
   ): IO[StatusException, BCancelOperationResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.cancelOperation(new OperationHandle(request.getOperationHandle))
       )
       .mapBoth(errorApplyFunc, _ => BCancelOperationResp())
 
   override def getOperationStatus(request: BGetOperationStatusReq, context: RequestContext)
     : IO[StatusException, BGetOperationStatusResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.getOperationStatus(new OperationHandle(request.getOperationHandle))
       )
       .mapBoth(errorApplyFunc, _.toBGetOperationStatusResp)
 
   override def closeOperation(request: BCloseOperationReq, context: RequestContext)
     : IO[StatusException, BCloseOperationResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.closeOperation(new OperationHandle(request.getOperationHandle))
       )
       .mapBoth(errorApplyFunc, _ => BCloseOperationResp())
 
   override def getInfo(request: BGetInfoReq, context: RequestContext): IO[StatusException, BGetInfoResp] =
-    asyncProtocol
+    async
       .when(
         serverNodeContext.isLeader,
-        OperationMustOnLeaderException(),
         _.getInfo(new SessionHandle(request.getSessionHandle), GetInfoType.toGetInfoType(request.infoType))
       )
       .mapBoth(errorApplyFunc, _.toBGetInfoResp)

@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network.protocol.impl
+package org.bitlap.network
 
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.impl.Sync
 
-/** The synchronous client used by JDBC has no logic and is all delegated to the asynchronous client
- *  [[org.bitlap.network.protocol.impl.Async]],
- *
- *  but JDBC exclusive logic can be added to it.
+/** The synchronization client used by JDBC is delegated to [[org.bitlap.network.protocol.impl.Async]]
  */
 final class BitlapClient(serverPeers: Array[String], props: Map[String, String]):
 

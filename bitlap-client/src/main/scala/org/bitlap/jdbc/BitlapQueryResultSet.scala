@@ -19,8 +19,8 @@ import java.sql.*
 
 import scala.collection.mutable
 
-import org.bitlap.client.BitlapClient
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.network.models.OperationStatus

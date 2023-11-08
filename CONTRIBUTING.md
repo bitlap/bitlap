@@ -16,19 +16,20 @@
 
 ***核心模块依赖关系***
 
-![](docs/bitlap-structure.png)
+![](docs/bitlap_structure.png)
 
-| 模块               | 技术栈                                     | 说明                                  |
-|------------------|-----------------------------------------|-------------------------------------|
-| bitlap-cli       | scala 3.x、zio-cli、 sqlline              | 交互式命令行实现                            |
-| bitlap-client    | scala 3.x、zio-grpc                      | JDBC 和 Client 实现                    |
-| bitlap-network   | scala 3.x、zio 2.x、 tagless final        | 网络 IO 抽象                            |
-| bitlap-server    | scala 3.x、jraft、zio-grpc、zio-http、tapir | RPC server 实现、raft 集成实现、HTTP API 实现 |
-| bitlap-core      | scala 3.x、calcite、parquet               | SQL解析、优化、任务、存储实现                    |
-| bitlap-spark3    | scala 2.13.x、spark 3.x                  | 与 spark3 集成                         |
-| bitlap-common    | scala 3.x、 RoaringBitmapX               | 公共模块、bitmap 封装                      |
-| bitlap-testkit   | scala 3.x、javafaker、rolls、scalatest     | 测试工具和集成测试模块                         |
-| bitlap-server-ui | umi                                     | 可视化 SQL 执行页面 UI                     |
+| 模块               | 技术栈                                     | 说明                                         |
+|------------------|-----------------------------------------|--------------------------------------------|
+| bitlap-cli       | scala 3.x、zio-cli、 sqlline              | 交互式命令行                                     |
+| bitlap-client    | scala 3.x                               | JDBC                                       |
+| bitlap-protobuf  | zio-grpc、protobuf-java                  | 所有 protobuf 定义，含 Scala 和 Java（仅供 jraft 使用） |
+| bitlap-network   | scala 3.x、zio 2.x、 tagless final        | 大部分模型定义、网络协议抽象及其默认实现、Client 默认实现           |
+| bitlap-server    | scala 3.x、jraft、zio-grpc、zio-http、tapir | 会话、调度、配置、Rpc、Raft、HTTP                     |
+| bitlap-core      | scala 3.x、calcite、parquet               | SQL 解析、优化、任务、存储                            |
+| bitlap-spark3    | scala 2.13.x、spark 3.x                  | Spark3 集成                                  |
+| bitlap-common    | scala 3.x、 RoaringBitmapX               | 工具、 配置、异常、基础模型                             |
+| bitlap-testkit   | scala 3.x、javafaker、rolls、scalatest     | 测试工具、集成测试                                  |
+| bitlap-server-ui | umi                                     | 可视化 SQL 页面 UI                              |
 
 ## 运行
 

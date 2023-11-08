@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network
+package org
+package bitlap
+package network
+package protocol
 
 import scala.concurrent.Await
 import scala.concurrent.duration.*
 import scala.util.control.NonFatal
 
-import org.bitlap.network.NetworkException.*
+import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.exception.BitlapIllegalStateException
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
@@ -32,6 +36,10 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
   self =>
 
   private lazy val timeout = 30.seconds
+
+  private lazy val defaultStateException = new BitlapIllegalStateException(
+    "Invalid node state, must be a leader for this operation"
+  )
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)
 
@@ -47,10 +55,13 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
       Await.result(future, timeout)
     } catch
       case NonFatal(e) =>
-        throw InternalException(s"${e.getLocalizedMessage}", Option(e))
+        throw BitlapException(s"${e.getLocalizedMessage}", cause = Option(e))
 
-  def when[A, E <: Throwable](predicate: => ZIO[Any, Throwable, Boolean], exception: => E, fa: PMonad => Task[A])
-    : Task[A] =
+  def when[A, E <: Throwable](
+    predicate: => ZIO[Any, Throwable, Boolean],
+    fa: PMonad => Task[A],
+    exception: => E = defaultStateException
+  ): Task[A] =
     ZIO
       .whenZIO(predicate)
       .apply {

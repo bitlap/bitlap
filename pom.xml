@@ -48,6 +48,7 @@
     <modules>
         <module>bitlap-common</module>
         <module>bitlap-core</module>
+        <module>bitlap-protobuf</module>
         <module>bitlap-network</module>
         <module>bitlap-server</module>
         <module>bitlap-client</module>
@@ -168,6 +169,11 @@
             <dependency>
                 <groupId>org.bitlap</groupId>
                 <artifactId>bitlap-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-protobuf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

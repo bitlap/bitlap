@@ -24,7 +24,7 @@ import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 import org.bitlap.common.BitlapConf
-import org.bitlap.network.NetworkException.InternalException
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
@@ -153,7 +153,7 @@ final class SessionManager extends LazyLogging:
       operation.state match {
         case OperationState.FinishedState => ZIO.succeed(operation)
         case _ =>
-          ZIO.fail(InternalException(s"Invalid OperationState: ${operation.state}"))
+          ZIO.fail(BitlapException(s"Invalid OperationState: ${operation.state}"))
       }
     }
 
@@ -163,7 +163,7 @@ final class SessionManager extends LazyLogging:
       if sessionStore.containsKey(sessionHandle) then {
         sessionStore.put(sessionHandle, session)
       } else {
-        throw InternalException(s"Invalid SessionHandle: $sessionHandle")
+        throw BitlapException(s"Invalid SessionHandle: $sessionHandle")
       }
     }
   end refreshSession
@@ -179,7 +179,7 @@ final class SessionManager extends LazyLogging:
     def withOperation[A](operationHandle: OperationHandle)(effect: Operation => Task[A]): Task[A] =
       val op = operationStore.getOrElse(operationHandle, null)
       if op == null then {
-        ZIO.fail(InternalException(s"Invalid OperationHandle: $operationHandle"))
+        ZIO.fail(BitlapException(s"Invalid OperationHandle: $operationHandle"))
       } else {
         refreshSession(op.parentSession.sessionHandle, op.parentSession)
         effect(op)
@@ -191,7 +191,7 @@ final class SessionManager extends LazyLogging:
         SessionManager.sessionAddLock.synchronized {
           val session = sessionStore.get(sessionHandle)
           if session == null then {
-            ZIO.fail(InternalException(s"Invalid SessionHandle: $sessionHandle"))
+            ZIO.fail(BitlapException(s"Invalid SessionHandle: $sessionHandle"))
           } else {
             refreshSession(sessionHandle, session)
             effect(session)

@@ -18,7 +18,7 @@ package org.bitlap.network.serde
 import java.nio.ByteBuffer
 import java.sql.*
 
-import org.bitlap.network.NetworkException.DataFormatException
+import org.bitlap.common.exception.DataFormatException
 import org.bitlap.network.enumeration.TypeId
 
 /** Byte array deserialization, compatible with different types as much as possible.
@@ -42,7 +42,7 @@ private[network] object BitlapDeserializer:
     case TypeId.DateType      => dateParser
     case TypeId.ByteType      => byteParser
     case TypeId.BooleanType   => booleanParser
-    case _                    => throw DataFormatException(msg = s"Invalid type for typeId:$typeId")
+    case _                    => throw DataFormatException(s"Invalid type for typeId:$typeId")
 
   private case object intParser extends BitlapDeserializer:
 

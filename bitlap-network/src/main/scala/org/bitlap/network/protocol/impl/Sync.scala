@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.client
+package org.bitlap.network.protocol.impl
 
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.SyncProtocol
 
 /** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
- *  [[org.bitlap.client.AsyncClient]].
+ *  [[org.bitlap.network.protocol.impl.Async]].
  */
-final class SyncClient(serverPeers: Array[String], props: Map[String, String]) extends SyncProtocol:
+final class Sync(serverPeers: Array[String], props: Map[String, String]) extends SyncProtocol:
 
-  private lazy val delegateClient = new AsyncClient(serverPeers, props)
+  private lazy val async = new Async(serverPeers, props)
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String]
-  ): Identity[SessionHandle] = delegateClient.sync {
+  ): Identity[SessionHandle] = async.sync {
     _.openSession(username, password, configuration)
   }
 
-  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = delegateClient.sync {
+  override def closeSession(sessionHandle: SessionHandle): Identity[Unit] = async.sync {
     _.closeSession(sessionHandle)
   }
 
@@ -44,31 +45,31 @@ final class SyncClient(serverPeers: Array[String], props: Map[String, String]) e
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): Identity[OperationHandle] = delegateClient.sync {
+  ): Identity[OperationHandle] = async.sync {
     _.executeStatement(sessionHandle, statement, queryTimeout, confOverlay)
   }
 
   override def fetchResults(opHandle: OperationHandle, maxRows: Int, fetchType: Int): Identity[FetchResults] =
-    delegateClient.sync {
+    async.sync {
       _.fetchResults(opHandle, maxRows, fetchType)
     }
 
-  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = delegateClient.sync {
+  override def getResultSetMetadata(opHandle: OperationHandle): Identity[TableSchema] = async.sync {
     _.getResultSetMetadata(opHandle)
   }
 
   override def cancelOperation(opHandle: OperationHandle): Identity[Unit] =
-    delegateClient.sync {
+    async.sync {
       _.cancelOperation(opHandle)
     }
 
   override def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus] =
-    delegateClient.sync {
+    async.sync {
       _.getOperationStatus(opHandle)
     }
 
   override def closeOperation(opHandle: OperationHandle): Identity[Unit] =
-    delegateClient.sync {
+    async.sync {
       _.closeOperation(opHandle)
     }
 

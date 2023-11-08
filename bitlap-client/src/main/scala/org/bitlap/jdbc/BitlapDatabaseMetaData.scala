@@ -17,9 +17,9 @@ package org.bitlap.jdbc
 
 import java.sql.{ Array as _, * }
 
-import org.bitlap.client.BitlapClient
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.{ JsonUtil, StringEx }
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.serde.BitlapSerde

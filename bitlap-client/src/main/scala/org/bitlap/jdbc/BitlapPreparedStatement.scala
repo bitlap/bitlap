@@ -26,7 +26,7 @@ import scala.{ Array as _, Byte as _ }
 import scala.collection.mutable
 import scala.util.control.Breaks.{ break, breakable }
 
-import org.bitlap.client.BitlapClient
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.SessionHandle
 
 class BitlapPreparedStatement(

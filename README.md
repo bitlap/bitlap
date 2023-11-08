@@ -16,8 +16,6 @@
   </a>
 </p>
 
-> A table schema-less OLAP Analytics Engine for Big Data.
-
 ### 🏠 [Homepage](https://bitlap.org/)
 
 ### ✨ [Demo](http://im.dreamylost.cn:18081)

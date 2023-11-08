@@ -17,53 +17,14 @@
             <artifactId>bitlap-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.thesamet.scalapb</groupId>
-            <artifactId>scalapb-runtime-grpc_${scala.binary.version}</artifactId>
-            <version>${scalapb.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.thesamet.scalapb.zio-grpc</groupId>
-            <artifactId>zio-grpc-core_${scala.binary.version}</artifactId>
-            <version>${zio.grpc.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-protobuf</artifactId>
         </dependency>
         <dependency>
             <groupId>dev.zio</groupId>
             <artifactId>zio_${scala.binary.version}</artifactId>
             <version>${zio.version}</version>
         </dependency>
-        <dependency>
-            <artifactId>netty-all</artifactId>
-            <groupId>io.netty</groupId>
-            <version>${netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-services</artifactId>
-            <version>${grpc.netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>${grpc.netty.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>rolls-csv_${scala.binary.version}</artifactId>
@@ -125,43 +86,6 @@
                         <goals>
                             <goal>test</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.os72</groupId>
-                <artifactId>protoc-jar-maven-plugin</artifactId>
-                <version>${protoc-jar-maven-plugin.version}</version>
-                <configuration>
-                    <!-- Trigger download for Mac M1 -->
-                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
-                    <includeMavenTypes>transitive</includeMavenTypes>
-                    <outputTargets>
-                        <outputTarget>
-                            <type>scalapb</type>
-                            <outputOptions>grpc</outputOptions>
-                            <pluginArtifact>com.thesamet.scalapb.zio-grpc:protoc-gen-zio:${zio.grpc.version}:${grpc.exe.suffix}:${grpc.os.family}</pluginArtifact>
-                        </outputTarget>
-                        <outputTarget>
-                            <!-- 阿里云没有支持win的protoc，不要使用阿里云 -->
-                            <type>scalapb</type>
-                            <outputOptions>grpc</outputOptions>
-                            <pluginArtifact>com.thesamet.scalapb:protoc-gen-scala:${scalapb.version}:${grpc.exe.suffix}:${grpc.os.family}</pluginArtifact>
-                        </outputTarget>
-                    </outputTargets>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <protocVersion>${protobuf.version}</protocVersion>
-                            <inputDirectories>
-                                <include>src/main/protobuf</include>
-                            </inputDirectories>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

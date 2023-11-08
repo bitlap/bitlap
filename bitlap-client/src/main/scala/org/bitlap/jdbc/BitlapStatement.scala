@@ -17,7 +17,7 @@ package org.bitlap.jdbc
 
 import java.sql.*
 
-import org.bitlap.client.BitlapClient
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*

@@ -24,8 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
-import org.bitlap.client.BitlapClient
 import org.bitlap.common.exception.BitlapExceptions
+import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
 
 import bitlap.rolls.core.jdbc.{ columns, sqlQ, ResultSetX, TypeRow1 }

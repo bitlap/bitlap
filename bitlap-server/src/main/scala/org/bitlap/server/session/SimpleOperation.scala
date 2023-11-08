@@ -19,9 +19,9 @@ import java.sql.*
 
 import scala.collection.mutable.ListBuffer
 
+import org.bitlap.common.exception.DataFormatException
 import org.bitlap.core.*
 import org.bitlap.core.sql.QueryExecution
-import org.bitlap.network.NetworkException.DataFormatException
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
@@ -59,7 +59,7 @@ final class SimpleOperation(parentSession: Session, opType: OperationType, hasRe
           case Types.FLOAT                  => serialize(rs.getFloat(it))
           case Types.TIME                   => serialize(rs.getTime(it).getTime)
           case Types.DATE                   => serialize(rs.getDate(it).getTime)
-          case tp                           => throw DataFormatException(msg = s"Unsupported type:$tp")
+          case tp                           => throw DataFormatException(s"Unsupported type:$tp")
         }
       }
       rows.append(Row(cl.toList))

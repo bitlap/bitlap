@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.bitlap</groupId>
+        <artifactId>bitlap</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>bitlap-protobuf</artifactId>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <configuration>
+                    <args>
+                        <arg>-Yretain-trees</arg>
+                    </args>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.os72</groupId>
+                <artifactId>protoc-jar-maven-plugin</artifactId>
+                <version>${protoc-jar-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Trigger download for Mac M1 -->
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
+                    <includeMavenTypes>transitive</includeMavenTypes>
+                    <outputTargets>
+                        <outputTarget>
+                            <type>scalapb</type>
+                            <outputOptions>grpc</outputOptions>
+                            <pluginArtifact>
+                                com.thesamet.scalapb.zio-grpc:protoc-gen-zio:${zio.grpc.version}:${grpc.exe.suffix}:${grpc.os.family}
+                            </pluginArtifact>
+                        </outputTarget>
+                        <outputTarget>
+                            <!-- 阿里云没有支持win的protoc，不要使用阿里云 -->
+                            <type>scalapb</type>
+                            <outputOptions>grpc</outputOptions>
+                            <pluginArtifact>
+                                com.thesamet.scalapb:protoc-gen-scala:${scalapb.version}:${grpc.exe.suffix}:${grpc.os.family}
+                            </pluginArtifact>
+                        </outputTarget>
+                    </outputTargets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <protocVersion>${protobuf.version}</protocVersion>
+                            <inputDirectories>
+                                <include>src/main/protobuf</include>
+                            </inputDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

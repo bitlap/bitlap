@@ -109,12 +109,40 @@
                         <configuration>
                             <protocVersion>${protobuf.version}</protocVersion>
                             <inputDirectories>
-                                <include>src/main/protobuf</include>
+                                <include>src/main/proto-scala</include>
                             </inputDirectories>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                    <protoSourceRoot>src/main/proto-java</protoSourceRoot>
+                </configuration>
+            </plugin>
+            </plugins>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.0</version>
+            </extension>
+        </extensions>
     </build>
 </project>

@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network
+package org
+package bitlap
+package network
+package protocol
 
 import scala.concurrent.Await
 import scala.concurrent.duration.*

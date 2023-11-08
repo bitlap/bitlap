@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.client
+package org.bitlap.network.protocol.impl
 
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
 /** The synchronous client used by JDBC has no logic and is all delegated to the asynchronous client
- *  [[org.bitlap.client.AsyncClient]],
+ *  [[org.bitlap.network.protocol.impl.Async]],
  *
  *  but JDBC exclusive logic can be added to it.
  */
 final class BitlapClient(serverPeers: Array[String], props: Map[String, String]):
 
-  private lazy val syncClient: SyncClient = new SyncClient(serverPeers, props)
+  private lazy val sync: Sync = new Sync(serverPeers, props)
 
   def openSession(
     username: String = "",
     password: String = "",
     config: Map[String, String] = Map.empty
   ): SessionHandle =
-    syncClient.openSession(username, password, config)
+    sync.openSession(username, password, config)
 
   def closeSession(sessionHandle: SessionHandle): Unit =
-    syncClient.closeSession(sessionHandle)
+    sync.closeSession(sessionHandle)
 
   def executeStatement(
     sessionHandle: SessionHandle,
@@ -44,22 +44,22 @@ final class BitlapClient(serverPeers: Array[String], props: Map[String, String])
     queryTimeout: Long,
     config: Map[String, String] = Map.empty
   ): OperationHandle =
-    syncClient.executeStatement(sessionHandle, statement, queryTimeout, config)
+    sync.executeStatement(sessionHandle, statement, queryTimeout, config)
 
   def fetchResults(operationHandle: OperationHandle, maxRows: Int, fetchType: Int): FetchResults =
-    syncClient.fetchResults(operationHandle, maxRows, fetchType)
+    sync.fetchResults(operationHandle, maxRows, fetchType)
 
   def getResultSetMetadata(operationHandle: OperationHandle): TableSchema =
-    syncClient.getResultSetMetadata(operationHandle)
+    sync.getResultSetMetadata(operationHandle)
 
   def cancelOperation(opHandle: OperationHandle): Unit =
-    syncClient.cancelOperation(opHandle)
+    sync.cancelOperation(opHandle)
 
   def closeOperation(opHandle: OperationHandle): Unit =
-    syncClient.closeOperation(opHandle)
+    sync.closeOperation(opHandle)
 
   def getOperationStatus(opHandle: OperationHandle): OperationStatus =
-    syncClient.getOperationStatus(opHandle)
+    sync.getOperationStatus(opHandle)
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
-    syncClient.getInfo(sessionHandle, getInfoType)
+    sync.getInfo(sessionHandle, getInfoType)

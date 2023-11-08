@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network
+package org
+package bitlap
+package network
+package protocol
 
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
 /** Functional synchronous RPC API, both for client and server, logic should be delegated to asynchronous RPC
- *  [[org.bitlap.network.AsyncProtocol]] and should not be implemented on its own.
+ *  [[AsyncProtocol]] and should not be implemented on its own.
  */
 trait SyncProtocol extends ProtocolMonad[Identity]:
   self =>

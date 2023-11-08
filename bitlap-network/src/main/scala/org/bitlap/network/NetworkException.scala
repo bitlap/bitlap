@@ -15,6 +15,8 @@
  */
 package org.bitlap.network
 
+import java.util.Collections
+
 import scala.jdk.CollectionConverters.*
 
 import org.bitlap.common.exception.BitlapException
@@ -27,7 +29,7 @@ sealed abstract class NetworkException(
   val code: Int = -1,
   val msg: String,
   override val cause: Option[Throwable] = None)
-    extends BitlapException(if msg == null then "" else msg, Map.empty[String, String], cause)
+    extends BitlapException(if msg == null then "" else msg, Map.empty, cause)
     with Product
 
 object NetworkException:

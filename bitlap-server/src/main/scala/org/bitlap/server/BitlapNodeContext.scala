@@ -18,11 +18,11 @@ package org.bitlap.server
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
 
-import org.bitlap.client.*
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.network.NetworkException.*
+import org.bitlap.network.protocol.impl.*
 import org.bitlap.server.config.*
 
 import com.alipay.sofa.jraft.*
@@ -39,7 +39,7 @@ final case class BitlapNodeContext(
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  clientRef: Ref[Option[AsyncClient]]) {
+  clientRef: Ref[Option[Async]]) {
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
@@ -47,13 +47,13 @@ final case class BitlapNodeContext(
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
 
-  def setClient(client: AsyncClient): ZIO[Any, Throwable, Unit] =
+  def setClient(client: Async): ZIO[Any, Throwable, Unit] =
     grpcStarted.await.timeout(refTimeout) *> clientRef.set(Option(client))
 
-  def getClient: ZIO[Any, Throwable, AsyncClient] =
+  def getClient: ZIO[Any, Throwable, Async] =
     grpcStarted.await.timeout(refTimeout) *>
       clientRef.get.someOrFail(
-        InternalException("Cannot find a AsyncClient instance")
+        InternalException("Cannot find a Async instance")
       )
 
   def getNode: ZIO[Any, Throwable, Node] =
@@ -125,7 +125,7 @@ object BitlapNodeContext:
       raftStart        <- Promise.make[Throwable, Boolean]
       cliClientService <- Ref.make(new CliClientServiceImpl)
       node             <- Ref.make(Option.empty[Node])
-      client           <- Ref.make(Option.empty[AsyncClient])
+      client           <- Ref.make(Option.empty[Async])
       config           <- ZIO.service[BitlapConfiguration]
     } yield BitlapNodeContext(config, grpcStart, raftStart, cliClientService, node, client)
   }

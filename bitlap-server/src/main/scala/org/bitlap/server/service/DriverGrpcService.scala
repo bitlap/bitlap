@@ -21,6 +21,7 @@ import org.bitlap.network.Driver.ZioDriver.ZDriverService
 import org.bitlap.network.NetworkException.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
+import org.bitlap.network.protocol.AsyncProtocol
 import org.bitlap.server.*
 
 import io.grpc.*

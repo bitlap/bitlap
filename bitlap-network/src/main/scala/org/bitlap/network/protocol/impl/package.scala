@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.client
+package org.bitlap.network.protocol.impl
 
-import org.bitlap.jdbc.Constants
 import org.bitlap.network.ServerAddress
 
 private val Separator = ":"
+private val Port      = 23333
 
 /** Parsing IP:PORT from String, returning [[org.bitlap.network.ServerAddress]].
  */
@@ -27,8 +27,8 @@ extension (serverUri: String)
   def asServerAddress: ServerAddress = {
     val as =
       if serverUri.contains(Separator) then serverUri.split(Separator).toList
-      else List(serverUri, Constants.DEFAULT_PORT)
-    ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Constants.DEFAULT_PORT.toInt))
+      else List(serverUri, Port.toString)
+    ServerAddress(as.head.trim, as(1).trim.toIntOption.getOrElse(Port))
   }
 end extension
 
@@ -44,3 +44,7 @@ extension (serverPeers: Array[String])
   end asServerAddresses
 
 end extension
+
+final case class ClientConfig(
+  props: Map[String, String],
+  serverPeers: List[String])

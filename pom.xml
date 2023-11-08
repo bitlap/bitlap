@@ -173,6 +173,11 @@
             </dependency>
             <dependency>
                 <groupId>org.bitlap</groupId>
+                <artifactId>bitlap-protobuf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitlap</groupId>
                 <artifactId>bitlap-core</artifactId>
                 <version>${project.version}</version>
             </dependency>

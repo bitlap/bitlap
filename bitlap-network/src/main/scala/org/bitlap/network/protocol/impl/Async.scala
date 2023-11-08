@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.client
+package org.bitlap.network.protocol.impl
 
 import org.bitlap.common.utils.StringEx
-import org.bitlap.jdbc.BitlapSQLException
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
 import org.bitlap.network.Driver.ZioDriver.DriverServiceClient
+import org.bitlap.network.NetworkException.InternalException
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.enumeration.GetInfoType.toBGetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.AsyncProtocol
 
 import io.grpc.*
 import zio.*
 
 /** Asynchronous RPC client, implemented based on zio grpc
  */
-final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) extends AsyncProtocol:
+final class Async(serverPeers: Array[String], props: Map[String, String]) extends AsyncProtocol:
 
   assert(serverPeers.length > 0)
 
@@ -65,7 +66,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
         .when(c.flatMap(_.toList).nonEmpty) {
           leaderRef.flatMap(_.get)
         }
-        .someOrFail(BitlapSQLException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+        .someOrFail(InternalException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
       client <- live
     } yield client
 
@@ -127,7 +128,7 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .map(t => TableSchema.fromBGetResultSetMetadataResp(t))
       .provideLayer(leaderClientLayer)
 
-  private[client] def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
+  private def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
     DriverServiceClient
       .getLeader(BGetLeaderReq.of(requestId))
       .map { f =>
@@ -162,9 +163,9 @@ final class AsyncClient(serverPeers: Array[String], props: Map[String, String]) 
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
 
-object AsyncClient {
+object Async {
 
-  def make(conf: ClientConfig): ULayer[AsyncClient] = ZLayer.succeed(
-    new AsyncClient(conf.serverPeers.toArray, conf.props)
+  def make(conf: ClientConfig): ULayer[Async] = ZLayer.succeed(
+    new Async(conf.serverPeers.toArray, conf.props)
   )
 }

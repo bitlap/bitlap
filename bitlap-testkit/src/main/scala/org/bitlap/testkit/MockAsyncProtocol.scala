@@ -19,6 +19,7 @@ import org.bitlap.network.*
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.AsyncProtocol
 import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.testkit.*
 

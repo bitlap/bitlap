@@ -28,6 +28,7 @@ import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
 import com.google.protobuf.ByteString
+import com.typesafe.scalalogging.StrictLogging
 
 import zio.{ System as _, * }
 
@@ -41,7 +42,8 @@ final class SimpleLocalSession(
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionState: AtomicBoolean = new AtomicBoolean(false),
   val creationTime: Long = System.currentTimeMillis())
-    extends Session {
+    extends Session
+    with StrictLogging {
 
   private[session] var _lastAccessTime: Long = _
 
@@ -96,7 +98,7 @@ final class SimpleLocalSession(
 
   override def closeOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = SessionManager.operationStore.getOrElse(operationHandle, null)
+      val op = SessionManager.OperationStoreMap.getOrDefault(operationHandle, null)
       if op != null then {
         op.setState(OperationState.ClosedState)
         removeOperation(operationHandle)
@@ -105,12 +107,12 @@ final class SimpleLocalSession(
 
   override def cancelOperation(operationHandle: OperationHandle): Unit =
     this.synchronized {
-      val op = SessionManager.operationStore.getOrElse(operationHandle, null)
+      val op = SessionManager.OperationStoreMap.getOrDefault(operationHandle, null)
       if op != null then {
         if op.state.terminal then {
-          println(s"$operationHandle Operation is already aborted in state - ${op.state}")
+          logger.info(s"$operationHandle Operation is already aborted in state - ${op.state}")
         } else {
-          println(s"$operationHandle Attempting to cancel from state - ${op.state}")
+          logger.info(s"$operationHandle Attempting to cancel from state - ${op.state}")
           op.setState(OperationState.CanceledState)
           removeOperation(operationHandle)
         }
@@ -140,8 +142,8 @@ final class SimpleLocalSession(
     )
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
     this.synchronized {
-      SessionManager.opHandleSet.append(operation.opHandle)
-      SessionManager.operationStore.put(operation.opHandle, operation)
+      SessionManager.OperationHandleVector.add(operation.opHandle)
+      SessionManager.OperationStoreMap.put(operation.opHandle, operation)
     }
     operation.statement = statement
     operation.run()
@@ -150,24 +152,21 @@ final class SimpleLocalSession(
 
   private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
     this.synchronized {
-      val r   = SessionManager.operationStore.remove(operationHandle)
-      val idx = SessionManager.opHandleSet.indexOf(operationHandle)
-      if idx != -1 then {
-        SessionManager.opHandleSet.remove(idx)
-      }
-      r
+      val r = SessionManager.OperationStoreMap.remove(operationHandle)
+      SessionManager.OperationHandleVector.remove(operationHandle)
+      Option(r)
     }
 
   private def removeTimedOutOperation(operationHandle: OperationHandle): Option[Operation] = {
-    val operation = SessionManager.operationStore.get(operationHandle)
-    if operation != null && operation.get.isTimedOut(System.currentTimeMillis) then {
+    val operation = SessionManager.OperationStoreMap.get(operationHandle)
+    if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
       return removeOperation(operationHandle)
     }
-    operation
+    Option(operation)
   }
 
   override def getNoOperationTime: Long = {
-    val noMoreOpHandle = SessionManager.opHandleSet.isEmpty
+    val noMoreOpHandle = SessionManager.OperationHandleVector.isEmpty
     if noMoreOpHandle then System.currentTimeMillis - _lastAccessTime
     else 0
   }

@@ -77,14 +77,13 @@ final case class BitlapNodeContext(
     isStarted *> nodeRef.get.someOrFail(BitlapIllegalStateException("Cannot find a leader")).map(_.isLeader)
 
   def getLeaderAddress(): Task[ServerAddress] =
-    (for {
-      config <- ZIO.service[BitlapConfiguration]
+    for {
+      cliClientService <- cliClientServiceRef.get
       peers      = config.raftConfig.initialServerAddressList
       groupId    = config.raftConfig.groupId
       timeout    = config.raftConfig.timeout
       grpcConfig = config.grpcConfig
-      cliClientService <- cliClientServiceRef.get
-      _node            <- nodeRef.get
+      _node <- nodeRef.get
       server <- ZIO
         .whenZIO(isLeader) {
           ZIO.succeed {
@@ -115,7 +114,7 @@ final case class BitlapNodeContext(
             throw BitlapIllegalStateException("Cannot find a leader address")
           else ServerAddress(re.getIp, re.getPort)
         }
-    } yield server).provideLayer(BitlapConfiguration.live)
+    } yield server
 }
 
 object BitlapNodeContext:

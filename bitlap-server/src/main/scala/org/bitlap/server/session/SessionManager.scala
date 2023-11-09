@@ -30,13 +30,12 @@ import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.config.BitlapConfiguration
 
-import com.typesafe.scalalogging.LazyLogging
-
 import zio.{ System as _, * }
+import zio.Ref.Synchronized
 
 /** Bitlap session manager
  */
-object SessionManager extends LazyLogging:
+object SessionManager:
 
   private val sessionAddLock: Object = new Object
 
@@ -53,48 +52,75 @@ object SessionManager extends LazyLogging:
   /** Start session listening, clear session when timeout occurs, and clear session related operation cache
    */
   def startListener(): ZIO[SessionManager & BitlapConfiguration, Nothing, Unit] =
-    logger.info(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
-    val current = System.currentTimeMillis
     for {
+      _             <- ZIO.logInfo(s"Bitlap server session listener started, it has [${sessionStore.size}] sessions")
+      now           <- Clock.currentTime(TimeUnit.MILLISECONDS)
       sessionConfig <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
       sessionTimeout = sessionConfig.timeout.toMillis
       _ <- ZIO
         .foreach(sessionStore.values().asScala) { session =>
-          if session.lastAccessTime + sessionTimeout <= current && (session.getNoOperationTime > sessionTimeout) then {
+          if session.lastAccessTime + sessionTimeout <= now && (session.getNoOperationTime > sessionTimeout) then {
             val handle = session.sessionHandle
-            logger.warn(
+            ZIO.logWarning(
               s"Session $handle is Timed-out (last access : ${new Date(session.lastAccessTime)}) and will be closed"
-            )
-            closeSession(handle)
+            ) *> ZIO.serviceWithZIO[SessionManager](sm => sm.closeSession(handle))
           } else ZIO.attempt(session.removeExpiredOperations(opHandleSet.toList))
         }
         .ignore
-      _ <- ZIO.succeed(logger.info(s"Bitlap server has [${sessionStore.size}] sessions"))
+      _ <- ZIO.logInfo(s"Bitlap server has [${sessionStore.size}] sessions")
     } yield ()
 
-  def openSession(
-    username: String,
-    password: String,
-    sessionConf: Map[String, String]
-  ): ZIO[SessionManager, Throwable, Session] =
-    ZIO.serviceWithZIO[SessionManager](sm => sm.openSession(username, password, sessionConf))
+  end startListener
 
-  def closeSession(sessionHandle: SessionHandle): ZIO[SessionManager, Throwable, Unit] =
-    ZIO.serviceWithZIO[SessionManager](sm => sm.closeSession(sessionHandle))
+  trait SessionDSL[F[_]] {
+    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => F[A]): F[A]
 
-  def getSession(sessionHandle: SessionHandle): ZIO[SessionManager, Throwable, Session] =
-    ZIO.serviceWithZIO[SessionManager](sm => sm.getSession(sessionHandle))
+    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => F[A]): F[A]
+  }
 
-  def getOperation(operationHandle: OperationHandle): ZIO[SessionManager, Throwable, Operation] =
-    ZIO.serviceWithZIO[SessionManager](sm => sm.getOperation(operationHandle))
+  private def refreshSession(sessionHandle: SessionHandle, session: Session): Task[Session] =
+    ZIO.attemptBlocking {
+      // TODO remove synchronized, use Ref or Synchronized?
+      SessionManager.sessionAddLock.synchronized {
+        session.asInstanceOf[SimpleLocalSession].lastAccessTime = System.currentTimeMillis()
+        if sessionStore.containsKey(sessionHandle) then {
+          sessionStore.put(sessionHandle, session)
+        } else {
+          throw BitlapException(s"Invalid SessionHandle: $sessionHandle")
+        }
+      }
+    }
+  end refreshSession
 
-  def getInfo(
-    sessionHandle: SessionHandle,
-    getInfoType: GetInfoType
-  ): ZIO[SessionManager, Throwable, GetInfoValue] =
-    ZIO.serviceWithZIO[SessionManager](sm => sm.getInfo(sessionHandle, getInfoType))
+  // public session operation
+  lazy val default: SessionDSL[Task] = new SessionDSL[Task] {
 
-final class SessionManager extends LazyLogging:
+    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => Task[A]): Task[A] =
+      ZIO.attemptBlocking {
+        val op = operationStore.getOrElse(operationHandle, null)
+        if op == null then {
+          throw BitlapException(s"Invalid OperationHandle: $operationHandle")
+        } else {
+          refreshSession(op.parentSession.sessionHandle, op.parentSession) *> effect(op)
+        }
+      }.flatten
+
+    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => Task[A]): Task[A] =
+      ZIO.attemptBlocking {
+        SessionManager.sessionAddLock.synchronized {
+          val session = sessionStore.get(sessionHandle)
+          if session == null then {
+            throw BitlapException(s"Invalid SessionHandle: $sessionHandle")
+          } else {
+            refreshSession(sessionHandle, session) *> effect(session)
+          }
+        }
+      }.flatten
+  }
+
+end SessionManager
+
+final class SessionManager:
   import SessionManager.*
 
   def openSession(
@@ -112,10 +138,9 @@ final class SessionManager extends LazyLogging:
         )
         session.open()
         sessionStore.put(session.sessionHandle, session)
-        logger.info(s"Create session [${session.sessionHandle}]")
         session
       }
-    }
+    }.tap(session => ZIO.logInfo(s"Create session [${session.sessionHandle}]"))
 
   def closeSession(sessionHandle: SessionHandle): Task[Unit] = ZIO.attemptBlocking {
     SessionManager.sessionAddLock.synchronized {
@@ -133,10 +158,9 @@ final class SessionManager extends LazyLogging:
     closedOps.zipWithIndex.foreach { case (_, i) =>
       opHandleSet.remove(i)
     }
-    logger.info(
-      s"Close session [$sessionHandle], [${sessionStore.size}] sessions exists"
-    )
-  }
+  } *> ZIO.logInfo(
+    s"Close session [$sessionHandle], [${sessionStore.size}] sessions exists"
+  )
 
   def getSession(sessionHandle: SessionHandle): Task[Session] =
     default.withLocalSession(sessionHandle) { session =>
@@ -156,48 +180,5 @@ final class SessionManager extends LazyLogging:
           ZIO.fail(BitlapException(s"Invalid OperationState: ${operation.state}"))
       }
     }
-
-  private def refreshSession(sessionHandle: SessionHandle, session: Session): Session =
-    SessionManager.sessionAddLock.synchronized {
-      session.asInstanceOf[SimpleLocalSession].lastAccessTime = System.currentTimeMillis()
-      if sessionStore.containsKey(sessionHandle) then {
-        sessionStore.put(sessionHandle, session)
-      } else {
-        throw BitlapException(s"Invalid SessionHandle: $sessionHandle")
-      }
-    }
-  end refreshSession
-
-  trait SessionDSL[F[_]] {
-    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => F[A]): F[A]
-    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => F[A]): F[A]
-  }
-
-  // public session operation
-  lazy val default: SessionDSL[Task] = new SessionDSL[Task] {
-
-    def withOperation[A](operationHandle: OperationHandle)(effect: Operation => Task[A]): Task[A] =
-      val op = operationStore.getOrElse(operationHandle, null)
-      if op == null then {
-        ZIO.fail(BitlapException(s"Invalid OperationHandle: $operationHandle"))
-      } else {
-        refreshSession(op.parentSession.sessionHandle, op.parentSession)
-        effect(op)
-      }
-
-    def withLocalSession[A](sessionHandle: SessionHandle)(effect: Session => Task[A]): Task[A] =
-      ZIO.attemptBlocking {
-        // TODO
-        SessionManager.sessionAddLock.synchronized {
-          val session = sessionStore.get(sessionHandle)
-          if session == null then {
-            ZIO.fail(BitlapException(s"Invalid SessionHandle: $sessionHandle"))
-          } else {
-            refreshSession(sessionHandle, session)
-            effect(session)
-          }
-        }
-      }.flatten
-  }
 
 end SessionManager

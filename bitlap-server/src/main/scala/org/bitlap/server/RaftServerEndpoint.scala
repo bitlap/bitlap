@@ -34,7 +34,7 @@ object RaftServerEndpoint:
   lazy val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
 
-  def service(args: List[String]): ZIO[RaftServerEndpoint with BitlapNodeContext, Throwable, Unit] =
+  def service(args: List[String]): ZIO[RaftServerEndpoint & BitlapNodeContext, Throwable, Unit] =
     (for {
       node <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
       _    <- ZIO.serviceWithZIO[BitlapNodeContext](_.setNode(node))

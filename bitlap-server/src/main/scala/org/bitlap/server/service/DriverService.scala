@@ -31,34 +31,33 @@ import zio.*
 /** Server side implementation of asynchronous RPC
  */
 object DriverService:
-  lazy val live: ULayer[AsyncProtocol] = ZLayer.succeed(new DriverService)
+
+  lazy val live: ZLayer[SessionManager, Nothing, AsyncProtocol] =
+    ZLayer.fromFunction((sm: SessionManager) => new DriverService(sm))
 end DriverService
 
-final class DriverService extends AsyncProtocol with LazyLogging:
+final class DriverService(sessionManager: SessionManager) extends AsyncProtocol with LazyLogging:
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, SessionHandle] =
-    SessionManager
-      .openSession(username, password, configuration)
-      .map { session =>
-        session.currentSchema = configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
-        session.sessionHandle
-      }
-      .provide(SessionManager.live)
+  ): Task[SessionHandle] =
+    sessionManager.openSession(username, password, configuration).map { session =>
+      session.currentSchema = configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
+      session.sessionHandle
+    }
 
-  override def closeSession(sessionHandle: SessionHandle): ZIO[Any, Throwable, Unit] =
-    SessionManager.closeSession(sessionHandle).provide(SessionManager.live)
+  override def closeSession(sessionHandle: SessionHandle): Task[Unit] =
+    sessionManager.closeSession(sessionHandle)
 
   override def executeStatement(
     sessionHandle: SessionHandle,
     statement: String,
     queryTimeout: Long,
     confOverlay: Map[String, String] = Map.empty
-  ): ZIO[Any, Throwable, OperationHandle] =
-    SessionManager
+  ): Task[OperationHandle] =
+    sessionManager
       .getSession(sessionHandle)
       .mapAttempt { session =>
         try
@@ -76,47 +75,43 @@ final class DriverService extends AsyncProtocol with LazyLogging:
             throw BitlapException(s"Unknown Error: ${e.getLocalizedMessage}", cause = Option(e))
         }
       }
-      .provide(SessionManager.live)
 
   override def fetchResults(
     opHandle: OperationHandle,
     maxRows: Int,
     fetchType: Int
-  ): ZIO[Any, Throwable, FetchResults] =
-    (for {
-      operation <- SessionManager
+  ): Task[FetchResults] =
+    for {
+      operation <- sessionManager
         .getOperation(opHandle)
       rs <- operation.parentSession.fetchResults(operation.opHandle)
-    } yield FetchResults(hasMoreRows = false, rs)).provide(SessionManager.live)
+    } yield FetchResults(hasMoreRows = false, rs)
 
-  override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
-    (for {
-      operation <- SessionManager.getOperation(opHandle)
+  override def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema] =
+    for {
+      operation <- sessionManager.getOperation(opHandle)
       rs        <- operation.parentSession.getResultSetMetadata(opHandle)
-    } yield rs).provide(SessionManager.live)
+    } yield rs
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
-    SessionManager
+    sessionManager
       .getOperation(opHandle)
       .map { operation =>
         val session = operation.parentSession
         session.cancelOperation(opHandle)
       }
-      .provide(SessionManager.live)
 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] =
-    SessionManager
+    sessionManager
       .getOperation(opHandle)
       .map { operation =>
         val session = operation.parentSession
         session.closeOperation(opHandle)
       }
-      .provide(SessionManager.live)
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     ZIO.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
-    SessionManager
+    sessionManager
       .getInfo(sessionHandle, getInfoType)
-      .provide(SessionManager.live)

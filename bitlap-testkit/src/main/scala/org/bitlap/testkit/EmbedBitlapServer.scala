@@ -18,6 +18,7 @@ package org.bitlap.testkit
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.service.DriverGrpcService
+import org.bitlap.server.session.SessionManager
 import org.bitlap.testkit.MockAsyncProtocol
 
 import zio.*
@@ -52,7 +53,8 @@ object EmbedBitlapServer extends ZIOAppDefault {
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapConfiguration.testLive,
-        BitlapNodeContext.live
+        BitlapNodeContext.live,
+        SessionManager.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

@@ -132,10 +132,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
     DriverServiceClient
       .getLeader(BGetLeaderReq.of(requestId))
       .map { f =>
-        if f == null || f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port))
-      }
-      .catchSomeCause {
-        case c if c.contains(Cause.fail(Status.ABORTED)) => ZIO.succeed(Option.empty[ServerAddress]) // ignore this
+        if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port))
       }
       .catchAll(_ => ZIO.none)
 

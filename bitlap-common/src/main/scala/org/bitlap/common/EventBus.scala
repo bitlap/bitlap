@@ -33,9 +33,9 @@ type BitlapSubscriber[A] = A => Unit
 class EventBus(val executor: ExecutorService = Executors.newWorkStealingPool()) extends LifeCycleWrapper {
   private val subscribers = ConcurrentHashMap[Class[_ <: BitlapEvent], ListBuffer[BitlapSubscriber[_]]]()
 
-  def subscribe[A <: BitlapEvent](subscriber: BitlapSubscriber[A])(implicit classTag: ClassTag[A]): EventBus = {
+  def subscribe[A <: BitlapEvent:ClassTag](subscriber: BitlapSubscriber[A]): EventBus = {
     val subscribers = this.subscribers
-      .computeIfAbsent(classTag.runtimeClass.asInstanceOf[Class[_ <: BitlapEvent]], { _ => ListBuffer() })
+      .computeIfAbsent(classTag[A].runtimeClass.asInstanceOf[Class[_ <: BitlapEvent]], { _ => ListBuffer() })
     subscribers += subscriber.asInstanceOf[BitlapSubscriber[_]]
     this
   }

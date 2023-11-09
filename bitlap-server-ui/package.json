@@ -10,14 +10,17 @@
     "start": "npm run dev"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
-    "@ant-design/pro-components": "^2.3.28",
+    "@ant-design/charts": "^1.4.2",
+    "@ant-design/icons": "^4.8.1",
+    "@ant-design/pro-components": "^2.3.57",
     "@codemirror/lang-sql": "^6.3.3",
     "@codemirror/language": "^6.3.1",
     "@uiw/react-codemirror": "^4.13.2",
     "@umijs/max": "^4.0.29",
-    "antd": "^4.20.7",
-    "umi-request": "^1.4.0"
+    "antd": "^5.2.2",
+    "umi-request": "^1.4.0",
+    "classnames": "^2.3.2",
+    "use-url-search-params": "^2.5.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
@@ -27,5 +30,10 @@
     "prettier-plugin-organize-imports": "^2",
     "prettier-plugin-packagejson": "^2",
     "typescript": "^4.1.2"
+  },
+  "overrides": {
+    "@ant-design/charts": {
+      "antd": "^5.2.2"
+    }
   }
 }

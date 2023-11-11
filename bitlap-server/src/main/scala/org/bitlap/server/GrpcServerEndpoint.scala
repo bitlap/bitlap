@@ -39,7 +39,7 @@ object GrpcServerEndpoint:
   def service(
     args: List[String]
   ): ZIO[
-    DriverGrpcService & Scope & GrpcServerEndpoint & BitlapNodeContext & BitlapConfiguration & SessionManager,
+    DriverGrpcService & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfiguration & SessionManager,
     Throwable,
     Unit
   ] =
@@ -52,7 +52,7 @@ object GrpcServerEndpoint:
         )
         .build
       _ <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
-      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setProtocolImpl(client.get))
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setProtocolImpl(client.get))
       _ <- ZIO.never
     } yield ())
       .onInterrupt(_ => ZIO.logWarning(s"Grpc Server was interrupted! Bye!"))
@@ -68,8 +68,8 @@ final class GrpcServerEndpoint(config: BitlapConfiguration):
         .addFromEnvironment[ZDriverService[RequestContext]]
     )
 
-  private def runGrpcServer(): URIO[BitlapNodeContext & SessionManager, ExitCode] = ZLayer
-    .makeSome[BitlapNodeContext & SessionManager, Server](
+  private def runGrpcServer(): URIO[BitlapGlobalContext & SessionManager, ExitCode] = ZLayer
+    .makeSome[BitlapGlobalContext & SessionManager, Server](
       serverLayer,
       DriverGrpcService.live,
       DriverService.live

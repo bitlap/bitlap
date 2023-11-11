@@ -31,11 +31,11 @@ import zio.*
  *
  *  data: simple_data.csv
  */
-object MockAsyncProtocol {
-  lazy val live: ULayer[AsyncProtocol] = ZLayer.succeed(new MockAsyncProtocol())
+object MockAsync {
+  lazy val live: ULayer[AsyncProtocol] = ZLayer.succeed(new MockAsync())
 }
 
-final class MockAsyncProtocol extends AsyncProtocol with CSVUtils {
+final class MockAsync extends AsyncProtocol with CSVUtils {
 
   val metrics: Seq[Metric] = readClasspathCSVData("simple_data.csv")
 

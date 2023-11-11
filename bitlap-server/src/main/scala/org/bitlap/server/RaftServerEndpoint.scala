@@ -34,10 +34,11 @@ object RaftServerEndpoint:
   lazy val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
 
-  def service(args: List[String]): ZIO[RaftServerEndpoint & BitlapNodeContext & BitlapConfiguration, Throwable, Unit] =
+  def service(args: List[String])
+    : ZIO[RaftServerEndpoint & BitlapGlobalContext & BitlapConfiguration, Throwable, Unit] =
     (for {
       node  <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
-      _     <- ZIO.serviceWithZIO[BitlapNodeContext](_.setNode(node))
+      _     <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setNode(node))
       ports <- ZIO.serviceWith[BitlapConfiguration](_.raftConfig.getPorts)
       _     <- ZIO.logInfo(s"Raft Server started at ports: ${ports.mkString(",")}")
       _     <- ZIO.never

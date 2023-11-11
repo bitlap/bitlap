@@ -15,9 +15,6 @@
  */
 package org.bitlap.server
 
-import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
-
 import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
@@ -26,8 +23,6 @@ import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
 
 import zio.{ Duration as ZDuration, * }
-import zio.logging.LogFormat
-import zio.logging.backend.SLF4J
 
 /** Bitlap aggregation Services
  */
@@ -55,7 +50,7 @@ object BitlapServer extends ZIOAppDefault:
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
     } yield ())
       .provide(
@@ -69,7 +64,7 @@ object BitlapServer extends ZIOAppDefault:
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapConfiguration.live,
-        BitlapNodeContext.live
+        BitlapGlobalContext.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

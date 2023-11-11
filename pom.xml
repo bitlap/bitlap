@@ -94,7 +94,7 @@
         <jupiter.version>5.9.3</jupiter.version>
         <tapir.version>1.8.3</tapir.version>
         <zio.http.version>3.0.0-RC1</zio.http.version>
-        <zio.logging.version>2.1.14</zio.logging.version>
+        <zio.logging.version>2.1.15</zio.logging.version>
         <javafaker.version>1.0.2</javafaker.version>
 
         <!-- others -->

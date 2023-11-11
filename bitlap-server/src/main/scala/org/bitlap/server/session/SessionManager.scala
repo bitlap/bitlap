@@ -52,7 +52,7 @@ object SessionManager:
    */
   def startListener(): ZIO[SessionManager & BitlapConfiguration, Nothing, Unit] =
     for {
-      _             <- ZIO.logInfo(s"Bitlap server session listener started, it has [${SessionStoreMap.size}] sessions")
+      _             <- ZIO.logInfo(s"Session state check started: ${SessionStoreMap.size} sessions")
       now           <- Clock.currentTime(TimeUnit.MILLISECONDS)
       sessionConfig <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
       sessionTimeout = sessionConfig.timeout.toMillis
@@ -66,7 +66,7 @@ object SessionManager:
           } else ZIO.attempt(session.removeExpiredOperations(OperationHandleVector.asScala.toList))
         }
         .ignore
-      _ <- ZIO.logInfo(s"Bitlap server has [${SessionStoreMap.size}] sessions")
+      _ <- ZIO.logInfo(s"Session state check ended: ${SessionStoreMap.size} sessions")
     } yield ()
 
   end startListener

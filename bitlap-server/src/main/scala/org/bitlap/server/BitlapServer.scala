@@ -15,6 +15,7 @@
  */
 package org.bitlap.server
 
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.*
@@ -32,7 +33,7 @@ import zio.logging.backend.SLF4J
  */
 object BitlapServer extends ZIOAppDefault:
 
-  private lazy val logger = Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
+  override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = BitlapLogFormat.slf4j
 
   // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
@@ -68,13 +69,12 @@ object BitlapServer extends ZIOAppDefault:
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapConfiguration.live,
-        BitlapNodeContext.live,
-        logger
+        BitlapNodeContext.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,
         _ => ZIO.attempt(ExitCode.success)
       )
-      .onTermination(_ => Console.printLine(s"Bitlap Server shutdown now").ignore)
-      .onExit(_ => Console.printLine(s"Bitlap Server stopped").ignore)
-      .onInterrupt(_ => Console.printLine(s"Bitlap Server was interrupted").ignore)
+      .onTermination(_ => ZIO.logError(s"Bitlap Server shutdown now"))
+      .onExit(_ => ZIO.logInfo(s"Bitlap Server stopped"))
+      .onInterrupt(_ => ZIO.logWarning(s"Bitlap Server was interrupted"))

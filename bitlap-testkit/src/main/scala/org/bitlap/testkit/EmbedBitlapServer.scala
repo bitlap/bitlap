@@ -15,6 +15,8 @@
  */
 package org.bitlap.testkit
 
+import java.time.format.DateTimeFormatter
+
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.service.DriverGrpcService
@@ -23,11 +25,17 @@ import org.bitlap.testkit.MockAsyncProtocol
 
 import zio.*
 import zio.ZIOAppArgs.getArgs
+import zio.logging.LogColor
+import zio.logging.LogFilter
+import zio.logging.LogFormat
+import zio.logging.LogFormat._
+import zio.logging.backend.SLF4J
 
-/** Bitlap embedded services include HTTP, GRPC, and Raft
+/** Bitlap embedded services include GRPC and Raft
  */
-
 object EmbedBitlapServer extends ZIOAppDefault {
+
+  override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = BitlapLogFormat.slf4j
 
   override def run =
     (for {

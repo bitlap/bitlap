@@ -44,7 +44,6 @@ object GrpcServerEndpoint:
     Unit
   ] =
     (for {
-      _      <- Console.printLine(s"Grpc Server started")
       config <- ZIO.service[BitlapConfiguration]
       _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
       client <- Async
@@ -52,10 +51,11 @@ object GrpcServerEndpoint:
           ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
         )
         .build
+      _ <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
       _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setProtocolImpl(client.get))
       _ <- ZIO.never
     } yield ())
-      .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
+      .onInterrupt(_ => ZIO.logWarning(s"Grpc Server was interrupted! Bye!"))
 
 end GrpcServerEndpoint
 

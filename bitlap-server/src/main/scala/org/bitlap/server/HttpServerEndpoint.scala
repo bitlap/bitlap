@@ -39,7 +39,7 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration with HttpServiceLive, Nothing, HttpServerEndpoint] =
+  lazy val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
     ZLayer.fromFunction((config: BitlapConfiguration, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
@@ -94,7 +94,7 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
   private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
       .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
-      .flatMap(port => Console.printLine(s"HTTP Server started at port:$port")) *> ZIO.never)
+      .flatMap(port => ZIO.logInfo(s"HTTP Server started at port: $port")) *> ZIO.never)
       .provide(
         ZLayer.succeed(
           Server.Config.default
@@ -108,4 +108,4 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
         Server.customized
       )
       .exitCode
-      .onInterrupt(_ => Console.printLine(s"HTTP Server was interrupted").ignore)
+      .onInterrupt(_ => ZIO.logWarning(s"HTTP Server was interrupted! Bye!"))

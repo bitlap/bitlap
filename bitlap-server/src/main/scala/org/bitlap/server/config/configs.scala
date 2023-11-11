@@ -45,4 +45,10 @@ private[config] final case class BitlapRaftConfig(
   // ip:port,ip:port,ip:port
   initialServerAddressList: String,
   // 5s 100ms
-  timeout: Duration)
+  timeout: Duration) {
+
+  def getPorts: List[Int] = {
+    val addrs = initialServerAddressList.split(",").toList.filter(_.contains(":"))
+    addrs.map(_.split(":")(1)).toList.map(_.toInt)
+  }
+}

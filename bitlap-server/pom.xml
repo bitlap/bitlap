@@ -100,6 +100,11 @@
             <artifactId>zio-logging-slf4j_3</artifactId>
             <version>${zio.logging.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

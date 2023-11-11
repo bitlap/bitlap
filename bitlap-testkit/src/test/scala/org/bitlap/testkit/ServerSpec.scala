@@ -36,7 +36,7 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
 
   // Each test will be executed once and needs to be modified!
   val server = new Thread {
-    override def run(): Unit = EmbedBitlapServer.main(scala.Array.empty)
+    override def run(): Unit = MockBitlapServer.main(scala.Array.empty)
   }
 
   override protected def beforeAll(): Unit = {

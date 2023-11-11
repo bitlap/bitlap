@@ -1,14 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO">
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration name="bitlap" status="INFO" monitorInterval="300">
+
+    <Properties>
+        <property name="logDir">logs</property>
+        <property name="logFileName">bitlap</property>
+        <property name="logLevel">INFO</property>
+        <property name="logPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
+
+        <!-- common log configuration  -->
+        <property name="rollFile">${logDir}/${logFileName}.log</property>
+        <property name="rollPattern">${logDir}/${logFileName}-%d{yyyy-MM-dd-HH}-%i.log.gz</property>
+        <property name="rollFileSize">20MB</property>
+        <property name="rollTimeInterval">4</property>
+        <property name="rollFileNum">10</property>
+    </Properties>
+
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="${logPattern}" />
         </Console>
+
+        <RollingFile name="RollingFile" fileName="${rollFile}" filePattern="${rollPattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${rollTimeInterval}" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${rollFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${rollFileNum}" />
+        </RollingFile>
     </Appenders>
 
     <Loggers>
-        <Root level="INFO">
+        <Logger name="zio" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Root level="${logLevel}">
             <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
         </Root>
     </Loggers>
 </Configuration>

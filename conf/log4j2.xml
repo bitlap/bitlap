@@ -31,7 +31,11 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="zio" level="${logLevel}" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="${logLevel}">
+            <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
     </Loggers>

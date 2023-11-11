@@ -18,21 +18,24 @@ package org.bitlap.testkit
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.service.DriverGrpcService
-import org.bitlap.testkit.MockAsyncProtocol
+import org.bitlap.server.session.SessionManager
+import org.bitlap.testkit.MockAsync
 
 import zio.*
 import zio.ZIOAppArgs.getArgs
 
-/** Bitlap embedded services include HTTP, GRPC, and Raft
+/** Bitlap embedded services include GRPC and Raft
  */
+object MockBitlapServer extends ZIOAppDefault {
 
-object EmbedBitlapServer extends ZIOAppDefault {
+  override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = BitlapLogFormat.slf4j
 
   override def run =
     (for {
       args <- getArgs
       t1   <- RaftServerEndpoint.service(args.toList).fork
       t2   <- GrpcServerEndpoint.service(args.toList).fork
+      // add http server?
       _ <- Console.printLine("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____
@@ -41,18 +44,19 @@ object EmbedBitlapServer extends ZIOAppDefault {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.start())
       _ <- ZIO.collectAll(Seq(t1.join, t2.join))
     } yield ())
       .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
         Scope.default,
-        MockAsyncProtocol.live,
+        MockAsync.live,
         ZIOAppArgs.empty,
         DriverGrpcService.live,
         BitlapConfiguration.testLive,
-        BitlapNodeContext.live
+        BitlapGlobalContext.live,
+        SessionManager.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

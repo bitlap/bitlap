@@ -21,6 +21,7 @@ import org.bitlap.network.protocol.AsyncProtocol
 import org.bitlap.network.protocol.impl.Async
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.service.*
+import org.bitlap.server.session.SessionManager
 
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
@@ -38,12 +39,11 @@ object GrpcServerEndpoint:
   def service(
     args: List[String]
   ): ZIO[
-    DriverGrpcService with Scope with GrpcServerEndpoint with BitlapNodeContext with BitlapConfiguration,
+    DriverGrpcService & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfiguration & SessionManager,
     Throwable,
     Unit
   ] =
     (for {
-      _      <- Console.printLine(s"Grpc Server started")
       config <- ZIO.service[BitlapConfiguration]
       _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
       client <- Async
@@ -51,14 +51,15 @@ object GrpcServerEndpoint:
           ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
         )
         .build
-      _ <- ZIO.serviceWithZIO[BitlapNodeContext](_.setProtocolImpl(client.get))
+      _ <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setProtocolImpl(client.get))
       _ <- ZIO.never
     } yield ())
-      .onInterrupt(_ => Console.printLine(s"Grpc Server was interrupted").ignore)
+      .onInterrupt(_ => ZIO.logWarning(s"Grpc Server was interrupted! Bye!"))
 
 end GrpcServerEndpoint
 
-final class GrpcServerEndpoint(val config: BitlapConfiguration):
+final class GrpcServerEndpoint(config: BitlapConfiguration):
 
   private val serverLayer =
     ServerLayer.fromServiceList(
@@ -67,8 +68,8 @@ final class GrpcServerEndpoint(val config: BitlapConfiguration):
         .addFromEnvironment[ZDriverService[RequestContext]]
     )
 
-  private def runGrpcServer(): URIO[BitlapNodeContext, ExitCode] = ZLayer
-    .makeSome[BitlapNodeContext, Server](
+  private def runGrpcServer(): URIO[BitlapGlobalContext & SessionManager, ExitCode] = ZLayer
+    .makeSome[BitlapGlobalContext & SessionManager, Server](
       serverLayer,
       DriverGrpcService.live,
       DriverService.live

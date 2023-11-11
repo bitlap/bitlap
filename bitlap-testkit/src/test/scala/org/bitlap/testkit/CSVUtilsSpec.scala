@@ -40,7 +40,7 @@ class CSVUtilsSpec extends AnyFunSuite with CSVUtils with should.Matchers {
   }
 
   test("test MockAsyncProtocol") {
-    val asyncProtocol = new MockAsyncProtocol()
+    val asyncProtocol = new MockAsync()
     val ret           = asyncProtocol.fetchResults(OperationHandle(OperationType.ExecuteStatement), 50, 1)
     val syncRet = zio.Unsafe.unsafe { implicit rt =>
       zio.Runtime.default.unsafe.run(ret).getOrThrowFiberFailure()

@@ -34,7 +34,7 @@ import zio.*
 
 /** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
  */
-final case class BitlapNodeContext(
+final case class BitlapGlobalContext(
   config: BitlapConfiguration,
   grpcStarted: Promise[Throwable, Boolean],
   raftStarted: Promise[Throwable, Boolean],
@@ -77,14 +77,13 @@ final case class BitlapNodeContext(
     isStarted *> nodeRef.get.someOrFail(BitlapIllegalStateException("Cannot find a leader")).map(_.isLeader)
 
   def getLeaderAddress(): Task[ServerAddress] =
-    (for {
-      config <- ZIO.service[BitlapConfiguration]
+    for {
+      cliClientService <- cliClientServiceRef.get
       peers      = config.raftConfig.initialServerAddressList
       groupId    = config.raftConfig.groupId
       timeout    = config.raftConfig.timeout
       grpcConfig = config.grpcConfig
-      cliClientService <- cliClientServiceRef.get
-      _node            <- nodeRef.get
+      _node <- nodeRef.get
       server <- ZIO
         .whenZIO(isLeader) {
           ZIO.succeed {
@@ -115,12 +114,12 @@ final case class BitlapNodeContext(
             throw BitlapIllegalStateException("Cannot find a leader address")
           else ServerAddress(re.getIp, re.getPort)
         }
-    } yield server).provideLayer(BitlapConfiguration.live)
+    } yield server
 }
 
-object BitlapNodeContext:
+object BitlapGlobalContext:
 
-  lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapNodeContext] = ZLayer.fromZIO {
+  lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapGlobalContext] = ZLayer.fromZIO {
     for {
       grpcStart        <- Promise.make[Throwable, Boolean]
       raftStart        <- Promise.make[Throwable, Boolean]
@@ -128,7 +127,7 @@ object BitlapNodeContext:
       node             <- Ref.make(Option.empty[Node])
       async            <- Ref.make(Option.empty[Async])
       config           <- ZIO.service[BitlapConfiguration]
-    } yield BitlapNodeContext(config, grpcStart, raftStart, cliClientService, node, async)
+    } yield BitlapGlobalContext(config, grpcStart, raftStart, cliClientService, node, async)
   }
 
-end BitlapNodeContext
+end BitlapGlobalContext

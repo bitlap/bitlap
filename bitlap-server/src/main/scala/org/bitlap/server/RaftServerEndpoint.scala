@@ -34,14 +34,16 @@ object RaftServerEndpoint:
   lazy val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
 
-  def service(args: List[String]): ZIO[RaftServerEndpoint with BitlapNodeContext, Throwable, Unit] =
+  def service(args: List[String])
+    : ZIO[RaftServerEndpoint & BitlapGlobalContext & BitlapConfiguration, Throwable, Unit] =
     (for {
-      node <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
-      _    <- ZIO.serviceWithZIO[BitlapNodeContext](_.setNode(node))
-      _    <- Console.printLine(s"Raft Server started")
-      _    <- ZIO.never
+      node  <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
+      _     <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setNode(node))
+      ports <- ZIO.serviceWith[BitlapConfiguration](_.raftConfig.getPorts)
+      _     <- ZIO.logInfo(s"Raft Server started at ports: ${ports.mkString(",")}")
+      _     <- ZIO.never
     } yield ())
-      .onInterrupt(_ => Console.printLine(s"Raft Server was interrupted").ignore)
+      .onInterrupt(_ => ZIO.logWarning(s"Raft Server was interrupted! Bye!"))
 end RaftServerEndpoint
 
 final class RaftServerEndpoint(config: BitlapConfiguration):

@@ -179,7 +179,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Task[Session] =
     for {
       sessionStoreMap <- globalContext.sessionStoreMap.get
-      _ <- session.asInstanceOf[SimpleLocalSession].lastAccessTimeRef.getAndUpdate { lt =>
+      _ <- session.asInstanceOf[SimpleLocalSession].lastAccessTimeRef.updateAndGet { lt =>
         lt.set(System.currentTimeMillis())
         if sessionStoreMap.containsKey(sessionHandle) then {
           sessionStoreMap.put(sessionHandle, session)

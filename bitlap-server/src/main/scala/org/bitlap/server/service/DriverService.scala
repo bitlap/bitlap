@@ -43,10 +43,10 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
     password: String,
     configuration: Map[String, String] = Map.empty
   ): Task[SessionHandle] = for {
-    session       <- sessionManager.openSession(username, password, configuration)
-    currentSchema <- session.currentSchemaRef.get
-    _ <- ZIO.attempt {
+    session <- sessionManager.openSession(username, password, configuration)
+    _ <- session.currentSchemaRef.updateAndGet { currentSchema =>
       currentSchema.set(configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB))
+      currentSchema
     }
   } yield session.sessionHandle
 

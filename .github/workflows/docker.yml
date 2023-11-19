@@ -1,63 +1,58 @@
 name: Docker
 
 on:
-  push:
-    branches:
-      - master
-      - dev
-  pull_request:
-    branches:
-      - master
-      - dev
-
+  workflow_dispatch:
+    inputs:
+      release_image_version:
+        description: 'Release Docker Image'
+        default: 'X.X.X'
+        required: true
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+    strategy:
+      matrix:
+        jdk-version: [ 11, 17, 21 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+      - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
 
       - name: Docker Build
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        run: bash deploy.sh ${{ vars.VERSION }}
+        run: bash deploy.sh ${{ github.event.inputs.release_image_version }}
         working-directory: ./docker
 
   publish:
     runs-on: ubuntu-latest
-    if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+    strategy:
+      matrix:
+        jdk-version: [ 11, 17, 21 ]
     needs: [ build ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
+      - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
 
       - name: Login to Docker Hub
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Push
-        if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ vars.VERSION }}
+        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ github.event.inputs.release_image_version }}
   
   ci:
     runs-on: ubuntu-latest
-    if: ${{ !endsWith(vars.VERSION, 'SNAPSHOT') }}
-    needs: [ publish ]
+    needs: [ build, publish ]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

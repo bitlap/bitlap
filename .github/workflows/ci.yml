@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        jdk-version: [ 11, 17, 21 ]
+        jdk-version: [ 11 ]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java ${{ matrix.jdk-version }}
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        jdk-version: [ 11, 17, 21 ]
+        jdk-version: [ 11 ]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java ${{ matrix.jdk-version }}

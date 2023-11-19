@@ -107,4 +107,11 @@ object BitlapConfKeys {
       .sys("bitlap.node.session.expiry.interval")
       .env("BITLAP_NODE_SESSION_EXPIRY_INTERVAL")
       .validator(Validators.gt(0.seconds))
+
+  val NODE_SESSION_EXPIRY_SQL: BitlapConfKey[Duration] =
+    BitlapConfKey[Duration]("bitlap.node.session.expiry.sql", 60.seconds /* 6s */ )
+      .sys("bitlap.node.session.expiry.sql")
+      .env("BITLAP_NODE_SESSION_EXPIRY_INTERVAL")
+      .validator(Validators.gt(0.seconds))
+
 }

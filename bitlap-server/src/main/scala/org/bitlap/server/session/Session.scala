@@ -15,14 +15,16 @@
  */
 package org.bitlap.server.session
 
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong, AtomicReference }
+
+import scala.collection.mutable
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 
-import zio.Task
+import zio.{ Ref, Task }
 
 /** Bitlap session
  */
@@ -33,44 +35,38 @@ trait Session {
   val username: String
   val sessionManager: SessionManager
 
-  def lastAccessTime: Long
+  def lastAccessTimeRef: Ref[AtomicLong]
 
-  def lastAccessTime_=(time: Long): Unit
+  def sessionConfRef: Ref[mutable.Map[String, String]]
 
-  def sessionConf: BitlapConf
+  def sessionStateRef: Ref[AtomicBoolean]
 
-  def sessionState: AtomicBoolean
+  def creationTimeRef: Ref[AtomicLong]
 
-  def creationTime: Long
-
-  def currentSchema: String
-
-  def currentSchema_=(schema: String): Unit
-
-  def open(): Unit
+  def currentSchemaRef: Ref[AtomicReference[String]]
 
   def executeStatement(
     statement: String,
     confOverlay: Map[String, String]
-  ): OperationHandle
+  ): Task[OperationHandle]
 
   def executeStatement(
     statement: String,
     confOverlay: Map[String, String] = Map.empty,
     queryTimeout: Long
-  ): OperationHandle
+  ): Task[OperationHandle]
 
   def fetchResults(operationHandle: OperationHandle): Task[RowSet]
 
   def getResultSetMetadata(operationHandle: OperationHandle): Task[TableSchema]
 
-  def closeOperation(operationHandle: OperationHandle): Unit
+  def closeOperation(operationHandle: OperationHandle): Task[Unit]
 
-  def cancelOperation(operationHandle: OperationHandle): Unit
+  def cancelOperation(operationHandle: OperationHandle): Task[Unit]
 
-  def removeExpiredOperations(handles: List[OperationHandle]): List[Operation]
+  def removeExpiredOperations(handles: List[OperationHandle]): Task[List[Operation]]
 
-  def getNoOperationTime: Long
+  def getNoOperationTime: Task[Long]
 
   def getInfo(getInfoType: GetInfoType): Task[GetInfoValue]
 }

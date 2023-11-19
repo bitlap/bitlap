@@ -25,11 +25,19 @@ import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
+import org.bitlap.server.config.BitlapConfiguration
+
+import zio.*
 
 /** Bitlap operation implementation on a single machine
  */
-final class SimpleOperation(parentSession: Session, opType: OperationType, hasResultSet: Boolean = false)
-    extends Operation(parentSession, opType, hasResultSet)
+final class SimpleOperation(
+  parentSession: Session,
+  opType: OperationType,
+  hasResultSet: Boolean = false
+)(
+  globalConfig: BitlapConfiguration)
+    extends Operation(parentSession, opType, hasResultSet, globalConfig)
     with BitlapSerde {
 
   def mapTo(rs: ResultSet): QueryResultSet = {
@@ -70,21 +78,26 @@ final class SimpleOperation(parentSession: Session, opType: OperationType, hasRe
     )
   }
 
-  override def run(): Unit = {
-    super.setState(OperationState.RunningState)
-    try {
-      val execution = new QueryExecution(statement, parentSession.currentSchema).execute()
-      execution match
-        case DefaultQueryResult(data, currentSchema) =>
-          parentSession.currentSchema = currentSchema
-          cache.put(opHandle, mapTo(data))
-        case _ =>
-      super.setState(OperationState.FinishedState)
-    } catch {
-      case e: Exception =>
-        super.setState(OperationState.ErrorState)
-        throw e
-    }
+  override def run(): Task[Unit] = {
+    for {
+      _ <- ZIO.attemptBlocking(super.setState(OperationState.RunningState))
+      currentSchemaRef <- parentSession.currentSchemaRef.getAndUpdate { schema =>
+        try {
+          val execution = new QueryExecution(statement, schema.get()).execute()
+          execution match
+            case DefaultQueryResult(data, currentSchema) =>
+              schema.set(currentSchema)
+              cache.put(opHandle, this.mapTo(data))
+            case _ =>
+          super.setState(OperationState.FinishedState)
+        } catch {
+          case e: Exception =>
+            super.setState(OperationState.ErrorState)
+            throw e
+        }
+        schema
+      }
+    } yield ()
   }
 
 }

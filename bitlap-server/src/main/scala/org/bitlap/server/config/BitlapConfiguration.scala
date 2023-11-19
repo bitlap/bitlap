@@ -66,7 +66,8 @@ final case class BitlapConfiguration(underlayConf: BitlapConf):
 
   val sessionConfig: BitlapSessionConfig = BitlapSessionConfig(
     Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_PERIOD), TimeUnit.MILLISECONDS),
-    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS)
+    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_INTERVAL), TimeUnit.MILLISECONDS),
+    Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_SQL), TimeUnit.MILLISECONDS)
   )
 
 end BitlapConfiguration

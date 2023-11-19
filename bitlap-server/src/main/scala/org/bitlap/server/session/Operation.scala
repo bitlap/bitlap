@@ -25,18 +25,23 @@ import org.bitlap.network.enumeration.{ OperationState, OperationType }
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models.*
+import org.bitlap.server.config.BitlapConfiguration
 
 import com.typesafe.scalalogging.LazyLogging
 
+import zio.Task
+
 /** Bitlap operation
  */
-abstract class Operation(val parentSession: Session, val opType: OperationType, val hasResultSet: Boolean = false)
+abstract class Operation(
+  val parentSession: Session,
+  val opType: OperationType,
+  val hasResultSet: Boolean = false,
+  globalConfig: BitlapConfiguration)
     extends LazyLogging {
 
   @volatile var state: OperationState = OperationState.InitializedState
-  val beginTime                       = System.currentTimeMillis()
-  @volatile var lastAccessTime        = beginTime
-  var operationTimeout                = 3000L // TODO (config)
+  @volatile var lastAccessTime: Long  = System.currentTimeMillis()
   var statement: String               = _
 
   lazy val opHandle: OperationHandle                = OperationHandle(opType, hasResultSet)
@@ -49,8 +54,9 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
     mutable.HashMap()
 
   private lazy val opTerminateMonitorLatch: CountDownLatch = new CountDownLatch(1)
+  private lazy val operationTimeout                        = globalConfig.sessionConfig.sql.toMillis
 
-  def run(): Unit
+  def run(): Task[Unit]
 
   def remove(operationHandle: OperationHandle) =
     cache.remove(operationHandle)
@@ -61,7 +67,7 @@ abstract class Operation(val parentSession: Session, val opType: OperationType, 
   def getResultSetSchema(): TableSchema =
     cache.get(opHandle).map(_.tableSchema).getOrElse(TableSchema())
 
-  def setState(operationState: OperationState): OperationState = {
+  def setState(operationState: OperationState): OperationState = this.synchronized {
     state.validateTransition(operationState)
     val prevState = state
     this.lastAccessTime = System.currentTimeMillis

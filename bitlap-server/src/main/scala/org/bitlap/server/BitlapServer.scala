@@ -33,12 +33,13 @@ object BitlapServer extends ZIOAppDefault:
   // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
     (for {
-      args         <- getArgs
-      t1           <- RaftServerEndpoint.service(args.toList).fork
-      t2           <- GrpcServerEndpoint.service(args.toList).fork
-      t3           <- HttpServerEndpoint.service(args.toList).fork
-      serverConfig <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
-      _ <- SessionManager
+      args           <- getArgs
+      t1             <- RaftServerEndpoint.service(args.toList).fork
+      t2             <- GrpcServerEndpoint.service(args.toList).fork
+      t3             <- HttpServerEndpoint.service(args.toList).fork
+      serverConfig   <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
+      sessionManager <- ZIO.service[SessionManager]
+      _ <- sessionManager
         .startListener()
         .repeat(Schedule.fixed(ZDuration.fromScala(serverConfig.interval)))
         .forkDaemon

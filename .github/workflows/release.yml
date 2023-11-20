@@ -37,7 +37,7 @@ jobs:
   
   ci:
     runs-on: ubuntu-latest
-    needs: [ build, publish ]
+    needs: [ publish ]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

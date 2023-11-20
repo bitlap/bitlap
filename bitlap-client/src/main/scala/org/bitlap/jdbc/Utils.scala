@@ -37,8 +37,7 @@ object Utils:
       throw BitlapJdbcUriParseException(s"Bad URL format: Missing prefix " + URL_PREFIX)
     val dummyAuthorityString = "dummyhost:00000"
     val suppliedAuthorities  = getAuthorities(uri)
-    println("Supplied authorities: " + suppliedAuthorities)
-    val authorityList = suppliedAuthorities.split(",")
+    val authorityList        = suppliedAuthorities.split(",")
     connParams.authorityList = authorityList
     uri = uri.replace(suppliedAuthorities, dummyAuthorityString)
 
@@ -120,7 +119,7 @@ object Utils:
       initSqlList = getInitSql(sb.toString)
     catch
       case e: IOException =>
-        throw new BitlapSQLException(msg = "Invalid sql syntax in initFile", cause = Option(e))
+        throw BitlapSQLException(msg = "Invalid sql syntax in initFile", cause = Option(e))
     finally if br != null then br.close()
     initSqlList
 

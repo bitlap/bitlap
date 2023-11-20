@@ -15,6 +15,8 @@
  */
 package org.bitlap.server
 
+import java.util.Vector as JVector
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.Nullable
 
@@ -23,8 +25,10 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.exception.BitlapIllegalStateException
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
+import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.protocol.impl.*
 import org.bitlap.server.config.*
+import org.bitlap.server.session.{ Operation, Session }
 
 import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.option.CliOptions
@@ -40,7 +44,10 @@ final case class BitlapGlobalContext(
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  asyncRef: Ref[Option[Async]]) {
+  asyncRef: Ref[Option[Async]],
+  sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
+  operationHandleVector: Ref[JVector[OperationHandle]],
+  operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]) {
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
@@ -121,13 +128,26 @@ object BitlapGlobalContext:
 
   lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapGlobalContext] = ZLayer.fromZIO {
     for {
-      grpcStart        <- Promise.make[Throwable, Boolean]
-      raftStart        <- Promise.make[Throwable, Boolean]
-      cliClientService <- Ref.make(new CliClientServiceImpl)
-      node             <- Ref.make(Option.empty[Node])
-      async            <- Ref.make(Option.empty[Async])
-      config           <- ZIO.service[BitlapConfiguration]
-    } yield BitlapGlobalContext(config, grpcStart, raftStart, cliClientService, node, async)
+      grpcStart             <- Promise.make[Throwable, Boolean]
+      raftStart             <- Promise.make[Throwable, Boolean]
+      cliClientService      <- Ref.make(new CliClientServiceImpl)
+      node                  <- Ref.make(Option.empty[Node])
+      async                 <- Ref.make(Option.empty[Async])
+      config                <- ZIO.service[BitlapConfiguration]
+      SessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
+      OperationHandleVector <- Ref.make(JVector[OperationHandle]())
+      OperationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
+    } yield BitlapGlobalContext(
+      config,
+      grpcStart,
+      raftStart,
+      cliClientService,
+      node,
+      async,
+      SessionStoreMap,
+      OperationHandleVector,
+      OperationStoreMap
+    )
   }
 
 end BitlapGlobalContext

@@ -32,7 +32,7 @@ private[config] final case class BitlapHttpConfig(port: Int, threads: Int)
 
 /** Session Configurations
  */
-private[config] final case class BitlapSessionConfig(timeout: Duration, interval: Duration)
+private[config] final case class BitlapSessionConfig(timeout: Duration, interval: Duration, sql: Duration)
 
 /** Raft Configurations
  */

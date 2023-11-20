@@ -42,11 +42,13 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): Task[SessionHandle] =
-    sessionManager.openSession(username, password, configuration).map { session =>
-      session.currentSchema = configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB)
-      session.sessionHandle
+  ): Task[SessionHandle] = for {
+    session <- sessionManager.openSession(username, password, configuration)
+    _ <- session.currentSchemaRef.updateAndGet { currentSchema =>
+      currentSchema.set(configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB))
+      currentSchema
     }
+  } yield session.sessionHandle
 
   override def closeSession(sessionHandle: SessionHandle): Task[Unit] =
     sessionManager.closeSession(sessionHandle)
@@ -59,20 +61,18 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
   ): Task[OperationHandle] =
     sessionManager
       .getSession(sessionHandle)
-      .mapAttempt { session =>
-        try
-          session.executeStatement(
-            statement,
-            confOverlay,
-            queryTimeout
-          )
-        catch {
+      .flatMap {
+        _.executeStatement(
+          statement,
+          confOverlay,
+          queryTimeout
+        ).mapError {
           case bitlapException: BitlapException =>
             logger.error(s"Internal Error: $statement", bitlapException)
-            throw bitlapException
+            bitlapException
           case e: Throwable =>
             logger.error(s"Unknown Error: $statement", e)
-            throw BitlapException(s"Unknown Error: ${e.getLocalizedMessage}", cause = Option(e))
+            BitlapException(s"Unknown Error: ${e.getLocalizedMessage}", cause = Option(e))
         }
       }
 
@@ -96,7 +96,7 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
     sessionManager
       .getOperation(opHandle)
-      .map { operation =>
+      .flatMap { operation =>
         val session = operation.parentSession
         session.cancelOperation(opHandle)
       }
@@ -104,7 +104,7 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] =
     sessionManager
       .getOperation(opHandle)
-      .map { operation =>
+      .flatMap { operation =>
         val session = operation.parentSession
         session.closeOperation(opHandle)
       }

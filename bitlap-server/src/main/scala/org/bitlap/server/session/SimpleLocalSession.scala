@@ -15,8 +15,11 @@
  */
 package org.bitlap.server.session
 
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.Vector as JVector
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong, AtomicReference }
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
@@ -26,6 +29,8 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.server.BitlapGlobalContext
+import org.bitlap.server.config.BitlapConfiguration
 
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.StrictLogging
@@ -37,49 +42,41 @@ import zio.{ System as _, * }
 final class SimpleLocalSession(
   val username: String,
   val password: String,
-  _sessionConf: Map[String, String],
   val sessionManager: SessionManager,
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
-  val sessionState: AtomicBoolean = new AtomicBoolean(false),
-  val creationTime: Long = System.currentTimeMillis())
+  val sessionConfRef: Ref[mutable.Map[String, String]],
+  val sessionStateRef: Ref[AtomicBoolean],
+  val creationTimeRef: Ref[AtomicLong],
+  val lastAccessTimeRef: Ref[AtomicLong],
+  val currentSchemaRef: Ref[AtomicReference[String]]
+)(using
+  sessionStoreMap: ConcurrentHashMap[SessionHandle, Session],
+  operationHandleVector: JVector[OperationHandle],
+  operationStoreMap: ConcurrentHashMap[OperationHandle, Operation],
+  globalConfig: BitlapConfiguration)
     extends Session
     with StrictLogging {
-
-  private[session] var _lastAccessTime: Long = _
-
-  private[session] var _currentSchema: String = _
-
-  override def lastAccessTime: Long = _lastAccessTime
-
-  override def lastAccessTime_=(time: Long): Unit = _lastAccessTime = time
-
-  override def sessionConf: BitlapConf = org.bitlap.core.BitlapContext.bitlapConf.clone(_sessionConf)
-
-  override def currentSchema: String = _currentSchema
-
-  override def currentSchema_=(schema: String): Unit = _currentSchema = schema
-
-  override def open(): Unit = {
-    this.sessionState.compareAndSet(false, true)
-    _lastAccessTime = System.currentTimeMillis()
-    _currentSchema = Database.DEFAULT_DATABASE
-  }
 
   override def executeStatement(
     statement: String,
     confOverlay: Map[String, String]
-  ): OperationHandle =
-    newExecuteStatementOperation(
-      this,
-      statement,
-      _sessionConf ++ confOverlay
-    ).opHandle
+  ): Task[OperationHandle] =
+    for {
+      sc <- sessionConfRef.get
+      re <-
+        newExecuteStatementOperation(
+          this,
+          statement,
+          sc ++ confOverlay
+        ).map(_.opHandle)
+
+    } yield re
 
   override def executeStatement(
     statement: String,
     confOverlay: Map[String, String],
     queryTimeout: Long
-  ): OperationHandle =
+  ): Task[OperationHandle] =
     executeStatement(statement, confOverlay)
 
   override def fetchResults(
@@ -96,36 +93,38 @@ final class SimpleLocalSession(
   ): Task[TableSchema] =
     sessionManager.getOperation(operationHandle).map(_.getResultSetSchema())
 
-  override def closeOperation(operationHandle: OperationHandle): Unit =
-    this.synchronized {
-      val op = SessionManager.OperationStoreMap.getOrDefault(operationHandle, null)
-      if op != null then {
-        op.setState(OperationState.ClosedState)
-        removeOperation(operationHandle)
-      }
-    }
-
-  override def cancelOperation(operationHandle: OperationHandle): Unit =
-    this.synchronized {
-      val op = SessionManager.OperationStoreMap.getOrDefault(operationHandle, null)
-      if op != null then {
-        if op.state.terminal then {
-          logger.info(s"$operationHandle Operation is already aborted in state - ${op.state}")
-        } else {
-          logger.info(s"$operationHandle Attempting to cancel from state - ${op.state}")
-          op.setState(OperationState.CanceledState)
+  override def closeOperation(operationHandle: OperationHandle): Task[Unit] =
+    for {
+      re <- ZIO.attemptBlocking {
+        val op = operationStoreMap.getOrDefault(operationHandle, null)
+        {
+          op.setState(OperationState.ClosedState)
           removeOperation(operationHandle)
+        }.unless(op == null)
+      }
+    } yield ()
+
+  override def cancelOperation(operationHandle: OperationHandle): Task[Unit] =
+    for {
+      re <- ZIO.attemptBlocking {
+        val op = operationStoreMap.getOrDefault(operationHandle, null)
+        if op != null then {
+          if op.state.terminal then {
+            ZIO.logInfo(s"$operationHandle Operation is already aborted in state - ${op.state}")
+          } else {
+            op.setState(OperationState.CanceledState)
+            ZIO.logInfo(s"$operationHandle Attempting to cancel from state - ${op.state}") *> removeOperation(
+              operationHandle
+            ).unit
+          }
         }
       }
-    }
+    } yield re
 
-  override def removeExpiredOperations(handles: List[OperationHandle]): List[Operation] = {
-    val removed = new ListBuffer[Operation]()
-    for handle <- handles do {
-      val operation = removeTimedOutOperation(handle)
-      operation.foreach(f => removed.append(f))
-    }
-    removed.toList
+  override def removeExpiredOperations(handles: List[OperationHandle]): Task[List[Operation]] = {
+    ZIO.blocking(
+      ZIO.foreach(handles)(handle => removeTimedOutOperation(handle)).map(_.map(_.toList)).map(_.flatten)
+    )
   }
 
   /** Create an operation for the SQL and execute it. For now, we put the results in memory by Map.
@@ -134,56 +133,58 @@ final class SimpleLocalSession(
     parentSession: Session,
     statement: String,
     confOverlay: scala.collection.Map[String, String] = Map.empty
-  ): Operation = {
+  ): Task[Operation] = ZIO.attempt {
     val operation = new SimpleOperation(
       parentSession,
       OperationType.ExecuteStatement,
       hasResultSet = true
-    )
+    )(globalConfig)
     confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
-    this.synchronized {
-      SessionManager.OperationHandleVector.add(operation.opHandle)
-      SessionManager.OperationStoreMap.put(operation.opHandle, operation)
-    }
+    operationHandleVector.add(operation.opHandle)
+    operationStoreMap.put(operation.opHandle, operation)
     operation.statement = statement
-    operation.run()
-    operation
-  }
+    operation.run().as(operation)
+  }.flatten
 
-  private def removeOperation(operationHandle: OperationHandle): Option[Operation] =
-    this.synchronized {
-      val r = SessionManager.OperationStoreMap.remove(operationHandle)
-      SessionManager.OperationHandleVector.remove(operationHandle)
+  private def removeOperation(operationHandle: OperationHandle): Task[Option[Operation]] =
+    ZIO.attemptBlocking {
+      val r = operationStoreMap.remove(operationHandle)
+      operationHandleVector.remove(operationHandle)
       Option(r)
     }
 
-  private def removeTimedOutOperation(operationHandle: OperationHandle): Option[Operation] = {
-    val operation = SessionManager.OperationStoreMap.get(operationHandle)
+  private def removeTimedOutOperation(operationHandle: OperationHandle): Task[Option[Operation]] = {
+    val operation = operationStoreMap.get(operationHandle)
     if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
-      return removeOperation(operationHandle)
-    }
-    Option(operation)
+      removeOperation(operationHandle)
+    } else ZIO.succeed(Option(operation))
   }
 
-  override def getNoOperationTime: Long = {
-    val noMoreOpHandle = SessionManager.OperationHandleVector.isEmpty
-    if noMoreOpHandle then System.currentTimeMillis - _lastAccessTime
-    else 0
+  override def getNoOperationTime: Task[Long] = {
+    for {
+      lt <- lastAccessTimeRef.get.map(_.get())
+      re <- ZIO.attempt {
+        val noMoreOpHandle = operationHandleVector.isEmpty
+        if noMoreOpHandle then System.currentTimeMillis - lt
+        else 0
+      }
+    } yield re
   }
 
   override def getInfo(getInfoType: GetInfoType): Task[GetInfoValue] =
-    ZIO.succeed(
+    ZIO.attempt {
       getInfoType match {
         case ServerName =>
-          GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+          Some(GetInfoValue(ByteString.copyFromUtf8("Bitlap")))
         case ServerConf =>
-          GetInfoValue(ByteString.copyFromUtf8(org.bitlap.core.BitlapContext.bitlapConf.toJson))
+          Some(GetInfoValue(ByteString.copyFromUtf8(org.bitlap.core.BitlapContext.bitlapConf.toJson)))
         case DbmsName =>
-          GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+          Some(GetInfoValue(ByteString.copyFromUtf8("Bitlap")))
         case DbmsVer =>
-          GetInfoValue(ByteString.copyFromUtf8(BitlapVersionInfo.getVersion))
-        case _ =>
-          throw BitlapSQLException("Unrecognized GetInfoType value: " + getInfoType.toString)
+          Some(GetInfoValue(ByteString.copyFromUtf8(BitlapVersionInfo.getVersion)))
+        case _ => None
       }
+    }.someOrFail(
+      BitlapSQLException("Unrecognized GetInfoType value: " + getInfoType.toString)
     )
 }

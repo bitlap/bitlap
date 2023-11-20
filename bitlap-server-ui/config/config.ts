@@ -5,7 +5,7 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const ip = require("ip");
+const ip = require('ip');
 const { REACT_APP_ENV = 'dev', BITLAP_DEBUG = 'false', USER } = process.env;
 
 export default defineConfig({
@@ -17,7 +17,7 @@ export default defineConfig({
     REACT_APP_ENV,
     BITLAP_DEBUG: BITLAP_DEBUG,
     BITLAP_IP: ip.address(),
-    BITLAP_USER: USER
+    BITLAP_USER: USER,
   },
 
   /**
@@ -152,7 +152,5 @@ export default defineConfig({
   // },
   mfsu: false,
   requestRecord: {},
-  favicons: [
-    '/logo.png'
-  ]
+  favicons: ['/logo.png'],
 });

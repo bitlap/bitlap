@@ -17,8 +17,13 @@ const Footer: React.FC = () => {
         background: 'none',
       }}
       copyright={
-        <span>{currentYear} {defaultMessage}, Licensed under the
-          <a href='https://www.apache.org/licenses/' target='_blank' rel="noopener noreferrer">
+        <span>
+          {currentYear} {defaultMessage}, Licensed under the
+          <a
+            href="https://www.apache.org/licenses/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Apache License, Version 2.0.
           </a>
         </span>

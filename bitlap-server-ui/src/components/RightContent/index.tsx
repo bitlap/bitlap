@@ -1,17 +1,24 @@
-import { HeartTwoTone, QuestionCircleOutlined, EyeOutlined, EyeInvisibleOutlined, GithubFilled } from '@ant-design/icons';
+import {
+  HeartTwoTone,
+  QuestionCircleOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  GithubFilled,
+} from '@ant-design/icons';
 import { SelectLang as UmiSelectLang } from '@umijs/max';
 import React, { useState } from 'react';
-import ReactMarkdown from "react-markdown";
-import { Modal } from "antd";
+import ReactMarkdown from 'react-markdown';
+import { Modal } from 'antd';
 import './index.less';
 
 export type SiderTheme = 'light' | 'dark';
 
 export const MenuVisible = () => {
-  const localStorageEnable = navigator.cookieEnabled && typeof window.localStorage !== 'undefined'
-  let visible = "false";
+  const localStorageEnable =
+    navigator.cookieEnabled && typeof window.localStorage !== 'undefined';
+  let visible = 'false';
   if (localStorageEnable) {
-    visible = window.localStorage.getItem("BITLAP_MENU_VISIBLE") || "false"
+    visible = window.localStorage.getItem('BITLAP_MENU_VISIBLE') || 'false';
   }
   return (
     <div
@@ -23,21 +30,22 @@ export const MenuVisible = () => {
       onClick={() => {
         if (localStorageEnable) {
           // window.localStorage.setItem('umi_locale', lang || '');
-          let visible = window.localStorage.getItem("BITLAP_MENU_VISIBLE") || "false"
-          if (visible === "true") {
-            visible = "false"
+          let visible =
+            window.localStorage.getItem('BITLAP_MENU_VISIBLE') || 'false';
+          if (visible === 'true') {
+            visible = 'false';
           } else {
-            visible = "true"
+            visible = 'true';
           }
-          window.localStorage.setItem("BITLAP_MENU_VISIBLE", visible)
-          window.location.reload()
+          window.localStorage.setItem('BITLAP_MENU_VISIBLE', visible);
+          window.location.reload();
         }
       }}
     >
-      { visible === "true" ? <EyeOutlined /> : <EyeInvisibleOutlined /> }
+      {visible === 'true' ? <EyeOutlined /> : <EyeInvisibleOutlined />}
     </div>
   );
-}
+};
 
 export const SelectLang = () => {
   return (
@@ -70,10 +78,8 @@ export const Github = () => {
       key="GithubFilled"
       onClick={() => window.open('https://github.com/bitlap/bitlap')}
     />
-  )
-}
-
-
+  );
+};
 
 const markdown = `
 
@@ -81,7 +87,7 @@ const markdown = `
 
 ---
 
-`
+`;
 
 export const UpdateLogs = () => {
   const [open, setOpen] = useState(false);
@@ -95,7 +101,7 @@ export const UpdateLogs = () => {
           height: 26,
         }}
         onClick={() => {
-          setOpen(true)
+          setOpen(true);
         }}
       >
         <HeartTwoTone twoToneColor="#eb2f96" />
@@ -113,5 +119,4 @@ export const UpdateLogs = () => {
       </Modal>
     </>
   );
-}
-
+};

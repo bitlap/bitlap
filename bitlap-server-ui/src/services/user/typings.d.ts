@@ -1,6 +1,4 @@
 // @ts-ignore
 /* eslint-disable */
 
-declare namespace API {
-
-}
+declare namespace API {}

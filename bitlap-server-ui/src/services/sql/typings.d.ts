@@ -1,7 +1,7 @@
 declare namespace API {
-  type RunSqlResult  = {
+  type RunSqlResult = {
     resultCode?: number;
     errorMessage?: string;
     data?: { list: [any] };
-  }
+  };
 }

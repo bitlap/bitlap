@@ -5,12 +5,21 @@
 
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
-import { Github, MenuVisible, Question, SelectLang, UpdateLogs } from '@/components/RightContent';
+import {
+  Github,
+  MenuVisible,
+  Question,
+  SelectLang,
+  UpdateLogs,
+} from '@/components/RightContent';
 import { RunTimeLayoutConfig } from '@@/plugin-layout/types';
 import defaultSettings from '../config/defaultSettings';
 import { requestConfig } from './request';
 import Footer from '@/components/Footer';
-import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
+import {
+  AvatarDropdown,
+  AvatarName,
+} from './components/RightContent/AvatarDropdown';
 
 const loginPath = '/pages/user/login';
 
@@ -26,15 +35,17 @@ export async function getInitialState(): Promise<{
       return {
         id: BITLAP_IP,
         name: BITLAP_USER || BITLAP_IP,
-        avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+        avatar:
+          'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       };
     }
     // return undefined;
     return {
       name: 'admin',
-      avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+      avatar:
+        'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     };
-  }
+  };
 
   // 如果不是登录页面，执行
   if (location.pathname !== loginPath) {
@@ -51,8 +62,11 @@ export async function getInitialState(): Promise<{
   };
 }
 
-export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
-  const currentUser = initialState?.currentUser
+export const layout: RunTimeLayoutConfig = ({
+  initialState,
+  setInitialState,
+}) => {
+  const currentUser = initialState?.currentUser;
   return {
     ...initialState?.settings,
     // 去掉面包屑
@@ -73,12 +87,16 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     actionsRender: () => [
       <Question key="Question" />,
       <Github key="Github" />,
-      <SelectLang key="SelectLang" />
+      <SelectLang key="SelectLang" />,
     ],
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath && BITLAP_DEBUG !== 'true') {
+      if (
+        !initialState?.currentUser &&
+        location.pathname !== loginPath &&
+        BITLAP_DEBUG !== 'true'
+      ) {
         // history.push(loginPath);
       }
     },
@@ -108,8 +126,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
   };
 };
-
-
 
 /**
  * @name request 配置，可以配置错误处理

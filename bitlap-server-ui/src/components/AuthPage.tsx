@@ -1,15 +1,20 @@
 import React from 'react';
-import { PageContainer } from "@ant-design/pro-components";
-import { useModel } from "@umijs/max";
-import {Result} from "antd";
+import { PageContainer } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
+import { Result } from 'antd';
 
 export type AuthPageProps = {
   title?: boolean;
   auth?: boolean;
   children?: React.ReactNode;
-}
+};
 
-const AuthPage: React.FC<AuthPageProps> = ({ title, auth, children, ...restProps }) => {
+const AuthPage: React.FC<AuthPageProps> = ({
+  title,
+  auth,
+  children,
+  ...restProps
+}) => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
 
@@ -18,13 +23,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ title, auth, children, ...restProps
   // > 2. 页面不控制权限
   // > 3. 当前登录用户有 admin 角色
   if (!auth || BITLAP_DEBUG === 'true' || currentUser?.name === 'admin') {
-    return <PageContainer title={title} {...restProps}>{children}</PageContainer>
+    return (
+      <PageContainer title={title} {...restProps}>
+        {children}
+      </PageContainer>
+    );
   }
-  return <Result
-    status="403"
-    title="403"
-    subTitle="暂无权限，请联系相关负责人添加权限。"
-  />
+  return (
+    <Result
+      status="403"
+      title="403"
+      subTitle="暂无权限，请联系相关负责人添加权限。"
+    />
+  );
 };
 
 export default AuthPage;

@@ -1,11 +1,15 @@
-import {history} from 'umi';
-import {PageContainer} from '@ant-design/pro-components';
-import {useModel} from '@umijs/max';
-import {Avatar, Card, theme, Typography, Col, Row, Alert} from 'antd';
-import React, {useEffect, useState} from 'react';
-import {EllipsisOutlined, HeartTwoTone, SmileTwoTone} from "@ant-design/icons";
+import { history } from 'umi';
+import { PageContainer } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
+import { Avatar, Card, theme, Typography, Col, Row, Alert } from 'antd';
+import React, { useEffect, useState } from 'react';
+import {
+  EllipsisOutlined,
+  HeartTwoTone,
+  SmileTwoTone,
+} from '@ant-design/icons';
 // import Marquee from "react-fast-marquee"; // 横幅
-import AuthPage from "@/components/AuthPage";
+import AuthPage from '@/components/AuthPage';
 
 /**
  * 每个单独的卡片，为了复用样式抽成了组件
@@ -17,10 +21,10 @@ const InfoCard: React.FC<{
   index: number;
   desc: string;
   href: string;
-}> = ({title, href, index, desc}) => {
-  const {useToken} = theme;
+}> = ({ title, href, index, desc }) => {
+  const { useToken } = theme;
 
-  const {token} = useToken();
+  const { token } = useToken();
 
   return (
     <div
@@ -88,8 +92,8 @@ const InfoCard: React.FC<{
 };
 
 const Welcome: React.FC = () => {
-  const {token} = theme.useToken();
-  const {initialState} = useModel('@@initialState');
+  const { token } = theme.useToken();
+  const { initialState } = useModel('@@initialState');
 
   return (
     <AuthPage title={false}>
@@ -122,8 +126,8 @@ const Welcome: React.FC = () => {
             欢迎使用 Bitlap 平台
           </div>
         </div>
-        <Typography.Title level={2} style={{textAlign: 'center'}}>
-          <SmileTwoTone/> Bitlap <HeartTwoTone twoToneColor="#eb2f96"/> You
+        <Typography.Title level={2} style={{ textAlign: 'center' }}>
+          <SmileTwoTone /> Bitlap <HeartTwoTone twoToneColor="#eb2f96" /> You
         </Typography.Title>
       </Card>
     </AuthPage>

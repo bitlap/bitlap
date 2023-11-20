@@ -6,10 +6,19 @@ import classNames from 'classnames';
 
 export type HeaderDropdownProps = {
   overlayClassName?: string;
-  placement?: 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topCenter' | 'topRight' | 'bottomCenter';
+  placement?:
+    | 'bottomLeft'
+    | 'bottomRight'
+    | 'topLeft'
+    | 'topCenter'
+    | 'topRight'
+    | 'bottomCenter';
 } & Omit<DropDownProps, 'overlay'>;
 
-const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, ...restProps }) => {
+const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
+  overlayClassName: cls,
+  ...restProps
+}) => {
   const className = useEmotionCss(({ token }) => {
     return {
       [`@media screen and (max-width: ${token.screenXS})`]: {
@@ -17,7 +26,13 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, 
       },
     };
   });
-  return <Dropdown overlayClassName={classNames(className, cls)} {...restProps} placement={'top'}/>;
+  return (
+    <Dropdown
+      overlayClassName={classNames(className, cls)}
+      {...restProps}
+      placement={'top'}
+    />
+  );
 };
 
 export default HeaderDropdown;

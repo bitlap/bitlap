@@ -10,8 +10,7 @@
  * @doc https://umijs.org/docs/guides/proxy
  */
 export default {
-
-    /**
+  /**
    * @name 详细的代理配置
    * @doc https://github.com/chimurai/http-proxy-middleware
    */
@@ -32,7 +31,6 @@ export default {
       // pathRewrite: {'^/prefix/v1' : ''}
     },
   },
-
 
   test: {
     '/api/v1': {

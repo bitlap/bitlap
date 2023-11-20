@@ -9,9 +9,9 @@
     "setup": "max setup",
     "start": "cross-env BITLAP_DEBUG=true REACT_APP_ENV=local UMI_ENV=local max dev",
     "start:dev": "cross-env  PORT=8080 REACT_APP_ENV=dev  UMI_ENV=dev HMR=none max dev",
-    "start:test": "cross-env PORT=8080 REACT_APP_ENV=test UMI_ENV=dev HMR=none max dev",
+    "start:prod": "cross-env PORT=8080 REACT_APP_ENV=prod UMI_ENV=dev HMR=none max dev",
     "start:stg": "cross-env  PORT=8080 REACT_APP_ENV=stg  UMI_ENV=dev HMR=none max dev",
-    "start:prod": "cross-env PORT=8080 REACT_APP_ENV=prod UMI_ENV=dev HMR=none max dev"
+    "start:test": "cross-env PORT=8080 REACT_APP_ENV=test UMI_ENV=dev HMR=none max dev"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
@@ -25,6 +25,8 @@
     "@ant-design/pro-components": "^2.3.57",
     "@ant-design/pro-utils": "^2.8.5",
     "@ant-design/use-emotion-css": "1.0.4",
+    "@codemirror/lang-sql": "^6.3.3",
+    "@codemirror/language": "^6.3.1",
     "@umijs/route-utils": "^2.2.2",
     "antd": "^5.2.2",
     "classnames": "^2.3.2",
@@ -37,8 +39,6 @@
     "react-dev-inspector": "^1.8.4",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^1.3.0",
-    "@codemirror/lang-sql": "^6.3.3",
-    "@codemirror/language": "^6.3.1",
     "umi-request": "^1.4.0",
     "use-url-search-params": "^2.5.1"
   },

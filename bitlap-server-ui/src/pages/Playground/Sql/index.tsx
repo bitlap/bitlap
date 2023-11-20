@@ -6,9 +6,15 @@ import { sql } from '@codemirror/lang-sql';
 import { Button, Spin } from 'antd';
 import { EditorView } from '@codemirror/view';
 import { runSql } from '@/services/sql';
-import AuthPage from "@/components/AuthPage";
+import AuthPage from '@/components/AuthPage';
 
-const sqlQuery = async (editor: EditorView, sqlText: string, setColumns: any, setData: any, setLoad) => {
+const sqlQuery = async (
+  editor: EditorView,
+  sqlText: string,
+  setColumns: any,
+  setData: any,
+  setLoad,
+) => {
   if (!sqlText.trim()) return;
   setLoad(true);
   let sql = sqlText;
@@ -22,9 +28,15 @@ const sqlQuery = async (editor: EditorView, sqlText: string, setColumns: any, se
   const data = res?.data || [];
 
   // @ts-ignore
-  setColumns(data?.columns?.map(c => ({ title: c.name, dataIndex: c.name, valueType: 'text'})) || [])
+  setColumns(
+    data?.columns?.map((c) => ({
+      title: c.name,
+      dataIndex: c.name,
+      valueType: 'text',
+    })) || [],
+  );
   // @ts-ignore
-  setData(data?.rows?.map(r => r.cells) || []);
+  setData(data?.rows?.map((r) => r.cells) || []);
   setLoad(false);
 };
 
@@ -41,7 +53,9 @@ const SqlPage: React.FC = () => {
       <Button
         type="primary"
         size="small"
-        onClick={() => sqlQuery(editor!!, sqlText, setColumns, setData, setLoad)}
+        onClick={() =>
+          sqlQuery(editor!!, sqlText, setColumns, setData, setLoad)
+        }
       >
         运行
       </Button>

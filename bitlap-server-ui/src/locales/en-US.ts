@@ -14,7 +14,8 @@ export default {
   'app.copyright.produced': 'Produced by bitlap.org',
   'app.preview.down.block': 'Download this page to your local project',
   'app.welcome.link.fetch-blocks': 'Get all block',
-  'app.welcome.link.block-list': 'Quickly build standard, pages based on `block` development',
+  'app.welcome.link.block-list':
+    'Quickly build standard, pages based on `block` development',
   ...globalHeader,
   ...menu,
   ...settingDrawer,

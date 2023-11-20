@@ -3,8 +3,8 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      release_image_version:
-        description: 'Release Docker Image'
+      publish_image_version:
+        description: 'Publish Image To hub.docker.com'
         default: 'X.X.X'
         required: true
 jobs:
@@ -23,7 +23,7 @@ jobs:
           cache: 'maven'
 
       - name: Docker Build
-        run: bash deploy.sh ${{ github.event.inputs.release_image_version }}
+        run: bash deploy.sh ${{ github.event.inputs.publish_image_version }}
         working-directory: ./docker
 
   publish:
@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Push
-        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ github.event.inputs.release_image_version }}
+        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ github.event.inputs.publish_image_version }}
   
   ci:
     runs-on: ubuntu-latest

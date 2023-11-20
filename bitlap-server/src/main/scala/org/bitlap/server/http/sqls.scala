@@ -15,8 +15,6 @@
  */
 package org.bitlap.server.http
 
-import scala.jdk.CollectionConverters.ListHasAsScala
-
 import org.bitlap.common.utils.internal.DBTable
 
 /** Wrapping sql data for queries

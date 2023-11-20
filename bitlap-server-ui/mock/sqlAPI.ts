@@ -19,7 +19,7 @@ export default {
   'POST /api/sql/run': (req: any, res: any) => {
     res.json({
       resultCode: 0,
-      data: rows
+      data: rows,
     });
   },
 };

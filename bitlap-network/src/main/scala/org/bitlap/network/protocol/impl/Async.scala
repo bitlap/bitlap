@@ -49,7 +49,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
    */
-  private inline def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] = ZLayer.scoped {
+  private def leaderClientLayer = ZLayer.scoped {
     for {
       leaderLayer <- DriverServiceClient.scoped(
         scalapb.zio_grpc.ZManagedChannel(builder =

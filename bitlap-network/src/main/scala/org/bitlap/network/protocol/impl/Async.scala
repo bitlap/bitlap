@@ -40,8 +40,8 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
 
   private val addr = serverPeers.asServerAddresses
 
-  private val clientRef: AtomicReference[DriverServiceClient] =
-    new AtomicReference[DriverServiceClient](null)
+  private val addRef: AtomicReference[ServerAddress] =
+    new AtomicReference[ServerAddress](null)
 
   /** Based on the configured service cluster, obtain its leader and construct
    *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
@@ -49,40 +49,41 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
    */
-  private def leaderClientLayer = ZLayer.scoped {
-    for {
-      leaderLayer <- DriverServiceClient.scoped(
-        scalapb.zio_grpc.ZManagedChannel(builder =
-          ManagedChannelBuilder
-            .forAddress(addr.head.ip, addr.head.port)
-            .usePlaintext()
-            .asInstanceOf[ManagedChannelBuilder[?]]
-        )
+  private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] =
+    ZLayer.make[DriverServiceClient](
+      Scope.default,
+      ZLayer.fromZIO(
+        for {
+          leaderLayer <-
+            if (addRef.get() == null) {
+              clientLayer(addr.head.ip, addr.head.port)
+                .flatMap(leaderLayer =>
+                  leaderLayer
+                    .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
+                    .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port)))
+                    .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+                )
+                .flatMap(address => clientLayer(address.ip, address.port) <* ZIO.succeed(addRef.set(address)))
+            } else clientLayer(addRef.get().ip, addRef.get().port)
+        } yield leaderLayer
       )
-      leaderClient <-
-        if (clientRef.get() == null) {
-          leaderLayer
-            .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
-            .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port)))
-            .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
-            .tap(ly =>
-              ZIO.succeed {
-                clientRef.set(leaderLayer)
-              }
-            ) *> ZIO.succeed(leaderLayer)
-        } else {
-          ZIO.succeed(clientRef.get())
-        }
-    } yield leaderClient
+    )
 
-  }
+  /** Get grpc channel based on IP:PORT.
+   */
+  private def clientLayer(ip: String, port: Int): ZIO[Scope, Throwable, DriverServiceClient] =
+    DriverServiceClient.scoped(
+      scalapb.zio_grpc.ZManagedChannel(builder =
+        ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[?]]
+      )
+    )
 
   private inline def onErrorFunc(cleanup: Cause[Throwable]): UIO[Unit] = {
     cleanup match
       case Cause.Fail(value, trace) =>
         value match {
           case state: BitlapIllegalStateException =>
-            clientRef.set(null)
+            addRef.set(null)
             ZIO.unit
           case _ => ZIO.unit
         }

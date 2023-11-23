@@ -60,7 +60,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
                 .flatMap(leaderLayer =>
                   leaderLayer
                     .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
-                    .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port)))
+                    .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("127.0.0.1"), f.port)))
                     .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
                 )
                 .flatMap(address => clientLayer(address.ip, address.port) <* ZIO.succeed(addRef.set(address)))

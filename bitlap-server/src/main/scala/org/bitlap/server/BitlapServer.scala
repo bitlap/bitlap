@@ -30,7 +30,6 @@ object BitlapServer extends ZIOAppDefault:
 
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = BitlapLogFormat.slf4j
 
-  // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
   override def run =
     (for {
       args           <- getArgs
@@ -43,7 +42,7 @@ object BitlapServer extends ZIOAppDefault:
         .startListener()
         .repeat(Schedule.fixed(ZDuration.fromScala(serverConfig.interval)))
         .forkDaemon
-      _ <- Console.printLine("""
+      _ <- ZIO.logInfo("""
                       |    __    _ __  __
                       |   / /_  (_) /_/ /___ _____
                       |  / __ \/ / __/ / __ `/ __ \

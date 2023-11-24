@@ -1,4 +1,4 @@
-<div align="center"><img src="bitlap.png" center/></div>
+<div align="center"><img src="docs/bitlap.png" center/></div>
 
 <h1 align="center">Welcome to bitlap 👋</h1>
 <p>
@@ -32,7 +32,7 @@
 
 ## Code Contributors
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+This project exists thanks to all the people who contribute. [[Contribute](docs/CONTRIBUTING.md)].
 <a href="https://github.com/bitlap/bitlap/graphs/contributors"><img src="https://opencollective.com/bitlap-project/contributors.svg?width=890&button=false" /></a>
 
 

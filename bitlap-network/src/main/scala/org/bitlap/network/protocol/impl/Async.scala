@@ -15,7 +15,10 @@
  */
 package org.bitlap.network.protocol.impl
 
+import java.util.concurrent.atomic.AtomicReference
+
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.exception.BitlapIllegalStateException
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
@@ -37,42 +40,36 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
 
   private val addr = serverPeers.asServerAddresses
 
-  private val leaderRef: UIO[Ref[ZIO[Scope, Throwable, DriverServiceClient]]] =
-    Ref.make(clientLayer(addr.head.ip, addr.head.port))
+  private val addRef: AtomicReference[ServerAddress] =
+    new AtomicReference[ServerAddress](null)
 
   /** Based on the configured service cluster, obtain its leader and construct
    *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
    *
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
-   *
-   *  TODO (When the leader does not exist, the client cannot perform any operations) cache leader address and add heart
-   *  between leader
    */
-  private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] = ZLayer.scoped {
-    for {
-      c <- ZIO.foreach(serverPeers.asServerAddresses) { address =>
-        val layer = clientLayer(address.ip, address.port)
-        leaderRef.flatMap { ref =>
-          getLeader(StringEx.uuid(true)).provideLayer(ZLayer.scoped((layer))).onExit {
-            case Exit.Success(value) if value.isDefined =>
-              ref.set(layer)
-            case _ =>
-              ZIO.unit
-          }
-        }
-      }
-      live <- ZIO
-        .when(c.flatMap(_.toList).nonEmpty) {
-          leaderRef.flatMap(_.get)
-        }
-        .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
-      client <- live
-    } yield client
+  private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] =
+    ZLayer.make[DriverServiceClient](
+      Scope.default,
+      ZLayer.fromZIO(
+        for {
+          leaderLayer <-
+            if (addRef.get() == null) {
+              clientLayer(addr.head.ip, addr.head.port)
+                .flatMap(leaderLayer =>
+                  leaderLayer
+                    .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
+                    .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("127.0.0.1"), f.port)))
+                    .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+                )
+                .flatMap(address => clientLayer(address.ip, address.port) <* ZIO.succeed(addRef.set(address)))
+            } else clientLayer(addRef.get().ip, addRef.get().port)
+        } yield leaderLayer
+      )
+    )
 
-  }
-
-  /** Obtain grpc channel based on IP:PORT, considering leader transfer, so Layer will be created every time.
+  /** Get grpc channel based on IP:PORT.
    */
   private def clientLayer(ip: String, port: Int): ZIO[Scope, Throwable, DriverServiceClient] =
     DriverServiceClient.scoped(
@@ -80,6 +77,18 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
         ManagedChannelBuilder.forAddress(ip, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[?]]
       )
     )
+
+  private inline def onErrorFunc(cleanup: Cause[Throwable]): UIO[Unit] = {
+    cleanup match
+      case Cause.Fail(value, trace) =>
+        value match {
+          case state: BitlapIllegalStateException =>
+            addRef.set(null)
+            ZIO.unit
+          case _ => ZIO.unit
+        }
+      case _ => ZIO.unit
+  }
 
   override def openSession(
     username: String,
@@ -90,12 +99,14 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
       .openSession(BOpenSessionReq(username, password, props ++ configuration))
       .map(r => new SessionHandle(r.getSessionHandle))
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def closeSession(sessionHandle: handles.SessionHandle): ZIO[Any, Throwable, Unit] =
     DriverServiceClient
       .closeSession(BCloseSessionReq(sessionHandle = Some(sessionHandle.toBSessionHandle())))
       .unit
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def executeStatement(
     sessionHandle: handles.SessionHandle,
@@ -109,6 +120,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
       )
       .map(r => new OperationHandle(r.getOperationHandle))
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def fetchResults(
     opHandle: OperationHandle,
@@ -121,44 +133,42 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
       )
       .map(r => FetchResults.fromBFetchResultsResp(r))
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def getResultSetMetadata(opHandle: OperationHandle): ZIO[Any, Throwable, TableSchema] =
     DriverServiceClient
       .getResultSetMetadata(BGetResultSetMetadataReq(Some(opHandle.toBOperationHandle())))
       .map(t => TableSchema.fromBGetResultSetMetadataResp(t))
       .provideLayer(leaderClientLayer)
-
-  private def getLeader(requestId: String): ZIO[DriverServiceClient, Nothing, Option[ServerAddress]] =
-    DriverServiceClient
-      .getLeader(BGetLeaderReq.of(requestId))
-      .map { f =>
-        if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("localhost"), f.port))
-      }
-      .catchAll(_ => ZIO.none)
+      .onError(e => onErrorFunc(e))
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
     DriverServiceClient
       .cancelOperation(BCancelOperationReq(Option(opHandle).map(_.toBOperationHandle())))
       .unit
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     DriverServiceClient
       .getOperationStatus(BGetOperationStatusReq(Option(opHandle).map(_.toBOperationHandle())))
       .map(t => OperationStatus.fromBGetOperationStatusResp(t))
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] =
     DriverServiceClient
       .closeOperation(BCloseOperationReq(Option(opHandle).map(_.toBOperationHandle())))
       .unit
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
     DriverServiceClient
       .getInfo(BGetInfoReq(Option(sessionHandle.toBSessionHandle()), toBGetInfoType(getInfoType)))
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
 
 object Async {
 

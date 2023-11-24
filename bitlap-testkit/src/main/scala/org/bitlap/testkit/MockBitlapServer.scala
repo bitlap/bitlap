@@ -36,7 +36,7 @@ object MockBitlapServer extends ZIOAppDefault {
       t1   <- RaftServerEndpoint.service(args.toList).fork
       t2   <- GrpcServerEndpoint.service(args.toList).fork
       // add http server?
-      _ <- Console.printLine("""
+      _ <- ZIO.logInfo("""
                         |    __    _ __  __
                         |   / /_  (_) /_/ /___ _____
                         |  / __ \/ / __/ / __ `/ __ \

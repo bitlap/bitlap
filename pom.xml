@@ -350,7 +350,7 @@
                             <scalaMajorVersion>2.13</scalaMajorVersion>
                         </scalafmt>
                         <licenseHeader>
-                            <file>${user.dir}/license-header</file>
+                            <file>${user.dir}/docs/license-header</file>
                             <delimiter>package</delimiter>
                         </licenseHeader>
                     </scala>

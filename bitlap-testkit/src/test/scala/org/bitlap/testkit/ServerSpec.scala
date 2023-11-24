@@ -18,10 +18,8 @@ package org.bitlap.testkit
 import java.sql.*
 
 import org.bitlap.network.{ ServerAddress, SyncConnection }
-import org.bitlap.server.http._
-import org.bitlap.testkit.*
+import org.bitlap.server.http.*
 
-import org.junit.*
 import org.scalatest.{ BeforeAndAfterAll, Inspectors }
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should

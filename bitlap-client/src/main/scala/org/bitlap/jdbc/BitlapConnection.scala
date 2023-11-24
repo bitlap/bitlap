@@ -24,6 +24,7 @@ import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.exception.BitlapExceptions
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
@@ -325,7 +326,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    val rs   = ResultSetX[TypeRow1[String]](sqlQ"SHOW CURRENT_DATABASE")
+    val rs   = ResultSetX[TypeRow1[String]](sqlQ"${ShowCurrentDatabase.command}")
     val data = rs.fetch()
     if (data.nonEmpty) {
       data.headOption.map(_.columns[rs.Out]._1).orNull

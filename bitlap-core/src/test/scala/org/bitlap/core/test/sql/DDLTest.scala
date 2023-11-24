@@ -16,12 +16,51 @@
 package org.bitlap.core.test.sql
 
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.core.catalog.metadata.Account.DEFAULT_USER
 import org.bitlap.core.catalog.metadata.Database.DEFAULT_DATABASE
 import org.bitlap.core.test.base.BaseLocalFsTest
 import org.bitlap.core.test.base.SqlChecker
 import org.bitlap.core.test.base.SqlSession
 
 class DDLTest extends BaseLocalFsTest with SqlChecker {
+
+  test("common user pwd ddl statements") {
+    val testUser = randomUser()
+    // create
+    sql(s"create user $testUser") shouldEqual List(List(true))
+    assertThrows[BitlapException] {
+      sql(s"create user $testUser identified by 'password'")
+    }
+    sql(s"create user if not exists $testUser identified by 'password'") shouldEqual List(List(false))
+    // show
+    sql(s"show users").result should contain(List(DEFAULT_USER))
+    sql(s"show users").result should contain(List(testUser))
+    // drop
+    sql(s"drop user $testUser") shouldEqual List(List(true))
+    sql(s"show users").result should not contain List(testUser)
+    assertThrows[BitlapException] {
+      sql(s"drop user $testUser")
+    }
+  }
+
+  test("common user ddl statements") {
+    val testUser = randomUser()
+    // create
+    sql(s"create user $testUser") shouldEqual List(List(true))
+    assertThrows[BitlapException] {
+      sql(s"create user $testUser")
+    }
+    sql(s"create user if not exists $testUser") shouldEqual List(List(false))
+    // show
+    sql(s"show users").result should contain(List(DEFAULT_USER))
+    sql(s"show users").result should contain(List(testUser))
+    // drop
+    sql(s"drop user $testUser") shouldEqual List(List(true))
+    sql(s"show users").result should not contain List(testUser)
+    assertThrows[BitlapException] {
+      sql(s"drop user $testUser")
+    }
+  }
 
   test("common database ddl statements") {
     val testDB = randomDatabase()

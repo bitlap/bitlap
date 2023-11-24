@@ -16,8 +16,7 @@
 package org.bitlap.core.event
 
 import org.bitlap.common.BitlapEvent
-import org.bitlap.core.catalog.metadata.Database
-import org.bitlap.core.catalog.metadata.Table
+import org.bitlap.core.catalog.metadata.{ Account, Database, Table }
 
 // TODO (Add event status, exception, and etc.)
 
@@ -28,3 +27,7 @@ final case class DatabaseDeleteEvent(database: Database) extends BitlapEvent
 // table
 final case class TableCreateEvent(table: Table) extends BitlapEvent
 final case class TableDeleteEvent(table: Table) extends BitlapEvent
+
+// user
+final case class AccountCreateEvent(account: Account) extends BitlapEvent
+final case class AccountDropEvent(account: Account)   extends BitlapEvent

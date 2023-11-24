@@ -18,6 +18,7 @@ package org.bitlap.jdbc
 import java.sql.{ Array as _, * }
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.utils.{ JsonUtil, StringEx }
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
@@ -367,10 +368,8 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet = {
-    given Connection = connection
-    sqlQ"show tables"._2
-  }
+  ): ResultSet =
+    sqlQ"${ShowTables.command}" (using connection)._2
 
   override def getSchemas: ResultSet =
     getSchemas(null, null)

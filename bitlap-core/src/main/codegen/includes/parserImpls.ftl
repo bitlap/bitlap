@@ -61,6 +61,8 @@ SqlCreate SqlCreateExtended(Span s, boolean replace) :
         create = SqlCreateDatabase(s, replace)
         |
         create = SqlCreateTable(s, replace)
+        |
+        create = SqlCreateUser(s, replace)                    
     )
     {
         return create;
@@ -116,6 +118,8 @@ SqlDrop SqlDropExtended(Span s, boolean replace) :
         drop = SqlDropDatabase(s, replace)
         |
         drop = SqlDropTable(s, replace)
+        |
+        drop = SqlDropUser(s, replace)                
     )
     {
         return drop;
@@ -192,6 +196,7 @@ SqlShowTables SqlShowTables() :
         return new SqlShowTables(getPos(), dbName);
     }
 }
+            
 SqlNode SqlUseDatabase() :
 {
     SqlIdentifier dbName = null;
@@ -203,6 +208,7 @@ SqlNode SqlUseDatabase() :
         return new SqlUseDatabase(getPos(), dbName);
     }
 }
+        
 SqlNode SqlShowCurrentDatabase() :
 {
 }
@@ -212,6 +218,7 @@ SqlNode SqlShowCurrentDatabase() :
         return new SqlShowCurrentDatabase(getPos());
     }
 }        
+            
 SqlNode SqlExplainX() :
 {
   SqlNode stmt;
@@ -254,3 +261,50 @@ SqlNode SqlExplainX() :
      return new SqlLoadData(getPos(), filePath, tableName, overwrite);
    }
  }
+
+/**
+ * ********************************* user commands *********************************
+ */
+SqlShowUsers SqlShowUsers() :
+{
+
+}
+{
+    <SHOW> <USERS>
+    {
+        return new SqlShowUsers(getPos());
+    }
+}
+
+SqlCreate SqlCreateUser(Span s, boolean replace) :
+{
+    boolean ifNotExists = false;
+    SqlIdentifier name;
+    String password = null;
+}
+{
+    <USER>
+    ifNotExists = IfNotExistsOpt()
+    name = CompoundIdentifier()
+    [
+        <IDENTIFIED> <BY> { password = SimpleStringLiteral(); }
+    ]
+    {
+        return new SqlCreateUser(s.pos(), name, password, ifNotExists, replace);
+    }
+}       
+
+            
+SqlDrop SqlDropUser(Span s, boolean replace) :
+{
+    boolean ifExists = false;
+    SqlIdentifier name = null;
+}
+{
+    <USER>
+    ifExists = IfExistsOpt()
+    name = CompoundIdentifier()
+    {
+        return new SqlDropUser(s.pos(), name, ifExists);
+    }
+}

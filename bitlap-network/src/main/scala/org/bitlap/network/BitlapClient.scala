@@ -22,7 +22,7 @@ import org.bitlap.network.protocol.impl.Sync
 
 /** The synchronization client used by JDBC is delegated to [[org.bitlap.network.protocol.impl.Async]]
  */
-final class BitlapClient(serverPeers: Array[String], props: Map[String, String]):
+final class BitlapClient(serverPeers: List[ServerAddress], props: Map[String, String]):
 
   private lazy val sync: Sync = new Sync(serverPeers, props)
 

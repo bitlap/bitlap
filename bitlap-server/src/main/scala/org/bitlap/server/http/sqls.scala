@@ -31,6 +31,12 @@ object SqlData:
 
   def empty: SqlData = SqlData(Seq.empty, Seq.empty)
 
+  def fromList(list: List[List[(String, String)]]): SqlData = {
+    val columns = list.headOption.getOrElse(List.empty).map(c => SqlColumn(c._1))
+    val sqlRows = list.map(r => SqlRow.apply(r.toMap))
+    SqlData(columns, sqlRows)
+  }
+
   def fromDBTable(table: DBTable): SqlData = {
     if table == null || table.columns.isEmpty then return SqlData()
     val columns = table.columns.map(_.label).map(SqlColumn.apply)

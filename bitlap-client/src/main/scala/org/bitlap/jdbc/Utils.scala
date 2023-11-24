@@ -123,6 +123,18 @@ object Utils:
     finally if br != null then br.close()
     initSqlList
 
+  def getSqlStmts(lines: List[String]): List[String] = {
+    val sb = new mutable.StringBuilder("")
+    lines.map(_.trim).foreach { line =>
+      if line.nonEmpty then
+        if !line.startsWith("#") && !line.startsWith("--") then {
+          sb.append(line.concat(" "))
+        }
+    }
+    getInitSql(sb.toString)
+
+  }
+
   private def getInitSql(sbLine: String): List[String] =
     val sqlArray    = sbLine.toCharArray
     val initSqlList = new JArrayList[String]

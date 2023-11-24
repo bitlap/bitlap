@@ -53,8 +53,7 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
   }
 
   // Execute FakeDataUtilSpec to generate new mock data
-  // When running Java 9 or above, JVM parameters are required: --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-  test("queryTest1") {
+  test("query by jdbc") {
     val rs = sql"""
        select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
        from $table

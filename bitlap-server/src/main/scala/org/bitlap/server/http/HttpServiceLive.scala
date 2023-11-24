@@ -19,12 +19,15 @@ import java.sql.*
 import java.util.Properties
 
 import scala.util.{ Failure, Success, Try, Using as ScalaUtils }
+import scala.util.control.NonFatal
 
 import org.bitlap.common.utils.internal.DBTablePrinter
+import org.bitlap.jdbc.Utils
+import org.bitlap.network.{ BitlapResultSet as MyResultSet, _ }
+import org.bitlap.network.{ ServerAddress, SyncConnection }
 
 import com.typesafe.scalalogging.LazyLogging
 
-import dotty.tools.dotc.ast.Trees.ApplyKind.Using
 import zio.*
 
 /** HTTP Specific logic implementation
@@ -35,36 +38,45 @@ end HttpServiceLive
 
 final class HttpServiceLive extends LazyLogging:
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
-
-  val properties = new Properties()
-  properties.put("bitlapconf:retries", "3")
-
-  private final val DEFAULT_URL = "jdbc:bitlap://localhost:23333/default"
-
   def execute(sql: String): SqlResult =
-    ScalaUtils.resource(DriverManager.getConnection(DEFAULT_URL, properties)) { conn =>
-      ScalaUtils.resource(conn.createStatement()) { stmt =>
-        val executed = Try {
-          stmt.execute(sql)
-          val rs    = stmt.getResultSet
-          val table = DBTablePrinter.from(rs)
+    var syncConnect: SyncConnection = null
+    try {
+      syncConnect = new SyncConnection("root", "")
+      syncConnect.open(ServerAddress("localhost", 23333), 3000)
+
+      val rss = Utils.getSqlStmts(sql.split("\n")).map { sql =>
+        val rs = syncConnect.execute(sql)
+        if (rs.hasNext)
           SqlResult(
-            data = SqlData.fromDBTable(table),
-            resultCode = 0
+            SqlData.fromList(MyResultSet.underlying(res.next(), res.tableSchema)),
+            0
           )
-        }
-        executed match
-          case Success(value) => value
-          case Failure(exception) =>
-            logger.error("Executing sql error", exception)
-            SqlResult(
-              data = SqlData.empty,
-              errorMessage = exception.getLocalizedMessage,
-              resultCode = 1
-            )
+        else
+          SqlResult(
+            SqlData.empty,
+            0
+          )
+      }
+      rss.lastOption.getOrElse(
+        SqlResult(
+          SqlData.empty,
+          0
+        )
+      )
+    } catch {
+      case NonFatal(e) =>
+        logger.error("Executing sql error", e)
+        SqlResult(
+          data = SqlData.empty,
+          errorMessage = e.getLocalizedMessage,
+          resultCode = 1
+        )
+    } finally {
+      if (syncConnect != null) {
+        syncConnect.close()
       }
     }
+
   end execute
 
 end HttpServiceLive

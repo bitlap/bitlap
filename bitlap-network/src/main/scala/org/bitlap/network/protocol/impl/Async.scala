@@ -34,11 +34,9 @@ import zio.*
 
 /** Asynchronous RPC client, implemented based on zio grpc
  */
-final class Async(serverPeers: Array[String], props: Map[String, String]) extends AsyncProtocol:
+final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) extends AsyncProtocol:
 
-  assert(serverPeers.length > 0)
-
-  private val addr = serverPeers.asServerAddresses
+  assert(serverPeers.nonEmpty)
 
   private val addRef: AtomicReference[ServerAddress] =
     new AtomicReference[ServerAddress](null)
@@ -56,7 +54,7 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
         for {
           leaderLayer <-
             if (addRef.get() == null) {
-              clientLayer(addr.head.ip, addr.head.port)
+              clientLayer(serverPeers.head.ip, serverPeers.head.port)
                 .flatMap(leaderLayer =>
                   leaderLayer
                     .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
@@ -173,6 +171,6 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
 object Async {
 
   def make(conf: ClientConfig): ULayer[Async] = ZLayer.succeed(
-    new Async(conf.serverPeers.toArray, conf.props)
+    new Async(conf.serverPeers.map(_.asServerAddress), conf.props)
   )
 }

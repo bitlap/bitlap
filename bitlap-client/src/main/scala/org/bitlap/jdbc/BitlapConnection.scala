@@ -26,6 +26,7 @@ import scala.util.control.Breaks.*
 
 import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.exception.BitlapExceptions
+import org.bitlap.network.{ Connection as _, _ }
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
 
@@ -87,7 +88,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     breakable {
       while numRetries < maxRetries do
         try {
-          client = new BitlapClient(connParams.authorityList, bitlapConfs ++ sessionVars)
+          client = new BitlapClient(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
           session = client.openSession()
           executeInitSql()
           closed = false
@@ -126,7 +127,6 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
         try {
           val sqlList = Utils.parseInitFile(initFile)
           for sql <- sqlList do {
-            println(s"Executing InitSql ... $sql")
             val hasResult = st.execute(sql)
             if hasResult then
               try {

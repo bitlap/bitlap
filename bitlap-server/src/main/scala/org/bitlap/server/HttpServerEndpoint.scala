@@ -20,6 +20,8 @@ import java.sql.DriverManager
 import java.util.Properties
 
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.network.{ BitlapResultSet as MyResultSet, _ }
+import org.bitlap.network.{ ServerAddress, SyncConnection }
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http.*
@@ -75,13 +77,6 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
   private val indexHtml: http.HttpApp[Any, Throwable] = Http.fromResource(s"static/index.html")
 
   private val staticApp: http.HttpApp[Any, Throwable] = Http.collectHttp[Request] {
-    case Method.GET -> !! / "init" =>
-      // When using initialization, enable this
-      val properties = new Properties()
-      properties.put("bitlapconf:retries", "1")
-      properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")
-      DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
-      indexHtml
     case req
         if req.method == Method.GET
           && req.path.startsWith(!! / "pages") =>

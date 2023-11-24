@@ -55,5 +55,3 @@ trait SyncProtocol extends ProtocolMonad[Identity]:
   def cancelOperation(opHandle: OperationHandle): Identity[Unit]
 
   def getOperationStatus(opHandle: OperationHandle): Identity[OperationStatus]
-
-  def authenticate(username: String, password: String): Identity[Unit]

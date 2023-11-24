@@ -125,8 +125,3 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
     sessionManager
       .getInfo(sessionHandle, getInfoType)
       .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
-
-  override def authenticate(username: String, password: String): Task[Unit] =
-    AccountAuthenticator
-      .auth(s"AUTH $username '$password'")
-      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)

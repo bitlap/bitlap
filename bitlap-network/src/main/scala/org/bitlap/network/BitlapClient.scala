@@ -61,5 +61,3 @@ final class BitlapClient(serverPeers: List[ServerAddress], props: Map[String, St
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
     sync.getInfo(sessionHandle, getInfoType)
-
-  def authenticate(username: String, password: String): Unit = sync.authenticate(username, password)

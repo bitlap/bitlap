@@ -177,15 +177,6 @@ message BGetInfoValue {
   bytes value = 1;
 }
 
-
-message BAuthenticateReq {
-  string username = 1;
-  string password = 2;
-}
-
-message BAuthenticateResp {
-}
-
 service DriverService {
   rpc OpenSession (BOpenSessionReq) returns (BOpenSessionResp) {}
 
@@ -206,6 +197,4 @@ service DriverService {
   rpc GetOperationStatus (BGetOperationStatusReq) returns (BGetOperationStatusResp) {}
 
   rpc GetInfo(BGetInfoReq) returns (BGetInfoResp) {}
-
-  rpc Authenticate(BAuthenticateReq) returns (BAuthenticateResp) {}
 }

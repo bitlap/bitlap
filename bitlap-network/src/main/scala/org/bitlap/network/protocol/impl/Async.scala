@@ -42,7 +42,7 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
     new AtomicReference[ServerAddress](null)
 
   /** Based on the configured service cluster, obtain its leader and construct
-   *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
+   *  [[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
    *
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
@@ -50,9 +50,10 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
   private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] =
     ZLayer.scoped {
       for {
+        rnd <- ZIO.random.flatMap(_.nextIntBetween(0, serverPeers.size))
         leaderLayer <-
           if (addRef.get() == null) {
-            clientLayer(serverPeers.head.ip, serverPeers.head.port)
+            clientLayer(serverPeers(rnd).ip, serverPeers(rnd).port)
               .flatMap(leaderLayer =>
                 leaderLayer
                   .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
@@ -75,9 +76,9 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
 
   private inline def onErrorFunc(cleanup: Cause[Throwable]): UIO[Unit] = {
     cleanup match
-      case Cause.Fail(value, trace) =>
+      case Cause.Fail(value, _) =>
         value match {
-          case state: BitlapIllegalStateException =>
+          case _: BitlapIllegalStateException =>
             addRef.set(null)
             ZIO.unit
           case _ => ZIO.unit
@@ -164,14 +165,6 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
       .onError(e => onErrorFunc(e))
-
-  override def authenticate(username: String, password: String): Task[Unit] = {
-    DriverServiceClient
-      .authenticate(BAuthenticateReq(username, password))
-      .unit
-      .provideLayer(leaderClientLayer)
-      .onError(e => onErrorFunc(e))
-  }
 
 object Async {
 

@@ -95,5 +95,3 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
   def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus]
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue]
-
-  def authenticate(username: String, password: String): Task[Unit]

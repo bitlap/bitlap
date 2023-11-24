@@ -18,12 +18,13 @@ package org.bitlap.jdbc
 import java.sql.DriverManager
 
 import org.bitlap.Driver
+import org.bitlap.common.exception.BitlapSQLException
 
 class UtilsTest extends BaseClientTest {
 
   test("test Utils failure") {
     val url = "jdbc:xxxx://host1:port1,host2:port2,host3:port3?initFile=1sql;retries=3"
-    assertThrows[BitlapJdbcUriParseException] { Utils.parseUri(url) }
+    assertThrows[BitlapSQLException] { Utils.parseUri(url) }
   }
 
   test("test Utils initSql") {

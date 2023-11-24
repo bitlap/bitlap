@@ -24,6 +24,16 @@ import org.bitlap.core.test.base.SqlSession
 
 class DDLTest extends BaseLocalFsTest with SqlChecker {
 
+  test("common user auth ddl statements") {
+    val testUser = randomUser()
+    // auth root default password
+    sql(s"auth root") shouldEqual List(List(true))
+
+    sql(s"create user if not exists $testUser identified by 'password'") shouldEqual List(List(true))
+    sql(s"auth $testUser 'password'") shouldEqual List(List(true))
+    sql(s"drop user $testUser") shouldEqual List(List(true))
+  }
+
   test("common user pwd ddl statements") {
     val testUser = randomUser()
     // create

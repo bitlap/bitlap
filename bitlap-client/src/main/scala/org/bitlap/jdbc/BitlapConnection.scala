@@ -26,6 +26,7 @@ import scala.util.control.Breaks.*
 
 import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.exception.BitlapExceptions
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.{ Connection as _, _ }
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
@@ -89,6 +90,10 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       while numRetries < maxRetries do
         try {
           client = new BitlapClient(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
+          client.authenticate(
+            sessionVars.getOrElse(JdbcConnectionParams.AUTH_USER, "root"),
+            sessionVars.getOrElse(JdbcConnectionParams.AUTH_PASSWD, "")
+          )
           session = client.openSession()
           executeInitSql()
           closed = false
@@ -102,8 +107,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
             catch {
               case _: Exception =>
             }
-            if numRetries >= maxRetries then
-              throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = Option(e))
+            if numRetries >= maxRetries then throw BitlapSQLException(s"$errMsg${e.getMessage}", cause = Option(e))
             else {
               System.err.println(
                 s"$warnMsg${e.getMessage} Retrying $numRetries of $maxRetries with retry interval $retryInterval ms"

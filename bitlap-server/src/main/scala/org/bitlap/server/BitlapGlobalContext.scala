@@ -17,12 +17,8 @@ package org.bitlap.server
 
 import java.util.Vector as JVector
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.annotation.Nullable
 
-import org.bitlap.common.BitlapConf
-import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.exception.BitlapIllegalStateException
+import org.bitlap.common.exception.{ BitlapException, BitlapIllegalStateException }
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }

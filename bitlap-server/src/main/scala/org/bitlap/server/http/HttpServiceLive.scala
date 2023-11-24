@@ -15,15 +15,9 @@
  */
 package org.bitlap.server.http
 
-import java.sql.*
-import java.util.Properties
-
-import scala.util.{ Failure, Success, Try, Using as ScalaUtils }
 import scala.util.control.NonFatal
 
-import org.bitlap.common.utils.internal.DBTablePrinter
-import org.bitlap.jdbc.Utils
-import org.bitlap.network.{ BitlapResultSet as MyResultSet, _ }
+import org.bitlap.common.utils.StringEx
 import org.bitlap.network.{ ServerAddress, SyncConnection }
 
 import com.typesafe.scalalogging.LazyLogging
@@ -42,13 +36,13 @@ final class HttpServiceLive extends LazyLogging:
     var syncConnect: SyncConnection = null
     try {
       syncConnect = new SyncConnection("root", "")
-      syncConnect.open(ServerAddress("localhost", 23333), 3000)
+      syncConnect.open(ServerAddress("127.0.0.7", 23333))
 
-      val rss = Utils.getSqlStmts(sql.split("\n")).map { sql =>
+      val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
         val rs = syncConnect.execute(sql)
         if (rs.hasNext)
           SqlResult(
-            SqlData.fromList(MyResultSet.underlying(res.next(), res.tableSchema)),
+            SqlData.fromList(rs.next().underlying),
             0
           )
         else

@@ -17,6 +17,8 @@ package org.bitlap.testkit
 
 import java.sql.*
 
+import org.bitlap.network.{ ServerAddress, SyncConnection }
+import org.bitlap.server.http._
 import org.bitlap.testkit.*
 
 import org.junit.*
@@ -32,7 +34,7 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
   private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
 
   Class.forName(classOf[org.bitlap.Driver].getName)
-  given Connection = DriverManager.getConnection("jdbc:bitlap://localhost:23333/default")
+  given Connection = DriverManager.getConnection("jdbc:bitlap://127.0.0.1:23333/default")
 
   // Each test will be executed once and needs to be modified!
   val server = new Thread {
@@ -62,15 +64,24 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
        """
     val ret1 = ResultSetX[TypeRow5[Long, Long, String, String, Int]](rs).fetch()
     assert(ret1.nonEmpty)
-    println(ret1)
+  }
 
-    //    sql"create database if not exists $database"
-    //    sql"use $database"
+  test("query by client") {
+    val stmt =
+      s"""
+       select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+       from $table
+       where _time >= 0
+       group by _time
+       """
+    val sync = new SyncConnection("", "")
+    sync.open(ServerAddress("127.0.0.1", 23333))
 
-    //    val showResult = ResultSetX[TypeRow1[String]](sql"show current_database").fetch()
-    //    println(database)
-    //    println(showResult.map(_.values))
-    //    assert(showResult.nonEmpty && showResult.exists(_.values.contains(database)))
+    val rs = sync.execute(stmt)
+
+    assert(rs.hasNext)
+
+    assert(rs.next().underlying.nonEmpty)
   }
 
 }

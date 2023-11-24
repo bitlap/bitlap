@@ -17,11 +17,10 @@ package org.bitlap.network
 
 abstract class Connection extends Serializable {
 
-  def open(address: ServerAddress, timeout: Int): Unit
+  def open(address: ServerAddress): Unit
 
   def open(
     address: ServerAddress,
-    timeout: Int,
     headers: Map[String, String]
   ): Unit
 

@@ -73,4 +73,12 @@ final class Sync(serverPeers: List[ServerAddress], props: Map[String, String]) e
       _.closeOperation(opHandle)
     }
 
-  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Identity[GetInfoValue] = ???
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Identity[GetInfoValue] =
+    async.sync {
+      _.getInfo(sessionHandle, getInfoType)
+    }
+
+  override def authenticate(username: String, password: String): Identity[Unit] =
+    async.sync {
+      _.authenticate(username, password)
+    }

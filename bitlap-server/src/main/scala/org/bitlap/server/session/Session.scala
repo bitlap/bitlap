@@ -15,11 +15,10 @@
  */
 package org.bitlap.server.session
 
-import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong, AtomicReference }
+import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
 
-import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*

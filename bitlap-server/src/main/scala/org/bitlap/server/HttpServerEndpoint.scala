@@ -15,15 +15,9 @@
  */
 package org.bitlap.server
 
-import java.io.IOException
-import java.sql.DriverManager
-import java.util.Properties
-
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.{ BitlapResultSet as MyResultSet, _ }
-import org.bitlap.network.{ ServerAddress, SyncConnection }
+import org.bitlap.network.BitlapResultSet as MyResultSet
 import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http.*
 
 import io.circe.generic.auto.*
@@ -33,7 +27,6 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir.*
 import zio.*
 import zio.http.*
-import zio.http.codec.*
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
 
@@ -52,8 +45,6 @@ object HttpServerEndpoint:
 end HttpServerEndpoint
 
 final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
-
-  Class.forName(classOf[org.bitlap.Driver].getCanonicalName)
 
   private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
     val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))

@@ -308,3 +308,19 @@ SqlDrop SqlDropUser(Span s, boolean replace) :
         return new SqlDropUser(s.pos(), name, ifExists);
     }
 }
+
+SqlNode SqlAuth() :
+{
+    SqlIdentifier user;
+    String password = null;
+}
+{
+    <AUTH>
+    user = CompoundIdentifier()
+    [ 
+        password = SimpleStringLiteral()
+    ]
+    {
+         return new SqlAuth(getPos(), user, password);
+    }
+}

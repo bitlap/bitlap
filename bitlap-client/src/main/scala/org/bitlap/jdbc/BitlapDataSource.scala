@@ -21,9 +21,13 @@ import java.util.Properties
 import java.util.logging.Logger
 import javax.sql.DataSource
 
+import org.bitlap.common.exception.BitlapSQLException
+
 /** Bitlap JDBC datasource has not yet implemented authentication and connection parameter configuration.
  */
-class BitlapDataSource extends DataSource:
+class BitlapDataSource(
+  uri: String)
+    extends DataSource:
 
   override def unwrap[T](iface: Class[T]): T = throw new SQLFeatureNotSupportedException("Method not supported")
 
@@ -41,9 +45,11 @@ class BitlapDataSource extends DataSource:
 
   override def getParentLogger: Logger = throw new SQLFeatureNotSupportedException("Method not supported")
 
-  // TODO connect pool
-  override def getConnection(): Connection = getConnection("", "")
+  override def getConnection(): Connection = getConnection("root", "")
 
   override def getConnection(username: String, password: String): Connection =
-    try new BitlapConnection("", new Properties())
-    catch case ex: Exception => throw BitlapSQLException(msg = "Error in getting BitlapConnection", cause = Option(ex))
+    val properties = new Properties()
+    properties.put(JdbcConnectionParams.AUTH_USER, username)
+    properties.put(JdbcConnectionParams.AUTH_PASSWD, password)
+    try new BitlapConnection(uri, properties)
+    catch case ex: Exception => throw BitlapSQLException("Error in getting BitlapConnection", cause = Option(ex))

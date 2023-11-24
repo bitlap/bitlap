@@ -17,6 +17,7 @@ package org.bitlap.jdbc
 
 import java.sql.*
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
@@ -86,9 +87,9 @@ class BitlapStatement(
     try if stmtHandle != null then client.closeOperation(stmtHandle)
     catch
       case e: SQLException =>
-        throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
+        throw BitlapSQLException(e.getLocalizedMessage, cause = Option(e.getCause))
       case e: Exception =>
-        throw BitlapSQLException(msg = "Failed to close statement", "08S01", cause = Option(e))
+        throw BitlapSQLException("Failed to close statement", cause = Option(e))
     finally stmtHandle = null
 
   override def close(): Unit =
@@ -203,18 +204,18 @@ class BitlapStatement(
         status.status match
           case Some(ClosedState | FinishedState) => isOperationComplete = true
           case Some(CanceledState) =>
-            throw BitlapSQLException("Query was cancelled", "01000")
+            throw BitlapSQLException("Query was cancelled")
           case Some(TimeoutState) =>
             throw new SQLTimeoutException(s"Query timed out after $queryTimeout seconds")
           case Some(ErrorState) =>
-            throw BitlapSQLException("Query was failed", "HY000")
+            throw BitlapSQLException("Query was failed")
           case Some(UnknownState) =>
-            throw BitlapSQLException("Unknown query", "HY000")
+            throw BitlapSQLException("Unknown query")
           case _ =>
       catch
         case e: SQLException => throw e
         case e: Exception =>
-          throw BitlapSQLException("Failed to wait for operation to complete", "08S01", cause = Option(e))
+          throw BitlapSQLException("Failed to wait for operation to complete", cause = Option(e))
     status
 
   def closeOnResultSetCompletion: Unit =

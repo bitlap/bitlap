@@ -26,7 +26,6 @@ import com.typesafe.scalalogging.LazyLogging
 final class SyncConnection(user: String, password: String) extends Connection with LazyLogging {
 
   private var configuration: Map[String, String] = Map.empty
-  private var timeout: Int                       = 0
   private var sync: Sync                         = _
   private var address: ServerAddress             = _
   private var sessionId: SessionHandle           = _
@@ -42,27 +41,28 @@ final class SyncConnection(user: String, password: String) extends Connection wi
   override def reopen(): Unit = {
     try {
       close()
-      open(address, timeout, configuration)
+      open(address, configuration)
     } catch
       case NonFatal(e) =>
         throw BitlapSQLException("reopen failed", cause = Some(e))
   }
 
-  override def open(address: ServerAddress, timeout: Int, configuration: Map[String, String]): Unit = {
+  override def open(address: ServerAddress, configuration: Map[String, String]): Unit = {
     try {
       this.sync = new Sync(List(address), configuration)
-      this.timeout = timeout
+      this.sync.authenticate(user, if (password == null) "" else password)
       this.address = address
       this.configuration = configuration
-      this.sessionId = sync.openSession(user, password, Map.empty)
+      this.sessionId = sync.openSession(user, password, configuration)
     } catch
       case NonFatal(e) =>
         throw BitlapSQLException("open failed", cause = Some(e))
   }
 
-  override def open(address: ServerAddress, timeout: Int): Unit = open(address, timeout, configuration)
+  override def open(address: ServerAddress): Unit = open(address, configuration)
 
-  def execute(stmt: String, queryTimeout: Long = 600000, confOverlay: Map[String, String] = Map.empty): BitlapResultSet = {
+  def execute(stmt: String, queryTimeout: Long = 600000, confOverlay: Map[String, String] = Map.empty)
+    : BitlapResultSet = {
     new BitlapResultSet(sync, sessionId, stmt, queryTimeout, confOverlay)
   }
 

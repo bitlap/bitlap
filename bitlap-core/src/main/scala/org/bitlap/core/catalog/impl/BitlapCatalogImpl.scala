@@ -28,10 +28,12 @@ import org.bitlap.common.utils.{ JsonUtil, PreConditions }
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.catalog.BitlapCatalog
 import org.bitlap.core.catalog.metadata.{ Account, Database, Table }
+import org.bitlap.core.catalog.metadata.Account.{ DEFAULT_PASSWORD, SecretKey }
 import org.bitlap.core.event.*
 import org.bitlap.core.hadoop.*
 import org.bitlap.core.storage.TableFormat
 
+import org.apache.commons.codec.digest.Md5Crypt
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, LocatedFileStatus, Path }
 import org.apache.hadoop.hdfs.protocol.HdfsNamedFileStatus
@@ -55,6 +57,8 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
 
   private val eventBus = BitlapContext.eventBus
 
+  private val salt = "$1$233333"
+
   override def start(): Unit = {
     super.start()
     if (!fs.exists(dataPath)) {
@@ -68,7 +72,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val defaultAccountPath = Path(getAccountDir, Account.DEFAULT_USER)
     if (!fs.exists(defaultAccountPath)) {
       fs.mkdirs(defaultAccountPath)
-      fs.writeSecret(defaultAccountPath, Account.SecretKey()) {}
+      fs.writeSecret(defaultAccountPath, Account.SecretKey(Md5Crypt.md5Crypt(DEFAULT_PASSWORD.getBytes, salt))) {}
     }
   }
 
@@ -257,7 +261,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
 
   override def listUsers: List[Account] = {
     fs.collectStatus(getAccountDir, _.isDirectory) { (_, status) =>
-      Account(status.getPath.getName)
+      Account(status.getPath.getName, Account.SecretKey("***"))
     }
   }
 
@@ -270,7 +274,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val exists = fs.exists(p)
     if (exists) {
       fs.delete(p, true)
-      eventBus.post(AccountDropEvent(Account(cleanName)))
+      eventBus.post(AccountDropEvent(Account(cleanName, Account.SecretKey("***"))))
       return true
     } else {
       if (!ifExists) {
@@ -293,9 +297,23 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
       throw BitlapException(s"Unable to create user $cleanName, it already exists.")
     }
     fs.mkdirs(p)
-    val secret = Account.SecretKey(password)
+    val pwd    = Md5Crypt.md5Crypt(password.getBytes, salt)
+    val secret = Account.SecretKey(pwd)
     fs.writeSecret(p, secret) {
       eventBus.post(AccountCreateEvent(Account(cleanName, secret)))
+    }
+  }
+
+  override def auth(username: String, password: String): Boolean = {
+    val cleanName = cleanUserName(username)
+    val p         = Path(getAccountDir, cleanName)
+    val exists    = fs.exists(p)
+    if (exists) {
+      val pwd      = Md5Crypt.md5Crypt(password.getBytes, salt)
+      val storePwd = fs.readSecret(p).value
+      pwd == storePwd
+    } else {
+      false
     }
   }
 

@@ -27,6 +27,7 @@ import scala.collection.mutable
 import scala.collection.mutable.Seq
 import scala.reflect.*
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 
@@ -644,7 +645,7 @@ abstract class BitlapBaseResultSet extends ResultSet with BitlapSerde:
 
       val columnType = getSchema.columns(columnIndex - 1).typeDesc
       deserialize[T](columnType, bColumnValue)
-    catch case e: Exception => throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
+    catch case e: Exception => throw BitlapSQLException(e.getLocalizedMessage, cause = Option(e.getCause))
 
   def setSchema(schema: TableSchema): Unit = this.schema = schema
 

@@ -69,6 +69,8 @@ trait BitlapCatalog {
    */
   def dropUser(username: String, ifExists: Boolean = false): Boolean
 
+  def auth(username: String, password: String): Boolean
+
   /** List all [Users], it also contains [[Account.DEFAULT_USER]]
    */
   def listUsers: List[Account]

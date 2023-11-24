@@ -15,12 +15,10 @@
  */
 package org.bitlap.server.session
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{ CountDownLatch, TimeUnit }
 
 import scala.collection.mutable
 
-import org.bitlap.common.BitlapConf
 import org.bitlap.network.enumeration.{ OperationState, OperationType }
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.OperationHandle

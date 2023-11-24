@@ -16,23 +16,19 @@
 package org.bitlap.server.session
 
 import java.util.Date
-import java.util.Vector as JVector
 import java.util.concurrent.*
-import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong, AtomicReference }
+import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-import org.bitlap.common.BitlapConf
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.config.BitlapConfiguration
 
 import zio.{ System as _, * }
 

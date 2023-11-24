@@ -15,23 +15,18 @@
  */
 package org.bitlap.network
 
-import java.sql.ResultSet
-import java.util
-
-import scala.collection.mutable.ListBuffer
-import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-import org.bitlap.common.exception._
-import org.bitlap.network.enumeration.TypeId
+import org.bitlap.common.exception.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.network.models.RowSet
 import org.bitlap.network.protocol.impl.Sync
-import org.bitlap.network.serde.BitlapSerde
 
-import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.LazyLogging
+
+final case class Result(
+  tableSchema: TableSchema,
+  fetchResult: FetchResults)
 
 final class BitlapResultSet(
   sync: Sync,
@@ -39,13 +34,12 @@ final class BitlapResultSet(
   stmt: String,
   queryTimeout: Long,
   confOverlay: Map[String, String])
-    extends Iterator[FetchResults]
+    extends Iterator[Result]
     with LazyLogging {
-  import BitlapResultSet._
 
-  private val operationId       = sync.executeStatement(sessionId, stmt, queryTimeout, confOverlay)
-  val tableSchema: TableSchema  = sync.getResultSetMetadata(operationId)
-  var fetchResult: FetchResults = _
+  private val operationId               = sync.executeStatement(sessionId, stmt, queryTimeout, confOverlay)
+  private val tableSchema: TableSchema  = sync.getResultSetMetadata(operationId)
+  private var fetchResult: FetchResults = _
 
   private var hasMore: Boolean    = false
   private var firstFetch: Boolean = true
@@ -58,7 +52,7 @@ final class BitlapResultSet(
     hasMore
   }
 
-  override def next(): FetchResults = {
+  override def next(): Result = {
     // TODO next
     if (!hasMore) throw BitlapSQLException("No more elements")
     try {
@@ -71,20 +65,9 @@ final class BitlapResultSet(
         hasMore = fetchResult.hasMoreRows
       }
       firstFetch = false
-      fetchResult
+      Result(tableSchema, fetchResult)
     } catch
       case NonFatal(e) =>
         throw BitlapSQLException("fetch next failed", cause = Some(e))
-  }
-}
-
-object BitlapResultSet {
-
-  def underlying(fetchResult: FetchResults, metadata: TableSchema): List[List[(String, String)]] = {
-    if (fetchResult == null) throw BitlapSQLException("Without more elements, unable to get underlining of fetchResult")
-    fetchResult.results.rows.map(_.values.zipWithIndex.map { case (string, i) =>
-      val typeDesc = metadata.columns.apply(i).typeDesc
-      typeDesc.name -> BitlapSerde.deserialize[String](typeDesc, string)
-    }.toList)
   }
 }

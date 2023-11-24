@@ -19,6 +19,7 @@ import java.sql.*
 
 import scala.collection.mutable
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
@@ -124,7 +125,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
       else return false
 
       rowsFetched = rowsFetched + 1
-    catch case e: Exception => throw BitlapSQLException(msg = "Error retrieving next row", cause = Option(e))
+    catch case e: Exception => throw BitlapSQLException("Error retrieving next row", cause = Option(e))
 
     true
 
@@ -147,7 +148,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
     try if stmtHandle != null then client.closeOperation(stmtHandle)
     catch
       case e: Exception =>
-        throw BitlapSQLException(e.toString, "08S01", cause = Option(e))
+        throw BitlapSQLException(e.toString, cause = Option(e))
 
   override def close(): Unit =
     if this.statement != null && this.statement.isInstanceOf[BitlapStatement] then

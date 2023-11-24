@@ -98,5 +98,9 @@ final class MockAsync extends AsyncProtocol with CSVUtils {
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
     ZIO.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
 
-  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ???
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] = ZIO.succeed(
+    GetInfoValue(ByteString.copyFromUtf8("Bitlap"))
+  )
+
+  override def authenticate(username: String, password: String): Task[Unit] = ZIO.unit
 }

@@ -17,7 +17,7 @@ package org.bitlap.core.catalog.metadata
 
 import Account._
 
-final case class Account(private val _name: String, secretKey: SecretKey = SecretKey(DEFAULT_PASSWORD)) {
+final case class Account(private val _name: String, secretKey: SecretKey) {
   val name: String = _name.toLowerCase()
 }
 
@@ -26,5 +26,5 @@ object Account {
   val DEFAULT_PASSWORD = ""
   val DEFAULT_DIR      = "/account"
 
-  final case class SecretKey(value: String = DEFAULT_PASSWORD)
+  final case class SecretKey(value: String)
 }

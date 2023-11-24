@@ -168,6 +168,14 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
       .provideLayer(leaderClientLayer)
       .onError(e => onErrorFunc(e))
 
+  override def authenticate(username: String, password: String): Task[Unit] = {
+    DriverServiceClient
+      .authenticate(BAuthenticateReq(username, password))
+      .unit
+      .provideLayer(leaderClientLayer)
+      .onError(e => onErrorFunc(e))
+  }
+
 object Async {
 
   def make(conf: ClientConfig): ULayer[Async] = ZLayer.succeed(

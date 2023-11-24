@@ -16,7 +16,6 @@
 package org.bitlap.server.service
 
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.jdbc.Constants
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
@@ -45,7 +44,7 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
   ): Task[SessionHandle] = for {
     session <- sessionManager.openSession(username, password, configuration)
     _ <- session.currentSchemaRef.updateAndGet { currentSchema =>
-      currentSchema.set(configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB))
+      currentSchema.set(configuration.getOrElse("DBNAME", "default"))
       currentSchema
     }
   } yield session.sessionHandle
@@ -115,3 +114,5 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
     sessionManager
       .getInfo(sessionHandle, getInfoType)
+
+  override def authenticate(username: String, password: String): Task[Unit] = ???

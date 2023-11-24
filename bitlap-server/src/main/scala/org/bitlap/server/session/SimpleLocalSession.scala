@@ -17,19 +17,16 @@ package org.bitlap.server.session
 
 import java.util.Vector as JVector
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong, AtomicReference }
+import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.{ BitlapConf, BitlapVersionInfo }
-import org.bitlap.core.catalog.metadata.Database
-import org.bitlap.jdbc.BitlapSQLException
+import org.bitlap.common.BitlapVersionInfo
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.config.BitlapConfiguration
 
 import com.google.protobuf.ByteString

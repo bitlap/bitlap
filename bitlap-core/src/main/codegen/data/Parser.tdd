@@ -45,6 +45,7 @@
     "org.bitlap.core.sql.parser.ddl.user.SqlCreateUser"
     "org.bitlap.core.sql.parser.ddl.user.SqlDropUser"
     "org.bitlap.core.sql.parser.ddl.user.SqlShowUsers"
+    "org.bitlap.core.sql.parser.ddl.user.SqlAuth"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -74,6 +75,7 @@
     "CURRENT_DATABASE",
     "USERS"
     "IDENTIFIED"
+    "AUTH"
   ]
 
   # List of keywords from "keywords" section that are not reserved.
@@ -437,7 +439,8 @@
     "SqlLoadData()"
     "SqlUseDatabase()",
     "SqlShowCurrentDatabase()",
-    "SqlShowUsers()"
+    "SqlShowUsers()",
+    "SqlAuth()"
   ]
 
   # List of methods for parsing custom literals.

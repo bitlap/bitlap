@@ -61,3 +61,5 @@ trait ProtocolMonad[F[_]]:
   def getOperationStatus(opHandle: OperationHandle): F[OperationStatus]
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): F[GetInfoValue]
+
+  def authenticate(username: String, password: String): F[Unit]

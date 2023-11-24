@@ -16,9 +16,7 @@
 package org.bitlap.server
 
 import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.config.BitlapRaftConfig
 import org.bitlap.server.raft.*
-import org.bitlap.server.service.DriverService
 
 import org.slf4j.LoggerFactory
 

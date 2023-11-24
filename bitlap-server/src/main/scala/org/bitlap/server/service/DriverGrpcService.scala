@@ -150,3 +150,13 @@ final class DriverGrpcService(async: AsyncProtocol, serverNodeContext: BitlapGlo
         _.getInfo(new SessionHandle(request.getSessionHandle), GetInfoType.toGetInfoType(request.infoType))
       )
       .mapBoth(errorApplyFunc, _.toBGetInfoResp)
+
+  override def authenticate(request: BAuthenticateReq, context: RequestContext)
+    : IO[StatusException, BAuthenticateResp] = {
+    async
+      .when(
+        serverNodeContext.isLeader,
+        _.authenticate(request.username, request.password)
+      )
+      .mapBoth(errorApplyFunc, _ => BAuthenticateResp())
+  }

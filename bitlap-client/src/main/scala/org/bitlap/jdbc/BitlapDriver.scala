@@ -19,6 +19,8 @@ import java.sql.{ Array as _, * }
 import java.util.Properties
 import java.util.logging.Logger
 
+import org.bitlap.common.exception.BitlapSQLException
+
 /** Bitlap jdbc driver
  */
 abstract class BitlapDriver extends Driver:
@@ -70,7 +72,6 @@ abstract class BitlapDriver extends Driver:
     dbProp.required = false
     dbProp.description = "Database name"
 
-    println(s"Driver connect to: host[${hostProp.value}],port[${portProp.value}],database:[${dbProp.value}]")
     Array(hostProp, portProp, dbProp)
 
   override def getMajorVersion(): Int = Constants.MAJOR_VERSION

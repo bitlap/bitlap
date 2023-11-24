@@ -15,17 +15,10 @@
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-client</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>
             <artifactId>bitlap-server</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>dev.zio</groupId>
-                    <artifactId>zio-http_3</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>

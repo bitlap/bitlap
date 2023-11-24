@@ -36,7 +36,7 @@ final class HttpServiceLive extends LazyLogging:
     var syncConnect: SyncConnection = null
     try {
       syncConnect = new SyncConnection("root", "")
-      syncConnect.open(ServerAddress("127.0.0.7", 23333))
+      syncConnect.open(ServerAddress("127.0.0.1", 23333))
 
       val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
         val rs = syncConnect.execute(sql)

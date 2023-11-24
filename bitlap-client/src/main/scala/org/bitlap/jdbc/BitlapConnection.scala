@@ -90,11 +90,11 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
       while numRetries < maxRetries do
         try {
           client = new BitlapClient(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
-          client.authenticate(
+          session = client.openSession(
             sessionVars.getOrElse(JdbcConnectionParams.AUTH_USER, "root"),
-            sessionVars.getOrElse(JdbcConnectionParams.AUTH_PASSWD, "")
+            sessionVars.getOrElse(JdbcConnectionParams.AUTH_PASSWD, ""),
+            sessionVars
           )
-          session = client.openSession()
           executeInitSql()
           closed = false
           break
@@ -107,7 +107,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
             catch {
               case _: Exception =>
             }
-            if numRetries >= maxRetries then throw BitlapSQLException(s"$errMsg${e.getMessage}", cause = Option(e))
+            if numRetries >= maxRetries then throw BitlapSQLException(s"${e.getMessage}", cause = Option(e))
             else {
               System.err.println(
                 s"$warnMsg${e.getMessage} Retrying $numRetries of $maxRetries with retry interval $retryInterval ms"

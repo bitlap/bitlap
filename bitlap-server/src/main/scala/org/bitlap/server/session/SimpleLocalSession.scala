@@ -37,8 +37,6 @@ import zio.{ System as _, * }
 /** Bitlap session implementation on a single machine
  */
 final class SimpleLocalSession(
-  val username: String,
-  val password: String,
   val sessionManager: SessionManager,
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionConfRef: Ref[mutable.Map[String, String]],

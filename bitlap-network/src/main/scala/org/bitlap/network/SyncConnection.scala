@@ -35,7 +35,7 @@ final class SyncConnection(user: String, password: String) extends Connection wi
       sync.closeSession(sessionId)
     } catch
       case NonFatal(e) =>
-        throw BitlapSQLException("close failed", cause = Some(e))
+        throw BitlapSQLException("Close failed", cause = Some(e))
   }
 
   override def reopen(): Unit = {
@@ -44,19 +44,18 @@ final class SyncConnection(user: String, password: String) extends Connection wi
       open(address, configuration)
     } catch
       case NonFatal(e) =>
-        throw BitlapSQLException("reopen failed", cause = Some(e))
+        throw BitlapSQLException("Reopen failed", cause = Some(e))
   }
 
   override def open(address: ServerAddress, configuration: Map[String, String]): Unit = {
     try {
       this.sync = new Sync(List(address), configuration)
-      this.sync.authenticate(user, if (password == null) "" else password)
       this.address = address
       this.configuration = configuration
       this.sessionId = sync.openSession(user, password, configuration)
     } catch
       case NonFatal(e) =>
-        throw BitlapSQLException("open failed", cause = Some(e))
+        throw BitlapSQLException("Open failed", cause = Some(e))
   }
 
   override def open(address: ServerAddress): Unit = open(address, configuration)

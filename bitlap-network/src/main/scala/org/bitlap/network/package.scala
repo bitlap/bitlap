@@ -61,6 +61,12 @@ final case class ClientConfig(
 
 lazy val errorApplyFunc: Throwable => StatusException = {
   case net @ BitlapException(errorKey, parameters, cause) =>
-    new StatusException(Status.fromThrowable(net).withDescription(errorKey.formatErrorMessage(parameters)))
+    new StatusException(
+      Status
+        .fromThrowable(net)
+        .withDescription(errorKey.formatErrorMessage(parameters))
+        .withCause(cause.orNull)
+    )
+
   case ex => new StatusException(Status.fromThrowable(ex))
 }

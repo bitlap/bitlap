@@ -137,8 +137,11 @@ class BitlapStatement(
     checkConnection("cancel")
     if isCancelled then return
 
-    try if stmtHandle != null then client.cancelOperation(stmtHandle)
-    catch
+    try {
+      if (stmtHandle != null) {
+        client.cancelOperation(stmtHandle)
+      }
+    } catch
       case e: SQLException =>
         throw e
       case e: Exception =>
@@ -180,7 +183,7 @@ class BitlapStatement(
       if stmtHandle == null || !stmtHandle.hasResultSet then return false
     catch
       case ex: Throwable => // TODO: get error msg, mapping it by code
-        throw BitlapSQLException(s"${ex.getLocalizedMessage}")
+        throw BitlapSQLException(s"${ex.getLocalizedMessage}", cause = Option(ex))
 
     val status = waitForOperationToComplete()
     // The query should be completed by now

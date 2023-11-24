@@ -54,7 +54,7 @@ final class BitlapResultSet(
 
   override def next(): Result = {
     // TODO next
-    if (!hasMore) throw BitlapSQLException("No more elements")
+    if (!firstFetch && !hasMore) throw BitlapSQLException("No more elements")
     try {
       if (fetchResult == null) {
         fetchResult = sync.fetchResults(operationId, 50, 1)

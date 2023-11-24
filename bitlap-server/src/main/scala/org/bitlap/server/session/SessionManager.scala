@@ -23,7 +23,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-import org.bitlap.common.exception.BitlapException
+import org.bitlap.common.exception.{ BitlapAuthenticationException, BitlapException }
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
@@ -86,12 +86,12 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
       sessionState          <- Ref.make(new AtomicBoolean(true))
       sessionCreateTime     <- Ref.make(new AtomicLong(System.currentTimeMillis()))
       defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
-      defaultSchema         <- Ref.make(AtomicReference(Database.DEFAULT_DATABASE))
+      db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
+      defaultSchema <- Ref.make(AtomicReference(db))
+      _             <- AccountAuthenticator.auth(s"AUTH $username '$password'")
       session <- ZIO
         .attempt(
           new SimpleLocalSession(
-            username = username,
-            password = password,
             sessionManager = this,
             sessionConfRef = defaultSessionConf,
             sessionStateRef = sessionState,

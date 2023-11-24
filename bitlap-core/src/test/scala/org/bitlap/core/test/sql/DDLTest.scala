@@ -29,6 +29,8 @@ class DDLTest extends BaseLocalFsTest with SqlChecker {
     // auth root default password
     sql(s"auth root") shouldEqual List(List(true))
 
+    sql(s"auth root ''") shouldEqual List(List(true))
+
     sql(s"create user if not exists $testUser identified by 'password'") shouldEqual List(List(true))
     sql(s"auth $testUser 'password'") shouldEqual List(List(true))
     sql(s"drop user $testUser") shouldEqual List(List(true))

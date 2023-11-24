@@ -27,8 +27,8 @@ final class BitlapClient(serverPeers: List[ServerAddress], props: Map[String, St
   private lazy val sync: Sync = new Sync(serverPeers, props)
 
   def openSession(
-    username: String = "",
-    password: String = "",
+    username: String,
+    password: String,
     config: Map[String, String] = Map.empty
   ): SessionHandle =
     sync.openSession(username, password, config)
@@ -62,4 +62,4 @@ final class BitlapClient(serverPeers: List[ServerAddress], props: Map[String, St
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
     sync.getInfo(sessionHandle, getInfoType)
 
-  def authenticate(username: String, password: String) = sync.authenticate(username, password)
+  def authenticate(username: String, password: String): Unit = sync.authenticate(username, password)

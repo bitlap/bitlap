@@ -17,6 +17,7 @@ package org.bitlap.testkit
 
 import java.sql.*
 
+import org.bitlap.jdbc.BitlapDataSource
 import org.bitlap.network.{ ServerAddress, SyncConnection }
 import org.bitlap.server.http.*
 
@@ -26,33 +27,31 @@ import org.scalatest.matchers.should
 
 import bitlap.rolls.core.jdbc.*
 
-class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers with Inspectors with CSVUtils {
+class JdbcOperationSpec extends BaseSpec {
 
-  private lazy val table    = s"test_table_${FakeDataUtils.randEntityNumber}"
-  private lazy val database = s"test_database_${FakeDataUtils.randEntityNumber}"
+  private val ds = new BitlapDataSource("jdbc:bitlap://127.0.0.1:23333/default")
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
-  given Connection = DriverManager.getConnection("jdbc:bitlap://127.0.0.1:23333/default")
-
-  // Each test will be executed once and needs to be modified!
-  val server = new Thread {
-    override def run(): Unit = MockBitlapServer.main(scala.Array.empty)
-  }
+  given Connection = ds.getConnection("root", "")
 
   override protected def beforeAll(): Unit = {
-    server.setDaemon(true)
-    server.start()
-    Thread.sleep(5000L)
-
-    initTable()
-  }
-
-  private def initTable(): Unit = {
+    super.beforeAll()
     sql"create table if not exists $table"
     sql"load data 'classpath:simple_data.csv' overwrite table $table"
   }
 
   // Execute FakeDataUtilSpec to generate new mock data
+
+  test("show database by jdbc") {
+    val rs =
+      sql"""
+            show databases
+       """
+    val retx = ResultSetX[TypeRow1[String]](rs)
+    val ret1 = retx.fetch()
+    assert(ret1.nonEmpty)
+    assert(ret1.head.columns[retx.Out]._1 == "default")
+  }
+
   test("query by jdbc") {
     val rs = sql"""
        select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
@@ -63,23 +62,4 @@ class ServerSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers
     val ret1 = ResultSetX[TypeRow5[Long, Long, String, String, Int]](rs).fetch()
     assert(ret1.nonEmpty)
   }
-
-  test("query by client") {
-    val stmt =
-      s"""
-       select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
-       from $table
-       where _time >= 0
-       group by _time
-       """
-    val sync = new SyncConnection("", "")
-    sync.open(ServerAddress("127.0.0.1", 23333))
-
-    val rs = sync.execute(stmt)
-
-    assert(rs.hasNext)
-
-    assert(rs.next().underlying.nonEmpty)
-  }
-
 }

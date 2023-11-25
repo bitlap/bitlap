@@ -29,7 +29,8 @@ import zio.*
 
 object AccountAuthenticator extends BitlapSerde {
 
-  def auth(statement: String): ZIO[Any, Throwable, Unit] = {
+  def auth(username: String, password: String): ZIO[Any, Throwable, Unit] = {
+    val statement: String = s"AUTH $username '$password'"
     val res =
       try {
         val execution = new QueryExecution(statement, Database.DEFAULT_DATABASE).execute()

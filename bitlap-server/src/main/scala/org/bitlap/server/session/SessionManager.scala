@@ -89,7 +89,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
       defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
       db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
       defaultSchema <- Ref.make(AtomicReference(db))
-      _             <- AccountAuthenticator.auth(s"AUTH $username '$password'")
+      _             <- AccountAuthenticator.auth(username, password)
       session <- ZIO
         .attempt(
           new SimpleLocalSession(

@@ -72,10 +72,3 @@ final class SyncConnection(user: String, password: String) extends Connection wi
   }
 
 }
-
-object SyncConnection {
-
-  def make(conf: ClientConfig): ULayer[SyncConnection] = ZLayer.succeed(
-    new SyncConnection(conf.username, conf.password)
-  )
-}

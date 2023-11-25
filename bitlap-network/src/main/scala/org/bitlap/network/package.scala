@@ -64,11 +64,6 @@ lazy val errorApplyFunc: Throwable => StatusException = {
 }
 
 // =================================class==================================================
-
-final case class ClientConfig(
-  username: String,
-  password: String)
-
 final case class Result(
   tableSchema: TableSchema,
   fetchResult: FetchResults)

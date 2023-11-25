@@ -34,7 +34,7 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
+  val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
     ZLayer.fromFunction((config: BitlapConfiguration, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )

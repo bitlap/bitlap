@@ -15,7 +15,6 @@
  */
 package org.bitlap.server
 
-import org.bitlap.network.ClientConfig
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
 import org.bitlap.network.SyncConnection
 import org.bitlap.server.config.BitlapConfiguration
@@ -32,7 +31,7 @@ import zio.*
  */
 object GrpcServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
+  val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
     ZLayer.fromFunction((config: BitlapConfiguration) => new GrpcServerEndpoint(config))
 
   def service(
@@ -44,15 +43,10 @@ object GrpcServerEndpoint:
   ] =
     (for {
       config <- ZIO.service[BitlapConfiguration]
+      _      <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
+      _      <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSyncConnection(new SyncConnection("root", "")))
       _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
-      client <- SyncConnection
-        .make(
-          ClientConfig("root", "") // todo
-        )
-        .build
-      _ <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
-      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSyncConnection(client.get))
-      _ <- ZIO.never
+      _      <- ZIO.never
     } yield ())
       .onInterrupt(_ => ZIO.logWarning(s"Grpc Server was interrupted! Bye!"))
 

@@ -31,7 +31,7 @@ import zio.{ Runtime as _, * }
  */
 object RaftServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
+  val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
 
   def service(args: List[String])

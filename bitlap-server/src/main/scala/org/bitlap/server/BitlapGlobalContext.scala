@@ -47,7 +47,9 @@ final case class BitlapGlobalContext(
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
-  def start(): ZIO[Any, Throwable, Boolean] = grpcStarted.succeed(true) && raftStarted.succeed(true)
+  def start(): ZIO[Any, Throwable, Boolean] = {
+    grpcStarted.succeed(true) && raftStarted.succeed(true)
+  }
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
 

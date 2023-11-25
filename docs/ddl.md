@@ -1,5 +1,5 @@
 # DDL
 
-| name | expr | description |
-|------|------|-------------|
-|      |      |             | 
+| name | expr | description | status |
+|------|------|-------------|--------|
+|      |      |             | ✅      |

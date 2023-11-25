@@ -1,5 +1,5 @@
 # CMD
 
-| name | expr | description |
-|------|------|-------------|
-|      |      |             | 
+| name | expr | description | status |
+|------|------|-------------|--------|
+|      |      |             | ✅      |

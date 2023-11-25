@@ -15,8 +15,10 @@
  */
 package org.bitlap.server.service
 
-import org.bitlap.common.exception.BitlapException
-import org.bitlap.jdbc.Constants
+import scala.util.control.NonFatal
+
+import org.bitlap.common.exception.{ BitlapException, BitlapThrowable }
+import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
@@ -30,25 +32,27 @@ import zio.*
 
 /** Server side implementation of asynchronous RPC
  */
-object DriverService:
+object AsyncServerService:
 
   lazy val live: ZLayer[SessionManager, Nothing, AsyncProtocol] =
-    ZLayer.fromFunction((sm: SessionManager) => new DriverService(sm))
-end DriverService
+    ZLayer.fromFunction((sm: SessionManager) => new AsyncServerService(sm))
+end AsyncServerService
 
-final class DriverService(sessionManager: SessionManager) extends AsyncProtocol with LazyLogging:
+final class AsyncServerService(sessionManager: SessionManager) extends AsyncProtocol with LazyLogging:
 
   override def openSession(
     username: String,
     password: String,
     configuration: Map[String, String] = Map.empty
-  ): Task[SessionHandle] = for {
-    session <- sessionManager.openSession(username, password, configuration)
-    _ <- session.currentSchemaRef.updateAndGet { currentSchema =>
-      currentSchema.set(configuration.getOrElse(Constants.DBNAME_PROPERTY_KEY, Constants.DEFAULT_DB))
-      currentSchema
-    }
-  } yield session.sessionHandle
+  ): Task[SessionHandle] =
+    (for {
+      session <- sessionManager.openSession(username, password, configuration)
+      _ <- session.currentSchemaRef.updateAndGet { currentSchema =>
+        currentSchema.set(configuration.getOrElse("DBNAME", Database.DEFAULT_DATABASE))
+        currentSchema
+      }
+    } yield session.sessionHandle)
+      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def closeSession(sessionHandle: SessionHandle): Task[Unit] =
     sessionManager.closeSession(sessionHandle)
@@ -63,17 +67,17 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
       .getSession(sessionHandle)
       .flatMap {
         _.executeStatement(
-          statement,
+          statement.stripSuffix(";"),
           confOverlay,
           queryTimeout
         ).mapError {
-          case bitlapException: BitlapException =>
-            logger.error(s"Internal Error: $statement", bitlapException)
-            bitlapException
-          case e: Throwable =>
+          case throwable: BitlapThrowable =>
+            logger.error(s"Internal Error: $statement", throwable)
+            throwable
+          case NonFatal(e) =>
             logger.error(s"Unknown Error: $statement", e)
             BitlapException(s"Unknown Error: ${e.getLocalizedMessage}", cause = Option(e))
-        }
+        }.onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
       }
 
   override def fetchResults(
@@ -81,17 +85,17 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
     maxRows: Int,
     fetchType: Int
   ): Task[FetchResults] =
-    for {
+    (for {
       operation <- sessionManager
         .getOperation(opHandle)
       rs <- operation.parentSession.fetchResults(operation.opHandle)
-    } yield FetchResults(hasMoreRows = false, rs)
+    } yield FetchResults(hasMoreRows = false, rs)).onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def getResultSetMetadata(opHandle: OperationHandle): Task[TableSchema] =
-    for {
+    (for {
       operation <- sessionManager.getOperation(opHandle)
       rs        <- operation.parentSession.getResultSetMetadata(opHandle)
-    } yield rs
+    } yield rs).onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def cancelOperation(opHandle: OperationHandle): Task[Unit] =
     sessionManager
@@ -100,6 +104,7 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
         val session = operation.parentSession
         session.cancelOperation(opHandle)
       }
+      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def closeOperation(opHandle: OperationHandle): Task[Unit] =
     sessionManager
@@ -108,10 +113,14 @@ final class DriverService(sessionManager: SessionManager) extends AsyncProtocol 
         val session = operation.parentSession
         session.closeOperation(opHandle)
       }
+      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def getOperationStatus(opHandle: OperationHandle): Task[OperationStatus] =
-    ZIO.succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+    ZIO
+      .succeed(OperationStatus(Some(true), Some(OperationState.FinishedState)))
+      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)
 
   override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
     sessionManager
       .getInfo(sessionHandle, getInfoType)
+      .onError(ce => ZIO.logErrorCause(ce).ignoreLogged)

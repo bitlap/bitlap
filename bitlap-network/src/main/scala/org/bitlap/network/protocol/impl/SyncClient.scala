@@ -15,6 +15,8 @@
  */
 package org.bitlap.network.protocol.impl
 
+import scala.concurrent.duration.Duration
+
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
@@ -22,11 +24,15 @@ import org.bitlap.network.models.*
 import org.bitlap.network.protocol.SyncProtocol
 
 /** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
- *  [[org.bitlap.network.protocol.impl.Async]].
+ *  [[org.bitlap.network.protocol.impl.AsyncClient]].
  */
-final class Sync(serverPeers: Array[String], props: Map[String, String]) extends SyncProtocol:
+final class SyncClient(
+  serverPeers: List[ServerAddress],
+  props: Map[String, String]
+)(using timeout: Duration)
+    extends SyncProtocol:
 
-  private lazy val async = new Async(serverPeers, props)
+  private val async = new AsyncClient(serverPeers, props)
 
   override def openSession(
     username: String,
@@ -73,4 +79,7 @@ final class Sync(serverPeers: Array[String], props: Map[String, String]) extends
       _.closeOperation(opHandle)
     }
 
-  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Identity[GetInfoValue] = ???
+  override def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Identity[GetInfoValue] =
+    async.sync {
+      _.getInfo(sessionHandle, getInfoType)
+    }

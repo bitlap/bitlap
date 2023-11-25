@@ -33,9 +33,9 @@ object BitlapServer extends ZIOAppDefault:
   override def run =
     (for {
       args           <- getArgs
-      t1             <- RaftServerEndpoint.service(args.toList).fork
-      t2             <- GrpcServerEndpoint.service(args.toList).fork
-      t3             <- HttpServerEndpoint.service(args.toList).fork
+      raft           <- RaftServerEndpoint.service(args.toList).fork
+      grpc           <- GrpcServerEndpoint.service(args.toList).fork
+      http           <- HttpServerEndpoint.service(args.toList).fork
       serverConfig   <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
       sessionManager <- ZIO.service[SessionManager]
       _ <- sessionManager
@@ -51,7 +51,7 @@ object BitlapServer extends ZIOAppDefault:
                       |                   /_/
                       |""".stripMargin)
       _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.start())
-      _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
+      _ <- ZIO.collectAll(Seq(raft.join, grpc.join, http.join))
     } yield ())
       .provide(
         RaftServerEndpoint.live,
@@ -59,10 +59,10 @@ object BitlapServer extends ZIOAppDefault:
         HttpServerEndpoint.live,
         HttpServiceLive.live,
         SessionManager.live,
-        DriverService.live,
+        AsyncServerService.live,
         Scope.default,
         ZIOAppArgs.empty,
-        DriverGrpcService.live,
+        DriverGrpcServer.live,
         BitlapConfiguration.live,
         BitlapGlobalContext.live
       )

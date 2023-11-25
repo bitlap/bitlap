@@ -177,7 +177,6 @@ message BGetInfoValue {
   bytes value = 1;
 }
 
-
 service DriverService {
   rpc OpenSession (BOpenSessionReq) returns (BOpenSessionResp) {}
 

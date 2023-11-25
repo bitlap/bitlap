@@ -30,6 +30,7 @@
     "org.apache.calcite.sql.ddl.SqlDdlNodes"
     "org.apache.calcite.sql.SqlCreate"
     "org.apache.calcite.sql.SqlDrop"
+    "org.apache.calcite.sql.SqlAlter"
     "org.bitlap.core.sql.parser.ddl.SqlCreateDatabase"
     "org.bitlap.core.sql.parser.ddl.SqlCreateTable"
     "org.bitlap.core.sql.parser.ddl.SqlDropDatabase"
@@ -41,6 +42,10 @@
     "org.bitlap.core.sql.parser.cmd.SqlLoadData"
     "org.bitlap.core.sql.parser.ddl.SqlUseDatabase"
     "org.bitlap.core.sql.parser.ddl.SqlShowCurrentDatabase"
+    "org.bitlap.core.sql.parser.ddl.user.SqlCreateUser"
+    "org.bitlap.core.sql.parser.ddl.user.SqlDropUser"
+    "org.bitlap.core.sql.parser.ddl.user.SqlShowUsers"
+    "org.bitlap.core.sql.parser.ddl.user.SqlAuth"
   ]
 
   # List of new keywords. Example: "DATABASES", "TABLES". If the keyword is
@@ -68,6 +73,9 @@
     "USE"
     "VIEWS"
     "CURRENT_DATABASE"
+    "USERS"
+    "IDENTIFIED"
+    "AUTH"
   ]
 
   # List of keywords from "keywords" section that are not reserved.
@@ -430,7 +438,9 @@
     "SqlExplainX()"
     "SqlLoadData()"
     "SqlUseDatabase()",
-    "SqlShowCurrentDatabase()"
+    "SqlShowCurrentDatabase()",
+    "SqlShowUsers()",
+    "SqlAuth()"
   ]
 
   # List of methods for parsing custom literals.

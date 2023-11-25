@@ -24,9 +24,12 @@ import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.exception.BitlapExceptions
-import org.bitlap.network.BitlapClient
+import org.bitlap.common.exception.BitlapSQLException
+import org.bitlap.network.{ Connection as _, _ }
 import org.bitlap.network.handles.*
+import org.bitlap.network.protocol.impl.SyncClient
 
 import bitlap.rolls.core.jdbc.{ columns, sqlQ, ResultSetX, TypeRow1 }
 
@@ -41,7 +44,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   private var closed                               = true
   private var readOnly                             = false
   private var warningChain: SQLWarning             = _
-  private var client: BitlapClient                 = _
+  private var client: SyncClient                   = _
   private var initFile: String                     = _
   private var maxRetries                           = BITLAP_DEFAULT_RETRIES
   private var connParams: JdbcConnectionParams     = _
@@ -86,8 +89,12 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     breakable {
       while numRetries < maxRetries do
         try {
-          client = new BitlapClient(connParams.authorityList, bitlapConfs ++ sessionVars)
-          session = client.openSession()
+          client = new SyncClient(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
+          session = client.openSession(
+            sessionVars.getOrElse(JdbcConnectionParams.AUTH_USER, "root"),
+            sessionVars.getOrElse(JdbcConnectionParams.AUTH_PASSWD, ""),
+            sessionVars
+          )
           executeInitSql()
           closed = false
           break
@@ -100,8 +107,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
             catch {
               case _: Exception =>
             }
-            if numRetries >= maxRetries then
-              throw BitlapSQLException(s"$errMsg${e.getMessage}", " 08S01", cause = Option(e))
+            if numRetries >= maxRetries then throw BitlapSQLException(s"${e.getMessage}", cause = Option(e))
             else {
               System.err.println(
                 s"$warnMsg${e.getMessage} Retrying $numRetries of $maxRetries with retry interval $retryInterval ms"
@@ -119,27 +125,30 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     if closed then throw BitlapSQLException(s"Cannot $action after connection has been closed")
 
   private def executeInitSql(): Unit =
-    if initFile != null && session != null then
-      try {
-        val st = new BitlapStatement(this, session, client)
-        try {
-          val sqlList = Utils.parseInitFile(initFile)
-          for sql <- sqlList do {
-            println(s"Executing InitSql ... $sql")
-            val hasResult = st.execute(sql)
-            if hasResult then
-              try {
-                val rs = st.getResultSet()
-                try while rs.next do println(rs.getString(1))
-                catch { case ignore: Exception => }
-                finally if rs != null then rs.close()
-              } catch { case ignore: Exception => }
-          }
-        } catch {
-          case e: Exception =>
-            throw BitlapSQLException(e.getMessage)
-        } finally if st != null then st.close()
+    if (initFile == null || session == null) {
+      return
+    }
+    val st = new BitlapStatement(this, session, client)
+    try {
+      val sqlList = Utils.parseInitFile(initFile)
+      for sql <- sqlList do {
+        val hasResult = st.execute(sql)
+        if hasResult then
+          try {
+            val rs = st.getResultSet()
+            try while rs.next do println(rs.getString(1))
+            catch { case ignore: Exception => }
+            finally if rs != null then rs.close()
+          } catch { case ignore: Exception => }
       }
+    } catch {
+      case e: Exception =>
+        throw BitlapSQLException(e.getMessage)
+    } finally {
+      if (st != null) {
+        st.close()
+      }
+    }
 
   override def unwrap[T](iface: Class[T]): T = {
     if (!iface.isInstance(this)) {
@@ -325,7 +334,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
 
   override def getSchema: String = {
     checkConnection("getSchema")
-    val rs   = ResultSetX[TypeRow1[String]](sqlQ"SHOW CURRENT_DATABASE")
+    val rs   = ResultSetX[TypeRow1[String]](sqlQ"${ShowCurrentDatabase.command}")
     val data = rs.fetch()
     if (data.nonEmpty) {
       data.headOption.map(_.columns[rs.Out]._1).orNull

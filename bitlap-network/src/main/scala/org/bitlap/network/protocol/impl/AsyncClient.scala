@@ -34,40 +34,36 @@ import zio.*
 
 /** Asynchronous RPC client, implemented based on zio grpc
  */
-final class Async(serverPeers: Array[String], props: Map[String, String]) extends AsyncProtocol:
+final class AsyncClient(serverPeers: List[ServerAddress], props: Map[String, String]) extends AsyncProtocol:
 
-  assert(serverPeers.length > 0)
-
-  private val addr = serverPeers.asServerAddresses
+  assert(serverPeers.nonEmpty)
 
   private val addRef: AtomicReference[ServerAddress] =
     new AtomicReference[ServerAddress](null)
 
   /** Based on the configured service cluster, obtain its leader and construct
-   *  it[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
+   *  [[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]]
    *
    *  Clients use[[org.bitlap.network.Driver.ZioDriver.DriverServiceClient]] to execute SQL, currently, all operations
    *  must be read based on the leader.
    */
   private def leaderClientLayer: ZLayer[Any, Throwable, DriverServiceClient] =
-    ZLayer.make[DriverServiceClient](
-      Scope.default,
-      ZLayer.fromZIO(
-        for {
-          leaderLayer <-
-            if (addRef.get() == null) {
-              clientLayer(addr.head.ip, addr.head.port)
-                .flatMap(leaderLayer =>
-                  leaderLayer
-                    .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
-                    .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("127.0.0.1"), f.port)))
-                    .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
-                )
-                .flatMap(address => clientLayer(address.ip, address.port) <* ZIO.succeed(addRef.set(address)))
-            } else clientLayer(addRef.get().ip, addRef.get().port)
-        } yield leaderLayer
-      )
-    )
+    ZLayer.scoped {
+      for {
+        rnd <- ZIO.random.flatMap(_.nextIntBetween(0, serverPeers.size))
+        leaderLayer <-
+          if (addRef.get() == null) {
+            clientLayer(serverPeers(rnd).ip, serverPeers(rnd).port)
+              .flatMap(leaderLayer =>
+                leaderLayer
+                  .getLeader(BGetLeaderReq.of(StringEx.uuid(true)))
+                  .map(f => if f.ip.isEmpty then None else Some(ServerAddress(f.ip.getOrElse("127.0.0.1"), f.port)))
+                  .someOrFail(BitlapException(s"Cannot find a leader via hosts: ${serverPeers.mkString(",")}"))
+              )
+              .flatMap(address => clientLayer(address.ip, address.port) <* ZIO.succeed(addRef.set(address)))
+          } else clientLayer(addRef.get().ip, addRef.get().port)
+      } yield leaderLayer
+    }
 
   /** Get grpc channel based on IP:PORT.
    */
@@ -80,9 +76,9 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
 
   private inline def onErrorFunc(cleanup: Cause[Throwable]): UIO[Unit] = {
     cleanup match
-      case Cause.Fail(value, trace) =>
+      case Cause.Fail(value, _) =>
         value match {
-          case state: BitlapIllegalStateException =>
+          case _: BitlapIllegalStateException =>
             addRef.set(null)
             ZIO.unit
           case _ => ZIO.unit
@@ -169,10 +165,3 @@ final class Async(serverPeers: Array[String], props: Map[String, String]) extend
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
       .onError(e => onErrorFunc(e))
-
-object Async {
-
-  def make(conf: ClientConfig): ULayer[Async] = ZLayer.succeed(
-    new Async(conf.serverPeers.toArray, conf.props)
-  )
-}

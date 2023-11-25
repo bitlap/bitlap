@@ -9,7 +9,6 @@ mkdir -p dist/
 find dist/ -name 'bitlap*.tar.gz' | xargs rm -f
 find docker/ -name 'bitlap*.tar.gz' | xargs rm -f
 find docker/ -name 'static' | xargs rm -rf
-find docker/ -name 'initFileForTest.sql' | xargs rm -f
 
 
 # make tar
@@ -25,8 +24,6 @@ if [[ $? -eq 0 ]]; then
   mv ${TAR_FILE} docker/
   # 拷贝静态文件
   mv bitlap-server/target/classes/static docker/
-  # 拷贝初始化SQL
-  cp ./conf/initFileForTest.sql ./docker/initFileForTest.sql
   echo "=============================================================================="
   echo "===============  🎉 package end in docker directory !!!  ======================="
   echo "=============================================================================="

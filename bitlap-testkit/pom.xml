@@ -14,13 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>org.bitlap</groupId>
+            <artifactId>bitlap-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlap</groupId>
             <artifactId>bitlap-server</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>zhttp_2.13</artifactId>
-                    <groupId>io.d11</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bitlap</groupId>

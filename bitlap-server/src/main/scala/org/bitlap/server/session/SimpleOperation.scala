@@ -37,57 +37,18 @@ final class SimpleOperation(
   hasResultSet: Boolean = false
 )(
   globalConfig: BitlapConfiguration)
-    extends Operation(parentSession, opType, hasResultSet, globalConfig)
-    with BitlapSerde {
-
-  def mapTo(rs: ResultSet): QueryResultSet = {
-    // get schema
-    val metaData = rs.getMetaData
-    val columns = (1 to metaData.getColumnCount).map { it =>
-      val colName = metaData.getColumnName(it)
-      val colType = TypeId.jdbc2Bitlap.getOrElse(
-        metaData.getColumnType(it),
-        TypeId.StringType
-      ) // TODO temporarily, do not use TypeId.Unspecified to avoid errors
-      ColumnDesc(colName, colType)
-    }
-    // get row set
-    val rows = ListBuffer[Row]()
-    while rs.next() do {
-      val cl = (1 to metaData.getColumnCount).map { it =>
-        metaData.getColumnType(it) match {
-          case Types.VARCHAR                => serialize(rs.getString(it))
-          case Types.SMALLINT               => serialize(rs.getShort(it))
-          case Types.TINYINT                => serialize(rs.getByte(it))
-          case Types.INTEGER                => serialize(rs.getInt(it))
-          case Types.BIGINT | Types.NUMERIC => serialize(rs.getLong(it))
-          case Types.DOUBLE                 => serialize(rs.getDouble(it))
-          case Types.BOOLEAN                => serialize(rs.getBoolean(it))
-          case Types.TIMESTAMP              => serialize(rs.getLong(it))
-          case Types.FLOAT                  => serialize(rs.getFloat(it))
-          case Types.TIME                   => serialize(rs.getTime(it).getTime)
-          case Types.DATE                   => serialize(rs.getDate(it).getTime)
-          case tp                           => throw DataFormatException(s"Unsupported type:$tp")
-        }
-      }
-      rows.append(Row(cl.toList))
-    }
-    QueryResultSet(
-      TableSchema(columns.toList),
-      RowSet(rows.toList)
-    )
-  }
+    extends Operation(parentSession, opType, hasResultSet, globalConfig) {
 
   override def run(): Task[Unit] = {
     for {
       _ <- ZIO.attemptBlocking(super.setState(OperationState.RunningState))
-      currentSchemaRef <- parentSession.currentSchemaRef.getAndUpdate { schema =>
+      _ <- parentSession.currentSchemaRef.getAndUpdate { schema =>
         try {
           val execution = new QueryExecution(statement, schema.get()).execute()
           execution match
             case DefaultQueryResult(data, currentSchema) =>
               schema.set(currentSchema)
-              cache.put(opHandle, this.mapTo(data))
+              cache.put(opHandle, data.mapTo)
             case _ =>
           super.setState(OperationState.FinishedState)
         } catch {

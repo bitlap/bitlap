@@ -15,17 +15,16 @@
  */
 package org.bitlap.jdbc
 
-import java.io.*
 import java.net.*
 import java.util
 import java.util.ArrayList as JArrayList
 import java.util.regex.Pattern
 
 import scala.collection.immutable.ListMap
-import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.*
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.jdbc.Constants.*
 
 object Utils:
@@ -33,8 +32,7 @@ object Utils:
   def parseUri(_uri: String): JdbcConnectionParams =
     var uri        = _uri
     val connParams = new JdbcConnectionParams
-    if !uri.startsWith(URL_PREFIX) then
-      throw BitlapJdbcUriParseException(s"Bad URL format: Missing prefix " + URL_PREFIX)
+    if !uri.startsWith(URL_PREFIX) then throw BitlapSQLException(s"Bad URL format: Missing prefix " + URL_PREFIX)
     val dummyAuthorityString = "dummyhost:00000"
     val suppliedAuthorities  = getAuthorities(uri)
     val authorityList        = suppliedAuthorities.split(",")
@@ -59,8 +57,7 @@ object Utils:
           while sessMatcher.find do
             if sessMatcher.group(2) != null then
               connParams.sessionVars = connParams.sessionVars ++ ListMap(sessMatcher.group(1) -> sessMatcher.group(2))
-            else
-              throw BitlapJdbcUriParseException("Bad URL format: Multiple values for property " + sessMatcher.group(1))
+            else throw BitlapSQLException("Bad URL format: Multiple values for property " + sessMatcher.group(1))
       if dbName.nonEmpty then connParams.dbName = dbName
     val confStr = jdbcURI.getQuery
     if confStr != null then
@@ -97,42 +94,4 @@ object Utils:
     if toIndex < 0 then uri.substring(fromIndex)
     else uri.substring(fromIndex, toIndex)
 
-  def parseInitFile(initFile: String): List[String] =
-    val file                      = new File(initFile)
-    var br: BufferedReader        = null
-    var initSqlList: List[String] = Nil
-    try
-      val input = new FileInputStream(file)
-      br = new BufferedReader(new InputStreamReader(input, "UTF-8"))
-      var line: String = null
-      val sb           = new mutable.StringBuilder("")
-      while {
-        line = br.readLine
-        line != null
-      } do
-        line = line.trim
-        if line.nonEmpty then
-          if !line.startsWith("#") && !line.startsWith("--") then {
-            line = line.concat(" ")
-            sb.append(line)
-          }
-      initSqlList = getInitSql(sb.toString)
-    catch
-      case e: IOException =>
-        throw BitlapSQLException(msg = "Invalid sql syntax in initFile", cause = Option(e))
-    finally if br != null then br.close()
-    initSqlList
-
-  private def getInitSql(sbLine: String): List[String] =
-    val sqlArray    = sbLine.toCharArray
-    val initSqlList = new JArrayList[String]
-    var index       = 0
-    var beginIndex  = 0
-    while index < sqlArray.length do
-      if sqlArray(index) == ';' then
-        val sql = sbLine.substring(beginIndex, index).trim
-        initSqlList.add(sql)
-        beginIndex = index + 1
-
-      index += 1
-    initSqlList.asScala.toList
+  def parseInitFile(initFile: String): List[String] = org.bitlap.common.utils.StringEx.parseInitFile(initFile)

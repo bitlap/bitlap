@@ -15,10 +15,17 @@
  */
 package org.bitlap.common.utils
 
-import java.io.File
+import java.io.{ BufferedReader, File, FileInputStream, InputStreamReader, IOException }
+import java.util.ArrayList as JArrayList
 import java.util.UUID
 
+import scala.collection.mutable
+import scala.jdk.CollectionConverters.*
 import scala.util.control.Breaks.{ break, breakable }
+
+import org.bitlap.common.exception.BitlapSQLException
+
+import dotty.tools.dotc.semanticdb.internal.MD5
 
 object StringEx {
 
@@ -87,4 +94,56 @@ object StringEx {
     }
     uuid
   }
+
+  def parseInitFile(initFile: String): List[String] =
+    val file                      = new File(initFile)
+    var br: BufferedReader        = null
+    var initSqlList: List[String] = Nil
+    try
+      val input = new FileInputStream(file)
+      br = new BufferedReader(new InputStreamReader(input, "UTF-8"))
+      var line: String = null
+      val sb           = new mutable.StringBuilder("")
+      while {
+        line = br.readLine
+        line != null
+      } do
+        line = line.trim
+        if line.nonEmpty then
+          if !line.startsWith("#") && !line.startsWith("--") then {
+            line = line.concat(" ")
+            sb.append(line)
+          }
+      initSqlList = getInitSql(sb.toString)
+    catch
+      case e: IOException =>
+        throw BitlapSQLException("Invalid sql syntax in initFile", cause = Option(e))
+    finally if br != null then br.close()
+    initSqlList
+
+  def getSqlStmts(lines: List[String]): List[String] = {
+    val sb = new mutable.StringBuilder("")
+    lines.map(_.trim).foreach { line =>
+      if line.nonEmpty then
+        if !line.startsWith("#") && !line.startsWith("--") then {
+          sb.append(line.concat(" "))
+        }
+    }
+    getInitSql(sb.toString)
+
+  }
+
+  private def getInitSql(sbLine: String): List[String] =
+    val sqlArray    = sbLine.toCharArray
+    val initSqlList = new JArrayList[String]
+    var index       = 0
+    var beginIndex  = 0
+    while index < sqlArray.length do
+      if sqlArray(index) == ';' then
+        val sql = sbLine.substring(beginIndex, index).trim
+        initSqlList.add(sql)
+        beginIndex = index + 1
+
+      index += 1
+    initSqlList.asScala.toList
 }

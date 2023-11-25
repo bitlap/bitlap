@@ -11,7 +11,6 @@ RUN mkdir -p $folder/$bitlap_server/static
 WORKDIR $folder
 
 COPY $bitlap_server.tar.gz  $folder/
-COPY initFileForTest.sql  $folder/
 COPY static/ $folder/$bitlap_server/static
 COPY entrypoint.sh $folder/$bitlap_server
 

@@ -17,6 +17,7 @@ package org.bitlap.jdbc
 
 import java.sql.*
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.enumeration.TypeId
 
 /** Bitlap result set metadata

@@ -15,6 +15,7 @@
  */
 package org.bitlap.core.sql.parser.ddl
 
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
@@ -41,5 +42,5 @@ class SqlShowCurrentDatabase(
 }
 
 object SqlShowCurrentDatabase {
-  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("SHOW CURRENT_DATABASE", SqlKind.OTHER)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator(ShowCurrentDatabase.command, SqlKind.OTHER)
 }

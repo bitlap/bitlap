@@ -15,16 +15,20 @@
  */
 package org.bitlap.server.session
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.sql.*
+import java.util.concurrent.{ CountDownLatch, TimeUnit }
 
 import scala.collection.mutable
 
-import org.bitlap.common.BitlapConf
+import org.bitlap.common.exception.DataFormatException
+import org.bitlap.core.*
+import org.bitlap.core.sql.QueryExecution
+import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.{ OperationState, OperationType }
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models.*
+import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.server.config.BitlapConfiguration
 
 import com.typesafe.scalalogging.LazyLogging
@@ -38,7 +42,8 @@ abstract class Operation(
   val opType: OperationType,
   val hasResultSet: Boolean = false,
   globalConfig: BitlapConfiguration)
-    extends LazyLogging {
+    extends LazyLogging
+    with BitlapSerde {
 
   @volatile var state: OperationState = OperationState.InitializedState
   @volatile var lastAccessTime: Long  = System.currentTimeMillis()
@@ -113,5 +118,4 @@ abstract class Operation(
     }
     lastAccessTime + -operationTimeout <= current
   }
-
 }

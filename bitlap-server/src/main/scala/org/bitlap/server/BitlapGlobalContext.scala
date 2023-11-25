@@ -17,12 +17,8 @@ package org.bitlap.server
 
 import java.util.Vector as JVector
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.annotation.Nullable
 
-import org.bitlap.common.BitlapConf
-import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.exception.BitlapIllegalStateException
+import org.bitlap.common.exception.{ BitlapException, BitlapIllegalStateException }
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
@@ -44,23 +40,25 @@ final case class BitlapGlobalContext(
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  asyncRef: Ref[Option[Async]],
+  syncConnectionRef: Ref[Option[SyncConnection]],
   sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
   operationHandleVector: Ref[JVector[OperationHandle]],
   operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]) {
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
-  def start(): ZIO[Any, Throwable, Boolean] = grpcStarted.succeed(true) && raftStarted.succeed(true)
+  def start(): ZIO[Any, Throwable, Boolean] = {
+    grpcStarted.succeed(true) && raftStarted.succeed(true)
+  }
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
 
-  def setProtocolImpl(async: Async): ZIO[Any, Throwable, Unit] =
-    grpcStarted.await.timeout(refTimeout) *> asyncRef.set(Option(async))
+  def setSyncConnection(syncConnection: SyncConnection): ZIO[Any, Throwable, Unit] =
+    grpcStarted.await.timeout(refTimeout) *> syncConnectionRef.set(Option(syncConnection))
 
-  def getClient: ZIO[Any, Throwable, Async] =
+  def getSyncConnection: ZIO[Any, Throwable, SyncConnection] =
     grpcStarted.await.timeout(refTimeout) *>
-      asyncRef.get.someOrFail(
+      syncConnectionRef.get.someOrFail(
         BitlapException("Cannot find a Async instance")
       )
 
@@ -132,21 +130,21 @@ object BitlapGlobalContext:
       raftStart             <- Promise.make[Throwable, Boolean]
       cliClientService      <- Ref.make(new CliClientServiceImpl)
       node                  <- Ref.make(Option.empty[Node])
-      async                 <- Ref.make(Option.empty[Async])
+      syncConnection        <- Ref.make(Option.empty[SyncConnection])
       config                <- ZIO.service[BitlapConfiguration]
-      SessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
-      OperationHandleVector <- Ref.make(JVector[OperationHandle]())
-      OperationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
+      sessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
+      operationHandleVector <- Ref.make(JVector[OperationHandle]())
+      operationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
     } yield BitlapGlobalContext(
       config,
       grpcStart,
       raftStart,
       cliClientService,
       node,
-      async,
-      SessionStoreMap,
-      OperationHandleVector,
-      OperationStoreMap
+      syncConnection,
+      sessionStoreMap,
+      operationHandleVector,
+      operationStoreMap
     )
   }
 

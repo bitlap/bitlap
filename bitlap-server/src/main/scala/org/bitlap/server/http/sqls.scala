@@ -15,7 +15,10 @@
  */
 package org.bitlap.server.http
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.common.utils.internal.DBTable
+import org.bitlap.network.Result
+import org.bitlap.network.serde.BitlapSerde
 
 /** Wrapping sql data for queries
  */
@@ -31,6 +34,12 @@ object SqlData:
 
   def empty: SqlData = SqlData(Seq.empty, Seq.empty)
 
+  def fromList(list: List[List[(String, String)]]): SqlData = {
+    val columns = list.headOption.getOrElse(List.empty).map(c => SqlColumn(c._1))
+    val sqlRows = list.map(r => SqlRow.apply(r.toMap))
+    SqlData(columns, sqlRows)
+  }
+
   def fromDBTable(table: DBTable): SqlData = {
     if table == null || table.columns.isEmpty then return SqlData()
     val columns = table.columns.map(_.label).map(SqlColumn.apply)
@@ -45,4 +54,15 @@ object SqlData:
       SqlRow(cells)
     }
     SqlData(columns, sqlRows)
+  }
+
+extension (result: Result)
+
+  def underlying: List[List[(String, String)]] = {
+    if (result == null)
+      throw BitlapSQLException("Without more elements, unable to get underlining of fetchResult")
+    result.fetchResult.results.rows.map(_.values.zipWithIndex.map { case (string, i) =>
+      val typeDesc = result.tableSchema.columns.apply(i).typeDesc
+      typeDesc.name -> BitlapSerde.deserialize[String](typeDesc, string)
+    }.toList)
   }

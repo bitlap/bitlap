@@ -17,7 +17,7 @@ package org.bitlap.testkit
 
 import org.bitlap.server.*
 import org.bitlap.server.config.*
-import org.bitlap.server.service.DriverGrpcService
+import org.bitlap.server.service.DriverGrpcServer
 import org.bitlap.server.session.SessionManager
 import org.bitlap.testkit.MockAsync
 
@@ -53,7 +53,7 @@ object MockBitlapServer extends ZIOAppDefault {
         Scope.default,
         MockAsync.live,
         ZIOAppArgs.empty,
-        DriverGrpcService.live,
+        DriverGrpcServer.live,
         BitlapConfiguration.testLive,
         BitlapGlobalContext.live,
         SessionManager.live

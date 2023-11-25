@@ -63,6 +63,11 @@ trait BaseLocalFsTest extends AnyFunSuite with BeforeAndAfterAll with should.Mat
     s"database_${tm}_${RandomEx.string(5)}"
   }
 
+  protected def randomUser(): String = {
+    val tm = DateTime.now().toString("yyyyMMddHHmmss")
+    s"user_${tm}_${RandomEx.string(5)}"
+  }
+
   protected def randomTable(): String = {
     val tm = DateTime.now().toString("yyyyMMddHHmmss")
     s"table_${tm}_${RandomEx.string(5)}"

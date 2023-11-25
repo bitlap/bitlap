@@ -18,23 +18,32 @@ package org.bitlap.network
 import org.bitlap.common.exception.*
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.network.ServerAddress
+import org.bitlap.network.models.{ FetchResults, TableSchema }
 
 import com.typesafe.scalalogging.LazyLogging
 
 import io.grpc.*
 
+// =================================type==================================================
+
 type Identity[T] = T
 
 private[bitlap] final case class ServerAddress(ip: String, port: Int)
 
-private val Separator = ":"
-private val Port      = 23333
+object ProtocolConstants:
+  // only protocol constants
+  val Separator    = ":"
+  val Port         = 23333
+  val Default_Host = "127.0.0.1"
+end ProtocolConstants
 
-/** Parsing IP:PORT from String, returning [[org.bitlap.network.ServerAddress]].
+// =================================extension==================================================
+/** Parsing `ip:port` from String, returning [[org.bitlap.network.ServerAddress]].
  */
 extension (serverUri: String)
 
   def asServerAddress: ServerAddress = {
+    import ProtocolConstants._
     val as =
       if serverUri.contains(Separator) then serverUri.split(Separator).toList
       else List(serverUri, Port.toString)
@@ -42,25 +51,19 @@ extension (serverUri: String)
   }
 end extension
 
-/** Parsing Array(IP:PORT,IP:PORT,IP:PORT,...) from String, returning a list of the
- *  [[org.bitlap.network.ServerAddress]].
- */
-extension (serverPeers: Array[String])
-
-  def asServerAddresses: List[ServerAddress] =
-    serverPeers.collect {
-      case add if add.nonEmpty => add.asServerAddress
-    }.toList
-  end asServerAddresses
-
-end extension
-
-final case class ClientConfig(
-  props: Map[String, String],
-  serverPeers: List[String])
-
 lazy val errorApplyFunc: Throwable => StatusException = {
   case net @ BitlapException(errorKey, parameters, cause) =>
-    new StatusException(Status.fromThrowable(net).withDescription(errorKey.formatErrorMessage(parameters)))
+    new StatusException(
+      Status
+        .fromThrowable(net)
+        .withDescription(errorKey.formatErrorMessage(parameters))
+        .withCause(cause.orNull)
+    )
+
   case ex => new StatusException(Status.fromThrowable(ex))
 }
+
+// =================================class==================================================
+final case class Result(
+  tableSchema: TableSchema,
+  fetchResult: FetchResults)

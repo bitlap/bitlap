@@ -15,13 +15,9 @@
  */
 package org.bitlap.server
 
-import java.io.IOException
-import java.sql.DriverManager
-import java.util.Properties
-
 import org.bitlap.common.exception.BitlapException
+import org.bitlap.network.BitlapSingleResult as MyResultSet
 import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.config.BitlapHttpConfig
 import org.bitlap.server.http.*
 
 import io.circe.generic.auto.*
@@ -31,7 +27,6 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir.*
 import zio.*
 import zio.http.*
-import zio.http.codec.*
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
 
@@ -39,7 +34,7 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
+  val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
     ZLayer.fromFunction((config: BitlapConfiguration, httpServiceLive: HttpServiceLive) =>
       new HttpServerEndpoint(config, httpServiceLive)
     )
@@ -51,12 +46,10 @@ end HttpServerEndpoint
 
 final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
 
-  Class.forName(classOf[org.bitlap.Driver].getCanonicalName)
-
   private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
     val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
-    ZIO
-      .attempt(httpServiceLive.execute(sqlInput.sql))
+    httpServiceLive
+      .execute(sqlInput.sql)
       .mapError(f => BitlapException("Unknown Error", cause = Option(f)))
   }
 
@@ -75,13 +68,6 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
   private val indexHtml: http.HttpApp[Any, Throwable] = Http.fromResource(s"static/index.html")
 
   private val staticApp: http.HttpApp[Any, Throwable] = Http.collectHttp[Request] {
-    case Method.GET -> !! / "init" =>
-      // When using initialization, enable this
-      val properties = new Properties()
-      properties.put("bitlapconf:retries", "1")
-      properties.put("bitlapconf:initFile", "conf/initFileForTest.sql")
-      DriverManager.getConnection("jdbc:bitlap://localhost:23333/default", properties)
-      indexHtml
     case req
         if req.method == Method.GET
           && req.path.startsWith(!! / "pages") =>

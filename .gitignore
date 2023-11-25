@@ -23,7 +23,6 @@ hs_err_pid*
 dist/
 raft/log
 deploy-dev.sh
-/docker/initFileForTest.sql
 /docker/*.tar.gz
 /docker/static
 

@@ -15,6 +15,7 @@
  */
 package org.bitlap.core.sql.parser.ddl
 
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.utils.StringEx._
 import org.bitlap.core.sql.QueryContext
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
@@ -51,5 +52,5 @@ class SqlShowTables(
 }
 
 object SqlShowTables {
-  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator("SHOW TABLES", SqlKind.OTHER)
+  val OPERATOR: SqlSpecialOperator = SqlSpecialOperator(ShowTables.command, SqlKind.OTHER)
 }

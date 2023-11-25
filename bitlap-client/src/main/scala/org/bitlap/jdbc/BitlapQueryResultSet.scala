@@ -19,15 +19,16 @@ import java.sql.*
 
 import scala.collection.mutable
 
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.jdbc.BitlapQueryResultSet.Builder
-import org.bitlap.network.BitlapClient
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.network.models.OperationStatus
+import org.bitlap.network.protocol.impl.SyncClient
 
 /** Bitlap result set of the query
  */
-class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows: Int, private val _row: Row = null)
+class BitlapQueryResultSet(private var client: SyncClient, private var maxRows: Int, private val _row: Row = null)
     extends BitlapBaseResultSet:
 
   private var warningChain: SQLWarning                           = _
@@ -124,7 +125,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
       else return false
 
       rowsFetched = rowsFetched + 1
-    catch case e: Exception => throw BitlapSQLException(msg = "Error retrieving next row", cause = Option(e))
+    catch case e: Exception => throw BitlapSQLException("Error retrieving next row", cause = Option(e))
 
     true
 
@@ -147,7 +148,7 @@ class BitlapQueryResultSet(private var client: BitlapClient, private var maxRows
     try if stmtHandle != null then client.closeOperation(stmtHandle)
     catch
       case e: Exception =>
-        throw BitlapSQLException(e.toString, "08S01", cause = Option(e))
+        throw BitlapSQLException(e.toString, cause = Option(e))
 
   override def close(): Unit =
     if this.statement != null && this.statement.isInstanceOf[BitlapStatement] then
@@ -187,7 +188,7 @@ object BitlapQueryResultSet:
 
   final class Builder(_statement: Statement):
     val statement: Statement        = _statement
-    var client: BitlapClient        = _
+    var client: SyncClient          = _
     var stmtHandle: OperationHandle = _
 
     /** Sets the limit for the maximum number of rows that any ResultSet object produced by this Statement can contain
@@ -198,10 +199,10 @@ object BitlapQueryResultSet:
     var retrieveSchema         = true
     var colNames: List[String] = List.empty
     var colTypes: List[String] = List.empty
-    var fetchSize              = 50
+    var fetchSize              = Constants.FETCH_SIZE
     var emptyResultSet         = false
 
-    def setClient(client: BitlapClient): Builder =
+    def setClient(client: SyncClient): Builder =
       this.client = client
       this
 

@@ -18,10 +18,11 @@ package org.bitlap.jdbc
 import java.sql.{ Array as _, * }
 
 import org.bitlap.common.BitlapConf
+import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.utils.{ JsonUtil, StringEx }
-import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
+import org.bitlap.network.protocol.impl.SyncClient
 import org.bitlap.network.serde.BitlapSerde
 
 import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
@@ -31,7 +32,7 @@ import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
 class BitlapDatabaseMetaData(
   private val connection: Connection,
   private val session: SessionHandle,
-  private val client: BitlapClient)
+  private val client: SyncClient)
     extends DatabaseMetaData
     with BitlapSerde {
   override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")
@@ -367,10 +368,8 @@ class BitlapDatabaseMetaData(
     schemaPattern: String,
     tableNamePattern: String,
     types: Array[String]
-  ): ResultSet = {
-    given Connection = connection
-    sqlQ"show tables"._2
-  }
+  ): ResultSet =
+    sqlQ"${ShowTables.command}" (using connection)._2
 
   override def getSchemas: ResultSet =
     getSchemas(null, null)

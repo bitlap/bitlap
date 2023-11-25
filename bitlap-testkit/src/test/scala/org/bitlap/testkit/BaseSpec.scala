@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.jdbc
+package org.bitlap.testkit
 
-import java.sql.SQLException
+import org.bitlap.jdbc.BitlapDataSource
 
-import scala.jdk.CollectionConverters.*
+import org.scalatest.{ BeforeAndAfterAll, Inspectors }
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should
 
-import org.bitlap.common.exception.BitlapException
+abstract class BaseSpec extends AnyFunSuite with BeforeAndAfterAll with should.Matchers with Inspectors with CSVUtils {
+  lazy val table = s"test_table_${FakeDataUtils.randEntityNumber}"
 
-/** Bitlap SQL exception on client side
- */
-final case class BitlapSQLException(
-  msg: String,
-  state: String = null,
-  code: Int = -1,
-  cause: Option[Throwable] = None)
-    extends SQLException(msg, state, code, cause.orNull)
+  // TODO
+  val server = new Thread {
+    override def run(): Unit = MockBitlapServer.main(scala.Array.empty)
+  }
 
-final case class BitlapJdbcUriParseException(msg: String, override val cause: Option[Throwable] = None)
-    extends BitlapException(msg, Map.empty[String, String], cause)
+  override protected def beforeAll(): Unit = {
+    server.setDaemon(true)
+    server.start()
+    Thread.sleep(5000L)
+  }
+}

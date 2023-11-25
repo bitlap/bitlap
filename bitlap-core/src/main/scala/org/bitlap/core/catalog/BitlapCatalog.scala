@@ -15,6 +15,7 @@
  */
 package org.bitlap.core.catalog
 
+import org.bitlap.core.catalog.metadata.Account
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.core.catalog.metadata.Table
 
@@ -47,7 +48,7 @@ trait BitlapCatalog {
    */
   def databaseExists(name: String): Boolean
 
-  /** List all [Database], it also contains [Database.DEFAULT_DATABASE]
+  /** List all [Database], it also contains [[Database.DEFAULT_DATABASE]]
    */
   def listDatabases(): List[Database]
 
@@ -56,6 +57,23 @@ trait BitlapCatalog {
    *  if [ifNotExists] is false, exception will be thrown when [Table] exists, otherwise ignore.
    */
   def createTable(name: String, database: String = Database.DEFAULT_DATABASE, ifNotExists: Boolean = false): Boolean
+
+  /** create [User] with [username] and [password]. if [ifNotExists] is false, exception will be thrown when [username]
+   *  exists, otherwise ignore.
+   */
+  def createUser(username: String, password: String = Account.DEFAULT_PASSWORD, ifNotExists: Boolean = false): Boolean
+
+  /** Drop [User] with [username].
+   *
+   *  [ifExists] if set false, exception will be thrown when [username] does not exist, otherwise ignore.
+   */
+  def dropUser(username: String, ifExists: Boolean = false): Boolean
+
+  def auth(username: String, password: String): Boolean
+
+  /** List all [Users], it also contains [[Account.DEFAULT_USER]]
+   */
+  def listUsers: List[Account]
 
   /** Drop [Table] with [name] in the [database].
    *

@@ -59,6 +59,10 @@ object Constants:
 
   val URI_JDBC_PREFIX = "jdbc:"
 
+  val FETCH_SIZE = 1000
+
+  val QUERY_TIMEOUT_SECONDS = 60
+
   // ===========================================================================================
   // for properties, bitlapconf:key -> value
   final val BITLAP_CONF_PREFIX     = "bitlapconf:"

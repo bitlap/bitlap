@@ -15,24 +15,25 @@
  */
 package org.bitlap.core.catalog.impl
 
+import java.nio.file.Paths
+
 import scala.jdk.CollectionConverters.*
+import scala.util.Using
 
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LifeCycleWrapper
 import org.bitlap.common.conf.BitlapConfKeys
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.common.utils.PreConditions
+import org.bitlap.common.utils.{ JsonUtil, PreConditions }
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.catalog.BitlapCatalog
-import org.bitlap.core.catalog.metadata.Database
-import org.bitlap.core.catalog.metadata.Table
-import org.bitlap.core.event.DatabaseCreateEvent
-import org.bitlap.core.event.DatabaseDeleteEvent
-import org.bitlap.core.event.TableCreateEvent
-import org.bitlap.core.event.TableDeleteEvent
+import org.bitlap.core.catalog.metadata.{ Account, Database, Table }
+import org.bitlap.core.catalog.metadata.Account.{ DEFAULT_PASSWORD, SecretKey }
+import org.bitlap.core.event.*
 import org.bitlap.core.hadoop.*
 import org.bitlap.core.storage.TableFormat
 
+import org.apache.commons.codec.digest.Md5Crypt
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileSystem, LocatedFileStatus, Path }
 import org.apache.hadoop.hdfs.protocol.HdfsNamedFileStatus
@@ -56,6 +57,8 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
 
   private val eventBus = BitlapContext.eventBus
 
+  private val salt = "$1$233333"
+
   override def start(): Unit = {
     super.start()
     if (!fs.exists(dataPath)) {
@@ -64,6 +67,12 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val defaultDBPath = Path(dataPath, Database.DEFAULT_DATABASE)
     if (!fs.exists(defaultDBPath)) {
       fs.mkdirs(defaultDBPath)
+    }
+
+    val defaultAccountPath = Path(getAccountDir, Account.DEFAULT_USER)
+    if (!fs.exists(defaultAccountPath)) {
+      fs.mkdirs(defaultAccountPath)
+      fs.writeSecret(defaultAccountPath, Account.SecretKey(Md5Crypt.md5Crypt(DEFAULT_PASSWORD.getBytes, salt))) {}
     }
   }
 
@@ -250,11 +259,75 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     }
   }
 
-  private def cleanDatabaseName(database: String): String = {
+  override def listUsers: List[Account] = {
+    fs.collectStatus(getAccountDir, _.isDirectory) { (_, status) =>
+      Account(status.getPath.getName, Account.SecretKey("***"))
+    }
+  }
+
+  override def dropUser(username: String, ifExists: Boolean): Boolean = {
+    val cleanName = cleanUserName(username)
+    if (cleanName == Account.DEFAULT_USER) {
+      throw BitlapException(s"Unable to drop default user, it's built-in.")
+    }
+    val p      = Path(getAccountDir, cleanName)
+    val exists = fs.exists(p)
+    if (exists) {
+      fs.delete(p, true)
+      eventBus.post(AccountDropEvent(Account(cleanName, Account.SecretKey("***"))))
+      return true
+    } else {
+      if (!ifExists) {
+        throw BitlapException(s"Unable to drop user $cleanName, it does not exist.")
+      }
+    }
+    false
+  }
+
+  override def createUser(username: String, password: String, ifNotExists: Boolean): Boolean = {
+    val cleanName = cleanUserName(username)
+    if (cleanName == Account.DEFAULT_USER) {
+      throw BitlapException(s"Unable to create default user, it's built-in.")
+    }
+    val p      = Path(getAccountDir, cleanName)
+    val exists = fs.exists(p)
+    if (exists && ifNotExists) {
+      return false
+    } else if (exists) {
+      throw BitlapException(s"Unable to create user $cleanName, it already exists.")
+    }
+    fs.mkdirs(p)
+    val pwd    = Md5Crypt.md5Crypt(password.getBytes, salt)
+    val secret = Account.SecretKey(pwd)
+    fs.writeSecret(p, secret) {
+      eventBus.post(AccountCreateEvent(Account(cleanName, secret)))
+    }
+  }
+
+  override def auth(username: String, password: String): Boolean = {
+    val cleanName = cleanUserName(username)
+    val p         = Path(getAccountDir, cleanName)
+    val exists    = fs.exists(p)
+    if (exists) {
+      val pwd      = Md5Crypt.md5Crypt(password.getBytes, salt)
+      val storePwd = fs.readSecret(p).value
+      pwd == storePwd
+    } else {
+      false
+    }
+  }
+
+  private inline def cleanDatabaseName(database: String): String = {
     PreConditions.checkNotBlank(database, "database").trim().toLowerCase()
   }
 
-  private def cleanTableName(tableName: String): String = {
+  private inline def cleanTableName(tableName: String): String = {
     PreConditions.checkNotBlank(tableName, "table").trim().toLowerCase()
   }
+
+  private inline def cleanUserName(username: String): String = {
+    PreConditions.checkNotBlank(username, "username").trim().toLowerCase()
+  }
+
+  private inline def getAccountDir = Path.mergePaths(rootPath, Path(Account.DEFAULT_DIR))
 }

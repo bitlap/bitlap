@@ -15,10 +15,8 @@
  */
 package org.bitlap.server
 
-import org.bitlap.network.ClientConfig
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
-import org.bitlap.network.protocol.AsyncProtocol
-import org.bitlap.network.protocol.impl.Async
+import org.bitlap.network.SyncConnection
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
@@ -33,27 +31,22 @@ import zio.*
  */
 object GrpcServerEndpoint:
 
-  lazy val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
+  val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
     ZLayer.fromFunction((config: BitlapConfiguration) => new GrpcServerEndpoint(config))
 
   def service(
     args: List[String]
   ): ZIO[
-    DriverGrpcService & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfiguration & SessionManager,
+    DriverGrpcServer & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfiguration & SessionManager,
     Throwable,
     Unit
   ] =
     (for {
       config <- ZIO.service[BitlapConfiguration]
+      _      <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
+      _      <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSyncConnection(new SyncConnection("root", "")))
       _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
-      client <- Async
-        .make(
-          ClientConfig(Map.empty, config.grpcConfig.getSplitPeers)
-        )
-        .build
-      _ <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
-      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setProtocolImpl(client.get))
-      _ <- ZIO.never
+      _      <- ZIO.never
     } yield ())
       .onInterrupt(_ => ZIO.logWarning(s"Grpc Server was interrupted! Bye!"))
 
@@ -71,8 +64,8 @@ final class GrpcServerEndpoint(config: BitlapConfiguration):
   private def runGrpcServer(): URIO[BitlapGlobalContext & SessionManager, ExitCode] = ZLayer
     .makeSome[BitlapGlobalContext & SessionManager, Server](
       serverLayer,
-      DriverGrpcService.live,
-      DriverService.live
+      DriverGrpcServer.live,
+      AsyncServerService.live
     )
     .launch
     .exitCode

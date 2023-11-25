@@ -17,22 +17,23 @@ package org.bitlap.jdbc
 
 import java.sql.*
 
-import org.bitlap.network.BitlapClient
+import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.impl.SyncClient
 
 /** Bitlap statement
  */
 class BitlapStatement(
   private val connection: Connection,
   private val sessHandle: SessionHandle,
-  private var client: BitlapClient)
+  private var client: SyncClient)
     extends Statement:
 
   private var stmtHandle: OperationHandle = _
-  private var fetchSize                   = 50
-  private var queryTimeout                = 30
+  private var fetchSize                   = Constants.FETCH_SIZE
+  private var queryTimeoutSeconds         = Constants.QUERY_TIMEOUT_SECONDS
 
   /** We need to keep a reference to the result set to support the following:
    *
@@ -86,13 +87,15 @@ class BitlapStatement(
     try if stmtHandle != null then client.closeOperation(stmtHandle)
     catch
       case e: SQLException =>
-        throw BitlapSQLException(msg = e.getLocalizedMessage, cause = Option(e.getCause))
+        throw BitlapSQLException(e.getLocalizedMessage, cause = Option(e.getCause))
       case e: Exception =>
-        throw BitlapSQLException(msg = "Failed to close statement", "08S01", cause = Option(e))
+        throw BitlapSQLException("Failed to close statement", cause = Option(e))
     finally stmtHandle = null
 
   override def close(): Unit =
-    if closed then return
+    if (closed) {
+      return
+    }
     closeClientOperation()
     client = null
     if resultSet != null then
@@ -127,17 +130,22 @@ class BitlapStatement(
 
   override def getQueryTimeout: Int =
     checkConnection("getQueryTimeout")
-    queryTimeout
+    queryTimeoutSeconds
 
   override def setQueryTimeout(seconds: Int): Unit =
-    queryTimeout = seconds
+    queryTimeoutSeconds = seconds
 
   override def cancel(): Unit =
     checkConnection("cancel")
-    if isCancelled then return
+    if (isCancelled) {
+      return
+    }
 
-    try if stmtHandle != null then client.cancelOperation(stmtHandle)
-    catch
+    try {
+      if (stmtHandle != null) {
+        client.cancelOperation(stmtHandle)
+      }
+    } catch
       case e: SQLException =>
         throw e
       case e: Exception =>
@@ -175,11 +183,11 @@ class BitlapStatement(
     reInitState()
     try
       resultSet = null
-      stmtHandle = client.executeStatement(sessHandle, sql, queryTimeout)
+      stmtHandle = client.executeStatement(sessHandle, sql, queryTimeoutSeconds)
       if stmtHandle == null || !stmtHandle.hasResultSet then return false
     catch
       case ex: Throwable => // TODO: get error msg, mapping it by code
-        throw BitlapSQLException(s"${ex.getLocalizedMessage}")
+        throw BitlapSQLException(s"${ex.getLocalizedMessage}", cause = Option(ex))
 
     val status = waitForOperationToComplete()
     // The query should be completed by now
@@ -203,18 +211,18 @@ class BitlapStatement(
         status.status match
           case Some(ClosedState | FinishedState) => isOperationComplete = true
           case Some(CanceledState) =>
-            throw BitlapSQLException("Query was cancelled", "01000")
+            throw BitlapSQLException("Query was cancelled")
           case Some(TimeoutState) =>
-            throw new SQLTimeoutException(s"Query timed out after $queryTimeout seconds")
+            throw new SQLTimeoutException(s"Query timed out after $queryTimeoutSeconds seconds")
           case Some(ErrorState) =>
-            throw BitlapSQLException("Query was failed", "HY000")
+            throw BitlapSQLException("Query was failed")
           case Some(UnknownState) =>
-            throw BitlapSQLException("Unknown query", "HY000")
+            throw BitlapSQLException("Unknown query")
           case _ =>
       catch
         case e: SQLException => throw e
         case e: Exception =>
-          throw BitlapSQLException("Failed to wait for operation to complete", "08S01", cause = Option(e))
+          throw BitlapSQLException("Failed to wait for operation to complete", cause = Option(e))
     status
 
   def closeOnResultSetCompletion: Unit =
@@ -253,7 +261,7 @@ class BitlapStatement(
   override def setFetchSize(rows: Int): Unit =
     checkConnection("setFetchSize")
     if rows > 0 then fetchSize = rows
-    else if rows == 0 then fetchSize = 50
+    else if rows == 0 then fetchSize = Constants.FETCH_SIZE
     else throw BitlapSQLException("Fetch size must be greater or equal to 0")
 
   override def getFetchSize(): Int =

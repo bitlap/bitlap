@@ -15,56 +15,62 @@
  */
 package org.bitlap.server.http
 
-import java.sql.*
-import java.util.Properties
+import scala.util.control.NonFatal
 
-import scala.util.{ Failure, Success, Try, Using as ScalaUtils }
-
-import org.bitlap.common.utils.internal.DBTablePrinter
+import org.bitlap.common.utils.StringEx
+import org.bitlap.network.*
+import org.bitlap.server.BitlapGlobalContext
 
 import com.typesafe.scalalogging.LazyLogging
 
-import dotty.tools.dotc.ast.Trees.ApplyKind.Using
 import zio.*
 
 /** HTTP Specific logic implementation
  */
 object HttpServiceLive:
-  lazy val live: ULayer[HttpServiceLive] = ZLayer.succeed(new HttpServiceLive)
+
+  lazy val live: ZLayer[BitlapGlobalContext, Nothing, HttpServiceLive] =
+    ZLayer.fromFunction((in: BitlapGlobalContext) => new HttpServiceLive(in))
 end HttpServiceLive
 
-final class HttpServiceLive extends LazyLogging:
+final class HttpServiceLive(context: BitlapGlobalContext) extends LazyLogging:
 
-  Class.forName(classOf[org.bitlap.Driver].getName)
-
-  val properties = new Properties()
-  properties.put("bitlapconf:retries", "3")
-
-  private final val DEFAULT_URL = "jdbc:bitlap://localhost:23333/default"
-
-  def execute(sql: String): SqlResult =
-    ScalaUtils.resource(DriverManager.getConnection(DEFAULT_URL, properties)) { conn =>
-      ScalaUtils.resource(conn.createStatement()) { stmt =>
-        val executed = Try {
-          stmt.execute(sql)
-          val rs    = stmt.getResultSet
-          val table = DBTablePrinter.from(rs)
-          SqlResult(
-            data = SqlData.fromDBTable(table),
-            resultCode = 0
-          )
+  def execute(sql: String): ZIO[Any, Throwable, SqlResult] =
+    context.getSyncConnection.map { syncConnect =>
+      try {
+        syncConnect.open(ServerAddress(ProtocolConstants.Default_Host, ProtocolConstants.Port))
+        val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
+          syncConnect
+            .execute(sql)
+            .headOption
+            .map { result =>
+              SqlResult(
+                SqlData.fromList(result.underlying),
+                0
+              )
+            }
+            .toList
         }
-        executed match
-          case Success(value) => value
-          case Failure(exception) =>
-            logger.error("Executing sql error", exception)
-            SqlResult(
-              data = SqlData.empty,
-              errorMessage = exception.getLocalizedMessage,
-              resultCode = 1
-            )
+        rss.flatten.lastOption.getOrElse(
+          SqlResult(
+            SqlData.empty,
+            0
+          )
+        )
+      } catch {
+        case NonFatal(e) =>
+          logger.error("Execute sql failed", e)
+          SqlResult(
+            data = SqlData.empty,
+            errorMessage = e.getLocalizedMessage,
+            resultCode = 1
+          )
+      } finally {
+        try {
+          syncConnect.close()
+        } catch
+          case NonFatal(e) =>
+            logger.error("Close client failed", e)
+
       }
     }
-  end execute
-
-end HttpServiceLive

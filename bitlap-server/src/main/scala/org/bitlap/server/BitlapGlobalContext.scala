@@ -130,9 +130,9 @@ object BitlapGlobalContext:
       node                  <- Ref.make(Option.empty[Node])
       syncConnection        <- Ref.make(Option.empty[SyncConnection])
       config                <- ZIO.service[BitlapConfiguration]
-      SessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
-      OperationHandleVector <- Ref.make(JVector[OperationHandle]())
-      OperationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
+      sessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
+      operationHandleVector <- Ref.make(JVector[OperationHandle]())
+      operationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
     } yield BitlapGlobalContext(
       config,
       grpcStart,
@@ -140,9 +140,9 @@ object BitlapGlobalContext:
       cliClientService,
       node,
       syncConnection,
-      SessionStoreMap,
-      OperationHandleVector,
-      OperationStoreMap
+      sessionStoreMap,
+      operationHandleVector,
+      operationStoreMap
     )
   }
 

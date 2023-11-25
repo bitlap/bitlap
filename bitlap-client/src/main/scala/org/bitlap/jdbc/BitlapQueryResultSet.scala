@@ -199,7 +199,7 @@ object BitlapQueryResultSet:
     var retrieveSchema         = true
     var colNames: List[String] = List.empty
     var colTypes: List[String] = List.empty
-    var fetchSize              = 50
+    var fetchSize              = Constants.FETCH_SIZE
     var emptyResultSet         = false
 
     def setClient(client: Sync): Builder =

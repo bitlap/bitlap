@@ -32,8 +32,8 @@ class BitlapStatement(
     extends Statement:
 
   private var stmtHandle: OperationHandle = _
-  private var fetchSize                   = 50
-  private var queryTimeout                = 30
+  private var fetchSize                   = Constants.FETCH_SIZE
+  private var queryTimeoutSeconds         = Constants.QUERY_TIMEOUT_SECONDS
 
   /** We need to keep a reference to the result set to support the following:
    *
@@ -93,7 +93,9 @@ class BitlapStatement(
     finally stmtHandle = null
 
   override def close(): Unit =
-    if closed then return
+    if (closed) {
+      return
+    }
     closeClientOperation()
     client = null
     if resultSet != null then
@@ -128,14 +130,16 @@ class BitlapStatement(
 
   override def getQueryTimeout: Int =
     checkConnection("getQueryTimeout")
-    queryTimeout
+    queryTimeoutSeconds
 
   override def setQueryTimeout(seconds: Int): Unit =
-    queryTimeout = seconds
+    queryTimeoutSeconds = seconds
 
   override def cancel(): Unit =
     checkConnection("cancel")
-    if isCancelled then return
+    if (isCancelled) {
+      return
+    }
 
     try {
       if (stmtHandle != null) {
@@ -179,7 +183,7 @@ class BitlapStatement(
     reInitState()
     try
       resultSet = null
-      stmtHandle = client.executeStatement(sessHandle, sql, queryTimeout)
+      stmtHandle = client.executeStatement(sessHandle, sql, queryTimeoutSeconds)
       if stmtHandle == null || !stmtHandle.hasResultSet then return false
     catch
       case ex: Throwable => // TODO: get error msg, mapping it by code
@@ -209,7 +213,7 @@ class BitlapStatement(
           case Some(CanceledState) =>
             throw BitlapSQLException("Query was cancelled")
           case Some(TimeoutState) =>
-            throw new SQLTimeoutException(s"Query timed out after $queryTimeout seconds")
+            throw new SQLTimeoutException(s"Query timed out after $queryTimeoutSeconds seconds")
           case Some(ErrorState) =>
             throw BitlapSQLException("Query was failed")
           case Some(UnknownState) =>
@@ -257,7 +261,7 @@ class BitlapStatement(
   override def setFetchSize(rows: Int): Unit =
     checkConnection("setFetchSize")
     if rows > 0 then fetchSize = rows
-    else if rows == 0 then fetchSize = 50
+    else if rows == 0 then fetchSize = Constants.FETCH_SIZE
     else throw BitlapSQLException("Fetch size must be greater or equal to 0")
 
   override def getFetchSize(): Int =

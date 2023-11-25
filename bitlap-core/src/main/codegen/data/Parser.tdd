@@ -72,7 +72,7 @@
     "UNLOAD"
     "USE"
     "VIEWS"
-    "CURRENT_DATABASE",
+    "CURRENT_DATABASE"
     "USERS"
     "IDENTIFIED"
     "AUTH"

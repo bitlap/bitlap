@@ -28,12 +28,12 @@ import scala.util.control.Breaks.{ break, breakable }
 
 import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.handles.SessionHandle
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.SyncClient
 
 class BitlapPreparedStatement(
   private val connection: Connection,
   private val sessHandle: SessionHandle,
-  private val client: Sync,
+  private val client: SyncClient,
   private val sql: String)
     extends BitlapStatement(connection, sessHandle, client)
     with PreparedStatement:

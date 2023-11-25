@@ -66,8 +66,8 @@ lazy val errorApplyFunc: Throwable => StatusException = {
 // =================================class==================================================
 
 final case class ClientConfig(
-  props: Map[String, String],
-  serverPeers: List[String])
+  username: String,
+  password: String)
 
 final case class Result(
   tableSchema: TableSchema,

@@ -34,7 +34,7 @@ import zio.*
 
 /** Asynchronous RPC client, implemented based on zio grpc
  */
-final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) extends AsyncProtocol:
+final class AsyncClient(serverPeers: List[ServerAddress], props: Map[String, String]) extends AsyncProtocol:
 
   assert(serverPeers.nonEmpty)
 
@@ -165,10 +165,3 @@ final class Async(serverPeers: List[ServerAddress], props: Map[String, String]) 
       .map(t => GetInfoValue.fromBGetInfoResp(t))
       .provideLayer(leaderClientLayer)
       .onError(e => onErrorFunc(e))
-
-object Async {
-
-  def make(conf: ClientConfig): ULayer[Async] = ZLayer.succeed(
-    new Async(conf.serverPeers.map(_.asServerAddress), conf.props)
-  )
-}

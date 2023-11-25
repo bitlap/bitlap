@@ -24,15 +24,15 @@ import org.bitlap.network.models.*
 import org.bitlap.network.protocol.SyncProtocol
 
 /** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
- *  [[org.bitlap.network.protocol.impl.Async]].
+ *  [[org.bitlap.network.protocol.impl.AsyncClient]].
  */
-final class Sync(
+final class SyncClient(
   serverPeers: List[ServerAddress],
   props: Map[String, String]
 )(using timeout: Duration)
     extends SyncProtocol:
 
-  private val async = new Async(serverPeers, props)
+  private val async = new AsyncClient(serverPeers, props)
 
   override def openSession(
     username: String,

@@ -25,7 +25,7 @@ import com.alipay.sofa.jraft.rpc.{ RpcProcessor as _, * }
 import com.google.protobuf.Message
 
 /** Use the RPC provided by Raft to obtain the metadata of the service itself, and provide it to
- *  [[org.bitlap.server.service.DriverGrpcService.getLeader()]].
+ *  [[org.bitlap.server.service.DriverGrpcServer.getLeader()]].
  */
 class GetServerMetadataProcessor(executor: Executor, conf: BitlapConf)
     extends RpcProcessor[GetServerAddressReq](

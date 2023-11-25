@@ -32,13 +32,13 @@ import zio.*
 
 /** Server side implementation of asynchronous RPC
  */
-object DriverService:
+object AsyncServerService:
 
   lazy val live: ZLayer[SessionManager, Nothing, AsyncProtocol] =
-    ZLayer.fromFunction((sm: SessionManager) => new DriverService(sm))
-end DriverService
+    ZLayer.fromFunction((sm: SessionManager) => new AsyncServerService(sm))
+end AsyncServerService
 
-final class DriverService(sessionManager: SessionManager) extends AsyncProtocol with LazyLogging:
+final class AsyncServerService(sessionManager: SessionManager) extends AsyncProtocol with LazyLogging:
 
   override def openSession(
     username: String,

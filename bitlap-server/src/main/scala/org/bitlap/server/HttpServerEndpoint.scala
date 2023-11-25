@@ -48,8 +48,8 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
 
   private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
     val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
-    ZIO
-      .attempt(httpServiceLive.execute(sqlInput.sql))
+    httpServiceLive
+      .execute(sqlInput.sql)
       .mapError(f => BitlapException("Unknown Error", cause = Option(f)))
   }
 

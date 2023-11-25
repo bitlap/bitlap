@@ -15,20 +15,22 @@
  */
 package org.bitlap.network
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.duration.Duration
 import scala.util.control.NonFatal
 
 import org.bitlap.common.exception.*
 import org.bitlap.network.handles.SessionHandle
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.{ AsyncClient, SyncClient }
 
 import com.typesafe.scalalogging.LazyLogging
+
+import zio.{ ULayer, ZLayer }
 
 final class SyncConnection(user: String, password: String) extends Connection with LazyLogging {
 
   private var configuration: Map[String, String] = Map.empty
-  private var sync: Sync                         = _
+  private var sync: SyncClient                   = _
   private var address: ServerAddress             = _
   private var sessionId: SessionHandle           = _
   given Duration                                 = 60.seconds
@@ -52,7 +54,7 @@ final class SyncConnection(user: String, password: String) extends Connection wi
 
   override def open(address: ServerAddress, configuration: Map[String, String]): Unit = {
     try {
-      this.sync = new Sync(List(address), configuration)
+      this.sync = new SyncClient(List(address), configuration)
       this.address = address
       this.configuration = configuration
       this.sessionId = sync.openSession(user, password, configuration)
@@ -69,4 +71,11 @@ final class SyncConnection(user: String, password: String) extends Connection wi
     new BitlapSingleResult(sync, sessionId, stmt, maxTimeout, confOverlay)
   }
 
+}
+
+object SyncConnection {
+
+  def make(conf: ClientConfig): ULayer[SyncConnection] = ZLayer.succeed(
+    new SyncConnection(conf.username, conf.password)
+  )
 }

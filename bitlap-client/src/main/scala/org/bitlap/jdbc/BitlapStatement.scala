@@ -21,14 +21,14 @@ import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.SyncClient
 
 /** Bitlap statement
  */
 class BitlapStatement(
   private val connection: Connection,
   private val sessHandle: SessionHandle,
-  private var client: Sync)
+  private var client: SyncClient)
     extends Statement:
 
   private var stmtHandle: OperationHandle = _

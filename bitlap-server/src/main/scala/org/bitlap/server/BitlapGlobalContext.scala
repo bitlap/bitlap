@@ -40,7 +40,7 @@ final case class BitlapGlobalContext(
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  asyncRef: Ref[Option[Async]],
+  syncConnectionRef: Ref[Option[SyncConnection]],
   sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
   operationHandleVector: Ref[JVector[OperationHandle]],
   operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]) {
@@ -51,12 +51,12 @@ final case class BitlapGlobalContext(
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
 
-  def setProtocolImpl(async: Async): ZIO[Any, Throwable, Unit] =
-    grpcStarted.await.timeout(refTimeout) *> asyncRef.set(Option(async))
+  def setSyncConnection(syncConnection: SyncConnection): ZIO[Any, Throwable, Unit] =
+    grpcStarted.await.timeout(refTimeout) *> syncConnectionRef.set(Option(syncConnection))
 
-  def getClient: ZIO[Any, Throwable, Async] =
+  def getSyncConnection: ZIO[Any, Throwable, SyncConnection] =
     grpcStarted.await.timeout(refTimeout) *>
-      asyncRef.get.someOrFail(
+      syncConnectionRef.get.someOrFail(
         BitlapException("Cannot find a Async instance")
       )
 
@@ -128,7 +128,7 @@ object BitlapGlobalContext:
       raftStart             <- Promise.make[Throwable, Boolean]
       cliClientService      <- Ref.make(new CliClientServiceImpl)
       node                  <- Ref.make(Option.empty[Node])
-      async                 <- Ref.make(Option.empty[Async])
+      syncConnection        <- Ref.make(Option.empty[SyncConnection])
       config                <- ZIO.service[BitlapConfiguration]
       SessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
       OperationHandleVector <- Ref.make(JVector[OperationHandle]())
@@ -139,7 +139,7 @@ object BitlapGlobalContext:
       raftStart,
       cliClientService,
       node,
-      async,
+      syncConnection,
       SessionStoreMap,
       OperationHandleVector,
       OperationStoreMap

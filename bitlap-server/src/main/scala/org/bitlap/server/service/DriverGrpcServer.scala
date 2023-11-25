@@ -30,16 +30,16 @@ import zio.*
 
 /** RPC server API implementation
  */
-object DriverGrpcService:
+object DriverGrpcServer:
 
-  lazy val live: ZLayer[AsyncProtocol & BitlapGlobalContext, Nothing, DriverGrpcService] =
+  lazy val live: ZLayer[AsyncProtocol & BitlapGlobalContext, Nothing, DriverGrpcServer] =
     ZLayer.fromFunction((asyncProtocol: AsyncProtocol, serverNodeContext: BitlapGlobalContext) =>
-      new DriverGrpcService(asyncProtocol, serverNodeContext)
+      new DriverGrpcServer(asyncProtocol, serverNodeContext)
     )
 
-end DriverGrpcService
+end DriverGrpcServer
 
-final class DriverGrpcService(async: AsyncProtocol, serverNodeContext: BitlapGlobalContext)
+final class DriverGrpcServer(async: AsyncProtocol, serverNodeContext: BitlapGlobalContext)
     extends ZDriverService[RequestContext]:
 
   // Directly using zio grpc's Status to represent errors and avoid handling multiple errors

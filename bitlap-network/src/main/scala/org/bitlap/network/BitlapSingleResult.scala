@@ -21,12 +21,12 @@ import scala.util.control.NonFatal
 import org.bitlap.common.exception.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.SyncClient
 
 import com.typesafe.scalalogging.LazyLogging
 
 final class BitlapSingleResult(
-  sync: Sync,
+  sync: SyncClient,
   sessionId: SessionHandle,
   stmt: String,
   queryTimeout: Long,

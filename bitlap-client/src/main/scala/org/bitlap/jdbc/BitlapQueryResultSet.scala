@@ -24,11 +24,11 @@ import org.bitlap.jdbc.BitlapQueryResultSet.Builder
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.network.models.OperationStatus
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.SyncClient
 
 /** Bitlap result set of the query
  */
-class BitlapQueryResultSet(private var client: Sync, private var maxRows: Int, private val _row: Row = null)
+class BitlapQueryResultSet(private var client: SyncClient, private var maxRows: Int, private val _row: Row = null)
     extends BitlapBaseResultSet:
 
   private var warningChain: SQLWarning                           = _
@@ -188,7 +188,7 @@ object BitlapQueryResultSet:
 
   final class Builder(_statement: Statement):
     val statement: Statement        = _statement
-    var client: Sync                = _
+    var client: SyncClient          = _
     var stmtHandle: OperationHandle = _
 
     /** Sets the limit for the maximum number of rows that any ResultSet object produced by this Statement can contain
@@ -202,7 +202,7 @@ object BitlapQueryResultSet:
     var fetchSize              = Constants.FETCH_SIZE
     var emptyResultSet         = false
 
-    def setClient(client: Sync): Builder =
+    def setClient(client: SyncClient): Builder =
       this.client = client
       this
 

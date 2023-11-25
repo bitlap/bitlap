@@ -29,7 +29,7 @@ import org.bitlap.common.exception.BitlapExceptions
 import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.network.{ Connection as _, _ }
 import org.bitlap.network.handles.*
-import org.bitlap.network.protocol.impl.Sync
+import org.bitlap.network.protocol.impl.SyncClient
 
 import bitlap.rolls.core.jdbc.{ columns, sqlQ, ResultSetX, TypeRow1 }
 
@@ -44,7 +44,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
   private var closed                               = true
   private var readOnly                             = false
   private var warningChain: SQLWarning             = _
-  private var client: Sync                         = _
+  private var client: SyncClient                   = _
   private var initFile: String                     = _
   private var maxRetries                           = BITLAP_DEFAULT_RETRIES
   private var connParams: JdbcConnectionParams     = _
@@ -89,7 +89,7 @@ class BitlapConnection(uri: String, info: Properties) extends Connection {
     breakable {
       while numRetries < maxRetries do
         try {
-          client = new Sync(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
+          client = new SyncClient(connParams.authorityList.toList.map(_.asServerAddress), bitlapConfs ++ sessionVars)
           session = client.openSession(
             sessionVars.getOrElse(JdbcConnectionParams.AUTH_USER, "root"),
             sessionVars.getOrElse(JdbcConnectionParams.AUTH_PASSWD, ""),

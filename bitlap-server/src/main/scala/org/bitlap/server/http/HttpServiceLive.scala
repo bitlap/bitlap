@@ -59,11 +59,18 @@ final class HttpServiceLive(context: BitlapGlobalContext) extends LazyLogging:
         )
       } catch {
         case NonFatal(e) =>
-          logger.error("Executing sql error", e)
+          logger.error("Execute sql failed", e)
           SqlResult(
             data = SqlData.empty,
             errorMessage = e.getLocalizedMessage,
             resultCode = 1
           )
+      } finally {
+        try {
+          syncConnect.close()
+        } catch
+          case NonFatal(e) =>
+            logger.error("Close client failed", e)
+
       }
     }

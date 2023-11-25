@@ -84,10 +84,11 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
 
   override def shutdown(): Unit = {
     if !this.started then return
-    if this.raftGroupService != null then {
+    if (this.raftGroupService != null) {
       this.raftGroupService.shutdown()
-      try this.raftGroupService.join()
-      catch {
+      try {
+        this.raftGroupService.join()
+      } catch {
         case e: InterruptedException =>
           ThrowUtil.throwException(e)
       }

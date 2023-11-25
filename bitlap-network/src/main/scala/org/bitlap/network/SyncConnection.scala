@@ -15,9 +15,11 @@
  */
 package org.bitlap.network
 
+import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.util.control.NonFatal
 
-import org.bitlap.common.exception._
+import org.bitlap.common.exception.*
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.network.protocol.impl.Sync
 
@@ -29,6 +31,7 @@ final class SyncConnection(user: String, password: String) extends Connection wi
   private var sync: Sync                         = _
   private var address: ServerAddress             = _
   private var sessionId: SessionHandle           = _
+  given Duration                                 = 60.seconds
 
   override def close(): Unit = {
     try {
@@ -60,9 +63,10 @@ final class SyncConnection(user: String, password: String) extends Connection wi
 
   override def open(address: ServerAddress): Unit = open(address, configuration)
 
-  def execute(stmt: String, queryTimeout: Long = 600000, confOverlay: Map[String, String] = Map.empty)
-    : BitlapResultSet = {
-    new BitlapResultSet(sync, sessionId, stmt, queryTimeout, confOverlay)
+  def execute(stmt: String, queryTimeout: Long = 60000, confOverlay: Map[String, String] = Map.empty)
+    : BitlapSingleResult = {
+    val maxTimeout = if (queryTimeout <= summon[Duration].toMillis) queryTimeout else summon[Duration].toMillis
+    new BitlapSingleResult(sync, sessionId, stmt, maxTimeout, confOverlay)
   }
 
 }

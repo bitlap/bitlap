@@ -29,6 +29,7 @@ import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
+import org.bitlap.server.service.AccountAuthenticator
 
 import zio.{ System as _, * }
 

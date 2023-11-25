@@ -35,10 +35,8 @@ import zio.{ Runtime, Task, UIO, Unsafe, ZIO }
 trait AsyncProtocol extends ProtocolMonad[Task]:
   self =>
 
-  private lazy val timeout = 30.seconds
-
   private lazy val defaultStateException = new BitlapIllegalStateException(
-    "Invalid node state, must be a leader for this operation"
+    "Invalid node state, this operation must be on the master node"
   )
 
   override def pure[A](a: A): Task[A] = ZIO.succeed(a)
@@ -47,7 +45,7 @@ trait AsyncProtocol extends ProtocolMonad[Task]:
 
   override def flatMap[A, B](fa: PMonad => Task[A])(f: A => Task[B]): Task[B] = fa(this).flatMap(f)
 
-  def sync[T](action: PMonad => Task[T]): T =
+  def sync[T](action: PMonad => Task[T])(using timeout: Duration): T =
     try {
       val future = Unsafe.unsafe { implicit rt =>
         Runtime.default.unsafe.runToFuture(action(this))

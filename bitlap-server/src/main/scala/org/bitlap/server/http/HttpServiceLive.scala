@@ -18,7 +18,7 @@ package org.bitlap.server.http
 import scala.util.control.NonFatal
 
 import org.bitlap.common.utils.StringEx
-import org.bitlap.network.{ ServerAddress, SyncConnection }
+import org.bitlap.network._
 
 import com.typesafe.scalalogging.LazyLogging
 
@@ -36,22 +36,21 @@ final class HttpServiceLive extends LazyLogging:
     var syncConnect: SyncConnection = null
     try {
       syncConnect = new SyncConnection("root", "")
-      syncConnect.open(ServerAddress("127.0.0.1", 23333))
+      syncConnect.open(ServerAddress(ProtocolConstants.Default_Host, ProtocolConstants.Port))
 
       val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
-        val rs = syncConnect.execute(sql)
-        if (rs.hasNext)
-          SqlResult(
-            SqlData.fromList(rs.next().underlying),
-            0
-          )
-        else
-          SqlResult(
-            SqlData.empty,
-            0
-          )
+        syncConnect
+          .execute(sql)
+          .headOption
+          .map { result =>
+            SqlResult(
+              SqlData.fromList(result.underlying),
+              0
+            )
+          }
+          .toList
       }
-      rss.lastOption.getOrElse(
+      rss.flatten.lastOption.getOrElse(
         SqlResult(
           SqlData.empty,
           0

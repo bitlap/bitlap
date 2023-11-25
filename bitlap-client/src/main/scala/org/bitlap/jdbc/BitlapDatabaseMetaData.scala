@@ -20,9 +20,9 @@ import java.sql.{ Array as _, * }
 import org.bitlap.common.BitlapConf
 import org.bitlap.common.LiteralSQL._
 import org.bitlap.common.utils.{ JsonUtil, StringEx }
-import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.{ GetInfoType, TypeId }
 import org.bitlap.network.handles.SessionHandle
+import org.bitlap.network.protocol.impl.Sync
 import org.bitlap.network.serde.BitlapSerde
 
 import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
@@ -32,7 +32,7 @@ import bitlap.rolls.core.jdbc.{ sqlQ, ResultSetX, TypeRow1 }
 class BitlapDatabaseMetaData(
   private val connection: Connection,
   private val session: SessionHandle,
-  private val client: BitlapClient)
+  private val client: Sync)
     extends DatabaseMetaData
     with BitlapSerde {
   override def allProceduresAreCallable(): Boolean = throw new SQLFeatureNotSupportedException("Method not supported")

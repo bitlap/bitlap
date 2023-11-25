@@ -16,7 +16,7 @@
 package org.bitlap.server
 
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.BitlapResultSet as MyResultSet
+import org.bitlap.network.BitlapSingleResult as MyResultSet
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.http.*
 

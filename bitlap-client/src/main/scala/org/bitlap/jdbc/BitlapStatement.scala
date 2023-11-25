@@ -18,17 +18,17 @@ package org.bitlap.jdbc
 import java.sql.*
 
 import org.bitlap.common.exception.BitlapSQLException
-import org.bitlap.network.BitlapClient
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.network.protocol.impl.Sync
 
 /** Bitlap statement
  */
 class BitlapStatement(
   private val connection: Connection,
   private val sessHandle: SessionHandle,
-  private var client: BitlapClient)
+  private var client: Sync)
     extends Statement:
 
   private var stmtHandle: OperationHandle = _

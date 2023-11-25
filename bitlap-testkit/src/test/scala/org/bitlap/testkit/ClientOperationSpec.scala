@@ -34,24 +34,32 @@ class ClientOperationSpec extends BaseSpec {
 
     sync.open(ServerAddress("127.0.0.1", 23333))
 
-    val cr: List[List[(String, String)]] = sync.execute(s"create table if not exists $table").next().underlying
+    val cr: List[List[(String, String)]] =
+      sync.execute(s"create table if not exists $table").headOption.map(_.underlying).getOrElse(List.empty)
+
     val ld: List[List[(String, String)]] =
-      sync.execute(s"load data 'classpath:simple_data.csv' overwrite table $table").next().underlying
+      sync
+        .execute(s"load data 'classpath:simple_data.csv' overwrite table $table")
+        .headOption
+        .map(_.underlying)
+        .getOrElse(List.empty)
 
     assert(cr == List(List(("Boolean", "true"))))
     assert(ld == List(List(("String", "true"))))
 
-    val rs = sync.execute(
-      s"""
+    val rs = sync
+      .execute(
+        s"""
           select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
             from $table
             where _time >= 0
             group by _time
        """
-    )
+      )
+      .headOption
+      .map(_.underlying)
+      .getOrElse(List.empty)
 
-    assert(rs.hasNext)
-
-    assert(rs.next().underlying.nonEmpty)
+    assert(rs.nonEmpty)
   }
 }

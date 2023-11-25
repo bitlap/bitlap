@@ -15,13 +15,15 @@
  */
 package org.bitlap.server
 
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.raft.*
+import org.bitlap.server.raft.{ ElectionNode, * }
 
 import org.slf4j.LoggerFactory
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
+import com.typesafe.scalalogging.LazyLogging
 
 import zio.{ Runtime as _, * }
 
@@ -44,38 +46,42 @@ object RaftServerEndpoint:
       .onInterrupt(_ => ZIO.logWarning(s"Raft Server was interrupted! Bye!"))
 end RaftServerEndpoint
 
-final class RaftServerEndpoint(config: BitlapConfiguration):
+final class RaftServerEndpoint(config: BitlapConfiguration) extends LazyLogging:
 
-  private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
+  private val dataPath       = config.raftConfig.dataPath
+  private val groupId        = config.raftConfig.groupId
+  private val serverIdStr    = config.raftConfig.serverAddress
+  private val initialConfStr = config.raftConfig.initialServerAddressList
 
-  private def runRaftServer(): Task[Node] = ZIO.attempt {
-    val dataPath       = config.raftConfig.dataPath
-    val groupId        = config.raftConfig.groupId
-    val serverIdStr    = config.raftConfig.serverAddress
-    val initialConfStr = config.raftConfig.initialServerAddressList
+  private def runRaftServer(): Task[Node] =
+    for {
+      promise <- Promise.make[Throwable, ElectionNode]
+      _ <- promise.complete(ZIO.attempt {
+        val electionOpts = ElectionNodeOptions(
+          dataPath = dataPath,
+          groupId = groupId,
+          serverAddress = serverIdStr,
+          initialServerAddressList = initialConfStr,
+          new NodeOptions
+        )
+        val node = new ElectionNode
+        node.addLeaderStateListener(new LeaderStateListener() {
+          override def onLeaderStart(leaderTerm: Long): Unit = {
+            logger.info(s"[ElectionBootstrap] Leader's address is: $serverIdStr")
+            logger.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
+          }
 
-    val electionOpts = ElectionNodeOptions(
-      dataPath = dataPath,
-      groupId = groupId,
-      serverAddress = serverIdStr,
-      initialServerAddressList = initialConfStr,
-      new NodeOptions
-    )
-    val node = new ElectionNode
-    node.addLeaderStateListener(new LeaderStateListener() {
-      override def onLeaderStart(leaderTerm: Long): Unit = {
-        LOG.info(s"[ElectionBootstrap] Leader's address is: $serverIdStr")
-        LOG.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
-      }
+          override def onLeaderStop(leaderTerm: Long): Unit =
+            logger.info(s"[ElectionBootstrap] Leader stop on term: $leaderTerm")
+        })
 
-      override def onLeaderStop(leaderTerm: Long): Unit =
-        LOG.info(s"[ElectionBootstrap] Leader stop on term: $leaderTerm")
-    })
-
-    Runtime.getRuntime.addShutdownHook(new Thread(() => node.shutdown()))
-
-    node.init(electionOpts)
-
-    while node.node == null do Thread.sleep(1000)
-    node.node
-  }
+        Runtime.getRuntime.addShutdownHook(new Thread(() => node.shutdown()))
+        node.init(electionOpts)
+        node
+      })
+      node <- promise.await
+        .timeout(Duration.fromScala(config.startTimeout))
+        .someOrFail(
+          BitlapException("Failed to initialize raft node")
+        )
+    } yield node.node

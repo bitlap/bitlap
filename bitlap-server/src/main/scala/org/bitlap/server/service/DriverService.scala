@@ -24,7 +24,6 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.network.protocol.AsyncProtocol
-import org.bitlap.server.session.AccountAuthenticator
 import org.bitlap.server.session.SessionManager
 
 import com.typesafe.scalalogging.LazyLogging

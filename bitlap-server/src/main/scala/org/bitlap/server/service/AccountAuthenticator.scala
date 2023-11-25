@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.session
+package org.bitlap.server.service
 
 import org.bitlap.common.exception.BitlapAuthenticationException
 import org.bitlap.core.*
@@ -23,6 +23,7 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.session.mapTo
 
 import zio.*
 

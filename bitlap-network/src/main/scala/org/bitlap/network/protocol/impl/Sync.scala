@@ -15,6 +15,8 @@
  */
 package org.bitlap.network.protocol.impl
 
+import scala.concurrent.duration.Duration
+
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.GetInfoType
 import org.bitlap.network.handles.*
@@ -24,7 +26,11 @@ import org.bitlap.network.protocol.SyncProtocol
 /** Synchronous RPC clients have no logic and are all delegated to asynchronous clients
  *  [[org.bitlap.network.protocol.impl.Async]].
  */
-final class Sync(serverPeers: List[ServerAddress], props: Map[String, String]) extends SyncProtocol:
+final class Sync(
+  serverPeers: List[ServerAddress],
+  props: Map[String, String]
+)(using timeout: Duration)
+    extends SyncProtocol:
 
   private val async = new Async(serverPeers, props)
 

@@ -464,6 +464,7 @@
                     <id>central</id>
                     <name>Maven Snapshots</name>
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
                 <repository>
                     <id>central</id>
@@ -513,6 +514,12 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

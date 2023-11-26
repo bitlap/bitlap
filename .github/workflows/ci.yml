@@ -24,7 +24,7 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
-          
+
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
-        
+  
   lint:
     runs-on: ubuntu-latest
     strategy:
@@ -49,7 +49,7 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
-          
+
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -59,8 +59,8 @@ jobs:
             ${{ runner.os }}-maven-    
 
       - name: Checking Code Style
-        run: ./mvnw spotless:check            
-        
+        run: ./mvnw spotless:check
+  
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -85,12 +85,12 @@ jobs:
 
       - name: Test
         run: ./mvnw -T 4 --batch-mode -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
-        
+
       - name: Report
-        run: ./mvnw -T 4 --batch-mode -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' jacoco:report        
+        run: ./mvnw -T 4 --batch-mode -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' jacoco:report
 
       - name: Upload test coverage report
-        run: bash <(curl -s https://codecov.io/bash)  -f '**/jacoco.xml'       
+        run: bash <(curl -s https://codecov.io/bash)  -f '**/jacoco.xml'
   
   ci:
     runs-on: ubuntu-latest
@@ -98,4 +98,3 @@ jobs:
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"
-

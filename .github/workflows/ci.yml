@@ -1,17 +1,14 @@
-name: CI
+name: Publish Snapshot
 
 on:
-  push:
-    branches:
-      - master
-      - dev
-  pull_request:
-    branches:
-      - master
-      - dev
-
+  workflow_dispatch:
+    inputs:
+      publish_snapshot_version:
+        description: 'Publish Snapshot to s01.oss.sonatype.org'
+        default: 'X.X.X-SNAPSHOT'
+        required: true
 jobs:
-  build:
+  snapshot:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,78 +21,30 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
-          
+          server-id: central
+          server-username: ${{ secrets.MAVEN_USERNAME }} # env variable for username in deploy
+          server-password: ${{ secrets.MAVEN_CENTRAL_TOKEN }} # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_SECRET }} # Value of the GPG private key to import
+          gpg-passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }} # env variable for GPG private key passphrase
+
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-          
+            ${{ runner.os }}-maven-  
 
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package
-        
-  lint:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        jdk-version: [ 11 ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Java ${{ matrix.jdk-version }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: ${{ matrix.jdk-version }}
-          cache: 'maven'
-          
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-    
 
-      - name: Checking Code Style
-        run: ./mvnw spotless:check            
-        
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        jdk-version: [ 11 ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Java ${{ matrix.jdk-version }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: ${{ matrix.jdk-version }}
-          cache: 'maven'
+      - name: Set Env CommitId
+        run: |
+          echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-           
+      - name: Get Env CommitId
+        run: echo ${{ env.CommitId }}
 
-      - name: Test
-        run: ./mvnw -T 4 --batch-mode -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' test
-        
-      - name: Report
-        run: ./mvnw -T 4 --batch-mode -Dmaven.test.jvmargs='--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED' jacoco:report        
-
-      - name: Upload test coverage report
-        run: bash <(curl -s https://codecov.io/bash)  -f '**/jacoco.xml'       
-  
-  ci:
-    runs-on: ubuntu-latest
-    needs: [ build, lint, test]
-    steps:
-      - name: Aggregate outcomes
-        run: echo "build succeeded"
-
+      - name: Publish Snapshot
+        if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
+        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Psnapshot  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}

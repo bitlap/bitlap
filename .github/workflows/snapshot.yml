@@ -22,8 +22,8 @@ jobs:
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
           server-id: central
-          server-username: ${{ secrets.MAVEN_USERNAME }}
-          server-password: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.MAVEN_GPG_SECRET }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           
@@ -47,6 +47,8 @@ jobs:
 
       - name: Publish Snapshot
         if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
-        run: ./mvnw  --batch-mode -Darguments="gpg.passphrase=${{ secrets.MAVEN_GPG_PASSPHRASE }}" -Dmaven.test.skip=true deploy  -Psnapshot  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}
+        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Psnapshot  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}
         env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

@@ -7,8 +7,38 @@ on:
         description: 'Publish image to hub.docker.com'
         default: 'X.X.X'
         required: true
+      publish_snapshot_version:
+        description: 'Publish Snapshot to s01.oss.sonatype.org'
+        default: 'X.X.X-SNAPSHOT'
+        required: true        
 jobs:
-  publish:
+  jar:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk-version: [ 11 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Java ${{ matrix.jdk-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: ${{ matrix.jdk-version }}
+          cache: 'maven'
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-          
+
+#      - name: Publish Snapshot
+#        if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
+#        run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}
+
+  image:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -37,7 +67,7 @@ jobs:
   
   ci:
     runs-on: ubuntu-latest
-    needs: [ publish ]
+    needs: [ jar, image ]
     steps:
       - name: Aggregate outcomes
         run: echo "build succeeded"        

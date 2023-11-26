@@ -32,11 +32,18 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-          
+            ${{ runner.os }}-maven-    
+            
+      - name: Set Env CommitId
+        run: |
+          echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
 
-#      - name: Publish Snapshot
-#        if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
-#        run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}
+      - name: Get Env CommitId
+        run: echo ${{ env.CommitId }}            
+
+      - name: Publish Snapshot
+        if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
+        run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}
 
   image:
     runs-on: ubuntu-latest

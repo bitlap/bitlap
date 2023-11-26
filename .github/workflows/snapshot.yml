@@ -43,3 +43,8 @@ jobs:
       - name: Publish Snapshot
         if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.PGP_SECRET }}
+          OSSRH_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}

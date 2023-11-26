@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
           
-      - name: Get CommitId
+      - name: Print CommitId
         run: |
           echo ${{ env.CommitId }}            
           
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "FinalVersion=`sh dev/version-commit.sh ${{github.event.inputs.publish_snapshot_version}} ${{env.CommitId}}`" >> $GITHUB_ENV          
 
-      - name: Get FinalVersion
+      - name: Print Final Version
         run: |
           echo ${{ env.FinalVersion }}
 

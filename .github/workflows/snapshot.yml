@@ -22,10 +22,10 @@ jobs:
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
           server-id: central
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_TOKEN
-          gpg-private-key: ${{ secrets.PGP_SECRET }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          server-username: MAVEN_USERNAME # env variable for username in deploy
+          server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
 
       - name: Cache local Maven repository
         uses: actions/cache@v3
@@ -49,6 +49,6 @@ jobs:
         if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
         run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Psnapshot  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}
         env:
-          OSSRH_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}          
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}        

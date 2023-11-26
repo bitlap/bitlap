@@ -42,7 +42,7 @@ jobs:
       - name: Set Env
         run: |
           echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
-          echo "NewVersion=`sh dev/version-commit.sh ${{github.event.inputs.publish_snapshot_version}} ${{CommitId}}`" >> $GITHUB_ENV
+          echo "NewVersion=`sh dev/version-commit.sh ${{github.event.inputs.publish_snapshot_version}} ${{env.CommitId}}`" >> $GITHUB_ENV
 
       - name: Get Env
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - name: Publish Snapshot
         if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
-        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{NewVersion}}
+        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{env.NewVersion}}
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}

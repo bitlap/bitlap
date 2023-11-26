@@ -24,13 +24,23 @@ jobs:
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      
-      - id: install-secret-key
-        name: Install gpg secret key
+          
+      - name: Set up GPG
         run: |
-          cat <(echo -e "${{ secrets.MAVEN_GPG_SECRET }}") | gpg --batch --import  --passphrase '${{ secrets.MAVEN_GPG_PASSPHRASE }}'
-          gpg --list-secret-keys --keyid-format LONG          
-
+          echo ${{ github.workspace }}
+          # gpg init
+          mkdir ~/.gnupg && echo use-agent >> ~/.gnupg/gpg.conf
+          echo pinentry-mode loopback >> ~/.gnupg/gpg.conf
+          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
+          echo RELOADAGENT | gpg-connect-agent
+          echo ${SIGNING_KEY} | awk '{gsub(/\\n/,"\n")}1'| gpg --dearmor > ${{ github.workspace }}/secretKeyRingFile.gpg
+          gpg --import  --pinentry-mode loopback --batch --passphrase '${SIGNING_PASSWORD}' ${{ github.workspace }}/secretKeyRingFile.gpg
+          ls -al ${{ github.workspace }}
+          ls -al ~/.gnupg/
+        env:
+          SIGNING_KEY: ${{ secrets.MAVEN_GPG_SECRET }}
+          SIGNING_PASSWORD: ${{ secrets.MAVEN_GPG_PASSPHRASE }}          
+      
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:

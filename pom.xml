@@ -304,13 +304,6 @@
                         </goals>
                         <phase>validate</phase>
                     </execution>
-                    <execution>
-                        <id>validate-the-git-infos</id>
-                        <goals>
-                            <goal>validateRevision</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
                 </executions>
                 <configuration>
                     <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
@@ -322,13 +315,6 @@
                     </generateGitPropertiesFilename>
                     <format>properties</format>
                     <dateFormatTimeZone>Asia/Shanghai</dateFormatTimeZone>
-                    <validationProperties>
-                        <validationProperty>
-                            <name>validating project version</name>
-                            <value>${project.version}</value>
-                            <shouldMatchTo><![CDATA[^.*(-SNAPSHOT)$]]></shouldMatchTo>
-                        </validationProperty>
-                    </validationProperties>
                     <gitDescribe>
                         <skip>false</skip>
                         <always>false</always>

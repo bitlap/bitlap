@@ -28,7 +28,7 @@ jobs:
       - id: install-secret-key
         name: Install gpg secret key
         run: |
-          cat <(echo -e "${{ secrets.MAVEN_GPG_SECRET }}") | gpg --batch --import
+          cat <(echo -e "${{ secrets.MAVEN_GPG_SECRET }}") | gpg --batch --import  --passphrase '${{ secrets.MAVEN_GPG_PASSPHRASE }}'
           gpg --list-secret-keys --keyid-format LONG          
 
       - name: Cache local Maven repository

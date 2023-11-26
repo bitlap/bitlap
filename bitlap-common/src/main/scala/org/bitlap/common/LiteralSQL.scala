@@ -17,13 +17,13 @@ package org.bitlap.common
 
 sealed trait LiteralSQL
 
-object LiteralSQL:
+private[bitlap] object LiteralSQL:
 
   sealed trait ShowSQL(name: String) extends LiteralSQL {
     def command: String = s"SHOW $name"
   }
 
-  final case object ShowCurrentDatabase extends ShowSQL("CURRENT_DATABASE")
-  final case object ShowDatabases       extends ShowSQL("DATABASES")
-  final case object ShowUsers           extends ShowSQL("USERS")
-  final case object ShowTables          extends ShowSQL("TABLES")
+  case object ShowCurrentDatabase extends ShowSQL("CURRENT_DATABASE")
+  case object ShowDatabases       extends ShowSQL("DATABASES")
+  case object ShowUsers           extends ShowSQL("USERS")
+  case object ShowTables          extends ShowSQL("TABLES")

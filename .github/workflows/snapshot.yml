@@ -27,6 +27,14 @@ jobs:
           gpg-private-key: ${{ secrets.PGP_SECRET }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
+      - name: Configure GPG Key
+        run: |
+          mkdir -p ~/.gnupg/
+          printf "$PGP_SECRET" | base64 --decode > ~/.gnupg/private.key
+          gpg --import ~/.gnupg/private.key
+        env:
+          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}          
+
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:

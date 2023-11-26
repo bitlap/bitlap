@@ -27,13 +27,21 @@ jobs:
           gpg-private-key: ${{ secrets.PGP_SECRET }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Configure GPG Key
+      - name: Set up GPG
         run: |
-          mkdir -p ~/.gnupg/
-          printf "$PGP_SECRET" | base64 --decode > ~/.gnupg/private.key
-          gpg --import ~/.gnupg/private.key
+          echo ${{ github.workspace }}
+          # gpg init
+          mkdir ~/.gnupg && echo use-agent >> ~/.gnupg/gpg.conf
+          echo pinentry-mode loopback >> ~/.gnupg/gpg.conf
+          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
+          echo RELOADAGENT | gpg-connect-agent
+          echo ${PGP_SECRET} | awk '{gsub(/\\n/,"\n")}1'| gpg --dearmor > ${{ github.workspace }}/secretKeyRingFile.gpg
+          gpg --import  --pinentry-mode loopback --batch --passphrase '${PGP_PASSPHRASE}' ${{ github.workspace }}/secretKeyRingFile.gpg
+          ls -al ${{ github.workspace }}
+          ls -al ~/.gnupg/
         env:
-          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}          
+          SIGNING_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}         
 
       - name: Cache local Maven repository
         uses: actions/cache@v3

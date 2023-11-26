@@ -1,0 +1,36 @@
+name: Publish Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_image_version:
+        description: 'Publish image to hub.docker.com'
+        default: 'X.X.X'
+        required: true
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk-version: [ 11 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Java ${{ matrix.jdk-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: ${{ matrix.jdk-version }}
+          cache: 'maven'
+
+      - name: Docker Build
+        run: bash deploy.sh ${{ github.event.inputs.publish_image_version }}
+        working-directory: ./docker
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Push
+        run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/bitlap:${{ github.event.inputs.publish_image_version }}

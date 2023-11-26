@@ -461,12 +461,12 @@
             <id>release</id>
             <distributionManagement>
                 <snapshotRepository>
-                    <id>scentral</id>
+                    <id>central</id>
                     <name>Maven Snapshots</name>
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
                 </snapshotRepository>
                 <repository>
-                    <id>rcentral</id>
+                    <id>central</id>
                     <name>Maven Releases</name>
                     <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>

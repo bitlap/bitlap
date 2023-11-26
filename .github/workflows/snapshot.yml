@@ -1,0 +1,42 @@
+name: Publish Snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_snapshot_version:
+        description: 'Publish Snapshot to s01.oss.sonatype.org'
+        default: 'X.X.X-SNAPSHOT'
+        required: true        
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk-version: [ 11 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Java ${{ matrix.jdk-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: ${{ matrix.jdk-version }}
+          cache: 'maven'
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-    
+            
+      - name: Set Env CommitId
+        run: |
+          echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
+
+      - name: Get Env CommitId
+        run: echo ${{ env.CommitId }}            
+
+      - name: Publish Snapshot
+        if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
+        run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}-${{ env.CommitId }}

@@ -39,14 +39,15 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      matrix:
+        jdk-version: [ 11 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
           
       - name: Cache local Maven repository

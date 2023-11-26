@@ -21,6 +21,11 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
           cache: 'maven'
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.PGP_SECRET }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Cache local Maven repository
         uses: actions/cache@v3
@@ -47,4 +52,3 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.PGP_SECRET }}

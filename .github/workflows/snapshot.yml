@@ -39,16 +39,19 @@ jobs:
       - name: Build with Maven
         run: ./mvnw -T 4 --batch-mode --update-snapshots -Dmaven.test.skip=true package            
             
-      - name: Set Env CommitId
+      - name: Set Env
         run: |
           echo "CommitId=`sh dev/commitId.sh`" >> $GITHUB_ENV
+          echo "NewVersion=`sh dev/version-commit.sh ${{github.event.inputs.publish_snapshot_version}} ${{CommitId}}`" >> $GITHUB_ENV
 
-      - name: Get Env CommitId
-        run: echo ${{ env.CommitId }}            
+      - name: Get Env
+        run: |
+          echo ${{ env.CommitId }}            
+          echo ${{ env.NewVersion }}
 
       - name: Publish Snapshot
         if: ${{ contains(github.event.inputs.publish_snapshot_version, 'SNAPSHOT') }}
-        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{github.event.inputs.publish_snapshot_version}}
+        run: ./mvnw  --batch-mode -Dmaven.test.skip=true deploy  -Prelease  -Drevision=${{NewVersion}}
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}

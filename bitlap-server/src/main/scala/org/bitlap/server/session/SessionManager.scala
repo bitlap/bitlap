@@ -81,25 +81,23 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
     sessionConf: Map[String, String]
   ): Task[Session] =
     for {
-      sessionStoreMap       <- globalContext.sessionStoreMap.get
-      operationStoreMap     <- globalContext.operationStoreMap.get
-      operationHandleVector <- globalContext.operationHandleVector.get
-      sessionState          <- Ref.make(new AtomicBoolean(true))
-      sessionCreateTime     <- Ref.make(new AtomicLong(System.currentTimeMillis()))
-      defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
+      sessionStoreMap    <- globalContext.sessionStoreMap.get
+      sessionState       <- Ref.make(new AtomicBoolean(true))
+      sessionCreateTime  <- Ref.make(new AtomicLong(System.currentTimeMillis()))
+      defaultSessionConf <- Ref.make(mutable.Map(sessionConf.toList: _*))
       db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
       defaultSchema <- Ref.make(AtomicReference(db))
       _             <- AccountAuthenticator.auth(username, password)
       session <- ZIO
         .attempt(
           new SimpleLocalSession(
-            sessionManager = this,
+            getOperation = getOperation,
             sessionConfRef = defaultSessionConf,
             sessionStateRef = sessionState,
             creationTimeRef = sessionCreateTime,
             lastAccessTimeRef = sessionCreateTime,
             defaultSchema
-          )(using sessionStoreMap, operationHandleVector, operationStoreMap, globalContext.config)
+          )
         )
         .tap(s => ZIO.succeed(sessionStoreMap.put(s.sessionHandle, s)))
       _ <- ZIO.logInfo(s"Create session [${session.sessionHandle}]")
@@ -176,12 +174,15 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Task[Session] =
     for {
       sessionStoreMap <- globalContext.sessionStoreMap.get
-      _ <- session.asInstanceOf[SimpleLocalSession].lastAccessTimeRef.updateAndGet { lt =>
-        lt.set(System.currentTimeMillis())
-        if sessionStoreMap.containsKey(sessionHandle) then {
-          sessionStoreMap.put(sessionHandle, session)
-        }
-        lt
-      }
+      _ <- session match
+        case session: SimpleLocalSession =>
+          session.lastAccessTimeRef.updateAndGet { lt =>
+            lt.set(System.currentTimeMillis())
+            if sessionStoreMap.containsKey(sessionHandle) then {
+              sessionStoreMap.put(sessionHandle, session)
+            }
+            lt
+          }
+        case _ => ZIO.succeed(session)
     } yield session
 end SessionManager

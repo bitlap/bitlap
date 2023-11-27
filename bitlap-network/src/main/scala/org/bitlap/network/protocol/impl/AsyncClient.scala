@@ -120,8 +120,8 @@ final class AsyncClient(serverPeers: List[ServerAddress], props: Map[String, Str
 
   override def fetchResults(
     opHandle: OperationHandle,
-    maxRows: Int = 50,
-    fetchType: Int = 1
+    maxRows: Int,
+    fetchType: Int
   ): ZIO[Any, Throwable, FetchResults] =
     DriverServiceClient
       .fetchResults(

@@ -35,8 +35,7 @@ final class SimpleOperation(
   parentSession: Session,
   opType: OperationType,
   hasResultSet: Boolean = false
-)(
-  globalConfig: BitlapConfiguration)
+)(using globalConfig: BitlapConfiguration)
     extends Operation(parentSession, opType, hasResultSet, globalConfig) {
 
   override def run(): Task[Unit] = {

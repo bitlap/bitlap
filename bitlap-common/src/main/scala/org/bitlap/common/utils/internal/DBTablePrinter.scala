@@ -301,4 +301,22 @@ object DBTablePrinter {
       case _ => CATEGORY_OTHER
     }
   }
+
+  def normalizeValue(columnType: Int, columnTypeName: String, _value: Any): String = {
+    val category = DBTablePrinter.whichCategory(columnType)
+    val value = if (category == CATEGORY_OTHER) {
+      "(" + columnTypeName + ")"
+    } else {
+      if (_value == null) "NULL" else _value
+    }
+    val __Value = _value.toString
+    category match {
+      case CATEGORY_DOUBLE if value != "NULL" =>
+        val dValue = __Value.toDoubleOption.getOrElse(0d)
+        String.format("%.3f", dValue)
+      case CATEGORY_STRING if __Value.length > DEFAULT_MAX_TEXT_COL_WIDTH =>
+        __Value.substring(0, DEFAULT_MAX_TEXT_COL_WIDTH - 3) + "..."
+      case _ => __Value
+    }
+  }
 }

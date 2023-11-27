@@ -27,6 +27,7 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
+import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.config.BitlapConfiguration
 
 import com.google.protobuf.ByteString
@@ -37,20 +38,18 @@ import zio.{ System as _, * }
 /** Bitlap session implementation on a single machine
  */
 final class SimpleLocalSession(
-  val sessionManager: SessionManager,
+  val getOperation: OperationHandle => Task[Operation],
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
   val sessionConfRef: Ref[mutable.Map[String, String]],
   val sessionStateRef: Ref[AtomicBoolean],
   val creationTimeRef: Ref[AtomicLong],
   val lastAccessTimeRef: Ref[AtomicLong],
   val currentSchemaRef: Ref[AtomicReference[String]]
-)(using
-  sessionStoreMap: ConcurrentHashMap[SessionHandle, Session],
-  operationHandleVector: JVector[OperationHandle],
-  operationStoreMap: ConcurrentHashMap[OperationHandle, Operation],
-  globalConfig: BitlapConfiguration)
+)(using globalContext: BitlapGlobalContext)
     extends Session
     with StrictLogging {
+
+  given BitlapConfiguration = globalContext.config
 
   override def executeStatement(
     statement: String,
@@ -77,7 +76,7 @@ final class SimpleLocalSession(
   override def fetchResults(
     operationHandle: OperationHandle
   ): Task[RowSet] =
-    sessionManager.getOperation(operationHandle).map { op =>
+    getOperation(operationHandle).map { op =>
       val rows = op.getNextResultSet()
       op.remove(operationHandle) // TODO (work with fetch offset & size)
       rows
@@ -86,11 +85,13 @@ final class SimpleLocalSession(
   override def getResultSetMetadata(
     operationHandle: OperationHandle
   ): Task[TableSchema] =
-    sessionManager.getOperation(operationHandle).map(_.getResultSetSchema())
+    getOperation(operationHandle).map(_.getResultSetSchema())
 
   override def closeOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
-      re <- ZIO.attemptBlocking {
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
+      _ <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         {
           op.setState(OperationState.ClosedState)
@@ -101,6 +102,8 @@ final class SimpleLocalSession(
 
   override def cancelOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
       re <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         if op != null then {
@@ -128,36 +131,55 @@ final class SimpleLocalSession(
     parentSession: Session,
     statement: String,
     confOverlay: scala.collection.Map[String, String] = Map.empty
-  ): Task[Operation] = ZIO.attempt {
-    val operation = new SimpleOperation(
-      parentSession,
-      OperationType.ExecuteStatement,
-      hasResultSet = true
-    )(globalConfig)
-    confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
-    operationHandleVector.add(operation.opHandle)
-    operationStoreMap.put(operation.opHandle, operation)
-    operation.statement = statement
-    operation.run().as(operation)
-  }.flatten
+  ): Task[Operation] =
+    for {
+      sessionManager        <- globalContext.getSessionManager
+      operationHandleVector <- sessionManager.operationHandleVector.get
+      operationStoreMap     <- sessionManager.operationStoreMap.get
+      re <- ZIO.attempt {
+        val operation = new SimpleOperation(
+          parentSession,
+          OperationType.ExecuteStatement,
+          hasResultSet = true
+        )
+        confOverlay.foreach(kv => operation.confOverlay.put(kv._1, kv._2))
+        operationHandleVector.add(operation.opHandle)
+        operationStoreMap.put(operation.opHandle, operation)
+        operation.statement = statement
+        operation.run().as(operation)
+      }.flatten
+
+    } yield re
 
   private def removeOperation(operationHandle: OperationHandle): Task[Option[Operation]] =
-    ZIO.attemptBlocking {
-      val r = operationStoreMap.remove(operationHandle)
-      operationHandleVector.remove(operationHandle)
-      Option(r)
-    }
+    for {
+      sessionManager        <- globalContext.getSessionManager
+      operationHandleVector <- sessionManager.operationHandleVector.get
+      operationStoreMap     <- sessionManager.operationStoreMap.get
+      re <- ZIO.attemptBlocking {
+        val r = operationStoreMap.remove(operationHandle)
+        operationHandleVector.remove(operationHandle)
+        Option(r)
+      }
+    } yield re
 
   private def removeTimedOutOperation(operationHandle: OperationHandle): Task[Option[Operation]] = {
-    val operation = operationStoreMap.get(operationHandle)
-    if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
-      removeOperation(operationHandle)
-    } else ZIO.succeed(Option(operation))
+    for {
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
+      operation         <- ZIO.succeed(operationStoreMap.get(operationHandle))
+      re <-
+        if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
+          removeOperation(operationHandle)
+        } else ZIO.succeed(Option(operation))
+    } yield re
   }
 
   override def getNoOperationTime: Task[Long] = {
     for {
-      lt <- lastAccessTimeRef.get.map(_.get())
+      sessionManager        <- globalContext.getSessionManager
+      lt                    <- lastAccessTimeRef.get.map(_.get())
+      operationHandleVector <- sessionManager.operationHandleVector.get
       re <- ZIO.attempt {
         val noMoreOpHandle = operationHandleVector.isEmpty
         if noMoreOpHandle then System.currentTimeMillis - lt

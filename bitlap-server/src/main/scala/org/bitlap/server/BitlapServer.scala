@@ -50,7 +50,8 @@ object BitlapServer extends ZIOAppDefault:
                       |/_.___/_/\__/_/\__,_/ .___/
                       |                   /_/
                       |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.startFinished())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSessionManager(sessionManager))
       _ <- ZIO.collectAll(Seq(raft.join, grpc.join, http.join))
     } yield ())
       .provide(

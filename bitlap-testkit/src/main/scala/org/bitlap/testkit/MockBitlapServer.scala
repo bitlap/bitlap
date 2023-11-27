@@ -32,9 +32,10 @@ object MockBitlapServer extends ZIOAppDefault {
 
   override def run =
     (for {
-      args <- getArgs
-      t1   <- RaftServerEndpoint.service(args.toList).fork
-      t2   <- GrpcServerEndpoint.service(args.toList).fork
+      args           <- getArgs
+      t1             <- RaftServerEndpoint.service(args.toList).fork
+      t2             <- GrpcServerEndpoint.service(args.toList).fork
+      sessionManager <- ZIO.service[SessionManager]
       // add http server?
       _ <- ZIO.logInfo("""
                         |    __    _ __  __
@@ -44,7 +45,8 @@ object MockBitlapServer extends ZIOAppDefault {
                         |/_.___/_/\__/_/\__,_/ .___/
                         |                   /_/
                         |""".stripMargin)
-      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.start())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.startFinished())
+      _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSessionManager(sessionManager))
       _ <- ZIO.collectAll(Seq(t1.join, t2.join))
     } yield ())
       .provide(

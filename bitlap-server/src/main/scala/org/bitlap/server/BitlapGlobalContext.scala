@@ -24,7 +24,7 @@ import org.bitlap.network.*
 import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
 import org.bitlap.network.protocol.impl.*
 import org.bitlap.server.config.*
-import org.bitlap.server.session.{ Operation, Session }
+import org.bitlap.server.session.{ Operation, Session, SessionManager }
 
 import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.option.CliOptions
@@ -34,35 +34,38 @@ import zio.*
 
 /** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
  */
-final case class BitlapGlobalContext(
-  config: BitlapConfiguration,
+final class BitlapGlobalContext(
+  val config: BitlapConfiguration,
   grpcStarted: Promise[Throwable, Boolean],
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  syncConnectionRef: Ref[Option[SyncConnection]]) {
+  syncConnectionRef: Ref[Option[SyncConnection]],
+  sessionManagerRef: Ref[Option[SessionManager]]) {
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
-  def start(): ZIO[Any, Throwable, Boolean] = {
+  def startFinished(): ZIO[Any, Throwable, Boolean] = {
     grpcStarted.succeed(true) && raftStarted.succeed(true)
   }
 
   def isStarted: ZIO[Any, Throwable, Boolean] = grpcStarted.await *> raftStarted.await
+
+  def getSessionManager: ZIO[Any, Throwable, SessionManager] = grpcStarted.await.timeout(refTimeout) *>
+    sessionManagerRef.get.someOrFail(BitlapException("Cannot find a SessionManager instance"))
+
+  def setSessionManager(sessionManager: SessionManager): ZIO[Any, Throwable, Unit] =
+    grpcStarted.await.timeout(refTimeout) *> sessionManagerRef.set(Option(sessionManager))
 
   def setSyncConnection(syncConnection: SyncConnection): ZIO[Any, Throwable, Unit] =
     grpcStarted.await.timeout(refTimeout) *> syncConnectionRef.set(Option(syncConnection))
 
   def getSyncConnection: ZIO[Any, Throwable, SyncConnection] =
     grpcStarted.await.timeout(refTimeout) *>
-      syncConnectionRef.get.someOrFail(
-        BitlapException("Cannot find a Async instance")
-      )
+      syncConnectionRef.get.someOrFail(BitlapException("Cannot find a SyncConnection instance"))
 
   def getNode: ZIO[Any, Throwable, Node] =
-    raftStarted.await.timeout(refTimeout) *> nodeRef.get.someOrFail(
-      BitlapException("Cannot find a Node instance")
-    )
+    raftStarted.await.timeout(refTimeout) *> nodeRef.get.someOrFail(BitlapException("Cannot find a Node instance"))
 
   def getCliClientService: UIO[CliClientServiceImpl] = cliClientServiceRef.get
 
@@ -129,13 +132,15 @@ object BitlapGlobalContext:
       node             <- Ref.make(Option.empty[Node])
       syncConnection   <- Ref.make(Option.empty[SyncConnection])
       config           <- ZIO.service[BitlapConfiguration]
+      sessionManager   <- Ref.make(Option.empty[SessionManager])
     } yield BitlapGlobalContext(
       config,
       grpcStart,
       raftStart,
       cliClientService,
       node,
-      syncConnection
+      syncConnection,
+      sessionManager
     )
   }
 

@@ -52,9 +52,9 @@ object SessionManager:
 end SessionManager
 
 final class SessionManager(
-  sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
-  operationHandleVector: Ref[JVector[OperationHandle]],
-  operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]
+  val sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
+  val operationHandleVector: Ref[JVector[OperationHandle]],
+  val operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]
 )(using globalContext: BitlapGlobalContext):
   import SessionManager.*
 
@@ -106,13 +106,13 @@ final class SessionManager(
       session <- ZIO
         .attempt(
           new SimpleLocalSession(
-            sessionManager = this,
+            getOperation = getOperation,
             sessionConfRef = defaultSessionConf,
             sessionStateRef = sessionState,
             creationTimeRef = sessionCreateTime,
             lastAccessTimeRef = sessionCreateTime,
             defaultSchema
-          )(using sessionStoreMap, operationHandleVector, operationStoreMap, globalContext.config)
+          )
         )
         .tap(s => ZIO.succeed(sessionStoreMap.put(s.sessionHandle, s)))
       _ <- ZIO.logInfo(s"Create session [${session.sessionHandle}]")
@@ -189,12 +189,15 @@ final class SessionManager(
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Task[Session] =
     for {
       sessionStoreMap <- sessionStoreMap.get
-      _ <- session.asInstanceOf[SimpleLocalSession].lastAccessTimeRef.updateAndGet { lt =>
-        lt.set(System.currentTimeMillis())
-        if sessionStoreMap.containsKey(sessionHandle) then {
-          sessionStoreMap.put(sessionHandle, session)
-        }
-        lt
-      }
+      _ <- session match
+        case session: SimpleLocalSession =>
+          session.lastAccessTimeRef.updateAndGet { lt =>
+            lt.set(System.currentTimeMillis())
+            if sessionStoreMap.containsKey(sessionHandle) then {
+              sessionStoreMap.put(sessionHandle, session)
+            }
+            lt
+          }
+        case _ => ZIO.succeed(session)
     } yield session
 end SessionManager

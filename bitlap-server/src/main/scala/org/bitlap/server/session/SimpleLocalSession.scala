@@ -89,7 +89,8 @@ final class SimpleLocalSession(
 
   override def closeOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
-      operationStoreMap <- globalContext.operationStoreMap.get
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
       _ <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         {
@@ -101,7 +102,8 @@ final class SimpleLocalSession(
 
   override def cancelOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
-      operationStoreMap <- globalContext.operationStoreMap.get
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
       re <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         if op != null then {
@@ -131,8 +133,9 @@ final class SimpleLocalSession(
     confOverlay: scala.collection.Map[String, String] = Map.empty
   ): Task[Operation] =
     for {
-      operationHandleVector <- globalContext.operationHandleVector.get
-      operationStoreMap     <- globalContext.operationStoreMap.get
+      sessionManager        <- globalContext.getSessionManager
+      operationHandleVector <- sessionManager.operationHandleVector.get
+      operationStoreMap     <- sessionManager.operationStoreMap.get
       re <- ZIO.attempt {
         val operation = new SimpleOperation(
           parentSession,
@@ -150,8 +153,9 @@ final class SimpleLocalSession(
 
   private def removeOperation(operationHandle: OperationHandle): Task[Option[Operation]] =
     for {
-      operationHandleVector <- globalContext.operationHandleVector.get
-      operationStoreMap     <- globalContext.operationStoreMap.get
+      sessionManager        <- globalContext.getSessionManager
+      operationHandleVector <- sessionManager.operationHandleVector.get
+      operationStoreMap     <- sessionManager.operationStoreMap.get
       re <- ZIO.attemptBlocking {
         val r = operationStoreMap.remove(operationHandle)
         operationHandleVector.remove(operationHandle)
@@ -161,7 +165,8 @@ final class SimpleLocalSession(
 
   private def removeTimedOutOperation(operationHandle: OperationHandle): Task[Option[Operation]] = {
     for {
-      operationStoreMap <- globalContext.operationStoreMap.get
+      sessionManager    <- globalContext.getSessionManager
+      operationStoreMap <- sessionManager.operationStoreMap.get
       operation         <- ZIO.succeed(operationStoreMap.get(operationHandle))
       re <-
         if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
@@ -172,8 +177,9 @@ final class SimpleLocalSession(
 
   override def getNoOperationTime: Task[Long] = {
     for {
+      sessionManager        <- globalContext.getSessionManager
       lt                    <- lastAccessTimeRef.get.map(_.get())
-      operationHandleVector <- globalContext.operationHandleVector.get
+      operationHandleVector <- sessionManager.operationHandleVector.get
       re <- ZIO.attempt {
         val noMoreOpHandle = operationHandleVector.isEmpty
         if noMoreOpHandle then System.currentTimeMillis - lt

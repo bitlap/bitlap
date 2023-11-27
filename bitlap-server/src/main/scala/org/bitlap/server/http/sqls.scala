@@ -16,8 +16,10 @@
 package org.bitlap.server.http
 
 import org.bitlap.common.exception.BitlapSQLException
-import org.bitlap.common.utils.internal.DBTable
+import org.bitlap.common.utils.internal.{ DBTable, DBTablePrinter }
 import org.bitlap.network.Result
+import org.bitlap.network.enumeration.TypeId
+import org.bitlap.network.models.ColumnDesc
 import org.bitlap.network.serde.BitlapSerde
 
 /** Wrapping sql data for queries
@@ -61,8 +63,23 @@ extension (result: Result)
   def underlying: List[List[(String, String)]] = {
     if (result == null)
       throw BitlapSQLException("Without more elements, unable to get underlining of fetchResult")
+
     result.fetchResult.results.rows.map(_.values.zipWithIndex.map { case (string, i) =>
-      val typeDesc = result.tableSchema.columns.apply(i).typeDesc
-      typeDesc.name -> BitlapSerde.deserialize[String](typeDesc, string)
+      val colDesc = result.tableSchema.columns.apply(i)
+      colDesc.columnName -> {
+        colDesc.typeDesc match
+          case TypeId.DoubleType =>
+            DBTablePrinter.normalizeValue(
+              colDesc.typeDesc.value,
+              colDesc.typeDesc.name,
+              BitlapSerde.deserialize[Double](colDesc.typeDesc, string)
+            )
+          case _ =>
+            DBTablePrinter.normalizeValue(
+              colDesc.typeDesc.value,
+              colDesc.typeDesc.name,
+              BitlapSerde.deserialize[String](colDesc.typeDesc, string)
+            )
+      }
     }.toList)
   }

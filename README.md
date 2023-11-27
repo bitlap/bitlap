@@ -38,7 +38,7 @@ This project exists thanks to all the people who contribute. [[Contribute](docs/
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/bitlap/bitlap/issues). You can also take a look at the [contributing guide](https://github.com/bitlap/bitlap/blob/dev/CONTRIBUTING.md).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/bitlap/bitlap/issues). You can also take a look at the [contributing guide](https://github.com/bitlap/bitlap/blob/dev/docs/CONTRIBUTING.md).
 
 ## Show your support
 

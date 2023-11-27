@@ -16,7 +16,9 @@
 package org.bitlap.server.session
 
 import java.util.Date
+import java.util.Vector as JVector
 import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
@@ -29,6 +31,7 @@ import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
+import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.service.AccountAuthenticator
 
 import zio.{ System as _, * }
@@ -37,20 +40,30 @@ import zio.{ System as _, * }
  */
 object SessionManager:
 
-  val live: ZLayer[BitlapGlobalContext, Nothing, SessionManager] =
-    ZLayer.fromFunction((in: BitlapGlobalContext) => new SessionManager(using in))
+  val live: ZLayer[BitlapGlobalContext, Nothing, SessionManager] = ZLayer.fromZIO {
+    for {
+      sessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
+      operationHandleVector <- Ref.make(JVector[OperationHandle]())
+      operationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
+      ctx                   <- ZIO.service[BitlapGlobalContext]
+    } yield new SessionManager(sessionStoreMap, operationHandleVector, operationStoreMap)(using ctx)
+  }
 
 end SessionManager
 
-final class SessionManager(using globalContext: BitlapGlobalContext):
+final class SessionManager(
+  sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
+  operationHandleVector: Ref[JVector[OperationHandle]],
+  operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]
+)(using globalContext: BitlapGlobalContext):
   import SessionManager.*
 
   /** Start session listening, clear session when timeout occurs, and clear session related operation cache
    */
   def startListener(): ZIO[Any, Nothing, Unit] = {
     for {
-      sessionStoreMap       <- globalContext.sessionStoreMap.get
-      operationHandleVector <- globalContext.operationHandleVector.get
+      sessionStoreMap       <- sessionStoreMap.get
+      operationHandleVector <- operationHandleVector.get
       _                     <- ZIO.logInfo(s"Session state check started: ${sessionStoreMap.size} sessions")
       now                   <- Clock.currentTime(TimeUnit.MILLISECONDS)
       sessionConfig  = globalContext.config.sessionConfig
@@ -81,9 +94,9 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
     sessionConf: Map[String, String]
   ): Task[Session] =
     for {
-      sessionStoreMap       <- globalContext.sessionStoreMap.get
-      operationStoreMap     <- globalContext.operationStoreMap.get
-      operationHandleVector <- globalContext.operationHandleVector.get
+      sessionStoreMap       <- sessionStoreMap.get
+      operationStoreMap     <- operationStoreMap.get
+      operationHandleVector <- operationHandleVector.get
       sessionState          <- Ref.make(new AtomicBoolean(true))
       sessionCreateTime     <- Ref.make(new AtomicLong(System.currentTimeMillis()))
       defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
@@ -107,9 +120,9 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
 
   def closeSession(sessionHandle: SessionHandle): Task[Unit] =
     for {
-      sessionStoreMap       <- globalContext.sessionStoreMap.get
-      operationHandleVector <- globalContext.operationHandleVector.get
-      operationStoreMap     <- globalContext.operationStoreMap.get
+      sessionStoreMap       <- sessionStoreMap.get
+      operationHandleVector <- operationHandleVector.get
+      operationStoreMap     <- operationStoreMap.get
       _ <- ZIO.attemptBlocking {
         sessionStoreMap.remove(sessionHandle)
         val closedOps = new ListBuffer[OperationHandle]()
@@ -130,7 +143,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
 
   def getSession(sessionHandle: SessionHandle): Task[Session] =
     for {
-      sessionStoreMap <- globalContext.sessionStoreMap.get
+      sessionStoreMap <- sessionStoreMap.get
       re <- ZIO.attemptBlocking {
         val session = sessionStoreMap.get(sessionHandle)
         if session == null then {
@@ -143,7 +156,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
 
   def getInfo(sessionHandle: SessionHandle, getInfoType: GetInfoType): Task[GetInfoValue] =
     for {
-      sessionStoreMap <- globalContext.sessionStoreMap.get
+      sessionStoreMap <- sessionStoreMap.get
       re <- ZIO.attemptBlocking {
         val session = sessionStoreMap.get(sessionHandle)
         if session == null then {
@@ -156,7 +169,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
 
   def getOperation(operationHandle: OperationHandle): Task[Operation] =
     for {
-      operationStoreMap <- globalContext.operationStoreMap.get
+      operationStoreMap <- operationStoreMap.get
       re <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         if op == null then {
@@ -175,7 +188,7 @@ final class SessionManager(using globalContext: BitlapGlobalContext):
 
   private def refreshSession(sessionHandle: SessionHandle, session: Session): Task[Session] =
     for {
-      sessionStoreMap <- globalContext.sessionStoreMap.get
+      sessionStoreMap <- sessionStoreMap.get
       _ <- session.asInstanceOf[SimpleLocalSession].lastAccessTimeRef.updateAndGet { lt =>
         lt.set(System.currentTimeMillis())
         if sessionStoreMap.containsKey(sessionHandle) then {

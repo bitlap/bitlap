@@ -40,10 +40,7 @@ final case class BitlapGlobalContext(
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
   nodeRef: Ref[Option[Node]],
-  syncConnectionRef: Ref[Option[SyncConnection]],
-  sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
-  operationHandleVector: Ref[JVector[OperationHandle]],
-  operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]) {
+  syncConnectionRef: Ref[Option[SyncConnection]]) {
 
   private val refTimeout = Duration.fromScala(config.startTimeout) // require a timeout?
 
@@ -126,25 +123,19 @@ object BitlapGlobalContext:
 
   lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapGlobalContext] = ZLayer.fromZIO {
     for {
-      grpcStart             <- Promise.make[Throwable, Boolean]
-      raftStart             <- Promise.make[Throwable, Boolean]
-      cliClientService      <- Ref.make(new CliClientServiceImpl)
-      node                  <- Ref.make(Option.empty[Node])
-      syncConnection        <- Ref.make(Option.empty[SyncConnection])
-      config                <- ZIO.service[BitlapConfiguration]
-      sessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
-      operationHandleVector <- Ref.make(JVector[OperationHandle]())
-      operationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
+      grpcStart        <- Promise.make[Throwable, Boolean]
+      raftStart        <- Promise.make[Throwable, Boolean]
+      cliClientService <- Ref.make(new CliClientServiceImpl)
+      node             <- Ref.make(Option.empty[Node])
+      syncConnection   <- Ref.make(Option.empty[SyncConnection])
+      config           <- ZIO.service[BitlapConfiguration]
     } yield BitlapGlobalContext(
       config,
       grpcStart,
       raftStart,
       cliClientService,
       node,
-      syncConnection,
-      sessionStoreMap,
-      operationHandleVector,
-      operationStoreMap
+      syncConnection
     )
   }
 

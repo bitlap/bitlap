@@ -30,7 +30,8 @@ import zio.{ Ref, Task }
 trait Session {
 
   val sessionHandle: SessionHandle
-  val sessionManager: SessionManager
+
+  def getOperation: OperationHandle => Task[Operation]
 
   def lastAccessTimeRef: Ref[AtomicLong]
 

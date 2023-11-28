@@ -19,9 +19,7 @@ import org.bitlap.server.http.Response
 
 import io.circe._
 import io.circe.generic.auto._
-import sttp.tapir.AnyEndpoint
 import sttp.tapir.Endpoint
-import sttp.tapir.PublicEndpoint
 import sttp.tapir.files.*
 import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe.*
@@ -29,14 +27,14 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*
 import zio.*
 
-object CommonRoute {
+object ResourceRoute {
 
-  lazy val live = ZLayer.succeed(CommonRoute())
+  lazy val live: ULayer[ResourceRoute] = ZLayer.succeed(ResourceRoute())
 }
 
-class CommonRoute extends Route("common") {
+final class ResourceRoute extends BitlapRoute("common") {
 
-  private val classLoader = CommonRoute.getClass.getClassLoader
+  private val classLoader = ResourceRoute.getClass.getClassLoader
 
   get(_.in("status").out(jsonBody[Response[String]])) { _ =>
     ZIO.succeed(Response.ok("ok"))

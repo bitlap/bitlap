@@ -18,7 +18,7 @@ package org.bitlap.testkit
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes.{ CommonRoute, SqlRoute }
+import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
 import org.bitlap.server.http.service.SqlService
 import org.bitlap.server.service.DriverGrpcServer
 import org.bitlap.server.session.SessionManager
@@ -66,7 +66,7 @@ object MockBitlapServer extends ZIOAppDefault {
         SessionManager.live,
         // http
         HttpRoutes.live,
-        CommonRoute.live,
+        ResourceRoute.live,
         SqlRoute.live,
         SqlService.live
       )

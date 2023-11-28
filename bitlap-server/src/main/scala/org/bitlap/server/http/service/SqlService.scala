@@ -18,6 +18,7 @@ package org.bitlap.server.http.service
 import scala.util.control.NonFatal
 
 import org.bitlap.common.BitlapLogging
+import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.extension.*
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
@@ -37,31 +38,34 @@ class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
 
   private val conf = context.config.grpcConfig
 
-  def execute(sql: String): ZIO[Any, Throwable, Response[SqlData]] = {
-    context.getSyncConnection.map { syncConnect =>
-      try {
-        syncConnect.use { conn =>
-          conn.open(ServerAddress(conf.host, conf.port))
-          val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
-            conn
-              .execute(sql)
-              .headOption
-              .map { result =>
-                SqlData.fromList(result.underlying)
-              }
-              .toList
-          }
-          Response.ok(
-            rss.flatten.lastOption.getOrElse(
-              SqlData.empty
+  def execute(sql: String): ZIO[Any, BitlapException, Response[SqlData]] = {
+    context.getSyncConnection.mapBoth(
+      e => new BitlapException("SqlService execute failed", cause = Option(e)),
+      { syncConnect =>
+        try {
+          syncConnect.use { conn =>
+            conn.open(ServerAddress(conf.host, conf.port))
+            val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
+              conn
+                .execute(sql)
+                .headOption
+                .map { result =>
+                  SqlData.fromList(result.underlying)
+                }
+                .toList
+            }
+            Response.ok(
+              rss.flatten.lastOption.getOrElse(
+                SqlData.empty
+              )
             )
-          )
+          }
+        } catch {
+          case NonFatal(e) =>
+            log.error("Execute sql failed", e)
+            Response.fail(e)
         }
-      } catch {
-        case NonFatal(e) =>
-          log.error("Execute sql failed", e)
-          Response.fail(e)
       }
-    }
+    )
   }
 }

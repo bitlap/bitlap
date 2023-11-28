@@ -19,7 +19,7 @@ import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes.{ CommonRoute, SqlRoute }
+import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
 import org.bitlap.server.http.service.SqlService
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
@@ -69,7 +69,7 @@ object BitlapServer extends ZIOAppDefault:
         BitlapGlobalContext.live,
         // http
         HttpRoutes.live,
-        CommonRoute.live,
+        ResourceRoute.live,
         SqlRoute.live,
         SqlService.live
       )

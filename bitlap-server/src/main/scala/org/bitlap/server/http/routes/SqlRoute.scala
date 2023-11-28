@@ -34,7 +34,7 @@ object SqlRoute {
     ZLayer.fromFunction((sqlService: SqlService) => SqlRoute(sqlService))
 }
 
-class SqlRoute(sqlService: SqlService) extends Route("sql") {
+class SqlRoute(sqlService: SqlService) extends BitlapRoute("sql") {
 
   post(_.in("run").in(jsonBody[SqlInput]).out(jsonBody[Response[SqlData]])) { in =>
     sqlService.execute(in.sql)

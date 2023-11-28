@@ -17,17 +17,56 @@ package org.bitlap.server.http.routes
 
 import scala.collection.mutable.ListBuffer
 
-import sttp.tapir.{ AnyEndpoint, Endpoint }
+import org.bitlap.common.exception.{ BitlapException, BitlapRuntimeException }
+
+import io.circe.*
+import io.circe.generic.auto.*
+import io.circe.syntax.EncoderOps
+import sttp.tapir.{ AnyEndpoint, Endpoint, Schema, SchemaType }
+import sttp.tapir.Codec.JsonCodec
+import sttp.tapir.generic.auto.*
+import sttp.tapir.json.circe.*
+import sttp.tapir.json.circe.jsonBody
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-trait Route(name: String) {
+trait BitlapRoute(name: String) {
 
-  protected lazy val API: Endpoint[Unit, Unit, Unit, Unit, Any]                      = endpoint.in("api" / name)
+  /** Custom Exception Schema
+   */
+  given Schema[BitlapException] =
+    Schema[BitlapException](SchemaType.SProduct(Nil), Some(Schema.SName("BitlapException")))
+
+  /** Custom exception codec
+   */
+  given exceptionCodec[A <: BitlapException]: JsonCodec[A] =
+    implicitly[JsonCodec[io.circe.Json]].map(json =>
+      json.as[A] match {
+        case Left(_)      => throw new BitlapRuntimeException("MessageParsingError")
+        case Right(value) => value
+      }
+    )(error => error.asJson)
+
+  /** TODO Custom exception serialization
+   */
+  given encodeException[A <: BitlapException]: Encoder[A] = (_: A) => Json.Null
+
+  /** TODO Custom exception deserialization
+   */
+  given decodeException[A <: BitlapException]: Decoder[A] =
+    (c: HCursor) =>
+      for {
+        msg <- c.get[String]("msg")
+      } yield BitlapException(msg).asInstanceOf[A]
+
+  protected lazy val API: Endpoint[Unit, Unit, BitlapException, Unit, Any] =
+    endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapException])
   protected lazy val endpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = ListBuffer.empty
 
+  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapException, Unit, Any]
+
   protected def get[A, I, E, O, R, RR](
-    point: Endpoint[Unit, Unit, Unit, Unit, Any] => Endpoint[A, I, E, O, R]
+    point: BitlapEndpoint => Endpoint[A, I, E, O, R]
   )(
     logic: I => ZIO[RR, E, O]
   )(using aIsUnit: A =:= Unit
@@ -39,7 +78,7 @@ trait Route(name: String) {
   }
 
   protected def post[A, I, E, O, R, RR](
-    point: Endpoint[Unit, Unit, Unit, Unit, Any] => Endpoint[A, I, E, O, R]
+    point: BitlapEndpoint => Endpoint[A, I, E, O, R]
   )(
     logic: I => ZIO[RR, E, O]
   )(using aIsUnit: A =:= Unit

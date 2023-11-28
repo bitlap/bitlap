@@ -15,8 +15,9 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.server.http.routes.{ CommonRoute, SqlRoute }
+import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
 
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir.ZServerEndpoint
@@ -25,24 +26,22 @@ import zio.http.HttpApp
 
 object HttpRoutes {
 
-  val live: ZLayer[CommonRoute & SqlRoute, Nothing, HttpRoutes] =
-    ZLayer.fromFunction((commonRoute: CommonRoute, sqlRoute: SqlRoute) => HttpRoutes(commonRoute, sqlRoute))
+  val live: ZLayer[ResourceRoute & SqlRoute, Nothing, HttpRoutes] =
+    ZLayer.fromFunction((commonRoute: ResourceRoute, sqlRoute: SqlRoute) => HttpRoutes(commonRoute, sqlRoute))
 }
 
-class HttpRoutes(commonRoute: CommonRoute, sqlRoute: SqlRoute) {
+final class HttpRoutes(commonRoute: ResourceRoute, sqlRoute: SqlRoute) {
 
-  private val swaggerEndpoints: List[ZServerEndpoint[Any, Task]] = SwaggerInterpreter().fromServerEndpoints[Task](
-    sqlRoute.getEndpoints.map(_._1)
-      ++ commonRoute.getEndpoints.map(_._1),
-    "Bitlap API",
-    "1.0"
+  private val swaggerEndpoints: List[ServerEndpoint[Any, Task]] = SwaggerInterpreter().fromServerEndpoints[Task](
+    endpoints = (sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2)).toList,
+    title = "Bitlap API",
+    version = "1.0"
   )
 
-  def getHttpApp: HttpApp[Any] = ZioHttpInterpreter().toHttp[Any](
-    sqlRoute.getEndpoints.map(_._2)
-      ++ commonRoute.getEndpoints.map(_._2)
-      ++ swaggerEndpoints
-      // must be last
-      ++ List(commonRoute.staticPage, commonRoute.staticDefault)
+  def getHttpApp = ZioHttpInterpreter().toHttp[Any](
+    (sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2)).toList ++ swaggerEndpoints ++ List(
+      commonRoute.staticPage,
+      commonRoute.staticDefault
+    )
   )
 }

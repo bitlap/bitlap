@@ -18,15 +18,12 @@ package org.bitlap.server.http.service
 import scala.util.control.NonFatal
 
 import org.bitlap.common.BitlapLogging
-import org.bitlap.common.exception.{ BitlapExceptions, BitlapSQLException }
+import org.bitlap.common.exception.BitlapExceptions
 import org.bitlap.common.extension.*
 import org.bitlap.common.utils.StringEx
-import org.bitlap.common.utils.internal.DBTablePrinter
 import org.bitlap.network.*
-import org.bitlap.network.enumeration.TypeId
-import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.http.model.SqlData
+import org.bitlap.server.http.model.{ underlying, SqlData }
 
 import zio.*
 
@@ -51,7 +48,7 @@ class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
                 .execute(sql)
                 .headOption
                 .map { result =>
-                  SqlData.fromList(underlying(result))
+                  SqlData.fromList(result.underlying)
                 }
                 .toList
             }
@@ -66,29 +63,5 @@ class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
         }
       }
     )
-  }
-
-  private def underlying(result: Result): List[List[(String, String)]] = {
-    if (result == null)
-      throw BitlapSQLException("Without more elements, unable to get underlining of fetchResult")
-
-    result.fetchResult.results.rows.map(_.values.zipWithIndex.map { case (string, i) =>
-      val colDesc = result.tableSchema.columns.apply(i)
-      colDesc.columnName -> {
-        colDesc.typeDesc match
-          case TypeId.DoubleType =>
-            DBTablePrinter.normalizeValue(
-              colDesc.typeDesc.value,
-              colDesc.typeDesc.name,
-              BitlapSerde.deserialize[Double](colDesc.typeDesc, string)
-            )
-          case _ =>
-            DBTablePrinter.normalizeValue(
-              colDesc.typeDesc.value,
-              colDesc.typeDesc.name,
-              BitlapSerde.deserialize[String](colDesc.typeDesc, string)
-            )
-      }
-    }.toList)
   }
 }

@@ -33,7 +33,7 @@
 
 > $tag就是版本号，如：0.4.0-alpha1
 ```
-# 打包、构建镜像、运行（默认不运行）
+# 打包、构建镜像、运行（由于名称是固定的，运行前，要删掉旧的容器，否则会重名）
 cd docker;sh deploy.sh $tag
 # 运行
 docker run --name bitlap-$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333  liguobin/bitlap:$tag

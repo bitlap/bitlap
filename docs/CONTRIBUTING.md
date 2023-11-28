@@ -14,8 +14,6 @@
 
 ## 模块概述
 
-***核心模块依赖关系***
-
 ![](bitlap_structure.png)
 
 | 模块               | 技术栈                                     | 说明                                         |
@@ -29,7 +27,7 @@
 | bitlap-spark3    | scala 2.13.x、spark 3.x                  | Spark3 集成                                  |
 | bitlap-common    | scala 3.x、 RoaringBitmapX               | 工具、 配置、异常、基础模型                             |
 | bitlap-testkit   | scala 3.x、javafaker、rolls、scalatest     | 测试工具、集成测试                                  |
-| bitlap-server-ui | umi                                     | 可视化 SQL 页面 UI                              |
+| bitlap-server-ui | umi                                     | 可视化页面                                      |
 
 ## 运行
 
@@ -44,4 +42,17 @@ docker run --name bitlap-$tag -dit -p 24333:24333 -p 23333:23333 -p 22333:22333 
 
 也可以使用打包好的 [镜像](https://hub.docker.com/r/liguobin/bitlap/tags)
 
-> 暂不建议本地直接启动`main`方法运行
+> 暂不建议在本地直接启动，尤其是在Windows上。非要运行，请使用`bitlap-testkit`中的这个入口：
+```scala
+package org.bitlap.testkit
+
+import org.bitlap.server.BitlapServer
+
+/** This entry can read the default test configuration
+ */
+@main def runForExampleAndDebug() = {
+  BitlapServer.main(Array.empty)
+}
+```
+
+这个`main`方法将读取测试的配置来启动服务

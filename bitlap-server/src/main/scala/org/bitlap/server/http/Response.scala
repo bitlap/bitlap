@@ -15,6 +15,8 @@
  */
 package org.bitlap.server.http
 
+import org.bitlap.common.exception.BitlapHttpException
+
 case class Response[T](
   data: Option[T],
   success: Boolean,
@@ -29,6 +31,13 @@ object Response {
   def ok[T](data: T): Response[T] =
     Response(Option(data), true, SUCCESS, None)
 
-  def fail[T](e: Throwable): Response[T] =
-    Response(None, false, FAIL, Option(e.getMessage))
+  def fail(e: Throwable): Response[String] =
+    e match {
+      // TODO (make code message)
+      case ex: BitlapHttpException => Response[String](None, false, ex.code, Option(e.getMessage))
+      case ex                      => Response[String](None, false, FAIL, Option(ex.getMessage))
+    }
+
+  def fail(code: Int, msg: String): Response[String] =
+    Response[String](None, false, code, Option(msg))
 }

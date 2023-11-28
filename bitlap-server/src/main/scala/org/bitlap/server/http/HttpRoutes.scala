@@ -20,7 +20,6 @@ import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.ztapir.ZServerEndpoint
 import zio.*
 import zio.http.HttpApp
 
@@ -38,7 +37,7 @@ final class HttpRoutes(commonRoute: ResourceRoute, sqlRoute: SqlRoute) {
     version = "1.0"
   )
 
-  def getHttpApp = ZioHttpInterpreter().toHttp[Any](
+  def getHttpApp: HttpApp[Any] = ZioHttpInterpreter().toHttp[Any](
     (sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2)).toList ++ swaggerEndpoints ++ List(
       commonRoute.staticPage,
       commonRoute.staticDefault

@@ -17,53 +17,48 @@ package org.bitlap.server.http.routes
 
 import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.exception.{ BitlapException, BitlapRuntimeException }
+import org.bitlap.common.exception.{ BitlapException, BitlapExceptions, BitlapThrowable }
+import org.bitlap.server.http.Response
 
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
 import sttp.tapir.{ AnyEndpoint, Endpoint, Schema, SchemaType }
 import sttp.tapir.Codec.JsonCodec
-import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
-import sttp.tapir.json.circe.jsonBody
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
 trait BitlapRoute(name: String) {
+  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapThrowable, Unit, Any]
 
-  /** Custom Exception Schema
-   */
-  given Schema[BitlapException] =
-    Schema[BitlapException](SchemaType.SProduct(Nil), Some(Schema.SName("BitlapException")))
+  // Custom Exception Schema
+  given Schema[BitlapThrowable] =
+    Schema[BitlapThrowable](SchemaType.SProduct(Nil), Some(Schema.SName("BitlapThrowable")))
 
-  /** Custom exception codec
-   */
-  given exceptionCodec[A <: BitlapException]: JsonCodec[A] =
+  // Custom exception serialization
+  given encodeException[A <: BitlapThrowable]: Encoder[A] = (e: A) => Response.fail(e.asInstanceOf[Throwable]).asJson
+
+  // Custom exception deserialization
+  given decodeException[A <: BitlapThrowable]: Decoder[A] = (c: HCursor) =>
+    for {
+      msg <- c.get[String]("msg")
+    } yield BitlapException(msg).asInstanceOf[A]
+
+  // Custom exception codec
+  given exceptionCodec[A <: BitlapThrowable]: JsonCodec[A] =
     implicitly[JsonCodec[io.circe.Json]].map(json =>
       json.as[A] match {
-        case Left(_)      => throw new BitlapRuntimeException("MessageParsingError")
+        case Left(_)      => throw new IllegalArgumentException("MessageParsingError")
         case Right(value) => value
       }
-    )(error => error.asJson)
+    )(_.asJson)
 
-  /** TODO Custom exception serialization
-   */
-  given encodeException[A <: BitlapException]: Encoder[A] = (_: A) => Json.Null
+  // common api
+  protected lazy val API: Endpoint[Unit, Unit, BitlapThrowable, Unit, Any] =
+    endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapThrowable])
 
-  /** TODO Custom exception deserialization
-   */
-  given decodeException[A <: BitlapException]: Decoder[A] =
-    (c: HCursor) =>
-      for {
-        msg <- c.get[String]("msg")
-      } yield BitlapException(msg).asInstanceOf[A]
-
-  protected lazy val API: Endpoint[Unit, Unit, BitlapException, Unit, Any] =
-    endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapException])
   protected lazy val endpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = ListBuffer.empty
-
-  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapException, Unit, Any]
 
   protected def get[A, I, E, O, R, RR](
     point: BitlapEndpoint => Endpoint[A, I, E, O, R]
@@ -90,4 +85,21 @@ trait BitlapRoute(name: String) {
   }
 
   def getEndpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = endpoints
+
+  // make zio response
+  extension [A](zio: ZIO[Any, Throwable, A]) {
+
+    // make response
+    def response: ZIO[Any, BitlapThrowable, Response[A]] = zio.mapBoth(
+      {
+        case ex: BitlapThrowable => ex
+        case ex                  => BitlapExceptions.unknownException(ex)
+      },
+      {
+        case rr: Response[_] => rr.asInstanceOf[Response[A]]
+        case rr: A           => Response.ok(rr)
+      }
+    )
+  }
+
 }

@@ -15,15 +15,10 @@
  */
 package org.bitlap.server
 
-import org.bitlap.common.exception.BitlapException
-import org.bitlap.network.BitlapSingleResult as MyResultSet
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.http.HttpRoutes
 
-import zio.ExitCode
-import zio.ZIO
-import zio.ZLayer
-import zio.http.HttpApp
+import zio.{ ExitCode, ZIO, ZLayer }
 import zio.http.Server
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
@@ -46,7 +41,6 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpRoutes: HttpRout
 
   private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
-      // .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
       .install(httpRoutes.getHttpApp)
       .flatMap(port => ZIO.logInfo(s"HTTP Server started at port: $port")) *> ZIO.never)
       .provide(

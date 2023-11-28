@@ -16,15 +16,13 @@
 package org.bitlap.server.http.routes
 
 import org.bitlap.server.http.Response
-import org.bitlap.server.http.service.{ SqlData, SqlInput, SqlService }
+import org.bitlap.server.http.model.{ SqlData, SqlInput }
+import org.bitlap.server.http.service.SqlService
 
 import io.circe.*
 import io.circe.generic.auto.*
-import sttp.tapir.{ AnyEndpoint, Endpoint, PublicEndpoint }
-import sttp.tapir.files.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*
 import zio.*
 
@@ -37,6 +35,6 @@ object SqlRoute {
 class SqlRoute(sqlService: SqlService) extends BitlapRoute("sql") {
 
   post(_.in("run").in(jsonBody[SqlInput]).out(jsonBody[Response[SqlData]])) { in =>
-    sqlService.execute(in.sql)
+    sqlService.execute(in.sql).response
   }
 }

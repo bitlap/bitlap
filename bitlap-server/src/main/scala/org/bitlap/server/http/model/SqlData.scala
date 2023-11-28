@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.service
+package org.bitlap.server.http.model
 
 import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.common.utils.internal.{ DBTable, DBTablePrinter }
@@ -55,29 +55,3 @@ object SqlData {
     SqlData(columns, sqlRows)
   }
 }
-
-extension (result: Result)
-
-  def underlying: List[List[(String, String)]] = {
-    if (result == null)
-      throw BitlapSQLException("Without more elements, unable to get underlining of fetchResult")
-
-    result.fetchResult.results.rows.map(_.values.zipWithIndex.map { case (string, i) =>
-      val colDesc = result.tableSchema.columns.apply(i)
-      colDesc.columnName -> {
-        colDesc.typeDesc match
-          case TypeId.DoubleType =>
-            DBTablePrinter.normalizeValue(
-              colDesc.typeDesc.value,
-              colDesc.typeDesc.name,
-              BitlapSerde.deserialize[Double](colDesc.typeDesc, string)
-            )
-          case _ =>
-            DBTablePrinter.normalizeValue(
-              colDesc.typeDesc.value,
-              colDesc.typeDesc.name,
-              BitlapSerde.deserialize[String](colDesc.typeDesc, string)
-            )
-      }
-    }.toList)
-  }

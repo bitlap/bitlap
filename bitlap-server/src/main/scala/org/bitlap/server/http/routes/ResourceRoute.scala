@@ -17,11 +17,10 @@ package org.bitlap.server.http.routes
 
 import org.bitlap.server.http.Response
 
-import io.circe._
-import io.circe.generic.auto._
-import sttp.tapir.Endpoint
+import io.circe.*
+import io.circe.generic.auto.*
 import sttp.tapir.files.*
-import sttp.tapir.generic.auto._
+import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*

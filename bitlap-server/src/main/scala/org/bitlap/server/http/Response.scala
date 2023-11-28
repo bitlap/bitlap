@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network
+package org.bitlap.server.http
 
-import java.io.Closeable
+case class Response[T](
+  data: Option[T],
+  success: Boolean,
+  code: Int,
+  error: Option[String])
 
-abstract class Connection extends Serializable with Closeable {
+object Response {
 
-  def open(address: ServerAddress): Unit
+  val SUCCESS: Int = 0
+  val FAIL: Int    = -1
 
-  def open(
-    address: ServerAddress,
-    headers: Map[String, String]
-  ): Unit
+  def ok[T](data: T): Response[T] =
+    Response(Option(data), true, SUCCESS, None)
 
-  def reopen(): Unit
-
+  def fail[T](e: Throwable): Response[T] =
+    Response(None, false, FAIL, Option(e.getMessage))
 }

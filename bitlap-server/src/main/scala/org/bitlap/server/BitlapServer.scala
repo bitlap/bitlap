@@ -18,7 +18,9 @@ package org.bitlap.server
 import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
-import org.bitlap.server.http.HttpServiceLive
+import org.bitlap.server.http.HttpRoutes
+import org.bitlap.server.http.routes.{ CommonRoute, SqlRoute }
+import org.bitlap.server.http.service.SqlService
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
 
@@ -58,14 +60,18 @@ object BitlapServer extends ZIOAppDefault:
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
         HttpServerEndpoint.live,
-        HttpServiceLive.live,
         SessionManager.live,
         AsyncServerService.live,
         Scope.default,
         ZIOAppArgs.empty,
         DriverGrpcServer.live,
         BitlapConfiguration.live,
-        BitlapGlobalContext.live
+        BitlapGlobalContext.live,
+        // http
+        HttpRoutes.live,
+        CommonRoute.live,
+        SqlRoute.live,
+        SqlService.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

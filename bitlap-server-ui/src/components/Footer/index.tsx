@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
       }}
       copyright={
         <span>
-          {currentYear} {defaultMessage}, Licensed under the
+          {currentYear} {defaultMessage}, Licensed under the &nbsp;
           <a
             href="https://www.apache.org/licenses/"
             target="_blank"

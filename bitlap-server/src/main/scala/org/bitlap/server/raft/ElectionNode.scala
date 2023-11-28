@@ -19,10 +19,10 @@ import java.io.*
 import java.nio.file.Paths
 import java.util.concurrent.CopyOnWriteArrayList
 
+import org.bitlap.common.BitlapLogging
 import org.bitlap.server.raft.rpc.GetServerMetadataProcessor
 
 import org.apache.commons.io.FileUtils
-import org.slf4j.LoggerFactory
 
 import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.conf.Configuration
@@ -32,9 +32,7 @@ import com.alipay.sofa.jraft.util.internal.ThrowUtil
 
 /** Raft selection
  */
-final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
-
-  private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionNode])
+final class ElectionNode extends Lifecycle[ElectionNodeOptions] with BitlapLogging {
 
   private val listeners                          = new CopyOnWriteArrayList[LeaderStateListener]
   private var raftGroupService: RaftGroupService = _
@@ -46,7 +44,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
 
   override def init(opts: ElectionNodeOptions): Boolean = {
     if this.started then {
-      LOG.info("[ElectionNode: {}] already started.", opts.serverAddress)
+      log.info("[ElectionNode: {}] already started.", opts.serverAddress)
       return true
     }
     // node options
@@ -64,7 +62,7 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
     catch {
       case e: IOException =>
         e.printStackTrace()
-        LOG.error("Fail to make dir for dataPath {}.", dataPath)
+        log.error("Fail to make dir for dataPath {}.", dataPath)
         return false
     }
     nodeOpts.setLogUri(Paths.get(dataPath, "log").toString)
@@ -94,8 +92,9 @@ final class ElectionNode extends Lifecycle[ElectionNodeOptions]:
       }
     }
     this.started = false
-    LOG.info("[ElectionNode] shutdown successfully: {}.", this)
+    log.info("[ElectionNode] shutdown successfully: {}.", this)
   }
 
   def addLeaderStateListener(listener: => LeaderStateListener): Unit =
     this.listeners.add(listener)
+}

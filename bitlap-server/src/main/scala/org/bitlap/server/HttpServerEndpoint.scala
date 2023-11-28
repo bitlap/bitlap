@@ -18,15 +18,13 @@ package org.bitlap.server
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.network.BitlapSingleResult as MyResultSet
 import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.http.*
+import org.bitlap.server.http.HttpRoutes
 
-import io.circe.generic.auto.*
-import io.circe.syntax.EncoderOps
-import sttp.tapir.server.ziohttp.ZioHttpInterpreter
-import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.ztapir.*
-import zio.*
-import zio.http.*
+import zio.ExitCode
+import zio.ZIO
+import zio.ZLayer
+import zio.http.HttpApp
+import zio.http.Server
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
 
@@ -34,9 +32,9 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  val live: ZLayer[BitlapConfiguration & HttpServiceLive, Nothing, HttpServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapConfiguration, httpServiceLive: HttpServiceLive) =>
-      new HttpServerEndpoint(config, httpServiceLive)
+  val live: ZLayer[BitlapConfiguration & HttpRoutes, Nothing, HttpServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapConfiguration, httpRoutes: HttpRoutes) =>
+      new HttpServerEndpoint(config, httpRoutes)
     )
 
   def service(args: List[String]): ZIO[HttpServerEndpoint, Nothing, ExitCode] =
@@ -44,42 +42,12 @@ object HttpServerEndpoint:
 
 end HttpServerEndpoint
 
-final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: HttpServiceLive) extends HttpEndpoint:
-
-  private lazy val runServerEndpoint: ZServerEndpoint[Any, Any] = runEndpoint.zServerLogic { sql =>
-    val sqlInput = sql.asJson.as[SqlInput].getOrElse(SqlInput(""))
-    httpServiceLive
-      .execute(sqlInput.sql)
-      .mapError(f => BitlapException("Unknown Error", cause = Option(f)))
-  }
-
-  private lazy val statusServerEndpoint: ZServerEndpoint[Any, Any] =
-    statusEndpoint.zServerLogic { _ =>
-      ZIO.succeed("""{"status":"ok"}""")
-    }
-
-  private val swaggerEndpoints: List[ZServerEndpoint[Any, Any]] =
-    SwaggerInterpreter()
-      .fromEndpoints[Task](List(runEndpoint, statusEndpoint), "Bitlap API", "1.0")
-
-  private lazy val routes: http.HttpApp[Any, Throwable] =
-    ZioHttpInterpreter().toHttp(List(runServerEndpoint, statusServerEndpoint) ++ swaggerEndpoints)
-
-  private val indexHtml: http.HttpApp[Any, Throwable] = Http.fromResource(s"static/index.html")
-
-  private val staticApp: http.HttpApp[Any, Throwable] = Http.collectHttp[Request] {
-    case req
-        if req.method == Method.GET
-          && req.path.startsWith(!! / "pages") =>
-      indexHtml
-    case Method.GET -> !! / path => Http.fromResource(s"static/$path")
-    case _ =>
-      indexHtml
-  }
+final class HttpServerEndpoint(config: BitlapConfiguration, httpRoutes: HttpRoutes) {
 
   private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server
-      .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
+      // .install(routes.withDefaultErrorResponse ++ staticApp.withDefaultErrorResponse)
+      .install(httpRoutes.getHttpApp)
       .flatMap(port => ZIO.logInfo(s"HTTP Server started at port: $port")) *> ZIO.never)
       .provide(
         ZLayer.succeed(
@@ -95,3 +63,4 @@ final class HttpServerEndpoint(config: BitlapConfiguration, httpServiceLive: Htt
       )
       .exitCode
       .onInterrupt(_ => ZIO.logWarning(s"HTTP Server was interrupted! Bye!"))
+}

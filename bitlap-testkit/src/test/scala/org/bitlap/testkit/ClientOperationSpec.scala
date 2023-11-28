@@ -20,6 +20,7 @@ import java.sql.*
 import org.bitlap.jdbc.BitlapDataSource
 import org.bitlap.network.{ ServerAddress, SyncConnection }
 import org.bitlap.server.http.*
+import org.bitlap.server.http.model.underlying
 
 import org.scalatest.{ BeforeAndAfterAll, Inspectors }
 import org.scalatest.funsuite.AnyFunSuite

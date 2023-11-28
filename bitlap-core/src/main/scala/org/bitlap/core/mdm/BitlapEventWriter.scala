@@ -36,15 +36,16 @@ import org.bitlap.roaringbitmap.x.{ BBM, CBM }
 
 import org.apache.commons.csv.{ CSVFormat, CSVParser }
 import org.apache.hadoop.conf.Configuration
-import org.slf4j.LoggerFactory
 
 /** bitlap mdm [[Event]] writer
  */
-class BitlapEventWriter(val table: Table, hadoopConf: Configuration) extends Serializable with Closeable {
+class BitlapEventWriter(val table: Table, hadoopConf: Configuration)
+    extends BitlapLogging
+    with Serializable
+    with Closeable {
 
   @volatile
   private var closed = false
-  private val log    = LoggerFactory.getLogger(classOf[BitlapEventWriter])
   private val store  = BitlapStore(table, hadoopConf).open()
 
   /** write mdm events

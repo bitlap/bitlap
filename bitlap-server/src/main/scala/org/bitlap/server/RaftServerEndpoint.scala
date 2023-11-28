@@ -15,11 +15,10 @@
  */
 package org.bitlap.server
 
+import org.bitlap.common.BitlapLogging
 import org.bitlap.common.exception.BitlapException
 import org.bitlap.server.config.BitlapConfiguration
 import org.bitlap.server.raft.{ ElectionNode, * }
-
-import org.slf4j.LoggerFactory
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
@@ -29,7 +28,7 @@ import zio.{ Runtime as _, * }
 
 /** Bitlap Raft cluster and RPC service
  */
-object RaftServerEndpoint:
+object RaftServerEndpoint {
 
   val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
     ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
@@ -44,9 +43,9 @@ object RaftServerEndpoint:
       _     <- ZIO.never
     } yield ())
       .onInterrupt(_ => ZIO.logWarning(s"Raft Server was interrupted! Bye!"))
-end RaftServerEndpoint
+}
 
-final class RaftServerEndpoint(config: BitlapConfiguration) extends LazyLogging:
+final class RaftServerEndpoint(config: BitlapConfiguration) extends BitlapLogging {
 
   private val dataPath       = config.raftConfig.dataPath
   private val groupId        = config.raftConfig.groupId
@@ -67,12 +66,12 @@ final class RaftServerEndpoint(config: BitlapConfiguration) extends LazyLogging:
         val node = new ElectionNode
         node.addLeaderStateListener(new LeaderStateListener() {
           override def onLeaderStart(leaderTerm: Long): Unit = {
-            logger.info(s"[ElectionBootstrap] Leader's address is: $serverIdStr")
-            logger.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
+            log.info(s"[ElectionBootstrap] Leader's address is: $serverIdStr")
+            log.info(s"[ElectionBootstrap] Leader start on term: $leaderTerm")
           }
 
           override def onLeaderStop(leaderTerm: Long): Unit =
-            logger.info(s"[ElectionBootstrap] Leader stop on term: $leaderTerm")
+            log.info(s"[ElectionBootstrap] Leader stop on term: $leaderTerm")
         })
 
         Runtime.getRuntime.addShutdownHook(new Thread(() => node.shutdown()))
@@ -85,3 +84,4 @@ final class RaftServerEndpoint(config: BitlapConfiguration) extends LazyLogging:
           BitlapException("Failed to initialize raft node")
         )
     } yield node.node
+}

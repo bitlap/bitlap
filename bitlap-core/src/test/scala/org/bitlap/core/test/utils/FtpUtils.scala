@@ -18,18 +18,16 @@ package org.bitlap.core.test.utils
 import java.net.ServerSocket
 import java.util.Collections
 
-import org.bitlap.common.extension._
+import org.bitlap.common.BitlapLogging
+import org.bitlap.common.extension.*
 
 import org.apache.ftpserver.FtpServer
 import org.apache.ftpserver.FtpServerFactory
 import org.apache.ftpserver.listener.ListenerFactory
 import org.apache.ftpserver.usermanager.impl.BaseUser
 import org.apache.ftpserver.usermanager.impl.WritePermission
-import org.slf4j.LoggerFactory
 
-object FtpUtils {
-
-  private val log = LoggerFactory.getLogger(FtpUtils.getClass)
+object FtpUtils extends BitlapLogging {
 
   def start(home: String): (FtpServer, Int) = {
     val port = ServerSocket(0).use { ss =>

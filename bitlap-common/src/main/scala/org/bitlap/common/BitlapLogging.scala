@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.network
+package org.bitlap.common
 
-import java.io.Closeable
+import com.typesafe.scalalogging.{ LazyLogging, Logger }
 
-abstract class Connection extends Serializable with Closeable {
+trait BitlapLogging extends LazyLogging {
 
-  def open(address: ServerAddress): Unit
+  @transient private var log_ : Logger = _
 
-  def open(
-    address: ServerAddress,
-    headers: Map[String, String]
-  ): Unit
-
-  def reopen(): Unit
-
+  protected def log: Logger = {
+    if (log_ == null) {
+      log_ = logger
+    }
+    log_
+  }
 }

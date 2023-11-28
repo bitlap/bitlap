@@ -23,8 +23,6 @@ import scala.jdk.CollectionConverters.*
 import org.bitlap.common.conf.BitlapConfKey
 import org.bitlap.common.utils.{ JsonUtil, PreConditions }
 
-import org.slf4j.LoggerFactory
-
 import com.typesafe.config.{ ConfigFactory, ConfigParseOptions, ConfigResolveOptions, ConfigValue }
 
 /** Bitlap core configuration.
@@ -40,9 +38,7 @@ import com.typesafe.config.{ ConfigFactory, ConfigParseOptions, ConfigResolveOpt
  *    - conf key `version`
  *    - ......
  */
-class BitlapConf(conf: Map[String, String] = Map.empty) extends Serializable {
-
-  private val log = LoggerFactory.getLogger(classOf[BitlapConf])
+class BitlapConf(conf: Map[String, String] = Map.empty) extends BitlapLogging with Serializable {
 
   /** core properties
    */

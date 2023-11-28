@@ -20,16 +20,14 @@ import java.util.concurrent.atomic.*
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-import org.slf4j.*
+import org.bitlap.common.BitlapLogging
 
 import com.alipay.sofa.jraft.{ Iterator as JRIterator, Status }
 import com.alipay.sofa.jraft.core.*
 
 /** Raft state machine, not currently in use
  */
-final class ElectionOnlyStateMachine extends StateMachineAdapter:
-
-  private lazy val LOG = LoggerFactory.getLogger(classOf[ElectionOnlyStateMachine])
+final class ElectionOnlyStateMachine extends StateMachineAdapter with BitlapLogging {
 
   private val leaderTerm                            = new AtomicLong(-1L)
   private var listeners: JList[LeaderStateListener] = new JArrayList[LeaderStateListener]
@@ -41,7 +39,7 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter:
 
   override def onApply(it: JRIterator): Unit =
     while it.hasNext do {
-      LOG.info("On apply with term: {} and index: {}. ", it.getTerm, it.getIndex)
+      log.info("On apply with term: {} and index: {}. ", it.getTerm, it.getIndex)
       it.next
     }
 
@@ -63,3 +61,4 @@ final class ElectionOnlyStateMachine extends StateMachineAdapter:
 
   def addLeaderStateListener(listener: LeaderStateListener): Unit =
     this.listeners.add(listener)
+}

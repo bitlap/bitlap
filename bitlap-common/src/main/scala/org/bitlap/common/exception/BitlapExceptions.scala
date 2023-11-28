@@ -19,6 +19,9 @@ package org.bitlap.common.exception
  */
 object BitlapExceptions {
 
+  def unknownException(cause: Throwable): BitlapException =
+    BitlapException("ERROR_UNKNOWN", Map.empty, Option(cause))
+
   def illegalException(argument: String): BitlapIllegalArgumentException =
     BitlapIllegalArgumentException("ERR_ILLEGAL", Map("argument" -> argument))
 
@@ -30,4 +33,7 @@ object BitlapExceptions {
 
   def checkNotBlankException(argument: String): BitlapIllegalArgumentException =
     BitlapIllegalArgumentException("ERR_ILLEGAL.CHECK_NOT_BLANK", Map("argument" -> argument))
+
+  def httpException(code: Int, msg: String): BitlapHttpException =
+    BitlapHttpException("ERR_HTTP", Map("code" -> code.toString, "msg" -> msg), code)
 }

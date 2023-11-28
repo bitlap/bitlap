@@ -2,7 +2,7 @@
 <Configuration name="bitlap" status="INFO" monitorInterval="300">
 
     <Properties>
-        <property name="logDir">logs</property>
+        <property name="logDir">bitlap-testkit/target/bitlap-test/logs</property>
         <property name="logFileName">bitlap</property>
         <property name="logLevel">INFO</property>
         <property name="logPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>

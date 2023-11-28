@@ -21,16 +21,13 @@ import scala.util.{ Failure, Success, Try }
 
 import org.bitlap.common.extension.*
 
-import org.slf4j.{ Logger, LoggerFactory }
-
 trait LifeCycle extends Closeable {
   def start(): Unit
   def isStarted: Boolean
   def isShutdown: Boolean
 }
 
-abstract class LifeCycleWrapper extends LifeCycle {
-  protected val log: Logger = LoggerFactory.getLogger(this.getClass)
+abstract class LifeCycleWrapper extends LifeCycle with BitlapLogging {
 
   @volatile
   protected var started = false

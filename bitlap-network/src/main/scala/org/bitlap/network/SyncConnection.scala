@@ -54,7 +54,9 @@ final class SyncConnection(user: String, password: String) extends Connection wi
 
   override def open(address: ServerAddress, configuration: Map[String, String]): Unit = {
     try {
-      this.sync = new SyncClient(List(address), configuration)
+      if (this.sync == null) {
+        this.sync = new SyncClient(List(address), configuration)
+      }
       this.address = address
       this.configuration = configuration
       this.sessionId = sync.openSession(user, password, configuration)

@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http
+package org.bitlap.server.http.model
 
 import org.bitlap.common.exception.BitlapSQLException
 import org.bitlap.common.utils.internal.{ DBTable, DBTablePrinter }
 import org.bitlap.network.Result
 import org.bitlap.network.enumeration.TypeId
-import org.bitlap.network.models.ColumnDesc
 import org.bitlap.network.serde.BitlapSerde
 
 /** Wrapping sql data for queries
  */
 final case class SqlInput(sql: String)
 
-final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
-
 final case class SqlColumn(name: String)
 final case class SqlRow(cells: Map[String, String] = Map.empty)
-final case class SqlResult(data: SqlData, resultCode: Int, errorMessage: String = "")
 
-object SqlData:
+final case class SqlData(columns: Seq[SqlColumn] = Seq.empty, rows: Seq[SqlRow] = Seq.empty)
 
+object SqlData {
   def empty: SqlData = SqlData(Seq.empty, Seq.empty)
 
   def fromList(list: List[List[(String, String)]]): SqlData = {
@@ -57,6 +54,7 @@ object SqlData:
     }
     SqlData(columns, sqlRows)
   }
+}
 
 extension (result: Result)
 

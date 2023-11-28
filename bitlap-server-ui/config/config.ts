@@ -11,7 +11,7 @@ const { REACT_APP_ENV = 'dev', BITLAP_DEBUG = 'false', USER } = process.env;
 export default defineConfig({
   // 需要的全局前缀
   // base: '',
-  // publicPath: '',
+  // publicPath: '/',
 
   define: {
     REACT_APP_ENV,

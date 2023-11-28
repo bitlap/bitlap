@@ -15,18 +15,17 @@
  */
 package org.bitlap.core.sql.rule
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
+
+import org.bitlap.common.BitlapLogging
 
 import org.apache.calcite.plan.Convention
 import org.apache.calcite.plan.RelOptRuleCall
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core.TableScan
-import org.slf4j.{ Logger, LoggerFactory }
 
-abstract class AbsRelRule(config: ConverterRule.Config) extends ConverterRule(config) {
-
-  protected val log: Logger = LoggerFactory.getLogger(this.getClass)
+abstract class AbsRelRule(config: ConverterRule.Config) extends ConverterRule(config) with BitlapLogging {
 
   def this(input: Class[_ <: RelNode], description: String) = this(
     ConverterRule.Config.INSTANCE.withConversion(input, Convention.NONE, Convention.NONE, description)

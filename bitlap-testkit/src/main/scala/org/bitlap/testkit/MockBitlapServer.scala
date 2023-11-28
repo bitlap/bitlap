@@ -17,6 +17,9 @@ package org.bitlap.testkit
 
 import org.bitlap.server.*
 import org.bitlap.server.config.*
+import org.bitlap.server.http.HttpRoutes
+import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
+import org.bitlap.server.http.service.SqlService
 import org.bitlap.server.service.DriverGrpcServer
 import org.bitlap.server.session.SessionManager
 import org.bitlap.testkit.MockAsync
@@ -35,6 +38,7 @@ object MockBitlapServer extends ZIOAppDefault {
       args           <- getArgs
       t1             <- RaftServerEndpoint.service(args.toList).fork
       t2             <- GrpcServerEndpoint.service(args.toList).fork
+      t3             <- HttpServerEndpoint.service(args.toList).fork
       sessionManager <- ZIO.service[SessionManager]
       // add http server?
       _ <- ZIO.logInfo("""
@@ -47,18 +51,24 @@ object MockBitlapServer extends ZIOAppDefault {
                         |""".stripMargin)
       _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.startFinished())
       _ <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSessionManager(sessionManager))
-      _ <- ZIO.collectAll(Seq(t1.join, t2.join))
+      _ <- ZIO.collectAll(Seq(t1.join, t2.join, t3.join))
     } yield ())
       .provide(
         RaftServerEndpoint.live,
         GrpcServerEndpoint.live,
+        HttpServerEndpoint.live,
         Scope.default,
         MockAsync.live,
         ZIOAppArgs.empty,
         DriverGrpcServer.live,
         BitlapConfiguration.testLive,
         BitlapGlobalContext.live,
-        SessionManager.live
+        SessionManager.live,
+        // http
+        HttpRoutes.live,
+        ResourceRoute.live,
+        SqlRoute.live,
+        SqlService.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

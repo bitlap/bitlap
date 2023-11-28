@@ -55,7 +55,7 @@ trait BitlapRoute(name: String) {
     )(_.asJson)
 
   // common api
-  protected lazy val API: Endpoint[Unit, Unit, BitlapThrowable, Unit, Any] =
+  protected lazy val API: BitlapEndpoint =
     endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapThrowable])
 
   protected lazy val endpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = ListBuffer.empty

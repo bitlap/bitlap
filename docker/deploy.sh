@@ -13,7 +13,7 @@ find docker/ -name 'static' | xargs rm -rf
 
 # make tar
 TAR_FILE="bitlap-server/target/bitlap*.tar.gz"
-cmd="./mvnw clean package -DskipTests -Passembly -Pwebapp -am -pl bitlap-server"
+cmd="./mvnw clean package -DskipTests -Passembly -Pwebapp -Drevision=${tag} -am -pl bitlap-server"
 echo "========================================================================================================================================"
 echo "==================  🔥 package start: ${cmd}  ============================"
 echo "========================================================================================================================================"

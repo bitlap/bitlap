@@ -38,7 +38,7 @@ class SqlLoadData(
     extends BitlapSqlDdlNode(_pos, SqlLoadData.OPERATOR, List(filePath, tableName)) {
 
   override val resultTypes: List[(String, SqlTypeName)] = List(
-    "result" -> SqlTypeName.VARCHAR
+    "result" -> SqlTypeName.BOOLEAN
   )
 
   override def operator(context: DataContext): List[Array[Any]] = {

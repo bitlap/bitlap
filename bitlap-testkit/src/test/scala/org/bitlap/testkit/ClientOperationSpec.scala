@@ -45,8 +45,8 @@ class ClientOperationSpec extends BaseSpec {
         .map(_.underlying)
         .getOrElse(List.empty)
 
-    assert(cr == List(List(("Boolean", "true"))))
-    assert(ld == List(List(("String", "true"))))
+    assert(cr == List(List(("result", "true"))))
+    assert(ld == List(List(("result", "true"))))
 
     val rs = sync
       .execute(

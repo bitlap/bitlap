@@ -110,10 +110,12 @@ final class SimpleLocalSession(
           if op.state.terminal then {
             ZIO.logInfo(s"$operationHandle Operation is already aborted in state - ${op.state}")
           } else {
-            op.setState(OperationState.CanceledState)
-            ZIO.logInfo(s"$operationHandle Attempting to cancel from state - ${op.state}") *> removeOperation(
-              operationHandle
-            ).unit
+            ZIO.attemptBlocking {
+              op.setState(OperationState.CanceledState)
+            } *>
+              ZIO.logInfo(s"$operationHandle Attempting to cancel from state - ${op.state}") *> removeOperation(
+                operationHandle
+              )
           }
         }
       }

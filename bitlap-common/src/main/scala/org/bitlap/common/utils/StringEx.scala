@@ -122,13 +122,9 @@ object StringEx {
     initSqlList
 
   def getSqlStmts(sqls: String): List[String] = {
-    val lines =
-      if (sqls.contains("\n")) sqls.split('\n').toList
-      else {
-        List(if (sqls.endsWith(";")) sqls else sqls + ";")
-      }
-    val sb = new mutable.StringBuilder("")
-    lines.map(_.trim).foreach { line =>
+    val lines = List(if (sqls.endsWith(";")) sqls else sqls + ";")
+    val sb    = new mutable.StringBuilder("")
+    lines.map(_.trim).filter(_.nonEmpty).foreach { line =>
       if line.nonEmpty then
         if !line.startsWith("#") && !line.startsWith("--") then {
           sb.append(line.concat(" "))

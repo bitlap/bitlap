@@ -38,30 +38,22 @@ class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
   private val conf = context.config.grpcConfig
 
   def execute(sql: String): ZIO[Any, Throwable, SqlData] = {
-    context.getSyncConnection.map(
-      { syncConnect =>
-        try {
-          syncConnect.use { conn =>
-            conn.open(ServerAddress(conf.host, conf.port))
-            val rss = StringEx.getSqlStmts(sql.split("\n").toList).map { sql =>
-              conn
-                .execute(sql)
-                .headOption
-                .map { result =>
-                  SqlData.fromList(result.underlying)
-                }
-                .toList
+    ZIO.acquireReleaseWith(context.getSyncConnection)(c => ZIO.attempt(c.close()).ignoreLogged) { conn =>
+      conn.open(ServerAddress(conf.host, conf.port))
+      ZIO.attempt {
+        val rss = StringEx.getSqlStmts(sql).map { sql =>
+          conn
+            .execute(sql)
+            .headOption
+            .map { result =>
+              SqlData.fromList(result.underlying)
             }
-            rss.flatten.lastOption.getOrElse(
-              SqlData.empty
-            )
-          }
-        } catch {
-          case NonFatal(e) =>
-            log.error("Execute sql failed", e)
-            throw BitlapExceptions.httpException(-1, e.getMessage)
+            .toList
         }
+        rss.flatten.lastOption.getOrElse(
+          SqlData.empty
+        )
       }
-    )
+    }
   }
 }

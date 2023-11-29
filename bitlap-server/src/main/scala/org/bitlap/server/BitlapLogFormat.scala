@@ -15,17 +15,36 @@
  */
 package org.bitlap.server
 
-import zio.Runtime
+import zio.{ Runtime, Trace }
 import zio.logging.{ LogColor, LogFilter, LogFormat }
-import zio.logging.LogFormat.*
+import zio.logging.LogFormat.{ quoted, * }
 import zio.logging.backend.SLF4J
 
 object BitlapLogFormat {
 
+  private val traceFormat = LogFormat.make {
+    (
+      builder,
+      trace,
+      _,
+      _,
+      _,
+      _,
+      _,
+      _,
+      _
+    ) =>
+      val text = trace match
+        case Trace(location, file, line) => s" $location:$line"
+        case t                           => s" $t"
+      builder.appendText(text)
+  }
+
   // we don't need to print the time and log level in zio anymore because they already exist in log4j2.
   val colored: LogFormat =
     label("thread", fiberId).color(LogColor.WHITE) |-|
-      label("message", quoted(line)).highlight +
+      label("message", quoted(line)).highlight |-|
+      label("trace", traceFormat).color(LogColor.BLUE) +
       (space + label("cause", cause).highlight).filter(LogFilter.causeNonEmpty)
 
   val slf4j = Runtime.removeDefaultLoggers >>> SLF4J.slf4j(colored)

@@ -56,3 +56,19 @@ import org.bitlap.server.BitlapServer
 ```
 
 这个`main`方法将读取测试的配置来启动服务
+
+## 初始化数据
+
+```sql
+create table if not exists bitlap_test_table;
+
+load data 'classpath:simple_data.csv' overwrite table bitlap_test_table;
+```
+
+## 查询
+
+```sql
+select _time, sum(vv) as vv, sum(pv) as pv, count(distinct pv) as uv
+from bitlap_test_table
+where _time >= 0 group by _time;
+```

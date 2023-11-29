@@ -34,4 +34,8 @@ abstract class BaseSpec extends AnyFunSuite with BeforeAndAfterAll with should.M
     server.start()
     Thread.sleep(5000L)
   }
+
+  override protected def afterAll(): Unit = {
+    server.interrupt()
+  }
 }

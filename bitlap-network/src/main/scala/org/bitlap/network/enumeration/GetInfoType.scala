@@ -22,6 +22,9 @@ import enumeratum.values.*
 sealed abstract class GetInfoType(val value: Int) extends IntEnumEntry
 
 object GetInfoType extends IntEnum[GetInfoType] {
+
+  case object Unknown extends GetInfoType(0)
+
   case object MaxDriverConnections extends GetInfoType(1)
 
   case object MaxConcurrentActivities extends GetInfoType(10)
@@ -41,7 +44,7 @@ object GetInfoType extends IntEnum[GetInfoType] {
   def toGetInfoType(getInfoType: BGetInfoType): GetInfoType =
     GetInfoType
       .withValueOpt(getInfoType.value)
-      .getOrElse(throw new IllegalArgumentException(s"Invalid GetInfoType: $getInfoType"))
+      .getOrElse(Unknown)
 
   def toBGetInfoType(getInfoType: GetInfoType): BGetInfoType =
     BGetInfoType.fromValue(getInfoType.value)

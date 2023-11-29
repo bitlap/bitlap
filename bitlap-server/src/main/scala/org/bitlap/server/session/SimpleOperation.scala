@@ -19,7 +19,8 @@ import java.sql.*
 
 import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.exception.DataFormatException
+import org.bitlap.common.BitlapLogging
+import org.bitlap.common.exception.{ BitlapException, DataFormatException }
 import org.bitlap.core.*
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
@@ -36,7 +37,8 @@ final class SimpleOperation(
   opType: OperationType,
   hasResultSet: Boolean = false
 )(using globalConfig: BitlapConfiguration)
-    extends Operation(parentSession, opType, hasResultSet, globalConfig) {
+    extends Operation(parentSession, opType, hasResultSet, globalConfig)
+    with BitlapLogging {
 
   override def run(): Task[Unit] = {
     for {
@@ -53,7 +55,7 @@ final class SimpleOperation(
         } catch {
           case e: Exception =>
             super.setState(OperationState.ErrorState)
-            throw e
+            logger.error("Simple operation run failed", e)
         }
         schema
       }

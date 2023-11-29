@@ -114,26 +114,27 @@ object StringEx {
             line = line.concat(" ")
             sb.append(line)
           }
-      initSqlList = getInitSql(sb.toString)
+      initSqlList = getMultipleSqls(sb.toString)
     catch
       case e: IOException =>
         throw BitlapSQLException("Invalid sql syntax in initFile", cause = Option(e))
     finally if br != null then br.close()
     initSqlList
 
-  def getSqlStmts(lines: List[String]): List[String] = {
-    val sb = new mutable.StringBuilder("")
-    lines.map(_.trim).foreach { line =>
+  def getSqlStmts(sqls: String): List[String] = {
+    val lines = List(if (sqls.endsWith(";")) sqls else sqls + ";")
+    val sb    = new mutable.StringBuilder("")
+    lines.map(_.trim).filter(_.nonEmpty).foreach { line =>
       if line.nonEmpty then
         if !line.startsWith("#") && !line.startsWith("--") then {
           sb.append(line.concat(" "))
         }
     }
-    getInitSql(sb.toString)
+    getMultipleSqls(sb.toString)
 
   }
 
-  private def getInitSql(sbLine: String): List[String] =
+  private def getMultipleSqls(sbLine: String): List[String] =
     val sqlArray    = sbLine.toCharArray
     val initSqlList = new JArrayList[String]
     var index       = 0

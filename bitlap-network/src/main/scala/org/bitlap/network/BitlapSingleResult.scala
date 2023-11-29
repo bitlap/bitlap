@@ -43,7 +43,7 @@ final class BitlapSingleResult(
       }
     } catch
       case NonFatal(e) =>
-        throw BitlapSQLException("Fetch metadata failed", cause = Some(e))
+        throw BitlapSQLException("Execute SQL failed", cause = Some(e))
   }
 
   private lazy val tableSchema: TableSchema = {
@@ -56,10 +56,22 @@ final class BitlapSingleResult(
     } catch
       case NonFatal(e) =>
         throw BitlapSQLException("Fetch metadata failed", cause = Some(e))
-
   }
-  private lazy val fetchResult: FetchResults = sync.fetchResults(operationId, 1000, 1)
-  private lazy val result: Result            = Result(tableSchema, fetchResult)
+
+  private lazy val fetchResult: FetchResults = {
+
+    try {
+      if (operationId != null) {
+        sync.fetchResults(operationId, 1000, 1)
+      } else {
+        throw BitlapRuntimeException(s"Invalid operationId: $sessionId")
+      }
+    } catch
+      case NonFatal(e) =>
+        throw BitlapSQLException("Fetch result failed", cause = Some(e))
+  }
+
+  private lazy val result: Result = Result(tableSchema, fetchResult)
 
   override def iterator: Iterator[Result] = Iterator.single(result)
 

@@ -64,7 +64,7 @@ final class BitlapSingleResult(
       if (operationId != null) {
         sync.fetchResults(operationId, 1000, 1)
       } else {
-        throw BitlapRuntimeException(s"Invalid operationId: $sessionId")
+        throw BitlapRuntimeException(s"Invalid operationId: $operationId")
       }
     } catch
       case NonFatal(e) =>

@@ -2,6 +2,11 @@
 /* eslint-disable */
 
 declare namespace API {
+  type RunSqlResult = {
+    resultCode?: number;
+    errorMessage?: string;
+    data?: { list: [any] };
+  };
   type CurrentUser = {
     id?: string;
     name?: string;
@@ -20,9 +25,9 @@ declare namespace API {
   };
 
   type LoginResult = {
-    status?: string;
+    id: string;
+    name: string;
     type?: string;
-    currentAuthority?: string;
   };
 
   type PageParams = {

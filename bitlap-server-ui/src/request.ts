@@ -4,7 +4,7 @@ import { message, notification } from 'antd';
 
 // 自定义请求头
 const customHeaders =
-  BITLAP_DEBUG === 'true'
+  BITLAP_DEBUG === 'false'
     ? { 'X-App-Id': 'bitlap-server-ui', 'X-App-Username': BITLAP_IP }
     : {};
 
@@ -78,7 +78,7 @@ export const requestConfig: RequestConfig = {
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        message.error(`${error.response.message}`);
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，

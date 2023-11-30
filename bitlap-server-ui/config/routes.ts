@@ -17,6 +17,9 @@ export default [
     icon: 'smile',
     component: './Welcome',
     hideInMenu: true,
+    wrappers: [
+      '@/wrappers/auth',
+    ],
   },
   {
     name: 'Playground',
@@ -52,6 +55,11 @@ export default [
   {
     path: '/',
     redirect: '/pages/welcome',
+  },
+  {
+    path: '/login',
+    layout: false,
+    component: '@/pages/User/Login',
   },
   {
     path: '*',

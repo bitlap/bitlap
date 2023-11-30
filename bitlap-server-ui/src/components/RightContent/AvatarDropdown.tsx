@@ -11,6 +11,7 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from './HeaderDropdown';
+import {accountLogout} from "@/services/user/logout";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -31,19 +32,20 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    // await outLogin();
+    const { currentUser } = initialState || {};
+    await accountLogout(currentUser.id);
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
     const redirect = urlParams.get('redirect');
     // Note: There may be security issues, please note
-    if (window.location.pathname !== '/pages/user/login' && !redirect) {
-      // history.replace({
-      //   pathname: '/pages/user/login',
-      //   search: stringify({
-      //     redirect: pathname + search,
-      //   }),
-      // });
+    if (window.location.pathname !== '/login' && !redirect) {
+      history.replace({
+        pathname: '/login',
+        search: stringify({
+          redirect: pathname + search,
+        }),
+      });
     }
   };
   const actionClassName = useEmotionCss(({ token }) => {
@@ -67,10 +69,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
     (event: MenuInfo) => {
       const { key } = event;
       if (key === 'logout') {
-        // flushSync(() => {
-        //   setInitialState((s) => ({ ...s, currentUser: undefined }));
-        // });
-        // loginOut();
+        flushSync(() => {
+          setInitialState((s) => ({ ...s, currentUser: undefined }));
+        });
+        loginOut();
         return;
       }
       history.push(`/account/${key}`);

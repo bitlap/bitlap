@@ -17,9 +17,7 @@ export default [
     icon: 'smile',
     component: './Welcome',
     hideInMenu: true,
-    wrappers: [
-      '@/wrappers/auth',
-    ],
+    wrappers: ['@/wrappers/auth'],
   },
   {
     name: 'Playground',

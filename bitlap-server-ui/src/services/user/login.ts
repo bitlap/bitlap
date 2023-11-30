@@ -1,8 +1,8 @@
 // @ts-ignore
-import {request} from '@umijs/max';
+import { request } from '@umijs/max';
 
 export async function accountLogin(
-  params: { username: string, password: string },
+  params: { username: string; password: string },
   options?: { [key: string]: any },
 ) {
   return request<API.LoginResult>('/api/user/login', {

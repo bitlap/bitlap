@@ -1,18 +1,18 @@
 // @ts-ignore
-import {request} from '@umijs/max';
+import { request } from '@umijs/max';
 
 export async function accountLogout(
-    id: string , // with password
-    options?: { [key: string]: any },
+  id: string, // with password
+  options?: { [key: string]: any },
 ) {
-    return request<API.LoginResult>('/api/user/logout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        data: {
-            id: id
-        },
-        ...(options || {}),
-    });
+  return request<API.LoginResult>('/api/user/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: {
+      id: id,
+    },
+    ...(options || {}),
+  });
 }

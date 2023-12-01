@@ -19,8 +19,8 @@ import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
-import org.bitlap.server.http.service.SqlService
+import org.bitlap.server.http.routes._
+import org.bitlap.server.http.service._
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
 
@@ -71,7 +71,10 @@ object BitlapServer extends ZIOAppDefault:
         HttpRoutes.live,
         ResourceRoute.live,
         SqlRoute.live,
-        SqlService.live
+        UserRoute.live,
+        SqlService.live,
+        UserService.live,
+        AccountAuthenticator.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

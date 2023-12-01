@@ -23,13 +23,18 @@ import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
 import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.http.model.AccountInfo
 import org.bitlap.server.session.mapTo
 
 import zio.*
 
-object AccountAuthenticator extends BitlapSerde {
+object AccountAuthenticator:
+  val live = ZLayer.succeed(new AccountAuthenticator)
+end AccountAuthenticator
 
-  def auth(username: String, password: String): ZIO[Any, Throwable, Unit] = {
+final class AccountAuthenticator extends BitlapSerde {
+
+  def auth(username: String, password: String): ZIO[Any, Throwable, AccountInfo] = {
     val statement: String = s"AUTH $username '$password'"
     val res =
       try {
@@ -44,7 +49,9 @@ object AccountAuthenticator extends BitlapSerde {
         case e: Exception =>
           throw BitlapAuthenticationException("Auth failed", cause = Option(e))
       }
-    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("Auth failed"))).unit
+      // return detail user info
+    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("Auth failed"))).unit *>
+      ZIO.succeed(AccountInfo.root)
   }
 
 }

@@ -32,6 +32,7 @@ import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.http.model.AccountInfo
 import org.bitlap.server.service.AccountAuthenticator
 
 import zio.{ System as _, * }
@@ -40,21 +41,31 @@ import zio.{ System as _, * }
  */
 object SessionManager:
 
-  val live: ZLayer[BitlapGlobalContext, Nothing, SessionManager] = ZLayer.fromZIO {
+  val live: ZLayer[BitlapGlobalContext & AccountAuthenticator, Nothing, SessionManager] = ZLayer.fromZIO {
     for {
       sessionStoreMap       <- Ref.make(ConcurrentHashMap[SessionHandle, Session]())
       operationHandleVector <- Ref.make(JVector[OperationHandle]())
       operationStoreMap     <- Ref.make(ConcurrentHashMap[OperationHandle, Operation]())
       ctx                   <- ZIO.service[BitlapGlobalContext]
-    } yield new SessionManager(sessionStoreMap, operationHandleVector, operationStoreMap)(using ctx)
+      accountAuthenticator  <- ZIO.service[AccountAuthenticator]
+      userSession           <- Ref.make(ConcurrentHashMap[String, AccountInfo]())
+    } yield new SessionManager(
+      accountAuthenticator,
+      sessionStoreMap,
+      operationHandleVector,
+      operationStoreMap,
+      userSession
+    )(using ctx)
   }
 
 end SessionManager
 
 final class SessionManager(
+  accountAuthenticator: AccountAuthenticator,
   val sessionStoreMap: Ref[ConcurrentHashMap[SessionHandle, Session]],
   val operationHandleVector: Ref[JVector[OperationHandle]],
-  val operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]]
+  val operationStoreMap: Ref[ConcurrentHashMap[OperationHandle, Operation]],
+  val userSession: Ref[ConcurrentHashMap[String, AccountInfo]]
 )(using globalContext: BitlapGlobalContext):
   import SessionManager.*
 
@@ -102,7 +113,7 @@ final class SessionManager(
       defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
       db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
       defaultSchema <- Ref.make(AtomicReference(db))
-      _             <- AccountAuthenticator.auth(username, password)
+      _             <- accountAuthenticator.auth(username, password)
       session <- ZIO
         .attempt(
           new SimpleLocalSession(

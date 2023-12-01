@@ -27,7 +27,7 @@ export default [
     routes: [
       {
         path: '/pages/playground/sql',
-        name: 'SQL ',
+        name: 'SQL',
         icon: 'CodeOutlined',
         component: './Playground/Sql',
       },

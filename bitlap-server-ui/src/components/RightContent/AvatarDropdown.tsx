@@ -33,8 +33,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
    */
   const loginOut = async () => {
     const { currentUser } = initialState || {};
-    if (currentUser.id != null) {
-      await accountLogout(currentUser.id);
+    if (currentUser && currentUser.name) {
+      await accountLogout(currentUser.name);
     }
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
@@ -128,7 +128,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: `退出登录【${currentUser?.id}】`,
+      label: `退出登录【${currentUser?.name}】`,
     },
   ];
 

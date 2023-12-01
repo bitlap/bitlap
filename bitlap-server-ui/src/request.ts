@@ -1,11 +1,14 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import Cookies from 'js-cookie'
 
 // 自定义请求头
 const customHeaders =
+  // @ts-ignore
   BITLAP_DEBUG === 'false'
-    ? { 'X-App-Id': 'bitlap-server-ui', 'X-App-Username': BITLAP_IP }
+    ? // @ts-ignore
+      { 'X-App-Id': 'bitlap-server-ui', 'X-App-Username': BITLAP_IP }
     : {};
 
 // 错误处理方案： 错误类型
@@ -114,6 +117,7 @@ export const requestConfig: RequestConfig = {
   ],
 
   // 自定义 header
+  // @ts-ignore
   headers: {
     ...customHeaders,
   },

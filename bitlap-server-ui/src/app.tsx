@@ -27,9 +27,10 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     // 本地调试模式
+    // @ts-ignore
     if (BITLAP_DEBUG === 'true') {
       return {
-        id: BITLAP_IP,
+        // @ts-ignore
         name: BITLAP_USER || BITLAP_IP,
         avatar:
           'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
@@ -37,11 +38,13 @@ export async function getInitialState(): Promise<{
     }
     const item = window.sessionStorage.getItem('user');
     const user = item ? JSON.parse(item) : {};
-    if (user.id === null) {
+    if (user.name === null) {
       return [];
     }
-    const result = await getCurrentUserInfo(user.id);
-    return result?.data || [];
+    // get more detail info?
+    const result = await getCurrentUserInfo(user.name);
+    // @ts-ignore
+    return result?.data;
   };
 
   // 如果不是登录页面，执行
@@ -93,6 +96,7 @@ export const layout: RunTimeLayoutConfig = ({
         location! &&
         !initialState?.currentUser &&
         location.pathname !== loginPath &&
+        // @ts-ignore
         BITLAP_DEBUG !== 'true'
       ) {
         history.push(loginPath);

@@ -8,7 +8,7 @@ declare namespace API {
     data?: { list: [any] };
   };
   type CurrentUser = {
-    id?: string;
+    // unique name
     name?: string;
     nickName?: string;
     avatar?: string;
@@ -25,9 +25,19 @@ declare namespace API {
   };
 
   type LoginResult = {
-    id: string;
     name: string;
-    type?: string;
+    nickName?: string;
+    avatar?: string;
+    email?: string;
+    gender?: string;
+    signature?: string
+    title?: string;
+    group?: string;
+    tags?: { key?: string; label?: string }[];
+    country?: string;
+    access?: string;
+    address?: string;
+    phone?: string;
   };
 
   type PageParams = {

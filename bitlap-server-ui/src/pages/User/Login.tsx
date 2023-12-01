@@ -6,7 +6,6 @@ import { Form, theme } from 'antd';
 import { accountLogin } from '@/services/user/login';
 import { LoginForm } from '@ant-design/pro-components';
 import { history } from 'umi';
-import { useModel } from '@@/exports';
 
 const iconStyles: CSSProperties = {
   color: 'rgba(0, 0, 0, 0.2)',
@@ -17,10 +16,13 @@ const iconStyles: CSSProperties = {
 
 export default () => {
   const [form] = Form.useForm();
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: {
+    username: string;
+    password: string;
+  }) => {
     const result = await accountLogin({ ...values });
-    const data = result?.data || [];
-    window.sessionStorage.setItem('user', JSON.stringify(data));
+    // @ts-ignore
+    window.sessionStorage.setItem('user', JSON.stringify(result?.data));
     history.push({ pathname: '/pages/welcome' });
   };
   const { token } = theme.useToken();
@@ -84,7 +86,7 @@ export default () => {
             placeholder={'密码: password'}
             rules={[
               {
-                required: true,
+                required: false,
                 message: '请输入密码！',
               },
             ]}

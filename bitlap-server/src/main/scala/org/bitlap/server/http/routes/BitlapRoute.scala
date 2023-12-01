@@ -30,7 +30,6 @@ import sttp.tapir.ztapir.*
 import zio.ZIO
 
 trait BitlapRoute(name: String) {
-  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapThrowable, Unit, Any]
 
   // Custom Exception Schema
   given Schema[BitlapThrowable] =
@@ -58,6 +57,8 @@ trait BitlapRoute(name: String) {
   protected lazy val API: BitlapEndpoint =
     endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapThrowable])
 
+  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapThrowable, Unit, Any]
+
   protected lazy val endpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = ListBuffer.empty
 
   protected def get[A, I, E, O, R, RR](
@@ -84,7 +85,7 @@ trait BitlapRoute(name: String) {
     zLogic
   }
 
-  def getEndpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = endpoints
+  def getEndpoints: List[(AnyEndpoint, ZServerEndpoint[Any, Any])] = endpoints.toList
 
   // make zio response
   extension [A](zio: ZIO[Any, Throwable, A]) {

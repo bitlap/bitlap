@@ -1,11 +1,18 @@
 import { Navigate, Outlet } from 'umi';
 import { useModel } from '@umijs/max';
+import { useEffect } from 'react';
 
-export default (props) => {
+export default () => {
   const userSimpleInfo = window.sessionStorage.getItem('user');
-  if (userSimpleInfo != null) {
+  if (userSimpleInfo !== null) {
     const { initialState, setInitialState } = useModel('@@initialState');
-    setInitialState((s) => ({ ...s, currentUser: JSON.parse(userSimpleInfo) }));
+    useEffect(() => {
+      setInitialState((s) => ({
+        ...s,
+        currentUser: JSON.parse(userSimpleInfo),
+        loading: false,
+      }));
+    });
     return <Outlet />;
   } else {
     return <Navigate to="/login" />;

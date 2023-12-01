@@ -1,7 +1,5 @@
 const data = {
-  "id": "abcdroot",
   "name": "root",
-  "type": "root",
   "avatar": "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
 }
 

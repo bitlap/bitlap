@@ -59,7 +59,7 @@ final class UserRoute(
       .in(jsonBody[UserLoginInput].validate(LoginValidator))
       .out(jsonBody[Response[AccountInfo]])
       .out(setCookie(Authorization))
-      .description(login)
+      .description("login")
   ) { in =>
     userService
       .login(in)

@@ -9,7 +9,7 @@ declare namespace API {
   };
   type CurrentUser = {
     // unique name
-    name?: string;
+    username?: string;
     nickName?: string;
     avatar?: string;
     email?: string;
@@ -24,20 +24,21 @@ declare namespace API {
     phone?: string;
   };
 
+  type GetUserInfoResult = {
+    resultCode?: number;
+    errorMessage?: string;
+    data?: CurrentUser;
+  };
+
   type LoginResult = {
-    name: string;
-    nickName?: string;
-    avatar?: string;
-    email?: string;
-    gender?: string;
-    signature?: string;
-    title?: string;
-    group?: string;
-    tags?: { key?: string; label?: string }[];
-    country?: string;
-    access?: string;
-    address?: string;
-    phone?: string;
+    resultCode?: number;
+    errorMessage?: string;
+    data?: CurrentUser;
+  };
+
+  type LogoutResult = {
+    resultCode?: number;
+    errorMessage?: string;
   };
 
   type PageParams = {

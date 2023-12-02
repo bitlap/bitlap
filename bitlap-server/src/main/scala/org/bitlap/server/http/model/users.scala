@@ -32,7 +32,7 @@ final case class AccountInfo(
 object AccountInfo:
 
   def createCookieValue(username: String, password: String): String = {
-    val base64 = Base64.getEncoder.encode(s"$username:$password".getBytes(Charset.forName("utf8")))
+    val base64 = Base64.getEncoder.encode(s"Bearer $username:$password".getBytes(Charset.forName("utf8")))
     new String(base64)
   }
 

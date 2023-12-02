@@ -2,16 +2,16 @@
 import { request } from '@umijs/max';
 
 export async function accountLogout(
-  id: string, // with password
+  username: string, // with password
   options?: { [key: string]: any },
 ) {
-  return request<API.LoginResult>('/api/user/logout', {
+  return request<API.LogoutResult>('/api/user/logout', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     data: {
-      id: id,
+      username: username,
     },
     ...(options || {}),
   });

@@ -21,7 +21,7 @@ export type GlobalHeaderRightProps = {
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
-  return <span className="anticon">{currentUser?.name}</span>;
+  return <span className="anticon">{currentUser?.username}</span>;
 };
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
@@ -33,21 +33,21 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
    */
   const loginOut = async () => {
     const { currentUser } = initialState || {};
-    if (currentUser && currentUser.name) {
-      await accountLogout(currentUser.name);
+    if (currentUser && currentUser.username) {
+      await accountLogout(currentUser.username);
     }
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
     const redirect = urlParams.get('redirect');
     // Note: There may be security issues, please note
-    if (window.location.pathname !== '/login' && !redirect) {
+    if (window.location.pathname !== '/pages/user/login' && !redirect) {
       flushSync(() => {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
+        window.sessionStorage.removeItem('token');
+        window.sessionStorage.removeItem('user');
       });
       history.replace({
-        pathname: '/login',
+        pathname: '/pages/user/login',
         search: stringify({
           redirect: pathname + search,
         }),
@@ -104,7 +104,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser || !currentUser.username) {
     return loading;
   }
 
@@ -129,7 +129,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: `退出登录【${currentUser?.name}】`,
+      label: `退出登录【${currentUser?.username}】`,
     },
   ];
 

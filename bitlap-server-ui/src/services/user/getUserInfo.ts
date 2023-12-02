@@ -2,13 +2,13 @@
 import { request } from '@umijs/max';
 
 export async function getCurrentUserInfo(
-  name: string,
+  username: string,
   options?: { [key: string]: any },
 ) {
-  return request<API.CurrentUser>('/api/user/getUserByName', {
+  return request<API.GetUserInfoResult>('/api/user/getUserByName', {
     method: 'GET',
     params: {
-      name: name,
+      username: username,
     },
     ...(options || {}),
   });

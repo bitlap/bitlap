@@ -24,12 +24,14 @@ export default [
     path: '/pages/playground',
     icon: 'CodeOutlined',
     fixPath: '/pages/playground/sql',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/pages/playground/sql',
         name: 'SQL',
         icon: 'CodeOutlined',
         component: './Playground/Sql',
+        wrappers: ['@/wrappers/auth'],
       },
       // {
       //   path: '/pages/playground/metadata',
@@ -55,7 +57,7 @@ export default [
     redirect: '/pages/welcome',
   },
   {
-    path: '/login',
+    path: '/pages/user/login',
     layout: false,
     component: '@/pages/User/Login',
   },

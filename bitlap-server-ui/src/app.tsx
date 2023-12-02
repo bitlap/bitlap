@@ -17,7 +17,7 @@ import {
 import { getCurrentUserInfo } from '@/services/user/getUserInfo';
 import { history } from 'umi';
 
-const loginPath = '/login';
+const loginPath = '/pages/user/login';
 
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
@@ -36,13 +36,14 @@ export async function getInitialState(): Promise<{
           'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       };
     }
-    const item = sessionStorage.getItem('user');
+    const item = window.sessionStorage.getItem('user');
+    console.log(item);
     const user = item ? JSON.parse(item) : {};
-    if (user.name === null) {
-      return [];
+    if (user.username === null) {
+      return {};
     }
     // get more detail info?
-    const result = await getCurrentUserInfo(user.name);
+    const result = await getCurrentUserInfo(user.username);
     // @ts-ignore
     return result?.data;
   };
@@ -81,7 +82,7 @@ export const layout: RunTimeLayoutConfig = ({
       },
     },
     waterMarkProps: {
-      content: currentUser?.name,
+      content: currentUser?.username,
     },
     footerRender: () => <Footer />,
     actionsRender: () => [

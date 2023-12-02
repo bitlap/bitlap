@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'umi';
 import { useModel } from '@umijs/max';
 import { useEffect } from 'react';
-import { message } from 'antd';
+import { stringify } from 'querystring';
 
 export default () => {
   const userSimpleInfo = sessionStorage.getItem('user');
@@ -14,8 +14,9 @@ export default () => {
         loading: false,
       }));
     });
+    console.log('userinfo' + JSON.stringify(initialState?.currentUser || {}));
     return <Outlet />;
   } else {
-    return <Navigate to="/login" />;
+    return <Navigate to="/pages/user/login" />;
   }
 };

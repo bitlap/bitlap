@@ -22,11 +22,11 @@ export default () => {
   }) => {
     const result = await accountLogin({ ...values });
     // @ts-ignore
-    sessionStorage.setItem('user', JSON.stringify(result?.data));
+    window.sessionStorage.setItem('user', JSON.stringify(result?.data));
     const pwd = values.password || '';
     const token = 'Bearer ' + values.username + ':' + pwd;
     const encodedString = Buffer.from(token).toString('base64');
-    sessionStorage.setItem('token', encodedString);
+    window.sessionStorage.setItem('token', encodedString);
     history.push({ pathname: '/pages/welcome' });
   };
   const { token } = theme.useToken();

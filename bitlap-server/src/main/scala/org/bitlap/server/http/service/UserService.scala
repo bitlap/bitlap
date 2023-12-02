@@ -45,9 +45,9 @@ final class UserService(
 
   def login(input: UserLoginInput): ZIO[Any, Throwable, AccountInfo] = {
     for {
-      root <- accountAuthenticator.auth(input.username, input.password)
+      root <- accountAuthenticator.auth(input.username, input.password.getOrElse(DefaultPassword))
       sessionId <- ZIO.attempt {
-        val conn = new SyncConnection(input.username, input.password)
+        val conn = new SyncConnection(input.username, input.password.getOrElse(DefaultPassword))
         conn.open(ServerAddress(conf.host, conf.port))
         conn.getSessionId
       }

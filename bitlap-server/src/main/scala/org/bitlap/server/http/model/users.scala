@@ -18,7 +18,9 @@ package org.bitlap.server.http.model
 import java.nio.charset.Charset
 import java.util.Base64
 
-final case class UserLoginInput(username: String, password: String)
+inline val DefaultPassword = ""
+
+final case class UserLoginInput(username: String, password: Option[String])
 final case class UserLogoutInput(username: String)
 
 final case class AccountInfo(

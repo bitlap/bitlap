@@ -43,7 +43,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
     // Note: There may be security issues, please note
     if (window.location.pathname !== '/login' && !redirect) {
       flushSync(() => {
-        window.sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
       });
       history.replace({
         pathname: '/login',

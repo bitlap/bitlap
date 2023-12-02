@@ -30,7 +30,7 @@ declare namespace API {
     avatar?: string;
     email?: string;
     gender?: string;
-    signature?: string
+    signature?: string;
     title?: string;
     group?: string;
     tags?: { key?: string; label?: string }[];

@@ -36,7 +36,7 @@ export async function getInitialState(): Promise<{
           'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       };
     }
-    const item = window.sessionStorage.getItem('user');
+    const item = sessionStorage.getItem('user');
     const user = item ? JSON.parse(item) : {};
     if (user.name === null) {
       return [];

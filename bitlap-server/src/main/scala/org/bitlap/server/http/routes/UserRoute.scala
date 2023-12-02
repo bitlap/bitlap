@@ -68,7 +68,7 @@ final class UserRoute(
         { a =>
           Response.ok(a) ->
             CookieValueWithMeta.unsafeApply(
-              value = AccountInfo.createCookieValue(in.username, in.password),
+              value = AccountInfo.createCookieValue(in.username, in.password.getOrElse(DefaultPassword)),
               maxAge = Some(sessionConfig.timeout.toSeconds),
               httpOnly = true,
               secure = false

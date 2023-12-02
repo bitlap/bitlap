@@ -84,11 +84,12 @@ final case class DataFormatException(
 final case class BitlapAuthenticationException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
+  code: Int = 401,
   cause: Option[Throwable] = None)
-    extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
+    extends BitlapHttpException(errorKey, parameters, code, cause)
     with BitlapThrowable
 
-final case class BitlapHttpException(
+case class BitlapHttpException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
   code: Int,

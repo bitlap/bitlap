@@ -11,6 +11,7 @@ function errorHandler(error) {
 const request = extend({
   responseType: 'json',
   errorHandler,
+  credentials: 'include',
 });
 
 request.interceptors.response.use(async (res, req) => {

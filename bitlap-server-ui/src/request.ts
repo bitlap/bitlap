@@ -1,7 +1,10 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { message, notification } from 'antd';
-import Cookies from 'js-cookie'
+import { message, Modal, notification } from 'antd';
+import { history } from 'umi';
+import { stringify } from 'querystring';
+import { Navigate } from '@@/exports';
+import initialState from '@@/plugin-initialState/@@initialState';
 
 // 自定义请求头
 const customHeaders =
@@ -19,6 +22,7 @@ enum ErrorShowType {
   NOTIFICATION = 3,
   REDIRECT = 9,
 }
+
 // 与后端约定的响应数据格式
 interface ResponseStructure {
   success: boolean;
@@ -100,6 +104,38 @@ export const requestConfig: RequestConfig = {
       // 拦截请求配置，进行个性化处理。
       const url = config?.url?.concat(`?tm=${new Date().getTime()}`);
       return { ...config, url };
+    },
+    (url: string, options: RequestConfig) => {
+      const token = sessionStorage.getItem('token');
+      if (token === null) {
+        const { location } = history;
+        // 如果没有登录，重定向到 login
+        if (
+          location! &&
+          location.pathname !== '/login' &&
+          // @ts-ignore
+          BITLAP_DEBUG !== 'true'
+        ) {
+          message.error('请重新登录！');
+
+          history.push('/login');
+        }
+        return {
+          url: `${url}`,
+          options: { ...options, interceptors: true, credentials: 'include' },
+        };
+      } else {
+        const authHeader = { Authorization: token };
+        return {
+          url: `${url}`,
+          options: {
+            ...options,
+            interceptors: true,
+            headers: authHeader,
+            credentials: 'include',
+          },
+        };
+      }
     },
   ],
 

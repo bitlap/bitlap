@@ -15,7 +15,7 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.common.exception.BitlapHttpException
+import org.bitlap.common.exception.{ BitlapAuthenticationException, BitlapHttpException }
 
 case class Response[T](
   data: Option[T],

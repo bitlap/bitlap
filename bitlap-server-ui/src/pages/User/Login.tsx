@@ -18,11 +18,15 @@ export default () => {
   const [form] = Form.useForm();
   const handleSubmit = async (values: {
     username: string;
-    password: string;
+    password?: string;
   }) => {
     const result = await accountLogin({ ...values });
     // @ts-ignore
-    window.sessionStorage.setItem('user', JSON.stringify(result?.data));
+    sessionStorage.setItem('user', JSON.stringify(result?.data));
+    const pwd = values.password || '';
+    const token = 'Bearer ' + values.username + ':' + pwd;
+    const encodedString = Buffer.from(token).toString('base64');
+    sessionStorage.setItem('token', encodedString);
     history.push({ pathname: '/pages/welcome' });
   };
   const { token } = theme.useToken();

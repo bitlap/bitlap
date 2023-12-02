@@ -21,9 +21,6 @@ import org.bitlap.server.http.model.AccountInfo
 
 import io.circe.*
 import io.circe.generic.auto.*
-import io.circe.syntax.EncoderOps
-import sttp.tapir._
-import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.json.circe.*
 import sttp.tapir.ztapir.*
 import zio.ZIO
@@ -41,7 +38,7 @@ trait BitlapAuthRoute extends BitlapRoute with Authenticator {
 
   protected val secureEndpoint
     : ZPartialServerEndpoint[Nothing, AuthenticationToken, AccountInfo, Unit, BitlapThrowable, Unit, Any] = API
-    .securityIn(header("Authentication").mapTo[AuthenticationToken])
+    .securityIn(header[String]("Authentication").mapTo[AuthenticationToken])
     // returning the authentication error code to the user
     .zServerSecurityLogic(authenticate)
 }

@@ -89,10 +89,10 @@ final case class BitlapAuthenticationException(
     extends BitlapHttpException(errorKey, parameters, code, cause)
     with BitlapThrowable
 
-case class BitlapHttpException(
+class BitlapHttpException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  code: Int,
+  val code: Int,
   cause: Option[Throwable] = None)
     extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable

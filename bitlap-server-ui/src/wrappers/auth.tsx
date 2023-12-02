@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from 'umi';
 import { useModel } from '@umijs/max';
 import { useEffect } from 'react';
-import { stringify } from 'querystring';
 
 export default () => {
-  const userSimpleInfo = sessionStorage.getItem('user');
-  if (userSimpleInfo !== null) {
+  const userSimpleInfo = window.sessionStorage.getItem('user');
+  const token = window.sessionStorage.getItem('token');
+  if (userSimpleInfo !== null && token !== null) {
     const { initialState, setInitialState } = useModel('@@initialState');
     useEffect(() => {
       setInitialState((s) => ({

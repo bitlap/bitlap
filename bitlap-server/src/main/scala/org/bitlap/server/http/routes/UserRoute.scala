@@ -15,18 +15,19 @@
  */
 package org.bitlap.server.http.routes
 
-import org.bitlap.common.exception.{BitlapExceptions, BitlapThrowable}
+import org.bitlap.common.exception.{ BitlapExceptions, BitlapThrowable }
 import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.http.Response
 import org.bitlap.server.http.model.*
 import org.bitlap.server.http.service.UserService
 import org.bitlap.server.service.AccountAuthenticator
+
 import io.circe.*
 import io.circe.generic.auto.*
 import sttp.model.HeaderNames.Authorization
 import sttp.model.headers.CookieValueWithMeta
+import sttp.tapir.{ ValidationResult, Validator }
 import sttp.tapir.files.staticResourceGetServerEndpoint
-import sttp.tapir.{ValidationResult, Validator}
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint

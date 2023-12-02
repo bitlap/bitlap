@@ -41,7 +41,7 @@ trait BitlapAuthRoute extends BitlapRoute with Authenticator {
 
   protected val secureEndpoint
     : ZPartialServerEndpoint[Nothing, AuthenticationToken, AccountInfo, Unit, BitlapThrowable, Unit, Any] = API
-    .securityIn(auth.bearer[String]().mapTo[AuthenticationToken])
+    .securityIn(header("Authentication").mapTo[AuthenticationToken])
     // returning the authentication error code to the user
     .zServerSecurityLogic(authenticate)
 }

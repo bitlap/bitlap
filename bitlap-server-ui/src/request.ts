@@ -106,38 +106,28 @@ export const requestConfig: RequestConfig = {
       return { ...config, url };
     },
     (url: string, options: RequestConfig) => {
-      if (
-        location! &&
-        location.pathname !== '/pages/user/login' &&
-        // @ts-ignore
-        BITLAP_DEBUG !== 'true'
-      ) {
-        const token = window.sessionStorage.getItem('token');
-        const authHeader = { Authorization: token };
-        if (token === null) {
+      const token = window.sessionStorage.getItem('token');
+      const authHeader = { Authorization: token };
+      if (token === null) {
+        if (
+          location! &&
+          location.pathname !== '/pages/user/login' &&
+          // @ts-ignore
+          BITLAP_DEBUG !== 'true'
+        ) {
           message.error('请重新登录！');
-          return {
-            url: `${url}`,
-            options: { ...options, interceptors: true, credentials: 'include' },
-          };
-        } else {
-          return {
-            url: `${url}`,
-            options: {
-              ...options,
-              interceptors: true,
-              headers: authHeader,
-              credentials: 'include',
-            },
-          };
         }
+        return {
+          url: `${url}`,
+          options: { ...options, interceptors: true, credentials: 'include' },
+        };
       } else {
-        console.log('登录！');
         return {
           url: `${url}`,
           options: {
             ...options,
             interceptors: true,
+            headers: authHeader,
             credentials: 'include',
           },
         };

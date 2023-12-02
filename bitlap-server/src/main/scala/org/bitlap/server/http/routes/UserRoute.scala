@@ -48,7 +48,7 @@ final class UserRoute(
   userService: UserService,
   accountAuthenticator: AccountAuthenticator,
   globalContext: BitlapGlobalContext)
-    extends BitlapAuthRoute
+    extends BitlapSecurityRoute
     with BitlapRoute("user")
     with BitlapValidator {
 

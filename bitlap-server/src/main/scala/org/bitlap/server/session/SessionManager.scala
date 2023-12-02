@@ -81,10 +81,13 @@ final class SessionManager(
           if (sessionId != null) {
             coo.remove(username)
           }
-          sessionId -> coo
+          Option(sessionId) -> coo
         }
         // close session, then cannot access pages
-        _ <- closeSession(sessionAndMap._1)
+        _ <-
+          sessionAndMap._1.fold(ZIO.unit) { sid =>
+            closeSession(sid)
+          }
       } yield {
         sessionAndMap._2
       }

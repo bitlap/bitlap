@@ -50,10 +50,12 @@ final class UserService(
         val conn = new SyncConnection(input.username, input.password.getOrElse(DefaultPassword))
         conn.open(ServerAddress(conf.host, conf.port))
         conn.getSessionId
-      }
-      _ <- sessionManager.frontendUserSessions.getAndUpdate { coo =>
-        coo.put(root.username, sessionId)
-        coo
+      }.fork
+      _ <- sessionManager.frontendUserSessions.getAndUpdateZIO { coo =>
+        sessionId.join.map(sessionId =>
+          coo.put(root.username, sessionId)
+          coo
+        )
       }
     } yield {
       root

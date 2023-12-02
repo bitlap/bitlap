@@ -51,10 +51,10 @@ final class AccountAuthenticator extends BitlapSerde {
           case _ => false
       } catch {
         case e: Exception =>
-          throw BitlapAuthenticationException("Auth failed", cause = Option(e))
+          throw BitlapAuthenticationException("用户名或密码不正确", cause = Option(e))
       }
       // return detail user info
-    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("Auth failed"))).unit *>
+    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("用户名或密码不正确"))).unit *>
       getUserInfoByName(username)
   }
 

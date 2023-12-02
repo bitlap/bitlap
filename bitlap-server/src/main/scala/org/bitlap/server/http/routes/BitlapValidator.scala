@@ -22,12 +22,24 @@ import sttp.tapir.{ ValidationResult, Validator }
 trait BitlapValidator {
 
   lazy val LogoutValidator =
-    Validator.custom[UserLogoutInput](in => ValidationResult.validWhen(in.username.trim.nonEmpty))
+    Validator.custom[UserLogoutInput](in =>
+      ValidationResult.validWhen(
+        in.username.trim.nonEmpty && in.username.toLongOption.isEmpty
+      )
+    )
 
   lazy val LoginValidator =
-    Validator.custom[UserLoginInput](in => ValidationResult.validWhen(in.username.trim.nonEmpty))
+    Validator.custom[UserLoginInput](in =>
+      ValidationResult.validWhen(
+        in.username.trim.nonEmpty && in.username.toLongOption.isEmpty
+      )
+    )
 
   lazy val NameValidator =
-    Validator.minLength(1)
+    Validator.custom[String](s =>
+      ValidationResult.validWhen(
+        s.trim.nonEmpty && s.toLongOption.isEmpty
+      )
+    )
 
 }

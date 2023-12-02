@@ -85,7 +85,11 @@ export const requestConfig: RequestConfig = {
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`${error.response.message}`);
+        if (error.response?.data === null) {
+          message.error('请求失败！');
+        } else {
+          message.error(`${error.response?.data?.error}`);
+        }
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
@@ -140,8 +144,15 @@ export const requestConfig: RequestConfig = {
     (response) => {
       // 拦截响应数据，进行个性化处理
       const { data } = response as unknown as ResponseStructure;
+      console.log(data);
 
-      if (data?.errorCode == 200 && data?.status == false) {
+      if (data?.code === 0) {
+        return response;
+      }
+
+      if (data?.error !== null) {
+        message.error(`${data?.error}`);
+      } else {
         message.error('请求失败！');
       }
       return response;

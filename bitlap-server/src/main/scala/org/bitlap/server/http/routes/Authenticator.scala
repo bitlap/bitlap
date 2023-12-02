@@ -20,11 +20,14 @@ import java.util.Base64
 import scala.util.Try
 
 import org.bitlap.common.exception.*
-import org.bitlap.server.http.model.AccountInfo
+import org.bitlap.server.http.model.*
 import org.bitlap.server.service.AccountAuthenticator
 
+import sttp.model.headers.AuthenticationScheme
 import zio.ZIO
 
+/** Verify based on the token in the request header
+ */
 trait Authenticator {
 
   import Authenticator._
@@ -33,18 +36,18 @@ trait Authenticator {
 
   // FIXME
   def authenticate(token: AuthenticationToken): ZIO[Any, BitlapAuthenticationException, AccountInfo] =
-    val tk             = if (token.value.trim.contains(" ")) token.value.trim.split(" ")(1) else token.value
-    val secret: String = Try(new String(Base64.getDecoder.decode(tk))).getOrElse(null)
-    if (secret == null || secret.isEmpty) {
-      ZIO.fail(BitlapAuthenticationException("Unauthorized"))
-    } else {
-      val usernamePassword = secret.split(":")
-      val user             = usernamePassword(0)
-      val passwd           = usernamePassword(1)
-      authenticator
-        .auth(user, passwd)
-        .mapError(e => BitlapAuthenticationException(e.getMessage, cause = Some(e)))
-    }
+    val secret = Try(new String(Base64.getDecoder.decode(token.value))).toEither
+    secret match
+      case Left(_) =>
+        ZIO.fail(BitlapAuthenticationException("Unauthorized"))
+      case Right(value) =>
+        val usernamePassword = value.stripPrefix(AuthenticationScheme.Bearer.name + " ").split(":")
+        val (user, passwd) = if (usernamePassword.length == 1) {
+          usernamePassword(0) -> DefaultPassword
+        } else usernamePassword(0) -> usernamePassword(1)
+        authenticator
+          .auth(user, passwd)
+          .mapError(e => BitlapAuthenticationException(e.getMessage, cause = Some(e)))
 
 }
 

@@ -17,41 +17,21 @@ package org.bitlap.server.http.routes
 
 import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.exception.{ BitlapException, BitlapExceptions, BitlapThrowable }
-import org.bitlap.server.http.Response
+import org.bitlap.common.exception.*
+import org.bitlap.server.http.{ BitlapCodec, Response }
 
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
+import sttp.model.StatusCode
 import sttp.tapir.{ AnyEndpoint, Endpoint, Schema, SchemaType }
 import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.json.circe.*
+import sttp.tapir.server.interceptor.CustomiseInterceptors
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-trait BitlapRoute(name: String) {
-
-  // Custom Exception Schema
-  given Schema[BitlapThrowable] =
-    Schema[BitlapThrowable](SchemaType.SProduct(Nil), Some(Schema.SName("BitlapThrowable")))
-
-  // Custom exception serialization
-  given encodeException[A <: BitlapThrowable]: Encoder[A] = (e: A) => Response.fail(e.asInstanceOf[Throwable]).asJson
-
-  // Custom exception deserialization
-  given decodeException[A <: BitlapThrowable]: Decoder[A] = (c: HCursor) =>
-    for {
-      msg <- c.get[String]("msg")
-    } yield BitlapException(msg).asInstanceOf[A]
-
-  // Custom exception codec
-  given exceptionCodec[A <: BitlapThrowable]: JsonCodec[A] =
-    implicitly[JsonCodec[io.circe.Json]].map(json =>
-      json.as[A] match {
-        case Left(_)      => throw new IllegalArgumentException("MessageParsingError")
-        case Right(value) => value
-      }
-    )(_.asJson)
+trait BitlapRoute(name: String) extends BitlapCodec {
 
   // common api
   protected lazy val API: BitlapEndpoint =
@@ -93,7 +73,9 @@ trait BitlapRoute(name: String) {
     // make response
     def response: ZIO[Any, BitlapThrowable, Response[A]] = zio.mapBoth(
       {
-        case ex: BitlapThrowable => ex
+        case ex: BitlapHttpException           => ex
+        case ex: BitlapAuthenticationException => ex
+        case ex: BitlapThrowable => BitlapExceptions.httpException(StatusCode.InternalServerError.code, ex.errorKey)
         case ex                  => BitlapExceptions.unknownException(ex)
       },
       {

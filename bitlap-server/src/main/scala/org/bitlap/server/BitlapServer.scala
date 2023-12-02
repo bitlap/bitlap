@@ -19,7 +19,7 @@ import scala.concurrent.duration.*
 
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes._
+import org.bitlap.server.http.route._
 import org.bitlap.server.http.service._
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
@@ -38,7 +38,7 @@ object BitlapServer extends ZIOAppDefault:
       raft           <- RaftServerEndpoint.service(args.toList).fork
       grpc           <- GrpcServerEndpoint.service(args.toList).fork
       http           <- HttpServerEndpoint.service(args.toList).fork
-      serverConfig   <- ZIO.serviceWith[BitlapConfiguration](_.sessionConfig)
+      serverConfig   <- ZIO.serviceWith[BitlapConfigWrapper](_.sessionConfig)
       sessionManager <- ZIO.service[SessionManager]
       _ <- sessionManager
         .startListener()
@@ -65,7 +65,7 @@ object BitlapServer extends ZIOAppDefault:
         Scope.default,
         ZIOAppArgs.empty,
         DriverGrpcServer.live,
-        BitlapConfiguration.live,
+        BitlapConfigWrapper.live,
         BitlapGlobalContext.live,
         // http
         HttpRoutes.live,

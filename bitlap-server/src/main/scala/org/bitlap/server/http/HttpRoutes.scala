@@ -16,7 +16,7 @@
 package org.bitlap.server.http
 
 import org.bitlap.common.exception.*
-import org.bitlap.server.http.routes.*
+import org.bitlap.server.http.route.*
 
 import io.circe.generic.auto.*
 import sttp.tapir.*
@@ -33,17 +33,19 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import zio.*
 import zio.http.HttpApp
 
-object HttpRoutes {
+object HttpRoutes:
 
   val live: ZLayer[ResourceRoute & SqlRoute & UserRoute, Nothing, HttpRoutes] =
     ZLayer.fromFunction((commonRoute: ResourceRoute, sqlRoute: SqlRoute, userRoute: UserRoute) =>
       HttpRoutes(commonRoute, sqlRoute, userRoute)
     )
-}
+end HttpRoutes
 
+/** All HTTP APIs.
+ */
 final class HttpRoutes(commonRoute: ResourceRoute, sqlRoute: SqlRoute, userRoute: UserRoute)
-    extends BitlapExceptionHandler
-    with BitlapCodec {
+    extends CustomExceptionHandler
+    with CustomExceptionCodec {
 
   private val swaggerEndpoints: List[ServerEndpoint[Any, Task]] = SwaggerInterpreter().fromServerEndpoints[Task](
     endpoints = sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2),

@@ -18,7 +18,7 @@ package org.bitlap.server.http.service
 import java.util.concurrent.ConcurrentHashMap
 
 import org.bitlap.common.exception.BitlapAuthenticationException
-import org.bitlap.network.{ ServerAddress, SyncConnection }
+import org.bitlap.network._
 import org.bitlap.network.handles.SessionHandle
 import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.http.model.*

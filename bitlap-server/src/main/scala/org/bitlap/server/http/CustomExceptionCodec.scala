@@ -29,9 +29,9 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-/** Provide a custom decoder, encoder, schema for [[org.bitlap.common.exception.BitlapThrowable]]
+/** Provide a custom decoder, encoder, schema for [[org.bitlap.common.exception.BitlapThrowable]].
  */
-trait BitlapCodec {
+trait CustomExceptionCodec {
 
   // Custom Exception Schema
   given Schema[BitlapThrowable] =

@@ -28,7 +28,7 @@ import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.StrictLogging
@@ -49,7 +49,7 @@ final class SimpleLocalSession(
     extends Session
     with StrictLogging {
 
-  given BitlapConfiguration = globalContext.config
+  given BitlapConfigWrapper = globalContext.config
 
   override def executeStatement(
     statement: String,

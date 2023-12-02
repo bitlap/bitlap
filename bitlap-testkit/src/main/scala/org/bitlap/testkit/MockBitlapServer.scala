@@ -18,7 +18,7 @@ package org.bitlap.testkit
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes.*
+import org.bitlap.server.http.route.*
 import org.bitlap.server.http.service._
 import org.bitlap.server.service._
 import org.bitlap.server.service.DriverGrpcServer
@@ -62,7 +62,7 @@ object MockBitlapServer extends ZIOAppDefault {
         MockAsync.live,
         ZIOAppArgs.empty,
         DriverGrpcServer.live,
-        BitlapConfiguration.testLive,
+        BitlapConfigWrapper.testLive,
         BitlapGlobalContext.live,
         SessionManager.live,
         // http

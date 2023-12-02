@@ -17,8 +17,8 @@ package org.bitlap.server
 
 import org.bitlap.common.BitlapLogging
 import org.bitlap.common.exception.BitlapException
-import org.bitlap.server.config.BitlapConfiguration
-import org.bitlap.server.raft.{ ElectionNode, * }
+import org.bitlap.server.config.BitlapConfigWrapper
+import org.bitlap.server.raft.*
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
@@ -30,22 +30,22 @@ import zio.{ Runtime as _, * }
  */
 object RaftServerEndpoint {
 
-  val live: ZLayer[BitlapConfiguration, Nothing, RaftServerEndpoint] =
-    ZLayer.fromFunction((conf: BitlapConfiguration) => new RaftServerEndpoint(conf))
+  val live: ZLayer[BitlapConfigWrapper, Nothing, RaftServerEndpoint] =
+    ZLayer.fromFunction((conf: BitlapConfigWrapper) => new RaftServerEndpoint(conf))
 
   def service(args: List[String])
-    : ZIO[RaftServerEndpoint & BitlapGlobalContext & BitlapConfiguration, Throwable, Unit] =
+    : ZIO[RaftServerEndpoint & BitlapGlobalContext & BitlapConfigWrapper, Throwable, Unit] =
     (for {
       node  <- ZIO.serviceWithZIO[RaftServerEndpoint](_.runRaftServer())
       _     <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setNode(node))
-      ports <- ZIO.serviceWith[BitlapConfiguration](_.raftConfig.getPorts)
+      ports <- ZIO.serviceWith[BitlapConfigWrapper](_.raftConfig.getPorts)
       _     <- ZIO.logInfo(s"Raft Server started at ports: ${ports.mkString(",")}")
       _     <- ZIO.never
     } yield ())
       .onInterrupt(_ => ZIO.logWarning(s"Raft Server was interrupted! Bye!"))
 }
 
-final class RaftServerEndpoint(config: BitlapConfiguration) extends BitlapLogging {
+final class RaftServerEndpoint(config: BitlapConfigWrapper) extends BitlapLogging {
 
   private val dataPath       = config.raftConfig.dataPath
   private val groupId        = config.raftConfig.groupId

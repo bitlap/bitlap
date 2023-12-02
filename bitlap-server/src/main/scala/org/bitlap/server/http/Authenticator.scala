@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http
 
 import java.util.Base64
 
@@ -26,30 +26,39 @@ import org.bitlap.server.service.AccountAuthenticator
 import sttp.model.headers.AuthenticationScheme
 import zio.ZIO
 
-/** Verify based on the token in the request header
+/** Verify based on the token in the request header.
  */
 trait Authenticator {
 
-  import Authenticator._
-
   val authenticator: AccountAuthenticator
 
-  // FIXME
-  def authenticate(token: AuthenticationToken): ZIO[Any, BitlapAuthenticationException, AccountInfo] =
-    val secret = Try(new String(Base64.getDecoder.decode(token.value))).toEither
+  inline def decodeToken(token: AuthenticationToken): Either[Throwable, String] = Try(
+    new String(Base64.getDecoder.decode(token.value))
+  ).toEither
+
+  inline def parseFromToken(tokenType: AuthenticationType, value: String): (String, String) = {
+    val usernamePassword = value.stripPrefix(tokenType.prefix).split(":")
+    if (usernamePassword.length == 1) usernamePassword(0) -> DefaultPassword
+    else usernamePassword(0)                              -> usernamePassword(1)
+  }
+
+  def authenticate(tokenType: AuthenticationType, token: AuthenticationToken)
+    : ZIO[Any, BitlapAuthenticationException, AccountInfo] =
+    val secret = decodeToken(token).map(v => parseFromToken(tokenType, v))
     secret match
       case Left(_) =>
         ZIO.fail(BitlapAuthenticationException("Unauthorized"))
       case Right(value) =>
-        val usernamePassword = value.stripPrefix(AuthenticationScheme.Bearer.name + " ").split(":")
-        val (user, passwd) = if (usernamePassword.length == 1) {
-          usernamePassword(0) -> DefaultPassword
-        } else usernamePassword(0) -> usernamePassword(1)
+        val (user, passwd) = value
         authenticator
           .auth(user, passwd)
           .mapError(e => BitlapAuthenticationException(e.getMessage, cause = Some(e)))
 
 }
 
-object Authenticator:
-  final case class AuthenticationToken(value: String)
+final case class AuthenticationToken(value: String)
+
+enum AuthenticationType(val prefix: String):
+  case Bearer extends AuthenticationType(AuthenticationScheme.Bearer.name + " ")
+  case Basic  extends AuthenticationType(AuthenticationScheme.Basic.name + " ")
+end AuthenticationType

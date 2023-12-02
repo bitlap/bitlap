@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http.route
 
-import org.bitlap.common.exception.{ BitlapExceptions, BitlapThrowable }
+import org.bitlap.common.exception._
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.http.Response
+import org.bitlap.server.http.{ FormValidator, Response }
 import org.bitlap.server.http.model.*
 import org.bitlap.server.http.service.UserService
 import org.bitlap.server.service.AccountAuthenticator
@@ -35,22 +35,24 @@ import sttp.tapir.ztapir.*
 import sttp.tapir.ztapir.query
 import zio.*
 
-object UserRoute {
+object UserRoute:
 
   val live: ZLayer[UserService & AccountAuthenticator & BitlapGlobalContext, Nothing, UserRoute] =
     ZLayer.fromFunction(
       (userService: UserService, accountAuthenticator: AccountAuthenticator, globalContext: BitlapGlobalContext) =>
         new UserRoute(userService, accountAuthenticator, globalContext)
     )
-}
+end UserRoute
 
+/** Routes for bitlap user/account endpoints.
+ */
 final class UserRoute(
   userService: UserService,
   accountAuthenticator: AccountAuthenticator,
   globalContext: BitlapGlobalContext)
-    extends BitlapSecurityRoute
-    with BitlapRoute("user")
-    with BitlapValidator {
+    extends SecurityRoute
+    with PublicRoute("user")
+    with FormValidator {
 
   override val authenticator: AccountAuthenticator = accountAuthenticator
 

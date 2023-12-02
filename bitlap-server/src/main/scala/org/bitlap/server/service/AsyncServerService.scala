@@ -30,7 +30,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 import zio.*
 
-/** Server side implementation of asynchronous RPC
+/** Server side implementation of asynchronous RPC.
  */
 object AsyncServerService:
 

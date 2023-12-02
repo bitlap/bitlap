@@ -22,7 +22,7 @@ import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 import org.bitlap.server.http.model.AccountInfo
 import org.bitlap.server.session.mapTo
 

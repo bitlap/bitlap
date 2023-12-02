@@ -18,10 +18,8 @@ package org.bitlap.server.http
 import org.bitlap.common.exception._
 
 import io.circe.Encoder._
-import sttp.model.{ Header, StatusCode }
-import sttp.monad.MonadError
+import sttp.model.{ headers => _, _ }
 import sttp.tapir._
-import sttp.tapir.{ server, Codec, DecodeResult, EndpointIO, EndpointOutput }
 import sttp.tapir.json.circe.jsonBody
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.decodefailure.DefaultDecodeFailureHandler
@@ -30,10 +28,10 @@ import sttp.tapir.server.interceptor.exception._
 import sttp.tapir.server.model.ValuedEndpointOutput
 import zio.Task
 
-/** Convert all errors to [[org.bitlap.common.exception.BitlapHttpException]]
+/** A custom ExceptionHandler to convert all errors to [[org.bitlap.common.exception.BitlapHttpException]].
  */
-trait BitlapExceptionHandler {
-  self: BitlapCodec =>
+trait CustomExceptionHandler {
+  self: CustomExceptionCodec =>
 
   import self.given
 

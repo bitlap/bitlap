@@ -20,13 +20,13 @@ import java.sql.*
 import scala.collection.mutable.ListBuffer
 
 import org.bitlap.common.BitlapLogging
-import org.bitlap.common.exception.{ BitlapException, DataFormatException }
+import org.bitlap.common.exception._
 import org.bitlap.core.*
 import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 
 import zio.*
 
@@ -36,7 +36,7 @@ final class SimpleOperation(
   parentSession: Session,
   opType: OperationType,
   hasResultSet: Boolean = false
-)(using globalConfig: BitlapConfiguration)
+)(using globalConfig: BitlapConfigWrapper)
     extends Operation(parentSession, opType, hasResultSet, globalConfig)
     with BitlapLogging {
 

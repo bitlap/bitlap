@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http.route
 
 import org.bitlap.server.http.Response
-import org.bitlap.server.http.model.{ SqlData, SqlInput }
-import org.bitlap.server.http.service.SqlService
 
 import io.circe.*
 import io.circe.generic.auto.*
+import sttp.tapir.files.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*
 import zio.*
 
-object SqlRoute {
+object ResourceRoute:
+  lazy val live: ULayer[ResourceRoute] = ZLayer.succeed(ResourceRoute())
+end ResourceRoute
 
-  lazy val live: ZLayer[SqlService, Nothing, SqlRoute] =
-    ZLayer.fromFunction((sqlService: SqlService) => SqlRoute(sqlService))
-}
+/** Routes for bitlap static endpoints.
+ */
+final class ResourceRoute extends PublicRoute("common") {
 
-class SqlRoute(sqlService: SqlService) extends BitlapRoute("sql") {
+  private val classLoader = ResourceRoute.getClass.getClassLoader
 
-  post(_.in("run").in(jsonBody[SqlInput]).out(jsonBody[Response[SqlData]])) { in =>
-    sqlService.execute(in.sql).response
+  get(_.in("status").out(jsonBody[Response[String]])) { _ =>
+    ZIO.succeed(Response.ok("ok"))
   }
+
+  val staticPage: ServerEndpoint[Any, Task] =
+    staticResourceGetServerEndpoint[Task]("pages")(classLoader, "static/index.html")
+
+  val staticDefault: ServerEndpoint[Any, Task] =
+    staticResourcesGetServerEndpoint[Task](emptyInput)(classLoader, "static")
 }

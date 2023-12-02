@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http.route
 
 import scala.collection.mutable.ListBuffer
 
 import org.bitlap.common.exception.*
-import org.bitlap.server.http.{ BitlapCodec, Response }
+import org.bitlap.server.http._
 
 import io.circe.*
 import io.circe.generic.auto.*
@@ -31,7 +31,9 @@ import sttp.tapir.server.interceptor.CustomiseInterceptors
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-trait BitlapRoute(name: String) extends BitlapCodec {
+/** Abstract routes for bitlap public endpoints.
+ */
+trait PublicRoute(name: String) extends CustomExceptionCodec {
 
   // common api
   protected lazy val API: BitlapEndpoint =

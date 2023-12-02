@@ -13,29 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http
 
-import org.bitlap.server.http.model._
+import org.bitlap.server.http.model.*
 
 import sttp.tapir.{ ValidationResult, Validator }
 
-trait BitlapValidator {
+/** Validating forms and data passed from the frontend.
+ */
+trait FormValidator {
 
-  lazy val LogoutValidator =
+  lazy val LogoutValidator: Validator[UserLogoutInput] =
     Validator.custom[UserLogoutInput](in =>
       ValidationResult.validWhen(
         in.username.trim.nonEmpty && in.username.toLongOption.isEmpty
       )
     )
 
-  lazy val LoginValidator =
+  lazy val LoginValidator: Validator[UserLoginInput] =
     Validator.custom[UserLoginInput](in =>
       ValidationResult.validWhen(
         in.username.trim.nonEmpty && in.username.toLongOption.isEmpty
       )
     )
 
-  lazy val NameValidator =
+  lazy val NameValidator: Validator[String] =
     Validator.custom[String](s =>
       ValidationResult.validWhen(
         s.trim.nonEmpty && s.toLongOption.isEmpty

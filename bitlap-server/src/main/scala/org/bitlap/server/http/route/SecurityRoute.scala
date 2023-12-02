@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http.route
 
 import org.bitlap.common.exception.*
-import org.bitlap.server.http.Response
+import org.bitlap.server.http._
 import org.bitlap.server.http.model.AccountInfo
 
 import io.circe.*
@@ -25,9 +25,9 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-trait BitlapSecurityRoute extends BitlapRoute with Authenticator {
-
-  import Authenticator._
+/** Abstract routes for bitlap security endpoints.
+ */
+trait SecurityRoute extends PublicRoute with Authenticator {
 
   private var securityEndpoints = List[ZServerEndpoint[Any, Any]]()
 
@@ -40,5 +40,5 @@ trait BitlapSecurityRoute extends BitlapRoute with Authenticator {
     : ZPartialServerEndpoint[Nothing, AuthenticationToken, AccountInfo, Unit, BitlapThrowable, Unit, Any] = API
     .securityIn(header[String]("Authorization").mapTo[AuthenticationToken])
     // returning the authentication error code to the user
-    .zServerSecurityLogic(authenticate)
+    .zServerSecurityLogic(token => authenticate(AuthenticationType.Bearer, token))
 }

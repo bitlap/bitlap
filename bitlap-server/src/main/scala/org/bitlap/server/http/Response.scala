@@ -15,9 +15,9 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.common.exception.{ BitlapAuthenticationException, BitlapHttpException }
+import org.bitlap.common.exception._
 
-case class Response[T](
+final case class Response[T](
   data: Option[T],
   success: Boolean,
   code: Int,

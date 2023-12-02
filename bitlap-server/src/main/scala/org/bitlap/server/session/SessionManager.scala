@@ -25,13 +25,13 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-import org.bitlap.common.exception.{ BitlapAuthenticationException, BitlapException }
+import org.bitlap.common.exception._
 import org.bitlap.core.catalog.metadata.Database
-import org.bitlap.network.enumeration.{ GetInfoType, OperationState }
+import org.bitlap.network.enumeration._
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 import org.bitlap.server.service.AccountAuthenticator
 
 import zio.{ System as _, * }
@@ -129,12 +129,10 @@ final class SessionManager(
     sessionConf: Map[String, String]
   ): Task[Session] =
     for {
-      sessionStoreMap       <- sessions.get
-      operationStoreMap     <- operations.get
-      operationHandleVector <- operationIds.get
-      sessionState          <- Ref.make(new AtomicBoolean(true))
-      sessionCreateTime     <- Ref.make(new AtomicLong(System.currentTimeMillis()))
-      defaultSessionConf    <- Ref.make(mutable.Map(sessionConf.toList: _*))
+      sessionStoreMap    <- sessions.get
+      sessionState       <- Ref.make(new AtomicBoolean(true))
+      sessionCreateTime  <- Ref.make(new AtomicLong(System.currentTimeMillis()))
+      defaultSessionConf <- Ref.make(mutable.Map(sessionConf.toList: _*))
       db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
       defaultSchema <- Ref.make(AtomicReference(db))
       _             <- accountAuthenticator.auth(username, password)

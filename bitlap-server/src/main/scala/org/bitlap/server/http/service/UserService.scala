@@ -15,7 +15,11 @@
  */
 package org.bitlap.server.http.service
 
+import java.util.concurrent.ConcurrentHashMap
+
 import org.bitlap.common.exception.BitlapAuthenticationException
+import org.bitlap.network.{ ServerAddress, SyncConnection }
+import org.bitlap.network.handles.SessionHandle
 import org.bitlap.server.BitlapGlobalContext
 import org.bitlap.server.http.model.*
 import org.bitlap.server.service.AccountAuthenticator
@@ -25,19 +29,30 @@ import zio.{ ZIO, ZLayer }
 
 object UserService {
 
-  val live: ZLayer[SessionManager with AccountAuthenticator, Nothing, UserService] =
-    ZLayer.fromFunction((sessionManager: SessionManager, accountAuthenticator: AccountAuthenticator) =>
-      new UserService(sessionManager, accountAuthenticator)
+  val live: ZLayer[SessionManager & AccountAuthenticator & BitlapGlobalContext, Nothing, UserService] =
+    ZLayer.fromFunction(
+      (sessionManager: SessionManager, accountAuthenticator: AccountAuthenticator, context: BitlapGlobalContext) =>
+        new UserService(sessionManager, accountAuthenticator, context)
     )
 }
 
-final class UserService(sessionManager: SessionManager, accountAuthenticator: AccountAuthenticator) {
+final class UserService(
+  sessionManager: SessionManager,
+  accountAuthenticator: AccountAuthenticator,
+  context: BitlapGlobalContext) {
+
+  private val conf = context.config.grpcConfig
 
   def login(input: UserLoginInput): ZIO[Any, Throwable, AccountInfo] = {
     for {
       root <- accountAuthenticator.auth(input.username, input.password)
-      _ <- sessionManager.userSession.getAndUpdate { coo =>
-        coo.put(root.username, root)
+      sessionId <- ZIO.attempt {
+        val conn = new SyncConnection(input.username, input.password)
+        conn.open(ServerAddress(conf.host, conf.port))
+        conn.getSessionId
+      }
+      _ <- sessionManager.frontendUserSessions.getAndUpdate { coo =>
+        coo.put(root.username, sessionId)
         coo
       }
     } yield {
@@ -47,27 +62,23 @@ final class UserService(sessionManager: SessionManager, accountAuthenticator: Ac
 
   def logout(accountInfo: AccountInfo, input: UserLogoutInput): ZIO[Any, Throwable, UserLogout] = {
     for {
+      // check user name
       _ <- ZIO
         .when(accountInfo.username != input.username) {
           ZIO.fail(BitlapAuthenticationException("Unauthorized"))
         }
         .someOrElse(())
-      _ <- sessionManager.userSession.getAndUpdate { coo =>
-        if (coo.contains(input.username)) {
-          coo.remove(input.username)
-        }
-        coo
-      }
+      _ <- sessionManager.isValidUserSession(input.username)
+      _ <- sessionManager.invalidateSession(input.username)
     } yield UserLogout()
   }
 
   // TODO
   def getUserByName(name: String): ZIO[Any, Throwable, AccountInfo] = {
     for {
-      user <- sessionManager.userSession.get.map(_.get(name))
       res <-
-        if (user == null) ZIO.fail(BitlapAuthenticationException("Access Denied"))
-        else ZIO.succeed(AccountInfo.root)
+        if (name == null) ZIO.fail(BitlapAuthenticationException("Access Denied"))
+        else accountAuthenticator.getUserInfoByName(name)
     } yield { res }
   }
 

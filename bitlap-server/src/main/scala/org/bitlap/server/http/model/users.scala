@@ -15,6 +15,9 @@
  */
 package org.bitlap.server.http.model
 
+import java.nio.charset.Charset
+import java.util.Base64
+
 final case class UserLoginInput(username: String, password: String)
 final case class UserLogoutInput(username: String)
 
@@ -25,6 +28,11 @@ final case class AccountInfo(
   nickName: Option[String] = None)
 
 object AccountInfo:
+
+  def createCookieValue(username: String, password: String): String = {
+    val base64 = Base64.getEncoder.encode(s"$username:$password".getBytes(Charset.forName("utf8")))
+    new String(base64)
+  }
 
   val root: AccountInfo = AccountInfo(
     "root",

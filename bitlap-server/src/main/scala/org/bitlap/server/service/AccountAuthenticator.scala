@@ -34,6 +34,10 @@ end AccountAuthenticator
 
 final class AccountAuthenticator extends BitlapSerde {
 
+  // TODO get by name
+  def getUserInfoByName(username: String): ZIO[Any, Throwable, AccountInfo] =
+    ZIO.succeed(AccountInfo.root)
+
   def auth(username: String, password: String): ZIO[Any, Throwable, AccountInfo] = {
     val statement: String = s"AUTH $username '$password'"
     val res =
@@ -51,7 +55,7 @@ final class AccountAuthenticator extends BitlapSerde {
       }
       // return detail user info
     ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("Auth failed"))).unit *>
-      ZIO.succeed(AccountInfo.root)
+      getUserInfoByName(username)
   }
 
 }

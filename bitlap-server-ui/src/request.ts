@@ -119,6 +119,8 @@ export const requestConfig: RequestConfig = {
           message.error('请重新登录！');
 
           history.push('/login');
+        } else {
+          console.warn('未登录！');
         }
         return {
           url: `${url}`,

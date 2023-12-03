@@ -113,6 +113,7 @@ export const requestConfig: RequestConfig = {
         if (
           location! &&
           location.pathname !== '/pages/user/login' &&
+          location.pathname !== '/' &&
           // @ts-ignore
           BITLAP_DEBUG !== 'true'
         ) {

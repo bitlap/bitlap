@@ -27,8 +27,8 @@ import org.bitlap.common.exception.BitlapException
 import org.bitlap.common.utils.{ JsonUtil, PreConditions }
 import org.bitlap.core.BitlapContext
 import org.bitlap.core.catalog.BitlapCatalog
-import org.bitlap.core.catalog.metadata.{ Account, Database, Table }
-import org.bitlap.core.catalog.metadata.Account.{ DEFAULT_PASSWORD, SecretKey }
+import org.bitlap.core.catalog.metadata._
+import org.bitlap.core.catalog.metadata.Account._
 import org.bitlap.core.event.*
 import org.bitlap.core.hadoop.*
 import org.bitlap.core.storage.TableFormat
@@ -72,7 +72,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val defaultAccountPath = Path(getAccountDir, Account.DEFAULT_USER)
     if (!fs.exists(defaultAccountPath)) {
       fs.mkdirs(defaultAccountPath)
-      fs.writeSecret(defaultAccountPath, Account.SecretKey(Md5Crypt.md5Crypt(DEFAULT_PASSWORD.getBytes, salt))) {}
+      fs.writeSecret(defaultAccountPath, SecretKey(Md5Crypt.md5Crypt(DEFAULT_PASSWORD.getBytes, salt))) {}
     }
   }
 
@@ -261,7 +261,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
 
   override def listUsers: List[Account] = {
     fs.collectStatus(getAccountDir, _.isDirectory) { (_, status) =>
-      Account(status.getPath.getName, Account.SecretKey("***"))
+      Account(status.getPath.getName, SecretKey("***"))
     }
   }
 
@@ -274,7 +274,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     val exists = fs.exists(p)
     if (exists) {
       fs.delete(p, true)
-      eventBus.post(AccountDropEvent(Account(cleanName, Account.SecretKey("***"))))
+      eventBus.post(AccountDropEvent(Account(cleanName, SecretKey("***"))))
       return true
     } else {
       if (!ifExists) {
@@ -298,7 +298,7 @@ class BitlapCatalogImpl(private val conf: BitlapConf, private val hadoopConf: Co
     }
     fs.mkdirs(p)
     val pwd    = Md5Crypt.md5Crypt(password.getBytes, salt)
-    val secret = Account.SecretKey(pwd)
+    val secret = SecretKey(pwd)
     fs.writeSecret(p, secret) {
       eventBus.post(AccountCreateEvent(Account(cleanName, secret)))
     }

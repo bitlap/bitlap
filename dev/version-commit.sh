@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# only available for snapshots
+
 version=$1
 commit=$2
 

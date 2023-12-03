@@ -19,7 +19,7 @@ import scala.reflect.ClassTag
 import scala.util.Using
 
 import org.bitlap.common.utils.JsonUtil
-import org.bitlap.core.catalog.metadata.{ Account, Table }
+import org.bitlap.core.catalog.metadata._
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{ FileStatus, FileSystem, LocatedFileStatus, Path }
@@ -51,7 +51,7 @@ extension (fs: FileSystem) {
     Configuration(fs.getConf)
   }
 
-  def writeSecret[A](accountPath: Path, secret: Account.SecretKey)(effect: => A): Boolean = {
+  def writeSecret[A](accountPath: Path, secret: SecretKey)(effect: => A): Boolean = {
     Using.resource(fs.create(Path(accountPath, ".secret"), true)) { o =>
       o.writeUTF(JsonUtil.json(secret))
     }
@@ -59,9 +59,9 @@ extension (fs: FileSystem) {
     true
   }
 
-  def readSecret(accountPath: Path): Account.SecretKey = {
+  def readSecret(accountPath: Path): SecretKey = {
     Using.resource(fs.open(Path(accountPath, ".secret"))) { in =>
-      JsonUtil.jsonAs(in.readUTF(), classOf[Account.SecretKey])
+      JsonUtil.jsonAs(in.readUTF(), classOf[SecretKey])
     }
   }
 }

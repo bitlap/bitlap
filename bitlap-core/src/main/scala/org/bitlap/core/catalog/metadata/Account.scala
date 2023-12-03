@@ -21,10 +21,10 @@ final case class Account(private val _name: String, secretKey: SecretKey) {
   val name: String = _name.toLowerCase()
 }
 
+final case class SecretKey(value: String)
+
 object Account {
   val DEFAULT_USER     = "root"
   val DEFAULT_PASSWORD = ""
   val DEFAULT_DIR      = "/account"
-
-  final case class SecretKey(value: String)
 }

@@ -1,15 +1,26 @@
 #!/bin/bash
 
 version=$1
-#sh dev/make-tarball.sh
 
-scp bitlap-server/target/bitlap-$1.tar.gz root@ip:/root/bitlap-$1.tar.gz
+cd $(dirname $0)/../
 
-cd bitlap-server/target/classes
+./mvnw compile
 
-tar -zcvf static.tar.gz ./static
+# only available for snapshots
+commitId=`sh dev/commitId.sh`
+newVersion=`sh dev/version-commit.sh $version $commitId` 
 
-scp static.tar.gz root@ip:/root/bitlap-$1/static.tar.gz
-ssh root@ip "cd /root/bitlap-$1; tar -zxvf static.tar.gz;"
+sh dev/make-tarball.sh $newVersion
 
-ssh root@ip "cd /root; tar -zxvf bitlap-$1.tar.gz; cd bitlap-$1; nohup bin/bitlap server restart > /dev/null 2>&1"
+if [[ $? -eq 0 ]]; then
+  scp dist/bitlap-$newVersion.tar.gz root@ip:/root/bitlap-$newVersion.tar.gz
+  echo "=============================================================================="
+  echo "===============  🎉 Upload end  !!!  ========================================="
+  echo "=============================================================================="
+  
+  ssh root@ip "cd /root; tar -zxvf bitlap-$newVersion.tar.gz; cd bitlap-$newVersion; nohup bin/bitlap server restart > /dev/null 2>&1"
+  
+  echo "=============================================================================="
+  echo "===============  🎉 Deploy end  !!!  ========================================="
+  echo "=============================================================================="
+fi

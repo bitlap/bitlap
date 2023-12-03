@@ -8,7 +8,6 @@ cd $(dirname $0)/../
 mkdir -p dist/
 find dist/ -name 'bitlap*.tar.gz' | xargs rm -f
 find docker/ -name 'bitlap*.tar.gz' | xargs rm -f
-find docker/ -name 'static' | xargs rm -rf
 
 
 # make tar
@@ -22,8 +21,6 @@ eval ${cmd}
 # move to dist directory
 if [[ $? -eq 0 ]]; then
   mv ${TAR_FILE} docker/
-  # 拷贝静态文件
-  mv bitlap-server/target/classes/static docker/
   echo "=============================================================================="
   echo "===============  🎉 package end in docker directory !!!  ======================="
   echo "=============================================================================="

@@ -22,7 +22,7 @@ hs_err_pid*
 # project
 dist/
 raft/log
-deploy-dev.sh
+dev/deploy-dev.sh
 /docker/*.tar.gz
 /docker/static
 

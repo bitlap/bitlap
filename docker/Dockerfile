@@ -6,12 +6,10 @@ ARG bitlap_server=bitlap-0.4.0
 ENV folder=/tmp/bitlap
 
 RUN mkdir $folder
-RUN mkdir -p $folder/$bitlap_server/static
 
 WORKDIR $folder
 
 COPY $bitlap_server.tar.gz  $folder/
-COPY static/ $folder/$bitlap_server/static
 COPY entrypoint.sh $folder/$bitlap_server
 
 RUN tar -zxvf $folder/$bitlap_server.tar.gz

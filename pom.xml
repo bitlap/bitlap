@@ -90,7 +90,7 @@
         <scalapb.version>0.11.14</scalapb.version>
         <jupiter.version>5.9.3</jupiter.version>
         <tapir.version>1.9.1</tapir.version>
-        <zio.http.version>3.0.0-RC3</zio.http.version>
+        <zio.http.version>3.0.0-RC4</zio.http.version>
         <zio.logging.version>2.1.16</zio.logging.version>
         <javafaker.version>1.0.2</javafaker.version>
 

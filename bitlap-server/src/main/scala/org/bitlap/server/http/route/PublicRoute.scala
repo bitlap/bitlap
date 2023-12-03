@@ -13,50 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bitlap.server.http.routes
+package org.bitlap.server.http.route
 
 import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.exception.{ BitlapException, BitlapExceptions, BitlapThrowable }
-import org.bitlap.server.http.Response
+import org.bitlap.common.exception.*
+import org.bitlap.server.http._
 
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.EncoderOps
+import sttp.model.StatusCode
 import sttp.tapir.{ AnyEndpoint, Endpoint, Schema, SchemaType }
 import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.json.circe.*
+import sttp.tapir.server.interceptor.CustomiseInterceptors
 import sttp.tapir.ztapir.*
 import zio.ZIO
 
-trait BitlapRoute(name: String) {
-  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapThrowable, Unit, Any]
-
-  // Custom Exception Schema
-  given Schema[BitlapThrowable] =
-    Schema[BitlapThrowable](SchemaType.SProduct(Nil), Some(Schema.SName("BitlapThrowable")))
-
-  // Custom exception serialization
-  given encodeException[A <: BitlapThrowable]: Encoder[A] = (e: A) => Response.fail(e.asInstanceOf[Throwable]).asJson
-
-  // Custom exception deserialization
-  given decodeException[A <: BitlapThrowable]: Decoder[A] = (c: HCursor) =>
-    for {
-      msg <- c.get[String]("msg")
-    } yield BitlapException(msg).asInstanceOf[A]
-
-  // Custom exception codec
-  given exceptionCodec[A <: BitlapThrowable]: JsonCodec[A] =
-    implicitly[JsonCodec[io.circe.Json]].map(json =>
-      json.as[A] match {
-        case Left(_)      => throw new IllegalArgumentException("MessageParsingError")
-        case Right(value) => value
-      }
-    )(_.asJson)
+/** Abstract routes for bitlap public endpoints.
+ */
+trait PublicRoute(name: String) extends CustomExceptionCodec {
 
   // common api
   protected lazy val API: BitlapEndpoint =
     endpoint.in("api" / name).errorOut(customCodecJsonBody[BitlapThrowable])
+
+  type BitlapEndpoint = Endpoint[Unit, Unit, BitlapThrowable, Unit, Any]
 
   protected lazy val endpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = ListBuffer.empty
 
@@ -84,7 +67,7 @@ trait BitlapRoute(name: String) {
     zLogic
   }
 
-  def getEndpoints: ListBuffer[(AnyEndpoint, ZServerEndpoint[Any, Any])] = endpoints
+  def getEndpoints: List[(AnyEndpoint, ZServerEndpoint[Any, Any])] = endpoints.toList
 
   // make zio response
   extension [A](zio: ZIO[Any, Throwable, A]) {
@@ -92,8 +75,9 @@ trait BitlapRoute(name: String) {
     // make response
     def response: ZIO[Any, BitlapThrowable, Response[A]] = zio.mapBoth(
       {
-        case ex: BitlapThrowable => ex
-        case ex                  => BitlapExceptions.unknownException(ex)
+        case ex: BitlapHttpException           => ex
+        case ex: BitlapAuthenticationException => ex
+        case ex                                => BitlapExceptions.unknownException(ex)
       },
       {
         case rr: Response[_] => rr.asInstanceOf[Response[A]]

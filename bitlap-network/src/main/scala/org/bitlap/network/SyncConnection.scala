@@ -67,6 +67,8 @@ final class SyncConnection(user: String, password: String) extends Connection wi
 
   override def open(address: ServerAddress): Unit = open(address, configuration)
 
+  def getSessionId: SessionHandle = this.sessionId
+
   def execute(stmt: String, queryTimeout: Long = 60000, confOverlay: Map[String, String] = Map.empty)
     : BitlapSingleResult = {
     val maxTimeout = if (queryTimeout <= summon[Duration].toMillis) queryTimeout else summon[Duration].toMillis

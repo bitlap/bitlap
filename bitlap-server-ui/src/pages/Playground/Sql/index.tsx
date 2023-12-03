@@ -13,7 +13,10 @@ const sqlQuery = async (
   sqlText: string,
   setColumns: any,
   setData: any,
-  setLoad,
+  setLoad: {
+    (value: React.SetStateAction<boolean>): void;
+    (arg0: boolean): void;
+  },
 ) => {
   if (!sqlText.trim()) return;
   setLoad(true);
@@ -29,6 +32,7 @@ const sqlQuery = async (
 
   // @ts-ignore
   setColumns(
+    // @ts-ignore
     data?.columns?.map((c) => ({
       title: c.name,
       dataIndex: c.name,

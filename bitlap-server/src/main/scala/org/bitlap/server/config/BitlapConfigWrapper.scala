@@ -27,19 +27,19 @@ import zio.*
 
 /** Wrapping configuration, forming a unified layer exposed.
  */
-object BitlapConfiguration:
+object BitlapConfigWrapper:
 
-  lazy val live: ZLayer[Any, Nothing, BitlapConfiguration] = ZLayer.make[BitlapConfiguration](
+  lazy val live: ZLayer[Any, Nothing, BitlapConfigWrapper] = ZLayer.make[BitlapConfigWrapper](
     ZLayer.succeed(org.bitlap.core.BitlapContext.bitlapConf),
-    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapConfiguration(underlayConf))
+    ZLayer.fromFunction((underlayConf: BitlapConf) => BitlapConfigWrapper(underlayConf))
   )
-  lazy val testLive: ZLayer[Any, Nothing, BitlapConfiguration] = live
+  lazy val testLive: ZLayer[Any, Nothing, BitlapConfigWrapper] = live
 
-end BitlapConfiguration
+end BitlapConfigWrapper
 
-final case class BitlapConfiguration(underlayConf: BitlapConf):
+final case class BitlapConfigWrapper(underlayConf: BitlapConf):
 
-  val startTimeout = Duration.create(underlayConf.get(BitlapConfKeys.NODE_START_TIMEOUT))
+  val startTimeout: Duration = Duration.create(underlayConf.get(BitlapConfKeys.NODE_START_TIMEOUT))
 
   val grpcConfig: BitlapGrpcConfig = {
     val addr = underlayConf.get(BitlapConfKeys.NODE_HOST).asServerAddress
@@ -70,4 +70,4 @@ final case class BitlapConfiguration(underlayConf: BitlapConf):
     Duration(underlayConf.getMillis(BitlapConfKeys.NODE_SESSION_EXPIRY_SQL), TimeUnit.MILLISECONDS)
   )
 
-end BitlapConfiguration
+end BitlapConfigWrapper

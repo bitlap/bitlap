@@ -13,6 +13,8 @@ export default defineConfig({
   // base: '',
   // publicPath: '/',
 
+  dva: {},
+
   define: {
     REACT_APP_ENV,
     BITLAP_DEBUG: BITLAP_DEBUG,

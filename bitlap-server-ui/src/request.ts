@@ -1,11 +1,14 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import { history } from 'umi';
 
 // 自定义请求头
 const customHeaders =
-  BITLAP_DEBUG === 'true'
-    ? { 'X-App-Id': 'bitlap-server-ui', 'X-App-Username': BITLAP_IP }
+  // @ts-ignore
+  BITLAP_DEBUG === 'false'
+    ? // @ts-ignore
+      { 'X-App-Id': 'bitlap-server-ui', 'X-App-Username': BITLAP_IP }
     : {};
 
 // 错误处理方案： 错误类型
@@ -16,6 +19,7 @@ enum ErrorShowType {
   NOTIFICATION = 3,
   REDIRECT = 9,
 }
+
 // 与后端约定的响应数据格式
 interface ResponseStructure {
   success: boolean;
@@ -78,7 +82,11 @@ export const requestConfig: RequestConfig = {
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        if (error.response?.data === null) {
+          message.error('请求失败！');
+        } else {
+          message.error(`${error.response?.data?.error}`);
+        }
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
@@ -98,6 +106,35 @@ export const requestConfig: RequestConfig = {
       const url = config?.url?.concat(`?tm=${new Date().getTime()}`);
       return { ...config, url };
     },
+    (url: string, options: RequestConfig) => {
+      const token = window.sessionStorage.getItem('token');
+      const authHeader = { Authorization: token };
+      if (token === null) {
+        if (
+          location! &&
+          location.pathname !== '/pages/user/login' &&
+          // @ts-ignore
+          BITLAP_DEBUG !== 'true'
+        ) {
+          message.error('请登录！');
+          history.push('/pages/user/login');
+        }
+        return {
+          url: `${url}`,
+          options: { ...options, interceptors: true, credentials: 'include' },
+        };
+      } else {
+        return {
+          url: `${url}`,
+          options: {
+            ...options,
+            interceptors: true,
+            headers: authHeader,
+            credentials: 'include',
+          },
+        };
+      }
+    },
   ],
 
   // 响应拦截器
@@ -105,8 +142,15 @@ export const requestConfig: RequestConfig = {
     (response) => {
       // 拦截响应数据，进行个性化处理
       const { data } = response as unknown as ResponseStructure;
+      console.log(data);
 
-      if (data?.errorCode == 200 && data?.status == false) {
+      if (data?.code === 0) {
+        return response;
+      }
+
+      if (data?.error !== null) {
+        message.error(`${data?.error}`);
+      } else {
         message.error('请求失败！');
       }
       return response;
@@ -114,6 +158,7 @@ export const requestConfig: RequestConfig = {
   ],
 
   // 自定义 header
+  // @ts-ignore
   headers: {
     ...customHeaders,
   },

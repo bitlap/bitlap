@@ -17,7 +17,7 @@ package org.bitlap.server
 
 import org.bitlap.network.Driver.ZioDriver.{ DriverService as _, ZDriverService }
 import org.bitlap.network.SyncConnection
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 import org.bitlap.server.service.*
 import org.bitlap.server.session.SessionManager
 
@@ -31,18 +31,18 @@ import zio.*
  */
 object GrpcServerEndpoint:
 
-  val live: ZLayer[BitlapConfiguration, Nothing, GrpcServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapConfiguration) => new GrpcServerEndpoint(config))
+  val live: ZLayer[BitlapConfigWrapper, Nothing, GrpcServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapConfigWrapper) => new GrpcServerEndpoint(config))
 
   def service(
     args: List[String]
   ): ZIO[
-    DriverGrpcServer & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfiguration & SessionManager,
+    DriverGrpcServer & Scope & GrpcServerEndpoint & BitlapGlobalContext & BitlapConfigWrapper & SessionManager,
     Throwable,
     Unit
   ] =
     (for {
-      config <- ZIO.service[BitlapConfiguration]
+      config <- ZIO.service[BitlapConfigWrapper]
       _      <- ZIO.logInfo(s"Grpc Server started at port: ${config.grpcConfig.port}")
       _      <- ZIO.serviceWithZIO[BitlapGlobalContext](_.setSyncConnection(new SyncConnection("root", "")))
       _      <- ZIO.serviceWithZIO[GrpcServerEndpoint](_.runGrpcServer())
@@ -52,7 +52,7 @@ object GrpcServerEndpoint:
 
 end GrpcServerEndpoint
 
-final class GrpcServerEndpoint(config: BitlapConfiguration):
+final class GrpcServerEndpoint(config: BitlapConfigWrapper):
 
   private val serverLayer =
     ServerLayer.fromServiceList(

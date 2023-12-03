@@ -5,13 +5,7 @@
 
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
-import {
-  Github,
-  MenuVisible,
-  Question,
-  SelectLang,
-  UpdateLogs,
-} from '@/components/RightContent';
+import { Github, Question, SelectLang } from '@/components/RightContent';
 import { RunTimeLayoutConfig } from '@@/plugin-layout/types';
 import defaultSettings from '../config/defaultSettings';
 import { requestConfig } from './request';
@@ -20,6 +14,8 @@ import {
   AvatarDropdown,
   AvatarName,
 } from './components/RightContent/AvatarDropdown';
+import { getCurrentUserInfo } from '@/services/user/getUserInfo';
+import { history } from 'umi';
 
 const loginPath = '/pages/user/login';
 
@@ -31,20 +27,25 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     // 本地调试模式
+    // @ts-ignore
     if (BITLAP_DEBUG === 'true') {
       return {
-        id: BITLAP_IP,
+        // @ts-ignore
         name: BITLAP_USER || BITLAP_IP,
         avatar:
           'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       };
     }
-    // return undefined;
-    return {
-      name: 'admin',
-      avatar:
-        'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-    };
+    const item = window.sessionStorage.getItem('user');
+    const user = item ? JSON.parse(item) : {};
+    if (user.username === null) {
+      return {};
+    }
+    // get more detail info?
+    const result = await getCurrentUserInfo(user.username);
+    console.log('fetchUserInfo:' + JSON.stringify(result));
+    // @ts-ignore
+    return result?.data;
   };
 
   // 如果不是登录页面，执行
@@ -81,7 +82,7 @@ export const layout: RunTimeLayoutConfig = ({
       },
     },
     waterMarkProps: {
-      content: currentUser?.name,
+      content: currentUser?.username,
     },
     footerRender: () => <Footer />,
     actionsRender: () => [
@@ -93,11 +94,13 @@ export const layout: RunTimeLayoutConfig = ({
       const { location } = history;
       // 如果没有登录，重定向到 login
       if (
+        location! &&
         !initialState?.currentUser &&
         location.pathname !== loginPath &&
+        // @ts-ignore
         BITLAP_DEBUG !== 'true'
       ) {
-        // history.push(loginPath);
+        history.push(loginPath);
       }
     },
     links: [],

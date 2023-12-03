@@ -15,13 +15,17 @@ const request = extend({
 });
 
 request.interceptors.response.use(async (res, req) => {
-  const { resultCode, errorMessage } = await res.clone().json();
+  const { code, error } = await res.clone().json();
   const { noThrow } = req || {};
-  const msg = errorMessage || '未知错误';
+  const msg = error || '未知错误';
   if (res.status !== 200) {
-    throw new Error(`${res.statusText}`);
+    if (error !== null) {
+      throw new Error(`${msg}`);
+    } else {
+      throw new Error(`${res.statusText}`);
+    }
   } else {
-    if (resultCode !== 0 && !noThrow) {
+    if (code !== 0 && !noThrow) {
       throw new Error(msg);
     }
   }

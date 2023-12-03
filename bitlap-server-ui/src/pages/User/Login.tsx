@@ -2,10 +2,10 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { ProConfigProvider, ProFormText } from '@ant-design/pro-components';
 import type { CSSProperties } from 'react';
 import React from 'react';
-import { Form, theme } from 'antd';
+import { Form, message, theme } from 'antd';
 import { accountLogin } from '@/services/user/login';
 import { LoginForm } from '@ant-design/pro-components';
-import { history } from 'umi';
+import { useModel } from '@@/exports';
 
 const iconStyles: CSSProperties = {
   color: 'rgba(0, 0, 0, 0.2)',
@@ -16,18 +16,29 @@ const iconStyles: CSSProperties = {
 
 export default () => {
   const [form] = Form.useForm();
+  const { setInitialState } = useModel('@@initialState');
   const handleSubmit = async (values: {
     username: string;
     password?: string;
   }) => {
     const result = await accountLogin({ ...values });
-    // @ts-ignore
-    window.sessionStorage.setItem('user', JSON.stringify(result?.data));
-    const pwd = values.password || '';
-    const token = 'Bearer ' + values.username + ':' + pwd;
-    const encodedString = Buffer.from(token).toString('base64');
-    window.sessionStorage.setItem('token', encodedString);
-    history.push({ pathname: '/pages/welcome' });
+    if (result.code === 0) {
+      message.success('登录成功！');
+      await setInitialState((s) => ({
+        ...s,
+        currentUser: result?.data,
+        loading: false,
+      }));
+      const pwd = values.password || '';
+      const token = 'Bearer ' + values.username + ':' + pwd;
+      const encodedString = Buffer.from(token).toString('base64');
+      window.sessionStorage.setItem('user', JSON.stringify(result?.data));
+      window.sessionStorage.setItem('token', encodedString);
+
+      // history.push('/'); not work
+      window.location.href = '/';
+      return;
+    }
   };
   const { token } = theme.useToken();
   return (

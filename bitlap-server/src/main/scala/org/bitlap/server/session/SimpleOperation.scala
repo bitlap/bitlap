@@ -53,7 +53,7 @@ final class SimpleOperation(
             case _ =>
           super.setState(OperationState.FinishedState)
         } catch {
-          case e: Exception =>
+          case e: Throwable =>
             super.setState(OperationState.ErrorState)
             logger.error("Simple operation run failed", e)
         }

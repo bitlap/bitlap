@@ -1,10 +1,7 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { message, Modal, notification } from 'antd';
+import { message, notification } from 'antd';
 import { history } from 'umi';
-import { stringify } from 'querystring';
-import { Navigate } from '@@/exports';
-import initialState from '@@/plugin-initialState/@@initialState';
 
 // 自定义请求头
 const customHeaders =
@@ -119,7 +116,8 @@ export const requestConfig: RequestConfig = {
           // @ts-ignore
           BITLAP_DEBUG !== 'true'
         ) {
-          message.error('请重新登录！');
+          message.error('请登录！');
+          history.push('/pages/user/login');
         }
         return {
           url: `${url}`,

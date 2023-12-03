@@ -52,8 +52,10 @@ trait Authenticator {
         val (user, passwd) = value
         authenticator
           .auth(user, passwd)
-          .mapError(e => BitlapAuthenticationException(e.getMessage, cause = Some(e)))
-
+          .mapError {
+            case ex: BitlapAuthenticationException => ex
+            case e                                 => BitlapAuthenticationException(e.getMessage, cause = Some(e))
+          }
 }
 
 final case class AuthenticationToken(value: String)

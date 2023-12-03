@@ -15,6 +15,7 @@
  */
 package org.bitlap.server.service
 
+import org.bitlap.common.BitlapLogging
 import org.bitlap.common.exception.BitlapAuthenticationException
 import org.bitlap.core.*
 import org.bitlap.core.catalog.metadata.Database
@@ -32,7 +33,7 @@ object AccountAuthenticator:
   val live = ZLayer.succeed(new AccountAuthenticator)
 end AccountAuthenticator
 
-final class AccountAuthenticator extends BitlapSerde {
+final class AccountAuthenticator extends BitlapSerde with BitlapLogging {
 
   // TODO get by name
   def getUserInfoByName(username: String): ZIO[Any, Throwable, AccountInfo] =
@@ -50,10 +51,10 @@ final class AccountAuthenticator extends BitlapSerde {
               .exists(v => deserialize[Boolean](TypeId.BooleanType, v))
           case _ => false
       } catch {
-        case e: Exception =>
-          throw BitlapAuthenticationException("用户名或密码不正确", cause = Option(e))
+        case e: Throwable =>
+          logger.error("Auth failed", e)
+          false
       }
-      // return detail user info
     ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("用户名或密码不正确"))).unit *>
       getUserInfoByName(username)
   }

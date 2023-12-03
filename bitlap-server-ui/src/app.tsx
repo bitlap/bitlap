@@ -37,13 +37,13 @@ export async function getInitialState(): Promise<{
       };
     }
     const item = window.sessionStorage.getItem('user');
-    console.log(item);
     const user = item ? JSON.parse(item) : {};
     if (user.username === null) {
       return {};
     }
     // get more detail info?
     const result = await getCurrentUserInfo(user.username);
+    console.log('fetchUserInfo:' + JSON.stringify(result));
     // @ts-ignore
     return result?.data;
   };

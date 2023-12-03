@@ -6,8 +6,8 @@ const data = {
 export default {
   'GET /api/user/getUserByName': (req: any, res: any) => {
     res.json({
-      resultCode: 0,
-      params: data,
+      code: 0,
+      data: data,
     });
   },
 };

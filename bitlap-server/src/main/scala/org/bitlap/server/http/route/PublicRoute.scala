@@ -77,8 +77,7 @@ trait PublicRoute(name: String) extends CustomExceptionCodec {
       {
         case ex: BitlapHttpException           => ex
         case ex: BitlapAuthenticationException => ex
-        case ex: BitlapThrowable => BitlapExceptions.httpException(StatusCode.InternalServerError.code, ex.errorKey)
-        case ex                  => BitlapExceptions.unknownException(ex)
+        case ex                                => BitlapExceptions.unknownException(ex)
       },
       {
         case rr: Response[_] => rr.asInstanceOf[Response[A]]

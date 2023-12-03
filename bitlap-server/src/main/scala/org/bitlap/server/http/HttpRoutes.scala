@@ -15,32 +15,64 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
+import org.bitlap.common.exception.*
+import org.bitlap.server.http.route.*
 
+import io.circe.generic.auto.*
+import sttp.tapir.*
+import sttp.tapir.generic.auto.*
+import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.ziohttp.ZioHttpInterpreter
+import sttp.tapir.server.interceptor.exception.ExceptionHandler
+import sttp.tapir.server.interceptor.log.DefaultServerLog
+import sttp.tapir.server.interceptor.reject.DefaultRejectHandler
+import sttp.tapir.server.interceptor.reject.RejectHandler
+import sttp.tapir.server.model.ValuedEndpointOutput
+import sttp.tapir.server.ziohttp.{ ZioHttpInterpreter, ZioHttpServerOptions }
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import zio.*
 import zio.http.HttpApp
 
-object HttpRoutes {
+object HttpRoutes:
 
-  val live: ZLayer[ResourceRoute & SqlRoute, Nothing, HttpRoutes] =
-    ZLayer.fromFunction((commonRoute: ResourceRoute, sqlRoute: SqlRoute) => HttpRoutes(commonRoute, sqlRoute))
-}
+  val live: ZLayer[ResourceRoute & SqlRoute & UserRoute, Nothing, HttpRoutes] =
+    ZLayer.fromFunction((commonRoute: ResourceRoute, sqlRoute: SqlRoute, userRoute: UserRoute) =>
+      HttpRoutes(commonRoute, sqlRoute, userRoute)
+    )
+end HttpRoutes
 
-final class HttpRoutes(commonRoute: ResourceRoute, sqlRoute: SqlRoute) {
+/** All HTTP APIs.
+ */
+final class HttpRoutes(commonRoute: ResourceRoute, sqlRoute: SqlRoute, userRoute: UserRoute)
+    extends CustomExceptionHandler
+    with CustomExceptionCodec {
 
   private val swaggerEndpoints: List[ServerEndpoint[Any, Task]] = SwaggerInterpreter().fromServerEndpoints[Task](
-    endpoints = (sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2)).toList,
+    endpoints = sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2),
     title = "Bitlap API",
     version = "1.0"
   )
 
-  def getHttpApp: HttpApp[Any] = ZioHttpInterpreter().toHttp[Any](
-    (sqlRoute.getEndpoints.map(_._2) ++ commonRoute.getEndpoints.map(_._2)).toList ++ swaggerEndpoints ++ List(
-      commonRoute.staticPage,
-      commonRoute.staticDefault
-    )
+  private val serverOptions =
+    ZioHttpServerOptions
+      .customiseInterceptors[Any]
+      .exceptionHandler(exceptionHandler)
+      .defaultHandlers(defaultFailureResponse)
+      .rejectHandler(DefaultRejectHandler.orNotFound[Task])
+      .decodeFailureHandler(decodeFailureHandler)
+      .options
+
+  def getHttpApp: HttpApp[Any] = ZioHttpInterpreter(
+    serverOptions
+  ).toHttp[Any](
+    (userRoute.getEndpoints.map(_._2) ++
+      userRoute.getSecurityEndpoints ++
+      sqlRoute.getEndpoints.map(_._2) ++
+      commonRoute.getEndpoints.map(_._2)) ++
+      swaggerEndpoints ++
+      List(
+        commonRoute.staticPage,
+        commonRoute.staticDefault
+      )
   )
 }

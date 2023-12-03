@@ -2,9 +2,14 @@
 /* eslint-disable */
 
 declare namespace API {
+  type RunSqlResult = {
+    code?: number;
+    error?: string;
+    data?: { list: [any] };
+  };
   type CurrentUser = {
-    id?: string;
-    name?: string;
+    // unique name
+    username?: string;
     nickName?: string;
     avatar?: string;
     email?: string;
@@ -19,23 +24,25 @@ declare namespace API {
     phone?: string;
   };
 
+  type GetUserInfoResult = {
+    code?: number;
+    error?: string;
+    data?: CurrentUser;
+  };
+
   type LoginResult = {
-    status?: string;
-    type?: string;
-    currentAuthority?: string;
+    code?: number;
+    error?: string;
+    data?: CurrentUser;
+  };
+
+  type LogoutResult = {
+    code?: number;
+    error?: string;
   };
 
   type PageParams = {
     current?: number;
     pageSize?: number;
-  };
-
-  type ErrorResponse = {
-    /** 业务约定的错误码 */
-    errorCode: string;
-    /** 业务上的错误信息 */
-    errorMessage?: string;
-    /** 业务上的请求是否成功 */
-    success?: boolean;
   };
 }

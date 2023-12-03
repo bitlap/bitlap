@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java ${{ matrix.jdk-version }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java ${{ matrix.jdk-version }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}
@@ -63,13 +63,14 @@ jobs:
   
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       matrix:
         jdk-version: [ 11 ]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java ${{ matrix.jdk-version }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.jdk-version }}

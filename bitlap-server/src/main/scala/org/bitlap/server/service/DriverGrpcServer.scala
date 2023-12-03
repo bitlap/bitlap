@@ -28,7 +28,7 @@ import io.grpc.*
 import scalapb.zio_grpc.RequestContext
 import zio.*
 
-/** RPC server API implementation
+/** RPC server APIs implementation.
  */
 object DriverGrpcServer:
 
@@ -103,7 +103,7 @@ final class DriverGrpcServer(async: AsyncProtocol, globalContext: BitlapGlobalCo
     val leaderAddress = globalContext.getLeaderAddress()
     leaderAddress.flatMap { ld =>
       if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
-        ZIO.fail(BitlapIllegalArgumentException(s"Invalid ip:port for requestId: ${request.requestId}"))
+        ZIO.fail(BitlapIllegalArgumentException(s"Invalid leader address for requestId: ${request.requestId}"))
       } else {
         ZIO.succeed(ld)
       }

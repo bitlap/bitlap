@@ -15,6 +15,7 @@
  */
 package org.bitlap.server.service
 
+import org.bitlap.common.BitlapLogging
 import org.bitlap.common.exception.BitlapAuthenticationException
 import org.bitlap.core.*
 import org.bitlap.core.catalog.metadata.Database
@@ -22,14 +23,23 @@ import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
+import org.bitlap.server.http.model.AccountInfo
 import org.bitlap.server.session.mapTo
 
 import zio.*
 
-object AccountAuthenticator extends BitlapSerde {
+object AccountAuthenticator:
+  val live = ZLayer.succeed(new AccountAuthenticator)
+end AccountAuthenticator
 
-  def auth(username: String, password: String): ZIO[Any, Throwable, Unit] = {
+final class AccountAuthenticator extends BitlapSerde with BitlapLogging {
+
+  // TODO get by name
+  def getUserInfoByName(username: String): ZIO[Any, Throwable, AccountInfo] =
+    ZIO.succeed(AccountInfo.root)
+
+  def auth(username: String, password: String): ZIO[Any, Throwable, AccountInfo] = {
     val statement: String = s"AUTH $username '$password'"
     val res =
       try {
@@ -41,10 +51,12 @@ object AccountAuthenticator extends BitlapSerde {
               .exists(v => deserialize[Boolean](TypeId.BooleanType, v))
           case _ => false
       } catch {
-        case e: Exception =>
-          throw BitlapAuthenticationException("Auth failed", cause = Option(e))
+        case e: Throwable =>
+          logger.error("Auth failed", e)
+          false
       }
-    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("Auth failed"))).unit
+    ZIO.unless(res)(ZIO.fail(BitlapAuthenticationException("用户名或密码不正确"))).unit *>
+      getUserInfoByName(username)
   }
 
 }

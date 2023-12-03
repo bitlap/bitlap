@@ -15,7 +15,7 @@
  */
 package org.bitlap.server
 
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 import org.bitlap.server.http.HttpRoutes
 
 import zio.{ ExitCode, ZIO, ZLayer }
@@ -27,8 +27,8 @@ import zio.http.netty.NettyConfig.LeakDetectionLevel
  */
 object HttpServerEndpoint:
 
-  val live: ZLayer[BitlapConfiguration & HttpRoutes, Nothing, HttpServerEndpoint] =
-    ZLayer.fromFunction((config: BitlapConfiguration, httpRoutes: HttpRoutes) =>
+  val live: ZLayer[BitlapConfigWrapper & HttpRoutes, Nothing, HttpServerEndpoint] =
+    ZLayer.fromFunction((config: BitlapConfigWrapper, httpRoutes: HttpRoutes) =>
       new HttpServerEndpoint(config, httpRoutes)
     )
 
@@ -37,7 +37,7 @@ object HttpServerEndpoint:
 
 end HttpServerEndpoint
 
-final class HttpServerEndpoint(config: BitlapConfiguration, httpRoutes: HttpRoutes) {
+final class HttpServerEndpoint(config: BitlapConfigWrapper, httpRoutes: HttpRoutes) {
 
   private def runHttpServer(): ZIO[Any, Nothing, ExitCode] =
     (Server

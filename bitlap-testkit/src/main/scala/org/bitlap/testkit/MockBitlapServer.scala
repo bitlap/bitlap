@@ -18,8 +18,9 @@ package org.bitlap.testkit
 import org.bitlap.server.*
 import org.bitlap.server.config.*
 import org.bitlap.server.http.HttpRoutes
-import org.bitlap.server.http.routes.{ ResourceRoute, SqlRoute }
-import org.bitlap.server.http.service.SqlService
+import org.bitlap.server.http.route.*
+import org.bitlap.server.http.service._
+import org.bitlap.server.service._
 import org.bitlap.server.service.DriverGrpcServer
 import org.bitlap.server.session.SessionManager
 import org.bitlap.testkit.MockAsync
@@ -61,14 +62,17 @@ object MockBitlapServer extends ZIOAppDefault {
         MockAsync.live,
         ZIOAppArgs.empty,
         DriverGrpcServer.live,
-        BitlapConfiguration.testLive,
+        BitlapConfigWrapper.testLive,
         BitlapGlobalContext.live,
         SessionManager.live,
         // http
         HttpRoutes.live,
         ResourceRoute.live,
         SqlRoute.live,
-        SqlService.live
+        SqlService.live,
+        UserRoute.live,
+        UserService.live,
+        AccountAuthenticator.live
       )
       .fold(
         e => ZIO.fail(e).exitCode,

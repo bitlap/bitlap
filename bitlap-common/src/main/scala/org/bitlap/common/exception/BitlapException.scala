@@ -17,10 +17,28 @@ package org.bitlap.common.exception
 
 import java.io.IOException
 
-class BitlapException(
+/** Common bitlap throwable
+ */
+sealed trait BitlapThrowable {
+
+  /** the key for the error message, it must be unique. if the error message of the key is null, the key will be the
+   *  default error message.
+   */
+  val errorKey: String
+
+  /** the parameters for the error message
+   */
+  val parameters: Map[String, String]
+
+  /** sql state
+   */
+  def sqlState(): String = this.errorKey.formatSqlState()
+}
+
+final case class BitlapException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends Exception(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
@@ -32,45 +50,45 @@ object BitlapException {
       case _    => Some(arg.errorKey, arg.parameters, arg.cause)
 }
 
-class BitlapRuntimeException(
+final case class BitlapRuntimeException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
-class BitlapNullPointerException(
+final case class BitlapNullPointerException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends NullPointerException(errorKey.formatErrorMessage(parameters))
     with BitlapThrowable
 
-class BitlapIllegalArgumentException(
+final case class BitlapIllegalArgumentException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends IllegalArgumentException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
-class BitlapIllegalStateException(
+final case class BitlapIllegalStateException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends IllegalStateException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
-class BitlapSQLException(
+final case class BitlapSQLException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
-class BitlapIOException(
+final case class BitlapIOException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  val cause: Option[Throwable] = None)
+  cause: Option[Throwable] = None)
     extends IOException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
 
@@ -84,6 +102,7 @@ final case class DataFormatException(
 final case class BitlapAuthenticationException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
+  code: Int = 401,
   cause: Option[Throwable] = None)
     extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable
@@ -91,7 +110,7 @@ final case class BitlapAuthenticationException(
 final case class BitlapHttpException(
   override val errorKey: String,
   override val parameters: Map[String, String] = Map.empty,
-  code: Int,
+  code: Int = 500,
   cause: Option[Throwable] = None)
     extends RuntimeException(errorKey.formatErrorMessage(parameters), cause.orNull)
     with BitlapThrowable

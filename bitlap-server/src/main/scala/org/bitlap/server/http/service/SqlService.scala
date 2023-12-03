@@ -23,7 +23,7 @@ import org.bitlap.common.extension.*
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.http.model.{ underlying, SqlData }
+import org.bitlap.server.http.model._
 
 import zio.*
 
@@ -33,7 +33,7 @@ object SqlService {
     ZLayer.fromFunction((context: BitlapGlobalContext) => SqlService(context))
 }
 
-class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
+final class SqlService(context: BitlapGlobalContext) extends BitlapLogging {
 
   private val conf = context.config.grpcConfig
 

@@ -25,7 +25,7 @@ import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 
 import com.typesafe.scalalogging.LazyLogging
 

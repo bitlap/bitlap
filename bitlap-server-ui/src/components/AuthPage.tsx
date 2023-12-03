@@ -22,7 +22,8 @@ const AuthPage: React.FC<AuthPageProps> = ({
   // > 1. 本地local debug模式
   // > 2. 页面不控制权限
   // > 3. 当前登录用户有 admin 角色
-  if (!auth || BITLAP_DEBUG === 'true' || currentUser?.name === 'admin') {
+  // @ts-ignore
+  if (!auth || BITLAP_DEBUG === 'true' || currentUser?.name === 'root') {
     return (
       <PageContainer title={title} {...restProps}>
         {children}

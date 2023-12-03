@@ -29,7 +29,7 @@ import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 
 import com.typesafe.scalalogging.LazyLogging
 
@@ -41,7 +41,7 @@ abstract class Operation(
   val parentSession: Session,
   val opType: OperationType,
   val hasResultSet: Boolean = false,
-  globalConfig: BitlapConfiguration)
+  globalConfig: BitlapConfigWrapper)
     extends LazyLogging
     with BitlapSerde {
 

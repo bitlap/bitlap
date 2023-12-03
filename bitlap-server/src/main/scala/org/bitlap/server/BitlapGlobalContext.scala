@@ -18,13 +18,13 @@ package org.bitlap.server
 import java.util.Vector as JVector
 import java.util.concurrent.ConcurrentHashMap
 
-import org.bitlap.common.exception.{ BitlapException, BitlapIllegalStateException }
+import org.bitlap.common.exception._
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
-import org.bitlap.network.handles.{ OperationHandle, SessionHandle }
+import org.bitlap.network.handles._
 import org.bitlap.network.protocol.impl.*
 import org.bitlap.server.config.*
-import org.bitlap.server.session.{ Operation, Session, SessionManager }
+import org.bitlap.server.session._
 
 import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.option.CliOptions
@@ -35,7 +35,7 @@ import zio.*
 /** Bitlap inter service context for GRPC, HTTP, Raft data dependencies
  */
 final class BitlapGlobalContext(
-  val config: BitlapConfiguration,
+  val config: BitlapConfigWrapper,
   grpcStarted: Promise[Throwable, Boolean],
   raftStarted: Promise[Throwable, Boolean],
   cliClientServiceRef: Ref[CliClientServiceImpl],
@@ -124,14 +124,14 @@ final class BitlapGlobalContext(
 
 object BitlapGlobalContext:
 
-  lazy val live: ZLayer[BitlapConfiguration, Nothing, BitlapGlobalContext] = ZLayer.fromZIO {
+  lazy val live: ZLayer[BitlapConfigWrapper, Nothing, BitlapGlobalContext] = ZLayer.fromZIO {
     for {
       grpcStart        <- Promise.make[Throwable, Boolean]
       raftStart        <- Promise.make[Throwable, Boolean]
       cliClientService <- Ref.make(new CliClientServiceImpl)
       node             <- Ref.make(Option.empty[Node])
       syncConnection   <- Ref.make(Option.empty[SyncConnection])
-      config           <- ZIO.service[BitlapConfiguration]
+      config           <- ZIO.service[BitlapConfigWrapper]
       sessionManager   <- Ref.make(Option.empty[SessionManager])
     } yield BitlapGlobalContext(
       config,

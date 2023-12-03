@@ -28,7 +28,7 @@ import org.bitlap.network.enumeration.GetInfoType.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.*
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.config.BitlapConfiguration
+import org.bitlap.server.config.BitlapConfigWrapper
 
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.StrictLogging
@@ -49,7 +49,7 @@ final class SimpleLocalSession(
     extends Session
     with StrictLogging {
 
-  given BitlapConfiguration = globalContext.config
+  given BitlapConfigWrapper = globalContext.config
 
   override def executeStatement(
     statement: String,
@@ -90,7 +90,7 @@ final class SimpleLocalSession(
   override def closeOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
       sessionManager    <- globalContext.getSessionManager
-      operationStoreMap <- sessionManager.operationStoreMap.get
+      operationStoreMap <- sessionManager.operations.get
       _ <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         {
@@ -103,7 +103,7 @@ final class SimpleLocalSession(
   override def cancelOperation(operationHandle: OperationHandle): Task[Unit] =
     for {
       sessionManager    <- globalContext.getSessionManager
-      operationStoreMap <- sessionManager.operationStoreMap.get
+      operationStoreMap <- sessionManager.operations.get
       re <- ZIO.attemptBlocking {
         val op = operationStoreMap.getOrDefault(operationHandle, null)
         if op != null then {
@@ -136,8 +136,8 @@ final class SimpleLocalSession(
   ): Task[Operation] =
     for {
       sessionManager        <- globalContext.getSessionManager
-      operationHandleVector <- sessionManager.operationHandleVector.get
-      operationStoreMap     <- sessionManager.operationStoreMap.get
+      operationHandleVector <- sessionManager.operationIds.get
+      operationStoreMap     <- sessionManager.operations.get
       re <- ZIO.attempt {
         val operation = new SimpleOperation(
           parentSession,
@@ -156,8 +156,8 @@ final class SimpleLocalSession(
   private def removeOperation(operationHandle: OperationHandle): Task[Option[Operation]] =
     for {
       sessionManager        <- globalContext.getSessionManager
-      operationHandleVector <- sessionManager.operationHandleVector.get
-      operationStoreMap     <- sessionManager.operationStoreMap.get
+      operationHandleVector <- sessionManager.operationIds.get
+      operationStoreMap     <- sessionManager.operations.get
       re <- ZIO.attemptBlocking {
         val r = operationStoreMap.remove(operationHandle)
         operationHandleVector.remove(operationHandle)
@@ -168,7 +168,7 @@ final class SimpleLocalSession(
   private def removeTimedOutOperation(operationHandle: OperationHandle): Task[Option[Operation]] = {
     for {
       sessionManager    <- globalContext.getSessionManager
-      operationStoreMap <- sessionManager.operationStoreMap.get
+      operationStoreMap <- sessionManager.operations.get
       operation         <- ZIO.succeed(operationStoreMap.get(operationHandle))
       re <-
         if operation != null && operation.isTimedOut(System.currentTimeMillis) then {
@@ -181,7 +181,7 @@ final class SimpleLocalSession(
     for {
       sessionManager        <- globalContext.getSessionManager
       lt                    <- lastAccessTimeRef.get.map(_.get())
-      operationHandleVector <- sessionManager.operationHandleVector.get
+      operationHandleVector <- sessionManager.operationIds.get
       re <- ZIO.attempt {
         val noMoreOpHandle = operationHandleVector.isEmpty
         if noMoreOpHandle then System.currentTimeMillis - lt

@@ -18,7 +18,8 @@
 
 ### 🏠 [Homepage](https://bitlap.org/)
 
-### ✨ [Demo](http://im.dreamylost.cn:18081)
+### ✨ [Demo](http://im.dreamylost.cn:22333/pages/user/login)
+> username:root, no password
 
 ## Author
 

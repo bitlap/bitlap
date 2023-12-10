@@ -15,7 +15,7 @@
  */
 package org.bitlap.core.sql.parser.ddl.user
 
-import org.bitlap.core.sql.parser.{ BitlapSqlDdlCreateNode, BitlapSqlDdlNode }
+import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 import org.bitlap.core.sql.parser.ddl.SqlShowCurrentDatabase
 
 import org.apache.calcite.DataContext

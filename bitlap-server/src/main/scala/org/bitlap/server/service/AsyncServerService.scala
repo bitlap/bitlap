@@ -17,7 +17,7 @@ package org.bitlap.server.service
 
 import scala.util.control.NonFatal
 
-import org.bitlap.common.exception.{ BitlapException, BitlapThrowable }
+import org.bitlap.common.exception._
 import org.bitlap.core.catalog.metadata.Database
 import org.bitlap.network.*
 import org.bitlap.network.enumeration.*

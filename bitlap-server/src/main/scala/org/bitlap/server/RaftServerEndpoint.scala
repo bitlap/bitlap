@@ -22,7 +22,6 @@ import org.bitlap.server.raft.*
 
 import com.alipay.sofa.jraft.Node
 import com.alipay.sofa.jraft.option.NodeOptions
-import com.typesafe.scalalogging.LazyLogging
 
 import zio.{ Runtime as _, * }
 

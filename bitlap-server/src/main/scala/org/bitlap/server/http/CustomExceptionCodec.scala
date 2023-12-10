@@ -15,10 +15,7 @@
  */
 package org.bitlap.server.http
 
-import scala.collection.mutable.ListBuffer
-
 import org.bitlap.common.exception._
-import org.bitlap.server.http.Response
 
 import io.circe.*
 import io.circe.generic.auto.*
@@ -26,8 +23,6 @@ import io.circe.syntax.EncoderOps
 import sttp.tapir.{ Schema, SchemaType }
 import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.json.circe.*
-import sttp.tapir.ztapir.*
-import zio.ZIO
 
 /** Provide a custom decoder, encoder, schema for [[org.bitlap.common.exception.BitlapThrowable]].
  */

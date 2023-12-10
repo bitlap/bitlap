@@ -28,7 +28,6 @@ import org.bitlap.core.sql.PruneTimeFilter
 import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.Enumerable
 import org.apache.calcite.linq4j.Linq4j
-import org.apache.calcite.rel.core.TableScan
 import org.apache.calcite.rex.RexNode
 import org.apache.calcite.util.ImmutableIntList
 

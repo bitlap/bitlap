@@ -15,20 +15,12 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.common.exception.*
 import org.bitlap.server.http.route.*
 
-import io.circe.generic.auto.*
 import sttp.tapir.*
-import sttp.tapir.generic.auto.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.interceptor.exception.ExceptionHandler
-import sttp.tapir.server.interceptor.log.DefaultServerLog
 import sttp.tapir.server.interceptor.reject.DefaultRejectHandler
-import sttp.tapir.server.interceptor.reject.RejectHandler
-import sttp.tapir.server.model.ValuedEndpointOutput
-import sttp.tapir.server.ziohttp.{ ZioHttpInterpreter, ZioHttpServerOptions }
+import sttp.tapir.server.ziohttp.*
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import zio.*
 import zio.http.HttpApp

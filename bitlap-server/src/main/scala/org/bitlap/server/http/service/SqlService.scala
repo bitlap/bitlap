@@ -15,11 +15,7 @@
  */
 package org.bitlap.server.http.service
 
-import scala.util.control.NonFatal
-
 import org.bitlap.common.BitlapLogging
-import org.bitlap.common.exception.BitlapExceptions
-import org.bitlap.common.extension.*
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
 import org.bitlap.server.BitlapGlobalContext

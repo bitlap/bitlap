@@ -15,9 +15,7 @@
  */
 package org.bitlap.core.sql.parser.ddl.user
 
-import org.bitlap.common.LiteralSQL._
-import org.bitlap.common.utils.StringEx.*
-import org.bitlap.core.sql.QueryContext
+import org.bitlap.common.LiteralSQL.*
 import org.bitlap.core.sql.parser.BitlapSqlDdlNode
 
 import org.apache.calcite.DataContext

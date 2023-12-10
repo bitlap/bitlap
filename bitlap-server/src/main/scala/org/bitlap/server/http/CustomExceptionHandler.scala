@@ -15,16 +15,14 @@
  */
 package org.bitlap.server.http
 
-import org.bitlap.common.exception._
+import org.bitlap.common.exception.*
 
-import io.circe.Encoder._
-import sttp.model.{ headers => _, _ }
-import sttp.tapir._
+import sttp.model.{ headers as _, * }
+import sttp.tapir.*
 import sttp.tapir.json.circe.jsonBody
-import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.decodefailure.DefaultDecodeFailureHandler
 import sttp.tapir.server.interceptor.decodefailure.DefaultDecodeFailureHandler.FailureMessages
-import sttp.tapir.server.interceptor.exception._
+import sttp.tapir.server.interceptor.exception.*
 import sttp.tapir.server.model.ValuedEndpointOutput
 import zio.Task
 

@@ -18,16 +18,11 @@ package org.bitlap.server.http.route
 import scala.collection.mutable.ListBuffer
 
 import org.bitlap.common.exception.*
-import org.bitlap.server.http._
+import org.bitlap.server.http.*
 
 import io.circe.*
 import io.circe.generic.auto.*
-import io.circe.syntax.EncoderOps
-import sttp.model.StatusCode
-import sttp.tapir.{ AnyEndpoint, Endpoint, Schema, SchemaType }
-import sttp.tapir.Codec.JsonCodec
-import sttp.tapir.json.circe.*
-import sttp.tapir.server.interceptor.CustomiseInterceptors
+import sttp.tapir.{ AnyEndpoint, Endpoint }
 import sttp.tapir.ztapir.*
 import zio.ZIO
 

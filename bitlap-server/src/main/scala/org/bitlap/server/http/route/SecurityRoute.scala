@@ -21,9 +21,7 @@ import org.bitlap.server.http.model.AccountInfo
 
 import io.circe.*
 import io.circe.generic.auto.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.ztapir.*
-import zio.ZIO
 
 /** Abstract routes for bitlap security endpoints.
  */

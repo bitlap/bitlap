@@ -15,7 +15,7 @@
  */
 package org.bitlap.server.http.model
 
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 inline val DefaultPassword = ""
@@ -32,7 +32,7 @@ final case class AccountInfo(
 object AccountInfo:
 
   def createCookieValue(username: String, password: String): String = {
-    val base64 = Base64.getEncoder.encode(s"Bearer $username:$password".getBytes(Charset.forName("utf8")))
+    val base64 = Base64.getEncoder.encode(s"Bearer $username:$password".getBytes(StandardCharsets.UTF_8))
     new String(base64)
   }
 

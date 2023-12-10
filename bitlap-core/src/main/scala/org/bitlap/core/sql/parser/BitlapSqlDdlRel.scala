@@ -20,7 +20,6 @@ import org.bitlap.core.sql.table.BitlapSqlDdlTable
 import org.apache.calcite.DataContext
 import org.apache.calcite.prepare.RelOptTableImpl
 import org.apache.calcite.rel.RelNode
-import org.apache.calcite.rel.hint.RelHint
 import org.apache.calcite.rel.logical.LogicalTableScan
 import org.apache.calcite.sql.`type`.SqlTypeName
 import org.apache.calcite.sql.SqlOperator

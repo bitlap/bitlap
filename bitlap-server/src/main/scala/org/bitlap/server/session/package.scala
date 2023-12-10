@@ -19,17 +19,12 @@ import java.sql.*
 
 import scala.collection.mutable.ListBuffer
 
-import org.bitlap.common.exception.DataFormatException
+import org.bitlap.common.exception._
 import org.bitlap.core.*
-import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
 import org.bitlap.network.models.*
 import org.bitlap.network.serde.BitlapSerde
-import org.bitlap.server.config.BitlapConfigWrapper
-
-import com.typesafe.scalalogging.LazyLogging
-
-import BitlapSerde._
+import org.bitlap.network.serde.BitlapSerde.*
 
 extension (rs: ResultSet)
 

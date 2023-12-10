@@ -21,7 +21,7 @@ import scala.collection.mutable.ListBuffer
 
 /** Prune time filter to push down
  */
-type TimeFilterFun = (Long) => Boolean
+type TimeFilterFun = Long => Boolean
 
 case class PruneTimeFilterExpr(name: String, func: TimeFilterFun, expr: String)
 

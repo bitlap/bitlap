@@ -15,24 +15,18 @@
  */
 package org.bitlap.server.http.route
 
-import org.bitlap.common.exception._
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.http.{ FormValidator, Response }
+import org.bitlap.server.http.*
 import org.bitlap.server.http.model.*
 import org.bitlap.server.http.service.UserService
 import org.bitlap.server.service.AccountAuthenticator
 
 import io.circe.*
 import io.circe.generic.auto.*
-import sttp.model.HeaderNames.Authorization
-import sttp.model.headers.CookieValueWithMeta
-import sttp.tapir.{ ValidationResult, Validator }
-import sttp.tapir.files.staticResourceGetServerEndpoint
+import sttp.tapir.Validator
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*
-import sttp.tapir.ztapir.query
 import zio.*
 
 object UserRoute:

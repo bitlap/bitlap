@@ -17,8 +17,6 @@ package org.bitlap.testkit
 
 import java.io.*
 
-import scala.util.Using
-
 import bitlap.rolls.csv.*
 import bitlap.rolls.csv.CSVUtils.*
 

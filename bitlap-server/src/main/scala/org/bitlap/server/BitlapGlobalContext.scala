@@ -15,16 +15,11 @@
  */
 package org.bitlap.server
 
-import java.util.Vector as JVector
-import java.util.concurrent.ConcurrentHashMap
-
-import org.bitlap.common.exception._
+import org.bitlap.common.exception.*
 import org.bitlap.common.utils.StringEx
 import org.bitlap.network.*
-import org.bitlap.network.handles._
-import org.bitlap.network.protocol.impl.*
 import org.bitlap.server.config.*
-import org.bitlap.server.session._
+import org.bitlap.server.session.*
 
 import com.alipay.sofa.jraft.*
 import com.alipay.sofa.jraft.option.CliOptions
@@ -81,7 +76,7 @@ final class BitlapGlobalContext(
   def isLeader: ZIO[Any, Throwable, Boolean] =
     isStarted *> nodeRef.get.someOrFail(BitlapIllegalStateException("Cannot find a leader")).map(_.isLeader)
 
-  def getLeaderAddress(): Task[ServerAddress] =
+  def getLeaderOrRefresh(): Task[ServerAddress] =
     for {
       cliClientService <- cliClientServiceRef.get
       peers      = config.raftConfig.initialServerAddressList

@@ -15,8 +15,6 @@
  */
 package org.bitlap.server.session
 
-import java.util.Vector as JVector
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
@@ -34,13 +32,14 @@ import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.StrictLogging
 
 import zio.{ System as _, * }
+import zio.Ref.Synchronized
 
 /** Bitlap session implementation on a single machine
  */
 final class SimpleLocalSession(
   val getOperation: OperationHandle => Task[Operation],
   val sessionHandle: SessionHandle = SessionHandle(HandleIdentifier()),
-  val sessionConfRef: Ref[mutable.Map[String, String]],
+  val sessionConfRef: Synchronized[mutable.Map[String, String]],
   val sessionStateRef: Ref[AtomicBoolean],
   val creationTimeRef: Ref[AtomicLong],
   val lastAccessTimeRef: Ref[AtomicLong],

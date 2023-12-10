@@ -15,7 +15,7 @@
  */
 package org.bitlap.server.service
 
-import org.bitlap.common.exception.BitlapIllegalArgumentException
+import org.bitlap.common.exception._
 import org.bitlap.network.*
 import org.bitlap.network.Driver.*
 import org.bitlap.network.Driver.ZioDriver.ZDriverService
@@ -100,7 +100,7 @@ final class DriverGrpcServer(async: AsyncProtocol, globalContext: BitlapGlobalCo
       .mapBoth(errorApplyFunc, _.toBGetResultSetMetadataResp)
 
   override def getLeader(request: BGetLeaderReq, context: RequestContext): IO[StatusException, BGetLeaderResp] = {
-    val leaderAddress = globalContext.getLeaderAddress()
+    val leaderAddress = globalContext.getLeaderOrRefresh()
     leaderAddress.flatMap { ld =>
       if ld == null || ld.port <= 0 || ld.ip == null || ld.ip.isEmpty then {
         ZIO.fail(BitlapIllegalArgumentException(s"Invalid leader address for requestId: ${request.requestId}"))

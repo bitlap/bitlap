@@ -15,23 +15,20 @@
  */
 package org.bitlap.server.session
 
-import java.util.Date
-import java.util.Vector as JVector
+import java.util.{ Date, Vector as JVector }
 import java.util.concurrent.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.*
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-import org.bitlap.common.exception._
+import org.bitlap.common.exception.*
 import org.bitlap.core.catalog.metadata.Database
-import org.bitlap.network.enumeration._
+import org.bitlap.network.enumeration.*
 import org.bitlap.network.handles.*
 import org.bitlap.network.models.GetInfoValue
 import org.bitlap.server.BitlapGlobalContext
-import org.bitlap.server.config.BitlapConfigWrapper
 import org.bitlap.server.service.AccountAuthenticator
 
 import zio.{ System as _, * }
@@ -132,7 +129,7 @@ final class SessionManager(
       sessionStoreMap    <- sessions.get
       sessionState       <- Ref.make(new AtomicBoolean(true))
       sessionCreateTime  <- Ref.make(new AtomicLong(System.currentTimeMillis()))
-      defaultSessionConf <- Ref.make(mutable.Map(sessionConf.toList: _*))
+      defaultSessionConf <- Synchronized.make(mutable.Map(sessionConf.toList: _*))
       db = sessionConf.getOrElse("DBNAME", Database.DEFAULT_DATABASE)
       defaultSchema <- Ref.make(AtomicReference(db))
       _             <- accountAuthenticator.auth(username, password)

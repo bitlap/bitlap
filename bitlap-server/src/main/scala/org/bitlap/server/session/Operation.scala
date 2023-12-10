@@ -15,16 +15,12 @@
  */
 package org.bitlap.server.session
 
-import java.sql.*
-import java.util.concurrent.{ CountDownLatch, TimeUnit }
+import java.util.concurrent.*
 
 import scala.collection.mutable
 
-import org.bitlap.common.exception.DataFormatException
 import org.bitlap.core.*
-import org.bitlap.core.sql.QueryExecution
 import org.bitlap.network.enumeration.*
-import org.bitlap.network.enumeration.{ OperationState, OperationType }
 import org.bitlap.network.enumeration.OperationState.*
 import org.bitlap.network.handles.OperationHandle
 import org.bitlap.network.models.*

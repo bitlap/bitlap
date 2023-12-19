@@ -105,7 +105,7 @@
         <hadoop.version>3.3.4</hadoop.version>
 
         <!-- plugins -->
-        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <maven.compiler.version>3.12.0</maven.compiler.version>
         <dokka.version>1.7.20</dokka.version>
         <drill-fmpp-maven-plugin.version>1.21.0</drill-fmpp-maven-plugin.version>
         <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>

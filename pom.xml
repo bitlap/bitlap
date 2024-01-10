@@ -110,7 +110,7 @@
         <drill-fmpp-maven-plugin.version>1.21.0</drill-fmpp-maven-plugin.version>
         <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>
         <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
-        <surefire.version>3.2.3</surefire.version>
+        <surefire.version>3.2.5</surefire.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <spotless-maven-plugin.version>2.41.0</spotless-maven-plugin.version>

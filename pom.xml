@@ -77,7 +77,7 @@
         <grpc.netty.version>1.47.0</grpc.netty.version>
 
         <!-- scala -->
-        <scala.version>3.3.1</scala.version>
+        <scala.version>3.4.0</scala.version>
         <scala.binary.version>3</scala.binary.version>
         <rolls.version>0.3.3+1-8d685d4b-SNAPSHOT</rolls.version>
         <scala.logging.version>3.9.5</scala.logging.version>

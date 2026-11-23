@@ -17,7 +17,7 @@ jobs:
       matrix:
         jdk-version: [ 11 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v4
         with:
@@ -42,7 +42,7 @@ jobs:
       matrix:
         jdk-version: [ 11 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v4
         with:
@@ -68,7 +68,7 @@ jobs:
       matrix:
         jdk-version: [ 11 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Setup Java ${{ matrix.jdk-version }}
         uses: actions/setup-java@v4
         with:
